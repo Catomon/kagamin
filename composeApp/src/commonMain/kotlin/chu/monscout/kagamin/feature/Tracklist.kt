@@ -51,7 +51,7 @@ fun Tracklist(state: KagaminViewModel, tracks: List<DenpaTrack>, modifier: Modif
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    track.songAuthorPlusTitle,
+                    track.name,
                     fontSize = 12.sp,
                     color = Color.White,
                     maxLines = 1,

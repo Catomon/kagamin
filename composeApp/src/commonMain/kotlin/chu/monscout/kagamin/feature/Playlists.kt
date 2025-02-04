@@ -2,6 +2,7 @@ package chu.monscout.kagamin.feature
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,7 +28,7 @@ import org.jetbrains.compose.resources.painterResource
 import kotlin.random.Random
 
 @Composable
-fun Playlists(modifier: Modifier = Modifier) {
+fun Playlists(state: KagaminViewModel, modifier: Modifier = Modifier) {
     val playlists by remember { mutableStateOf(loadPlaylists()) }
     LazyColumn(
         modifier,
@@ -38,7 +39,10 @@ fun Playlists(modifier: Modifier = Modifier) {
             val playlist = playlists[it]
             Column(
                 Modifier.background(color = if (it % 2 == 0) Colors.dividers else Colors.background)
-                    .padding(4.dp)
+                    .clickable {
+                        state.currentPlaylistName = playlist.first
+                        state.currentTab = Tabs.TRACKLIST
+                    }.padding(4.dp)
             ) {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,

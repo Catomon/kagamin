@@ -5,7 +5,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHost
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.github.catomon.yukinotes.feature.YukiTheme
 import org.koin.java.KoinJavaComponent.get
 
 @Composable
@@ -13,9 +12,7 @@ fun KagaminApp(
     kagaminViewModel: KagaminViewModel = get(KagaminViewModel::class.java),
     modifier: Modifier = Modifier
 ) {
-    YukiTheme {
-        Scaffold(snackbarHost = { SnackbarHost(LocalSnackbarHostState.current) }, modifier = modifier) {
-            MainScreen(kagaminViewModel)//, modifier)
-        }
+    Scaffold(snackbarHost = { SnackbarHost(LocalSnackbarHostState.current) }, modifier = modifier) {
+        MainScreen(kagaminViewModel)//, modifier)
     }
 }

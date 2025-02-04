@@ -2,7 +2,6 @@ package chu.monscout.kagamin.feature
 
 import DenpaFilePicker
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,13 +10,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,10 +34,7 @@ import createDenpaPlayer
 import createDenpaTrack
 import isValidFileName
 import kagamin.composeapp.generated.resources.Res
-import kagamin.composeapp.generated.resources.add
 import kagamin.composeapp.generated.resources.folder
-import kagamin.composeapp.generated.resources.menu
-import kagamin.composeapp.generated.resources.playlists
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -114,6 +108,7 @@ fun MainScreen(
                 when (it) {
                     Tabs.PLAYLISTS -> {
                         Playlists(
+                            state,
                             Modifier.align(Alignment.Center)
                                 .fillMaxSize()//.padding(start = 4.dp, end = 4.dp)
                         )
@@ -156,66 +151,6 @@ fun MainScreen(
 }
 
 @Composable
-private fun Sidebar(state: KagaminViewModel) {
-    Column(Modifier.fillMaxHeight().width(32.dp).background(color = Colors.bars)) {
-        TextButton(
-            modifier = Modifier.weight(0.3f),
-            onClick = {
-
-            }
-        ) {
-            Image(
-                painterResource(Res.drawable.menu),
-                "Menu",
-                modifier = Modifier.size(32.dp)
-            )
-        }
-
-        TextButton(
-            modifier = Modifier.weight(0.3f),
-            onClick = {
-                if (state.currentTab == Tabs.TRACKLIST)
-                    state.currentTab = Tabs.PLAYLISTS
-                else state.currentTab = Tabs.TRACKLIST
-            }
-        ) {
-            Image(
-                painterResource(Res.drawable.playlists),
-                "Playlists",
-                modifier = Modifier.size(32.dp)
-            )
-        }
-
-        if (state.currentTab == Tabs.PLAYLISTS || state.currentTab == Tabs.TRACKLIST) {
-            TextButton(
-                modifier = Modifier.weight(0.3f),
-                onClick = {
-                    when (state.currentTab) {
-                        Tabs.PLAYLISTS -> {
-                            state.currentTab = Tabs.CREATE_PLAYLIST
-                        }
-
-                        Tabs.TRACKLIST -> {
-                            state.currentTab = Tabs.ADD_TRACKS
-                        }
-
-                        else -> {
-                            //unreachable
-                        }
-                    }
-                }
-            ) {
-                Image(
-                    painterResource(Res.drawable.add),
-                    "Add button",
-                    modifier = Modifier.size(16.dp)
-                )
-            }
-        }
-    }
-}
-
-@Composable
 fun CreatePlaylistTab(state: KagaminViewModel, modifier: Modifier) {
     var name by remember { mutableStateOf("") }
     var isError by remember { mutableStateOf(false) }
@@ -236,7 +171,7 @@ fun CreatePlaylistTab(state: KagaminViewModel, modifier: Modifier) {
                 //state.playlists = loadPlaylists()
                 //name = ""
 
-                state.currentTab = Tabs.PLAYLISTS
+                state.currentTab = Tabs.TRACKLIST
             } else
                 isError = true
         }) {

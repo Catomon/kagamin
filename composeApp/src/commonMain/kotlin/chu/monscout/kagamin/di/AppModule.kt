@@ -1,0 +1,8 @@
+package com.github.catomon.yukinotes.di
+
+import chu.monscout.kagamin.feature.KagaminViewModel
+import org.koin.dsl.module
+
+val appModule = module {
+    factory { KagaminViewModel() }
+}

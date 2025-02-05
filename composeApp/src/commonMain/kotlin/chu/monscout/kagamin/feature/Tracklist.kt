@@ -1,7 +1,7 @@
 package chu.monscout.kagamin.feature
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,15 +19,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import audio.DenpaTrack
-import chu.monscout.kagamin.audio.songAuthorPlusTitle
 import com.github.catomon.yukinotes.feature.Colors
-import kagamin.composeapp.generated.resources.Res
-import kagamin.composeapp.generated.resources.yt_ic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.painterResource
-import kotlin.random.Random
 
 @Composable
 fun Tracklist(state: KagaminViewModel, tracks: List<DenpaTrack>, modifier: Modifier = Modifier) {
@@ -39,7 +33,12 @@ fun Tracklist(state: KagaminViewModel, tracks: List<DenpaTrack>, modifier: Modif
             Box(
                 modifier = Modifier.fillMaxWidth().height(32.dp)
                     .background(color = backColor)
-                    .clickable {
+                    .let {
+                        if (state.currentTrack == track) it.border(
+                            2.dp,
+                            Colors.bars
+                        ) else it
+                    }.clickable {
                         if (state.isLoadingSong != null) return@clickable
                         CoroutineScope(Dispatchers.Default).launch {
                             state.isLoadingSong = track
@@ -63,16 +62,16 @@ fun Tracklist(state: KagaminViewModel, tracks: List<DenpaTrack>, modifier: Modif
                     Modifier.align(Alignment.CenterEnd),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (Random.nextInt(0, 4) == 1)
-                        Image(
-                            painterResource(Res.drawable.yt_ic),
-                            "",
-                            modifier = Modifier.background(
-                                color = backColor,
-                                shape = RoundedCornerShape(4.dp)
-                            )
-                                .padding(horizontal = 2.dp)
-                        )
+//                    if (Random.nextInt(0, 4) == 1)
+//                        Image(
+//                            painterResource(Res.drawable.yt_ic),
+//                            "",
+//                            modifier = Modifier.background(
+//                                color = backColor,
+//                                shape = RoundedCornerShape(4.dp)
+//                            )
+//                                .padding(horizontal = 2.dp)
+//                        )
 
 //                    Text(
 //                        "5:25", //remember { formatMilliseconds(track.duration).take(9) },

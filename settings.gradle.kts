@@ -26,6 +26,7 @@ dependencyResolutionManagement {
         }
         mavenCentral()
         maven("https://jitpack.io")
+        maven(url = "https://maven.lavalink.dev/releases")
     }
 }
 

@@ -15,7 +15,7 @@ kotlin {
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_18)
         }
     }
     
@@ -38,8 +38,8 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
 
-            implementation(libs.room.runtime)
-            implementation(libs.sqlite.bundled)
+//            implementation(libs.room.runtime)
+//            runtimeOnly("androidx.sqlite:sqlite-bundled:2.5.0-alpha13")
             implementation(libs.navigation.compose)
             implementation(libs.koin.core)
             //implementation(libs.datastore)
@@ -49,13 +49,18 @@ kotlin {
 
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.mpfilepicker)
-            implementation(libs.discord.rpc)
-            implementation(libs.lavaplayer)
             implementation(libs.mp3agic)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
+
+            implementation(libs.discord.rpc)
+            implementation(libs.lavaplayer)
+            implementation("org.slf4j:slf4j-api:2.0.7")
+            implementation("org.slf4j:slf4j-simple:2.0.7")
+            implementation("dev.lavalink.youtube:common:1.11.4")
+//            implementation("dev.arbjerg:lavaplayer:2.1.2")
         }
     }
 }
@@ -82,8 +87,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_18
+        targetCompatibility = JavaVersion.VERSION_18
     }
 }
 
@@ -96,9 +101,21 @@ compose.desktop {
         mainClass = "chu.monscout.kagamin.MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "chu.monscout.kagamin"
+            targetFormats(TargetFormat.Msi)//, TargetFormat.Dmg, , TargetFormat.Deb)
+            packageName = "Kagamin"
             packageVersion = "1.0.0"
+
+            modules("java.compiler", "java.instrument", "java.naming", "java.scripting", "java.security.jgss", "java.sql", "jdk.management", "jdk.unsupported")
+
+            buildTypes.release.proguard {
+//                configurationFiles.from(project.file("compose-desktop.pro"))
+                isEnabled = false
+            }
+
+            windows {
+                iconFile.set(project.file("kagamin.ico"))
+                shortcut = true
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 package audio
 
+import chu.monscout.kagamin.audio.DenpaLoader
 import chu.monscout.kagamin.audio.Rich
 import chu.monscout.kagamin.audio.discordRich
 import chu.monscout.kagamin.audio.startDiscordRich

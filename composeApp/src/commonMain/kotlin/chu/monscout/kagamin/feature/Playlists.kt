@@ -1,7 +1,7 @@
 package chu.monscout.kagamin.feature
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,11 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.catomon.yukinotes.feature.Colors
-import kagamin.composeapp.generated.resources.Res
-import kagamin.composeapp.generated.resources.yt_ic
 import loadPlaylists
-import org.jetbrains.compose.resources.painterResource
-import kotlin.random.Random
 
 @Composable
 fun Playlists(state: KagaminViewModel, modifier: Modifier = Modifier) {
@@ -35,13 +31,18 @@ fun Playlists(state: KagaminViewModel, modifier: Modifier = Modifier) {
         state = rememberLazyListState(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        items(playlists.size) {
-            val playlist = playlists[it]
+        items(playlists.size) { i ->
+            val playlist = playlists[i]
             Column(
-                Modifier.background(color = if (it % 2 == 0) Colors.dividers else Colors.background)
+                Modifier.background(color = if (i % 2 == 0) Colors.dividers else Colors.background)
                     .clickable {
                         state.currentPlaylistName = playlist.first
                         state.currentTab = Tabs.TRACKLIST
+                    }.let {
+                        if (state.currentPlaylistName == playlist.first) it.border(
+                            2.dp,
+                            Colors.bars
+                        ) else it
                     }.padding(4.dp)
             ) {
                 Row(
@@ -53,8 +54,8 @@ fun Playlists(state: KagaminViewModel, modifier: Modifier = Modifier) {
                         maxLines = 1
                     )
 
-                    if (Random.nextInt(0, 4) == 1)
-                        Image(painterResource(Res.drawable.yt_ic), "")
+//                    if (Random.nextInt(0, 4) == 1)
+//                        Image(painterResource(Res.drawable.yt_ic), "")
                 }
 
                 Row(Modifier.fillMaxWidth()) {

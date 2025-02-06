@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import kagamin.composeapp.generated.resources.BadComic_Regular
 import kagamin.composeapp.generated.resources.Res
+import loadSettings
 import org.jetbrains.compose.resources.Font
 
 @Composable
@@ -29,13 +30,13 @@ fun YukiTheme(content: @Composable () -> Unit) {
 }
 
 object Themes {
-    val list = listOf(Pink(), Violet(), Blue())
+    val list = listOf(Violet, Pink, Blue)
 
     fun forName(name: String) = list.find { it.name == name }
 
     fun forNameOrFirst(name: String) = list.find { it.name == name } ?: list.first()
 
-    class Pink : IYukiTheme {
+    object Pink : IYukiTheme {
         override val name: String = "yuki"
         override val background = Color(0xffe96c76)
         override val surface = Color(0xfff799b4)
@@ -45,7 +46,7 @@ object Themes {
         override val bars = Color(0xffdc5c73)
     }
 
-    class Violet : IYukiTheme {
+    object Violet : IYukiTheme {
         override val name: String = "gami-kasa"
         override val background = Color(0xff6e4eaa)
         override val surface = Color(0xff916dd6)
@@ -55,7 +56,7 @@ object Themes {
         override val bars = Color(0xFF66419F)
     }
 
-    class Blue : IYukiTheme {
+    object Blue : IYukiTheme {
         override val name: String = "nata"
         override val background = Color(0xff3a55af)
         override val surface = Color(0xff6197de)
@@ -90,11 +91,11 @@ object Colors {
     var background = Color(0xff6e4eaa)
     var bars = Color(0xFF66419F)
     var dividers = Color(0xff8563cc)
-//
-//    init {
-//        currentYukiTheme = Themes.list.find { it.name == loadSettings().theme } ?: Themes.list.first()
-//        updateTheme()
-//    }
+
+    init {
+        currentYukiTheme = Themes.list.find { it.name == loadSettings().theme } ?: Themes.list.first()
+        updateTheme()
+    }
 
     fun updateTheme() {
         noteBackground = currentYukiTheme.surface

@@ -35,7 +35,6 @@ class DenpaTrackJVM(
             author = audioTrack?.info?.author ?: ""
             name = audioTrack?.trackName ?: ""
             duration = audioTrack?.duration ?: Long.MAX_VALUE
-            println(value?.info?.artworkUrl)
         }
 
     constructor(audioTrack: AudioTrack) : this(

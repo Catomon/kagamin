@@ -12,6 +12,7 @@ import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.github.catomon.yukinotes.feature.Colors
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.add
@@ -24,14 +25,14 @@ import org.jetbrains.compose.resources.painterResource
 expect fun MinimizeButton(modifier: Modifier = Modifier)
 
 @Composable
-fun Sidebar(state: KagaminViewModel) {
+fun Sidebar(state: KagaminViewModel, navController: NavHostController) {
     Column(Modifier.fillMaxHeight().width(32.dp).background(color = Colors.bars)) {
         MinimizeButton(modifier = Modifier.weight(0.15f))
 
         TextButton(
             modifier = Modifier.weight(0.15f),
             onClick = {
-
+                navController.navigate(SettingsDestination.toString())
             }
         ) {
             Image(

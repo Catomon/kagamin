@@ -1,26 +1,17 @@
 package chu.monscout.kagamin.feature
 
-import DenpaFilePicker
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,20 +19,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import audio.DenpaTrack
 import com.github.catomon.yukinotes.feature.Colors
 import createDenpaPlayer
 import createDenpaTrack
-import isValidFileName
-import kagamin.composeapp.generated.resources.Res
-import kagamin.composeapp.generated.resources.folder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import loadPlaylist
 import loadSettings
-import org.jetbrains.compose.resources.painterResource
-import savePlaylist
 
 enum class Tabs {
     TRACKLIST, PLAYLISTS, OPTIONS, ADD_TRACKS, CREATE_PLAYLIST,
@@ -67,10 +55,18 @@ class KagaminViewModel : ViewModel() {
     var width by mutableStateOf(0)
 }
 
+@Serializable
+object MainScreenDestination {
+    override fun toString(): String {
+        return "main_screen"
+    }
+}
+
 @Composable
 fun MainScreen(
     state: KagaminViewModel = viewModel { KagaminViewModel() },
-    modifier: Modifier = Modifier
+    navController: NavHostController,
+    modifier: Modifier = Modifier,
 ) {
 
     val denpaPlayer = state.denpaPlayer
@@ -146,61 +142,6 @@ fun MainScreen(
             }
         }
 
-        Sidebar(state)
-    }
-}
-
-@Composable
-fun CreatePlaylistTab(state: KagaminViewModel, modifier: Modifier) {
-    var name by remember { mutableStateOf("") }
-    var isError by remember { mutableStateOf(false) }
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier,
-        verticalArrangement = Arrangement.Center
-    ) {
-        TextField(name, onValueChange = {
-            name = it
-        }, isError = isError)
-
-        Button(onClick = {
-            if (isValidFileName(name)) {
-                state.currentPlaylistName = name
-                savePlaylist(name, emptyArray())
-                //state.playlists = loadPlaylists()
-                //name = ""
-
-                state.currentTab = Tabs.TRACKLIST
-            } else
-                isError = true
-        }) {
-            Text("Create")
-        }
-    }
-}
-
-@Composable
-fun AddTracksTab(state: KagaminViewModel, modifier: Modifier = Modifier) {
-    val showFilePicker = remember { mutableStateOf(false) }
-    DenpaFilePicker(showFilePicker, state.denpaPlayer, state.currentPlaylistName)
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            "Drop files or folders here,\nor select from folder:",
-            textAlign = TextAlign.Center,
-            //color = Colors.noteText
-            modifier = Modifier.padding(horizontal = 8.dp)
-        )
-
-        IconButton(onClick = {
-            showFilePicker.value = true
-        }) {
-            Icon(painterResource(Res.drawable.folder), "Select files from folder")
-        }
+        Sidebar(state, navController)
     }
 }

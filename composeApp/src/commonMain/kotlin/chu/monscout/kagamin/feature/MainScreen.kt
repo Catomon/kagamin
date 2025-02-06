@@ -56,14 +56,14 @@ class KagaminViewModel : ViewModel() {
 }
 
 @Serializable
-object MainScreenDestination {
+object PlayerScreenDestination {
     override fun toString(): String {
-        return "main_screen"
+        return "player_screen"
     }
 }
 
 @Composable
-fun MainScreen(
+fun PlayerScreen(
     state: KagaminViewModel = viewModel { KagaminViewModel() },
     navController: NavHostController,
     modifier: Modifier = Modifier,

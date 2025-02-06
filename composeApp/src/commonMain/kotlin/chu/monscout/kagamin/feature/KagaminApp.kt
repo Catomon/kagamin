@@ -19,9 +19,9 @@ fun KagaminApp(
 
     Scaffold(snackbarHost = { SnackbarHost(LocalSnackbarHostState.current) }, modifier = modifier) {
         NavHost(navController,
-            startDestination = MainScreenDestination.toString()) {
-            composable(MainScreenDestination.toString()) {
-                MainScreen(kagaminViewModel, navController)
+            startDestination = PlayerScreenDestination.toString()) {
+            composable(PlayerScreenDestination.toString()) {
+                PlayerScreen(kagaminViewModel, navController)
             }
 
             composable(SettingsDestination.toString()) {

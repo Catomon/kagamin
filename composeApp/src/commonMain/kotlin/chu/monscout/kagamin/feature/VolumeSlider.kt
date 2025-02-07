@@ -17,15 +17,15 @@ fun VolumeSlider(volumeChanged: (Float) -> Unit, modifier: Modifier = Modifier) 
     val interactionSource = MutableInteractionSource()
     val colors = SliderDefaults.colors(
         Colors.noteBackground,
-        Colors.bars,
+        Colors.background,
         Colors.noteBackground,
-        Colors.bars,
-        Colors.bars,
-        Colors.bars,
-        Colors.bars,
-        Colors.bars,
-        Colors.bars,
-        Colors.bars
+        Colors.background,
+        Colors.background,
+        Colors.background,
+        Colors.background,
+        Colors.background,
+        Colors.background,
+        Colors.background
     )
     Slider(
         value = volume,

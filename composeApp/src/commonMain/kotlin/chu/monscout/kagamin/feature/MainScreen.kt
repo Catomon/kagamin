@@ -96,7 +96,7 @@ fun PlayerScreen(
 
     Row(modifier.background(color = Colors.background)) {
         // Column(modifier.background(color = Colors.bars).fillMaxHeight()) {
-        CurrentTrackFrame(currentTrack, denpaPlayer, Modifier.width(200.dp).fillMaxHeight())
+        CurrentTrackFrame(currentTrack, denpaPlayer, Modifier.width(200.dp).fillMaxHeight().background(color = Colors.bars))
         // }
 
         Box(Modifier.weight(0.75f).background(color = Colors.background)) {

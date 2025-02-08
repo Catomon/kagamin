@@ -1,7 +1,7 @@
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import audio.DenpaPlayer
-import audio.DenpaTrack
+import chu.monscout.kagamin.audio.DenpaPlayer
+import chu.monscout.kagamin.audio.DenpaTrack
 
 actual fun <T : DenpaTrack> createDenpaTrack(uri: String, name: String): T {
     TODO("Not yet implemented")

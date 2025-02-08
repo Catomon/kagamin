@@ -1,4 +1,4 @@
-package audio
+package chu.monscout.kagamin.audio
 
 import javax.sound.sampled.AudioFormat
 import javax.sound.sampled.AudioInputStream

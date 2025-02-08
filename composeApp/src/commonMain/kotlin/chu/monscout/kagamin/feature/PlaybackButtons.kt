@@ -9,15 +9,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.TextButton
+import androidx.compose.material.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
-import audio.DenpaPlayer
-import audio.DenpaTrack
+import chu.monscout.kagamin.audio.DenpaPlayer
+import chu.monscout.kagamin.audio.DenpaTrack
 import com.github.catomon.yukinotes.feature.Colors
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.next
@@ -33,9 +33,8 @@ fun PlaybackButtons(player: DenpaPlayer<DenpaTrack>, modifier: Modifier = Modifi
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        TextButton(
-            modifier = Modifier.size(50.dp).padding(2.dp).clip(shape = RoundedCornerShape(12.dp))
-                .background(color = Colors.noteBackground).padding(0.dp),
+        IconButton(
+            modifier = Modifier.size(50.dp),
             onClick = {
                 player.prevTrack()
             }
@@ -43,14 +42,13 @@ fun PlaybackButtons(player: DenpaPlayer<DenpaTrack>, modifier: Modifier = Modifi
             Image(
                 painterResource(Res.drawable.prev),
                 "Previous",
-                modifier = Modifier.size(48.dp),
-                colorFilter = ColorFilter.tint(Colors.background)
+                modifier = Modifier.size(38.dp),
+                colorFilter = ColorFilter.tint(Colors.noteBackground)
             )
         }
 
-        TextButton(
-            modifier = Modifier.size(66.dp).padding(2.dp).clip(shape = RoundedCornerShape(12.dp))
-                .background(color = Colors.noteBackground).padding(0.dp),
+        IconButton(
+            modifier = Modifier.size(50.dp),
             onClick = {
                 when (player.playState.value) {
                     DenpaPlayer.PlayState.PLAYING -> player.pause()
@@ -64,23 +62,22 @@ fun PlaybackButtons(player: DenpaPlayer<DenpaTrack>, modifier: Modifier = Modifi
                     Image(
                         painterResource(Res.drawable.play),
                         "Play",
-                        modifier = Modifier.size(64.dp),
-                        colorFilter = ColorFilter.tint(Colors.background)
+                        modifier = Modifier.size(48.dp),
+                        colorFilter = ColorFilter.tint(Colors.noteBackground)
                     )
                 } else {
                     Image(
                         painterResource(Res.drawable.pause),
                         "Pause",
                         modifier = Modifier.size(64.dp),
-                        colorFilter = ColorFilter.tint(Colors.background)
+                        colorFilter = ColorFilter.tint(Colors.noteBackground)
                     )
                 }
             }
         }
 
-        TextButton(
-            modifier = Modifier.size(50.dp).padding(2.dp).clip(shape = RoundedCornerShape(12.dp))
-                .background(color = Colors.noteBackground).padding(0.dp),
+        IconButton(
+            modifier = Modifier.size(50.dp),
             onClick = {
                 player.nextTrack()
             }
@@ -88,8 +85,8 @@ fun PlaybackButtons(player: DenpaPlayer<DenpaTrack>, modifier: Modifier = Modifi
             Image(
                 painterResource(Res.drawable.next),
                 "Next",
-                modifier = Modifier.size(48.dp),
-                colorFilter = ColorFilter.tint(Colors.background)
+                modifier = Modifier.size(38.dp),
+                colorFilter = ColorFilter.tint(Colors.noteBackground)
             )
         }
     }

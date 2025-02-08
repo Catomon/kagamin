@@ -1,7 +1,8 @@
-package audio
+package chu.monscout.kagamin.audio
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import chu.monscout.kagamin.audio.DenpaPlayer
 import java.util.LinkedList
 
 abstract class BaseDenpaPlayer<T : DenpaTrack> : DenpaPlayer<T> {
@@ -13,6 +14,7 @@ abstract class BaseDenpaPlayer<T : DenpaTrack> : DenpaPlayer<T> {
     override val playlist: MutableState<MutableList<T>> = mutableStateOf(mutableListOf())
     override val currentTrack: MutableState<T?> = mutableStateOf(null)
     override val volume: MutableState<Float> = mutableStateOf(0.5f)
+    override val fade: MutableState<Boolean> = mutableStateOf(false)
 
     override fun create() {
 

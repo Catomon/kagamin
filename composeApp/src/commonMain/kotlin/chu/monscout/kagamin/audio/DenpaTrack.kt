@@ -1,4 +1,4 @@
-package audio
+package chu.monscout.kagamin.audio
 
 import kotlin.random.Random
 

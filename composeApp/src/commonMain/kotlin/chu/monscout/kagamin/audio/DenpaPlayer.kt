@@ -1,6 +1,7 @@
-package audio
+package chu.monscout.kagamin.audio
 
 import androidx.compose.runtime.MutableState
+import chu.monscout.kagamin.audio.DenpaTrack
 import java.util.LinkedList
 
 interface DenpaPlayer<T : DenpaTrack> {
@@ -26,6 +27,7 @@ interface DenpaPlayer<T : DenpaTrack> {
     val currentTrack: MutableState<T?>
     val volume: MutableState<Float>
     val position: Long get() = -1L
+    val fade: MutableState<Boolean>
 
     fun create()
 

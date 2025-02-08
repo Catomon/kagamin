@@ -12,8 +12,7 @@ import androidx.compose.ui.Modifier
 import com.github.catomon.yukinotes.feature.Colors
 
 @Composable
-fun VolumeSlider(volumeChanged: (Float) -> Unit, modifier: Modifier = Modifier) {
-    var volume by remember { mutableStateOf(0.5f) }
+fun VolumeSlider(volume: Float, volumeChanged: (Float) -> Unit, modifier: Modifier = Modifier) {
     val interactionSource = MutableInteractionSource()
     val colors = SliderDefaults.colors(
         Colors.noteBackground,
@@ -30,7 +29,6 @@ fun VolumeSlider(volumeChanged: (Float) -> Unit, modifier: Modifier = Modifier) 
     Slider(
         value = volume,
         onValueChange = {
-            volume = it
             volumeChanged(it)
         },
         colors = colors,

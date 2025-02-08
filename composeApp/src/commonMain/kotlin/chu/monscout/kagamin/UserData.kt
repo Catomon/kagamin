@@ -1,4 +1,4 @@
-import audio.DenpaTrack
+import chu.monscout.kagamin.audio.DenpaTrack
 import com.github.catomon.yukinotes.feature.Themes
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
@@ -36,13 +36,17 @@ fun loadSettings(): UserSettings {
 }
 
 @Serializable
-class UserSettings(
+data class UserSettings(
     var showTrackProgressBar: Boolean = true,
     var discordIntegration: Boolean = true,
     var japaneseTitle: Boolean = false,
     var theme: String = Themes.list.first().name,
     var alwaysOnTop: Boolean = false,
     var showSingerIcons: Boolean = false,
+    var volume: Float = 0.5f,
+    var random: Boolean = false,
+    var fade: Boolean = false,
+    var repeat: Boolean = false,
 )
 
 //Playlists

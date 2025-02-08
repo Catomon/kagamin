@@ -11,8 +11,8 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toSize
-import audio.DenpaPlayer
-import audio.DenpaTrack
+import chu.monscout.kagamin.audio.DenpaPlayer
+import chu.monscout.kagamin.audio.DenpaTrack
 import java.awt.Desktop
 import java.net.URI
 import java.util.Locale

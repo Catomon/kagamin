@@ -2,7 +2,7 @@ package chu.monscout.kagamin.audio
 
 import appName
 import appNameEng
-import audio.DenpaTrack
+import chu.monscout.kagamin.audio.DenpaTrack
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.denpa

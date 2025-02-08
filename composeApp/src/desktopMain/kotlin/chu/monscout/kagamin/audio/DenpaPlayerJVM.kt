@@ -1,6 +1,7 @@
-package audio
+package chu.monscout.kagamin.audio
 
 import chu.monscout.kagamin.audio.DenpaLoader
+import chu.monscout.kagamin.audio.DenpaPlayer
 import chu.monscout.kagamin.audio.Rich
 import chu.monscout.kagamin.audio.discordRich
 import chu.monscout.kagamin.audio.startDiscordRich
@@ -19,6 +20,7 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason
+import loadSettings
 import java.util.UUID
 
 class DenpaTrackJVM(
@@ -59,7 +61,14 @@ class DenpaPlayerJVM : BaseDenpaPlayer<DenpaTrackJVM>() {
 //        val nipah = ClassLoader.getSystemClassLoader().getResource("nipah.mp3")?.toURI().toString()
 //        loader.playerManager.loadItem(nipah, EmptyAudioResultHandler())
 
-        setVolume(0.5f)
+        val settings = loadSettings()
+        fade.value = settings.fade
+        if (settings.random)
+            playMode.value = DenpaPlayer.PlayMode.RANDOM
+        else
+            if (settings.repeat)
+                playMode.value = DenpaPlayer.PlayMode.REPEAT_TRACK
+        setVolume(settings.volume)
     }
 
     override fun create() {

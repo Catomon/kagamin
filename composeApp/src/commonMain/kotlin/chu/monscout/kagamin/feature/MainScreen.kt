@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import audio.DenpaTrack
+import chu.monscout.kagamin.audio.DenpaTrack
 import com.github.catomon.yukinotes.feature.Colors
 import createDenpaPlayer
 import createDenpaTrack

@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import chu.monscout.kagamin.audio.DenpaPlayer
 import com.github.catomon.yukinotes.feature.Colors
 import com.github.catomon.yukinotes.feature.Themes
 import kotlinx.serialization.Serializable
@@ -80,6 +81,13 @@ fun SettingsScreen(state: KagaminViewModel, navController: NavHostController) {
 
         Button({
             //todo expect exitApp()
+
+            val player = state.denpaPlayer
+            settings.fade = player.fade.value
+            settings.repeat = player.playMode.value == DenpaPlayer.PlayMode.REPEAT_TRACK
+            settings.volume = player.volume.value
+            settings.random = player.playMode.value == DenpaPlayer.PlayMode.RANDOM
+            saveSettings(settings)
             exitProcess(1)
         },
             modifier = Modifier.padding(top = 12.dp)) {

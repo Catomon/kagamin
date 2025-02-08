@@ -46,7 +46,7 @@ fun main() = application {
 
     System.setProperty("skiko.renderApi", "OPENGL")
 
-    val windowState = rememberWindowState(width = 600.dp, height = 300.dp)
+    val windowState = rememberWindowState(width = 600.dp, height = 350.dp)
     val kagaminViewModel: KagaminViewModel = get(KagaminViewModel::class.java)
 
     Window(

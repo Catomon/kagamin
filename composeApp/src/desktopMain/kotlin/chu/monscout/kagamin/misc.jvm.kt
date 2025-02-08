@@ -8,11 +8,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.window.WindowScope
-import audio.DenpaPlayer
-import audio.DenpaTrack
-import audio.DenpaTrackJVM
+import chu.monscout.kagamin.audio.DenpaPlayer
+import chu.monscout.kagamin.audio.DenpaTrack
+import chu.monscout.kagamin.audio.DenpaTrackJVM
 import com.darkrockstudios.libraries.mpfilepicker.MultipleFilePicker
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.awt.MouseInfo

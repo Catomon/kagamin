@@ -3,9 +3,7 @@ package chu.monscout.kagamin.feature
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.TextButton
@@ -13,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.github.catomon.yukinotes.feature.Colors
+import chu.monscout.kagamin.Colors
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.add
 import kagamin.composeapp.generated.resources.menu
@@ -26,7 +24,7 @@ expect fun MinimizeButton(modifier: Modifier = Modifier)
 
 @Composable
 fun Sidebar(state: KagaminViewModel, navController: NavHostController) {
-    Column(Modifier.fillMaxHeight().width(32.dp).background(color = Colors.bars)) {
+    Column(Modifier.fillMaxHeight().width(32.dp).background(color = Colors.bars.copy(alpha = 0.5f))) {
         MinimizeButton(modifier = Modifier.weight(0.15f))
 
         TextButton(

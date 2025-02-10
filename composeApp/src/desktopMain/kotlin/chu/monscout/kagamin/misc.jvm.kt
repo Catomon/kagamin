@@ -1,3 +1,5 @@
+package chu.monscout.kagamin
+
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Box
@@ -27,6 +29,8 @@ actual val userDataFolder: File = File(System.getProperty("user.home"), "AppData
 actual fun <T : DenpaTrack> createDenpaTrack(uri: String, name: String): T {
     return DenpaTrackJVM(uri = uri, name = name) as T
 }
+
+
 
 @Composable
 actual fun DenpaFilePicker(show: MutableState<Boolean>, denpaPlayer: DenpaPlayer<DenpaTrack>, currentPlaylistName: String) {

@@ -1,6 +1,5 @@
-package com.github.catomon.yukinotes.feature
+package chu.monscout.kagamin
 
-import LocalSnackbarHostState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Typography
@@ -11,7 +10,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import kagamin.composeapp.generated.resources.BadComic_Regular
 import kagamin.composeapp.generated.resources.Res
-import loadSettings
 import org.jetbrains.compose.resources.Font
 
 @Composable

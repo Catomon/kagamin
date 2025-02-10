@@ -1,3 +1,5 @@
+package chu.monscout.kagamin
+
 const val appNameJp = "かがみん"
 const val appNameEng = "Kagamin"
 

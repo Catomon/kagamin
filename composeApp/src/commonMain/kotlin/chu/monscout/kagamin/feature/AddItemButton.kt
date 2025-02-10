@@ -8,7 +8,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.github.catomon.yukinotes.feature.Colors
+import chu.monscout.kagamin.Colors
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.add
 import org.jetbrains.compose.resources.painterResource

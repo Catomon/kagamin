@@ -1,3 +1,5 @@
+package chu.monscout.kagamin
+
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState

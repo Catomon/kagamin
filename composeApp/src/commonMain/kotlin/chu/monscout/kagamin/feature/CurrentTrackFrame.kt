@@ -1,5 +1,6 @@
 package chu.monscout.kagamin.feature
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.IconButton
 import androidx.compose.runtime.Composable
@@ -26,24 +26,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope.Companion.DefaultFilterQuality
 import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import chu.monscout.kagamin.audio.DenpaTrack
 import chu.monscout.kagamin.audio.DenpaPlayer
-import com.github.catomon.yukinotes.feature.Colors
-import com.mpatric.mp3agic.Mp3File
+import chu.monscout.kagamin.audio.DenpaTrack
+import chu.monscout.kagamin.Colors
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.fade
-import kagamin.composeapp.generated.resources.kagamin1000
 import kagamin.composeapp.generated.resources.random
 import kagamin.composeapp.generated.resources.repeat_single
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.skia.Image
+
+expect fun getThumbnail(denpaTrack: DenpaTrack): ImageBitmap?
 
 @Composable
 fun CurrentTrackFrame(
@@ -52,15 +51,17 @@ fun CurrentTrackFrame(
     modifier: Modifier = Modifier
 ) {
 
+    //val coroutineScope = rememberCoroutineScope()
+
     var playMode by player.playMode
     var fade by player.fade
 
-    var progress by remember { mutableStateOf(0f) }
+    var progress by remember { mutableStateOf(-1f) }
     val updateProgress = {
         progress = when (currentTrack) {
             null -> 0f
             else -> if (currentTrack.duration > 0 && currentTrack.duration < Long.MAX_VALUE)
-                player.position.toFloat() / currentTrack.duration else 1f
+                player.position.toFloat() / currentTrack.duration else -1f
         }
     }
 
@@ -73,25 +74,29 @@ fun CurrentTrackFrame(
     }
 
     Box(modifier) {
+//        Image(
+//            painterResource(Res.drawable.kagamin1000),
+//            "Track thumbnail",
+//            modifier = modifier,
+//            contentScale = ContentScale.Crop,
+//            colorFilter = ColorFilter.tint(Colors.background)
+//        )
         if (currentTrack == null) {
-            Image(
-                painterResource(Res.drawable.kagamin1000),
-                "Track thumbnail",
-                modifier = modifier,
-                contentScale = ContentScale.Crop,
-            )
+            //    Image(
+            //                painterResource(Res.drawable.kagamin1000),
+            //                "Track thumbnail",
+            //                modifier = modifier,
+            //                contentScale = ContentScale.Crop,
+            //            )
         } else {
-            val image = remember(currentTrack) {
-                try {
-                    val file = Mp3File(currentTrack.uri)
-                    file.id3v2Tag.albumImage?.let { albumImage ->
-                        Image.makeFromEncoded(albumImage)
-                            .toComposeImageBitmap()
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    null
-                }
+            //val defThumb = imageResource(Res.drawable.def_thumb)
+            var image by remember(currentTrack) {
+                mutableStateOf<ImageBitmap?>(null)
+            }
+            var loadingThumb by remember { mutableStateOf(true) }
+            LaunchedEffect(currentTrack) {
+                image = getThumbnail(currentTrack)
+                loadingThumb = false
             }
 
 //                Image(
@@ -117,28 +122,59 @@ fun CurrentTrackFrame(
                             }
                         }
                 ) {
-                    Image(
-                        if (image != null)
-                            remember(image) {
-                                BitmapPainter(
-                                    image,
-                                    filterQuality = DefaultFilterQuality
+                    AnimatedContent(image, modifier = Modifier.fillMaxSize()) {
+                        if (!loadingThumb && image == null) { //this still executes idc
+                            Box(
+                                Modifier.fillMaxSize()
+                            ) {}
+//                            Image(
+//                                remember {
+//                                    BitmapPainter(
+//                                        defThumb,
+//                                        filterQuality = DefaultFilterQuality
+//                                    )
+//                                },
+//                                "Track thumbnail",
+//                                contentScale = ContentScale.Crop,
+//                                modifier = Modifier.fillMaxSize()
+//                            )
+                        } else {
+                            if (loadingThumb || image == null) {
+                                Box(
+                                    Modifier.fillMaxSize()
+                                ) {}
+                            } else {
+                                Image(
+                                    remember {
+                                        BitmapPainter(
+                                            image!!,
+                                            filterQuality = DefaultFilterQuality
+                                        )
+                                    },
+                                    "Track thumbnail",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.fillMaxSize(),
                                 )
                             }
-                        else
-                            painterResource(Res.drawable.kagamin1000),
-                        "Track thumbnail",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-
-                    Row(modifier = Modifier.fillMaxSize()) {
-                        Box(modifier = Modifier.fillMaxHeight().let { val weight = progress; if (weight > 0) it.weight(weight) else it }.background(remember {
-                            Colors.bars.copy(0.5f)
-                        })) { }
-
-                        Box(modifier = Modifier.fillMaxHeight().let { val weight = 1f - progress; if (weight > 0) it.weight(weight) else it }) { }
+                        }
                     }
+
+                    if (progress >= 0)
+                        Row(modifier = Modifier.fillMaxSize()) {
+                            Box(
+                                modifier = Modifier.fillMaxHeight().let {
+                                    val weight = progress; if (weight > 0) it.weight(weight) else it
+                                }.background(remember {
+                                    Colors.bars.copy(0.5f)
+                                })
+                            ) { }
+
+                            Box(
+                                modifier = Modifier.fillMaxHeight().let {
+                                    val weight =
+                                        1f - progress; if (weight > 0) it.weight(weight) else it
+                                }) { }
+                        }
                 }
 
                 PlaybackButtons(

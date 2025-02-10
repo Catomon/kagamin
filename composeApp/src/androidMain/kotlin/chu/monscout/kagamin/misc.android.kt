@@ -1,3 +1,5 @@
+package chu.monscout.kagamin
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import chu.monscout.kagamin.audio.DenpaPlayer

@@ -1,6 +1,6 @@
 package chu.monscout.kagamin.feature
 
-import DenpaFilePicker
+import chu.monscout.kagamin.DenpaFilePicker
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding

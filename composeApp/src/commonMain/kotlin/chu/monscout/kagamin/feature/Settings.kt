@@ -15,11 +15,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import chu.monscout.kagamin.audio.DenpaPlayer
-import com.github.catomon.yukinotes.feature.Colors
-import com.github.catomon.yukinotes.feature.Themes
+import chu.monscout.kagamin.Colors
+import chu.monscout.kagamin.Themes
 import kotlinx.serialization.Serializable
-import loadSettings
-import saveSettings
+import chu.monscout.kagamin.loadSettings
+import chu.monscout.kagamin.saveSettings
 import kotlin.system.exitProcess
 
 @Serializable
@@ -30,14 +30,14 @@ object SettingsDestination {
 }
 
 @Composable
-fun SettingsScreen(state: KagaminViewModel, navController: NavHostController) {
+fun SettingsScreen(state: KagaminViewModel, navController: NavHostController, modifier: Modifier = Modifier) {
     val settings = state.settings
     val theme = state.settings.theme
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize()
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Theme")

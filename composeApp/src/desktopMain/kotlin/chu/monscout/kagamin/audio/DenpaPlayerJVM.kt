@@ -1,12 +1,5 @@
 package chu.monscout.kagamin.audio
 
-import chu.monscout.kagamin.audio.DenpaLoader
-import chu.monscout.kagamin.audio.DenpaPlayer
-import chu.monscout.kagamin.audio.Rich
-import chu.monscout.kagamin.audio.discordRich
-import chu.monscout.kagamin.audio.startDiscordRich
-import chu.monscout.kagamin.audio.stopDiscordRich
-import chu.monscout.kagamin.audio.trackName
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEvent
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventListener
@@ -20,7 +13,7 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason
-import loadSettings
+import chu.monscout.kagamin.loadSettings
 import java.util.UUID
 
 class DenpaTrackJVM(

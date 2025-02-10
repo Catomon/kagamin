@@ -1,5 +1,6 @@
+package chu.monscout.kagamin
+
 import chu.monscout.kagamin.audio.DenpaTrack
-import com.github.catomon.yukinotes.feature.Themes
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

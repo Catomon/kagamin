@@ -1,15 +1,14 @@
 package chu.monscout.kagamin.audio
 
-import appName
-import appNameEng
-import chu.monscout.kagamin.audio.DenpaTrack
+import chu.monscout.kagamin.appName
+import chu.monscout.kagamin.appNameEng
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.denpa
 import kagamin.composeapp.generated.resources.higurashi
 import kagamin.composeapp.generated.resources.nanahira
 import kagamin.composeapp.generated.resources.toromi
-import loadSettings
+import chu.monscout.kagamin.loadSettings
 import net.arikia.dev.drpc.DiscordEventHandlers
 import net.arikia.dev.drpc.DiscordRPC
 import net.arikia.dev.drpc.DiscordRichPresence

@@ -12,8 +12,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import isValidFileName
-import savePlaylist
+import chu.monscout.kagamin.isValidFileName
+import chu.monscout.kagamin.savePlaylist
 
 @Composable
 fun CreatePlaylistTab(state: KagaminViewModel, modifier: Modifier) {
@@ -33,7 +33,7 @@ fun CreatePlaylistTab(state: KagaminViewModel, modifier: Modifier) {
             if (isValidFileName(name)) {
                 state.currentPlaylistName = name
                 savePlaylist(name, emptyArray())
-                //state.playlists = loadPlaylists()
+                //state.playlists = chu.monscout.kagamin.loadPlaylists()
                 //name = ""
 
                 state.currentTab = Tabs.TRACKLIST

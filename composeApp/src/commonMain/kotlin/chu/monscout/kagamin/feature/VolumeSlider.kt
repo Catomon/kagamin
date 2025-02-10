@@ -4,12 +4,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.material.Slider
 import androidx.compose.material.SliderDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.github.catomon.yukinotes.feature.Colors
+import chu.monscout.kagamin.Colors
 
 @Composable
 fun VolumeSlider(volume: Float, volumeChanged: (Float) -> Unit, modifier: Modifier = Modifier) {

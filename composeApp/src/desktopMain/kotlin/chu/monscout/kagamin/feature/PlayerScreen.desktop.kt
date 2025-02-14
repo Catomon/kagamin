@@ -4,9 +4,15 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -17,15 +23,17 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import chu.monscout.kagamin.Colors
 import chu.monscout.kagamin.createDenpaTrack
+import chu.monscout.kagamin.loadPlaylist
 import kagamin.composeapp.generated.resources.Res
+import kagamin.composeapp.generated.resources.star64
 import kagamin.composeapp.generated.resources.stars_background
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import chu.monscout.kagamin.loadPlaylist
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -67,14 +75,32 @@ actual fun PlayerScreen(
             colorFilter = ColorFilter.tint(Colors.bars)
         )
 
-        Row() {
+        Row {
+            Column(Modifier.fillMaxHeight().background(color = Colors.bars.copy(alpha = 0.5f))) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(4.dp)
+                ) {
+                    Image(
+                        painterResource(Res.drawable.star64),
+                        "App icon",
+                        colorFilter = ColorFilter.tint(Colors.noteBackground),
+                        modifier = Modifier.size(24.dp).offset(y = (-3).dp)
+                    )
+                    Text(
+                        "Kagamin", //かがみん
+                        color = Colors.noteBackground,
+                        fontSize = 16.sp,
+                        modifier = Modifier.height(32.dp)
+                    )
+                }
 
-            CurrentTrackFrame(
-                currentTrack,
-                denpaPlayer,
-                Modifier.width(180.dp).fillMaxHeight()
-                    .background(color = Colors.bars.copy(alpha = 0.5f))
-            )
+                CurrentTrackFrame(
+                    currentTrack,
+                    denpaPlayer,
+                    Modifier.width(180.dp).fillMaxHeight())
+            }
+
 
             Box(Modifier.weight(0.75f)) {
                 AnimatedContent(state.currentTab) {

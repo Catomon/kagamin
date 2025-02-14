@@ -37,7 +37,7 @@ fun loadSettings(): UserSettings {
 }
 
 @Serializable
-data class UserSettings(
+class UserSettings(
     var showTrackProgressBar: Boolean = true,
     var discordIntegration: Boolean = true,
     var japaneseTitle: Boolean = false,

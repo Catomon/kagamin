@@ -2,6 +2,7 @@ package chu.monscout.kagamin.feature
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -12,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import chu.monscout.kagamin.isValidFileName
 import chu.monscout.kagamin.savePlaylist
 
@@ -27,7 +29,7 @@ fun CreatePlaylistTab(state: KagaminViewModel, modifier: Modifier) {
     ) {
         TextField(name, onValueChange = {
             name = it
-        }, isError = isError, singleLine = true, label = { Text("New playlist") })
+        }, isError = isError, singleLine = true, label = { Text("New playlist") }, modifier = Modifier.padding(horizontal = 8.dp))
 
         Button(onClick = {
             if (isValidFileName(name)) {

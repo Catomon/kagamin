@@ -117,7 +117,7 @@ fun WindowScope.App(kagaminViewModel: KagaminViewModel = get(KagaminViewModel::c
 
                                         //fixme
                                         GlobalScope.launch {
-                                            snackbar.showSnackbar("${musicFiles.size} file's were added.")
+                                            snackbar.showSnackbar("${musicFiles.size} files were added.")
                                         }
                                         return true
                                     } catch (ex: Exception) {

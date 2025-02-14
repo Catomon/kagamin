@@ -4,8 +4,6 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.rememberScrollableState
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -45,6 +44,7 @@ import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.fade
 import kagamin.composeapp.generated.resources.random
 import kagamin.composeapp.generated.resources.repeat_single
+import kagamin.composeapp.generated.resources.star64
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 
@@ -89,7 +89,10 @@ fun CurrentTrackFrame(
                 loadingThumb = false
             }
 
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier.height(160.dp).padding(8.dp)

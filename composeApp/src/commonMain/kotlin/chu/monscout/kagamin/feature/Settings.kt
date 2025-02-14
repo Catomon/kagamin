@@ -1,5 +1,6 @@
 package chu.monscout.kagamin.feature
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,47 +38,51 @@ fun SettingsScreen(state: KagaminViewModel, navController: NavHostController, mo
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize().background(Colors.background)
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("Theme")
-            RadioButton(
-                theme == Themes.Violet.name,
-                colors = RadioButtonDefaults.colors(Themes.Violet.bars, Themes.Violet.surface),
-                onClick = {
-                    Colors.currentYukiTheme = Themes.Violet
-                    settings.theme = Themes.Violet.name
-                    saveSettings(settings)
-                    state.settings = loadSettings()
-                    Colors.updateTheme()
-                })
-            RadioButton(
-                theme == Themes.Pink.name,
-                colors = RadioButtonDefaults.colors(Themes.Pink.bars, Themes.Pink.surface),
-                onClick = {
-                    Colors.currentYukiTheme = Themes.Pink
-                    settings.theme = Themes.Pink.name
-                    saveSettings(settings)
-                    state.settings = loadSettings()
-                    Colors.updateTheme()
-                })
-            RadioButton(
-                theme == Themes.Blue.name,
-                colors = RadioButtonDefaults.colors(Themes.Blue.bars, Themes.Blue.surface),
-                onClick = {
-                    Colors.currentYukiTheme = Themes.Blue
-                    settings.theme = Themes.Blue.name
-                    saveSettings(settings)
-                    state.settings = loadSettings()
-                    Colors.updateTheme()
-                })
+        Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(0.9f)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Theme")
+                RadioButton(
+                    theme == Themes.Violet.name,
+                    colors = RadioButtonDefaults.colors(Themes.Violet.bars, Themes.Violet.surface),
+                    onClick = {
+                        Colors.currentYukiTheme = Themes.Violet
+                        settings.theme = Themes.Violet.name
+                        saveSettings(settings)
+                        state.settings = loadSettings()
+                        Colors.updateTheme()
+                    })
+                RadioButton(
+                    theme == Themes.Pink.name,
+                    colors = RadioButtonDefaults.colors(Themes.Pink.bars, Themes.Pink.surface),
+                    onClick = {
+                        Colors.currentYukiTheme = Themes.Pink
+                        settings.theme = Themes.Pink.name
+                        saveSettings(settings)
+                        state.settings = loadSettings()
+                        Colors.updateTheme()
+                    })
+                RadioButton(
+                    theme == Themes.Blue.name,
+                    colors = RadioButtonDefaults.colors(Themes.Blue.bars, Themes.Blue.surface),
+                    onClick = {
+                        Colors.currentYukiTheme = Themes.Blue
+                        settings.theme = Themes.Blue.name
+                        saveSettings(settings)
+                        state.settings = loadSettings()
+                        Colors.updateTheme()
+                    })
+            }
+
+            Button({
+                navController.popBackStack()
+            }) {
+                Text("Return")
+            }
+
         }
 
-        Button({
-            navController.popBackStack()
-        }) {
-            Text("Return")
-        }
 
         Button({
             //todo expect exitApp()

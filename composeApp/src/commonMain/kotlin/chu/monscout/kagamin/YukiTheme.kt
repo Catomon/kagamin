@@ -41,17 +41,17 @@ object Themes {
         override val surfaceSecondary = Color(0xffee8890)
         override val font = Color(0xFFFFFFFF)
         override val fontSecondary = Color(0xFFFFE1EA)
-        override val bars = Color(0xffdc5c73)
+        override val bars = Color(0xffc94d63)
     }
 
     object Violet : IYukiTheme {
         override val name: String = "gami-kasa"
-        override val background = Color(0xff6e4eaa)
+        override val background = Color(0xff7852be)
         override val surface = Color(0xff916dd6)
         override val surfaceSecondary = Color(0xff8563cc)
         override val font = Color(0xFFFFFFFF)
         override val fontSecondary = Color(0xFFDECCFF)
-        override val bars = Color(0xFF66419F)
+        override val bars = Color(0xff6232a9)
     }
 
     object Blue : IYukiTheme {
@@ -86,7 +86,7 @@ object Colors {
     var noteTextHeadline = Color(0xFFFFFFFF)
     var noteText = Color(0xFFDECCFF)
     var noteTextSmall = Color(0xFFDECCFF)
-    var background = Color(0xff6e4eaa)
+    var background = Color(0xff7852be)
     var bars = Color(0xFF66419F)
     var dividers = Color(0xff8563cc)
 

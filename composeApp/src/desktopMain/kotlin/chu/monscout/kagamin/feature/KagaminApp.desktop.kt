@@ -11,9 +11,9 @@ import androidx.navigation.compose.rememberNavController
 import org.koin.java.KoinJavaComponent.get
 
 @Composable
-fun KagaminApp(
-    kagaminViewModel: KagaminViewModel = get(KagaminViewModel::class.java),
-    modifier: Modifier = Modifier
+actual fun KagaminApp(
+    kagaminViewModel: KagaminViewModel,
+    modifier: Modifier
 ) {
     val navController = rememberNavController()
 

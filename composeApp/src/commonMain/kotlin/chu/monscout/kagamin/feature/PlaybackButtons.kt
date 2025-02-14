@@ -25,12 +25,12 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun PlaybackButtons(player: DenpaPlayer<DenpaTrack>, modifier: Modifier = Modifier) {
     Row(
-        modifier = modifier.height(66.dp),//.background(Colors.noteBackground.copy(alpha = 0.75f)),
+        modifier = modifier.height(48.dp),//.background(Colors.noteBackground.copy(alpha = 0.75f)),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(
-            modifier = Modifier.size(50.dp),
+            modifier = Modifier.size(32.dp),
             onClick = {
                 player.prevTrack()
             }
@@ -38,13 +38,13 @@ fun PlaybackButtons(player: DenpaPlayer<DenpaTrack>, modifier: Modifier = Modifi
             Image(
                 painterResource(Res.drawable.prev),
                 "Previous",
-                modifier = Modifier.size(38.dp),
+                modifier = Modifier.size(32.dp),
                 colorFilter = ColorFilter.tint(Colors.noteBackground)
             )
         }
 
         IconButton(
-            modifier = Modifier.size(50.dp),
+            modifier = Modifier.size(40.dp),
             onClick = {
                 when (player.playState.value) {
                     DenpaPlayer.PlayState.PLAYING -> player.pause()
@@ -58,14 +58,14 @@ fun PlaybackButtons(player: DenpaPlayer<DenpaTrack>, modifier: Modifier = Modifi
                     Image(
                         painterResource(Res.drawable.play),
                         "Play",
-                        modifier = Modifier.size(48.dp),
+                        modifier = Modifier.size(40.dp),
                         colorFilter = ColorFilter.tint(Colors.noteBackground)
                     )
                 } else {
                     Image(
                         painterResource(Res.drawable.pause),
                         "Pause",
-                        modifier = Modifier.size(64.dp),
+                        modifier = Modifier.size(40.dp),
                         colorFilter = ColorFilter.tint(Colors.noteBackground)
                     )
                 }
@@ -73,7 +73,7 @@ fun PlaybackButtons(player: DenpaPlayer<DenpaTrack>, modifier: Modifier = Modifi
         }
 
         IconButton(
-            modifier = Modifier.size(50.dp),
+            modifier = Modifier.size(32.dp),
             onClick = {
                 player.nextTrack()
             }
@@ -81,7 +81,7 @@ fun PlaybackButtons(player: DenpaPlayer<DenpaTrack>, modifier: Modifier = Modifi
             Image(
                 painterResource(Res.drawable.next),
                 "Next",
-                modifier = Modifier.size(38.dp),
+                modifier = Modifier.size(32.dp),
                 colorFilter = ColorFilter.tint(Colors.noteBackground)
             )
         }

@@ -14,6 +14,8 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason
 import chu.monscout.kagamin.loadSettings
+import java.io.File
+import java.net.URI
 import java.util.UUID
 
 class DenpaTrackJVM(
@@ -38,6 +40,10 @@ class DenpaTrackJVM(
         audioTrack.info.author,
         audioTrack.trackName
     )
+
+    override fun equals(other: Any?): Boolean {
+        return other is DenpaTrack && uri == other.uri
+    }
 }
 
 class DenpaPlayerJVM : BaseDenpaPlayer<DenpaTrackJVM>() {
@@ -81,7 +87,7 @@ class DenpaPlayerJVM : BaseDenpaPlayer<DenpaTrackJVM>() {
             return true
         }
 
-        return loader.player.startTrack(track.audioTrack!!.makeClone(), false) and super.play(track)
+        return if (!loader.player.startTrack(track.audioTrack!!.makeClone(), false) and super.play(track)) nextTrack() != null else true
     }
 
     override fun prevTrack(): DenpaTrackJVM? {
@@ -93,11 +99,32 @@ class DenpaPlayerJVM : BaseDenpaPlayer<DenpaTrackJVM>() {
         return nextDenpaTrack
     }
 
+    private var filePlayTried = 0
+
     override fun nextTrack(): DenpaTrackJVM? {
         val nextDenpaTrack = super.nextTrack()
 
         loader.player.stopTrack()
-        play(nextDenpaTrack ?: return null)
+
+        nextDenpaTrack ?: return null
+
+        if (!nextDenpaTrack.uri.startsWith("http")) {
+            if (filePlayTried >= playlist.value.size) {
+                println("playlist has no files to play")
+                return null
+            }
+            filePlayTried++
+
+            if (!File(nextDenpaTrack.uri).exists()) {
+                println("track file does not exist: ${nextDenpaTrack.uri}")
+
+                return nextTrack()
+            }
+        }
+
+        filePlayTried = 0
+
+        play(nextDenpaTrack)
 
         return nextDenpaTrack
     }

@@ -27,7 +27,7 @@ actual fun PlaylistItem(
     clear: () -> Unit
 ) {
         Column(
-            Modifier.background(color = if (i % 2 == 0) Colors.dividers else Colors.background)
+            Modifier.background(color = if (i % 2 == 0) Colors.dividers.copy(alpha = 0.50f) else Colors.background.copy(alpha = 0.50f))
                 .clickable {
                     state.currentPlaylistName = playlist.first
                     state.currentTab = Tabs.TRACKLIST

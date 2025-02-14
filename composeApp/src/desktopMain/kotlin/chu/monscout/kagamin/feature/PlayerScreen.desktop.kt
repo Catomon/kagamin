@@ -72,7 +72,7 @@ actual fun PlayerScreen(
             CurrentTrackFrame(
                 currentTrack,
                 denpaPlayer,
-                Modifier.width(200.dp).fillMaxHeight()
+                Modifier.width(180.dp).fillMaxHeight()
                     .background(color = Colors.bars.copy(alpha = 0.5f))
             )
 

@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,11 +29,11 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 actual fun TrackItem(
     index: Int,
-    tracksManager: TracksManager,
     track: DenpaTrack,
-    clipboard: ClipboardManager,
-    coroutineScope: CoroutineScope,
-    state: KagaminViewModel
+    tracklistManager: TracklistManager,
+    state: KagaminViewModel,
+    onClick: () -> Unit,
+    modifier: Modifier
 ) {
     val backColor =
         if (index % 2 == 0) Colors.dividers.copy(alpha = 0.50f) else Colors.background.copy(alpha = 0.50f)
@@ -51,8 +50,8 @@ actual fun TrackItem(
                 ) else it
             }
             .clickable {
-                if (tracksManager.isAnySelected) {
-                    tracksManager.select(index, track)
+                if (tracklistManager.isAnySelected) {
+                    tracklistManager.select(index, track)
                     return@clickable
                 }
                 if (state.isLoadingSong != null) return@clickable
@@ -78,7 +77,7 @@ actual fun TrackItem(
             Modifier.align(Alignment.CenterEnd),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (tracksManager.selected.contains(index))
+            if (tracklistManager.selected.contains(index))
                 Icon(painterResource(Res.drawable.selected), null)
         }
     }

@@ -4,6 +4,8 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,8 +16,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.IconButton
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -32,9 +37,10 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import chu.monscout.kagamin.Colors
 import chu.monscout.kagamin.audio.DenpaPlayer
 import chu.monscout.kagamin.audio.DenpaTrack
-import chu.monscout.kagamin.Colors
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.fade
 import kagamin.composeapp.generated.resources.random
@@ -50,9 +56,6 @@ fun CurrentTrackFrame(
     player: DenpaPlayer<DenpaTrack>,
     modifier: Modifier = Modifier
 ) {
-
-    //val coroutineScope = rememberCoroutineScope()
-
     var playMode by player.playMode
     var fade by player.fade
 
@@ -74,22 +77,9 @@ fun CurrentTrackFrame(
     }
 
     Box(modifier) {
-//        Image(
-//            painterResource(Res.drawable.kagamin1000),
-//            "Track thumbnail",
-//            modifier = modifier,
-//            contentScale = ContentScale.Crop,
-//            colorFilter = ColorFilter.tint(Colors.background)
-//        )
         if (currentTrack == null) {
-            //    Image(
-            //                painterResource(Res.drawable.kagamin1000),
-            //                "Track thumbnail",
-            //                modifier = modifier,
-            //                contentScale = ContentScale.Crop,
-            //            )
+            //
         } else {
-            //val defThumb = imageResource(Res.drawable.def_thumb)
             var image by remember(currentTrack) {
                 mutableStateOf<ImageBitmap?>(null)
             }
@@ -99,18 +89,10 @@ fun CurrentTrackFrame(
                 loadingThumb = false
             }
 
-//                Image(
-//                    image,
-//                    "Background track thumbnail",
-//                    modifier = Modifier.fillMaxSize().align(Alignment.Center).blur(16.dp).graphicsLayer(1.35f, 1.35f).alpha(0.75f),
-//                    contentScale = ContentScale.Crop,
-//                )
-
-
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Box(
                     contentAlignment = Alignment.Center,
-                    modifier = Modifier.height(184.dp).padding(8.dp)
+                    modifier = Modifier.height(160.dp).padding(8.dp)
                         .clip(
                             RoundedCornerShape(12.dp)
                         ).pointerInput(currentTrack) {
@@ -127,17 +109,6 @@ fun CurrentTrackFrame(
                             Box(
                                 Modifier.fillMaxSize()
                             ) {}
-//                            Image(
-//                                remember {
-//                                    BitmapPainter(
-//                                        defThumb,
-//                                        filterQuality = DefaultFilterQuality
-//                                    )
-//                                },
-//                                "Track thumbnail",
-//                                contentScale = ContentScale.Crop,
-//                                modifier = Modifier.fillMaxSize()
-//                            )
                         } else {
                             if (loadingThumb || image == null) {
                                 Box(
@@ -192,7 +163,7 @@ fun CurrentTrackFrame(
                     }, modifier = Modifier.size(32.dp)) {
                         Image(
                             painterResource(Res.drawable.fade),
-                            "fade in/out",
+                            "crossfade",
                             colorFilter =
                             if (fade)
                                 ColorFilter.tint(Colors.noteBackground)
@@ -237,114 +208,31 @@ fun CurrentTrackFrame(
                         )
                     }
                 }
-//
-//                IconButton(
-//                    {
-//                        when (playMode) {
-//                            DenpaPlayer.PlayMode.ONCE -> {
-//                                player.playMode.value = DenpaPlayer.PlayMode.REPEAT_TRACK
-//
-//                            }
-//
-//                            DenpaPlayer.PlayMode.REPEAT_TRACK -> {
-//                                player.playMode.value = DenpaPlayer.PlayMode.PLAYLIST
-//
-//                            }
-//
-//                            DenpaPlayer.PlayMode.PLAYLIST -> {
-//                                player.playMode.value = DenpaPlayer.PlayMode.REPEAT_PLAYLIST
-//
-//                            }
-//
-//                            DenpaPlayer.PlayMode.REPEAT_PLAYLIST -> {
-//                                player.playMode.value = DenpaPlayer.PlayMode.RANDOM
-//                            }
-//
-//                            DenpaPlayer.PlayMode.RANDOM -> {
-//                                player.playMode.value = DenpaPlayer.PlayMode.ONCE
-//                            }
-//                        }
-//                    },
-//                    modifier = Modifier.size(32.dp)
-//                ) {
-//                    AnimatedContent(playMode, modifier = Modifier.size(32.dp)) {
-//                        when (it) {
-//                            DenpaPlayer.PlayMode.ONCE -> {
-//                                Image(
-//                                    painterResource(Res.drawable.single),
-//                                    null,
-//                                    modifier = Modifier.size(32.dp),
-//                                    colorFilter = ColorFilter.tint(Colors.noteBackground)
-//                                )
-//                            }
-//
-//                            DenpaPlayer.PlayMode.REPEAT_TRACK -> {
-//                                Image(
-//                                    painterResource(Res.drawable.repeat_single),
-//                                    null,
-//                                    modifier = Modifier.size(32.dp),
-//                                    colorFilter = ColorFilter.tint(Colors.noteBackground)
-//                                )
-//                            }
-//
-//                            DenpaPlayer.PlayMode.PLAYLIST -> {
-//                                Image(
-//                                    painterResource(Res.drawable.playlist),
-//                                    null,
-//                                    modifier = Modifier.size(32.dp),
-//                                    colorFilter = ColorFilter.tint(Colors.noteBackground)
-//                                )
-//                            }
-//
-//                            DenpaPlayer.PlayMode.REPEAT_PLAYLIST -> {
-//                                Image(
-//                                    painterResource(Res.drawable.repeat_all),
-//                                    null,
-//                                    modifier = Modifier.size(32.dp),
-//                                    colorFilter = ColorFilter.tint(Colors.noteBackground)
-//                                )
-//                            }
-//
-//                            DenpaPlayer.PlayMode.RANDOM -> {
-//                                Image(
-//                                    painterResource(Res.drawable.random),
-//                                    null,
-//                                    modifier = Modifier.size(32.dp),
-//                                    colorFilter = ColorFilter.tint(Colors.noteBackground)
-//                                )
-//                            }
-//                        }
-//                    }
-//                }
 
                 var volume by player.volume
                 VolumeSlider(
                     volume,
                     { newVolume -> volume = newVolume; player.setVolume(newVolume) },
-                    Modifier.fillMaxWidth().padding(8.dp)
+                    Modifier.fillMaxWidth().padding(horizontal = 18.dp)
                 )
+
+                //TrackInfoText(currentTrack, Modifier.padding(horizontal = 16.dp))
             }
-//                    Image(
-//                        image,
-//                        "Track thumbnail",
-//                        modifier = Modifier.height(184.dp).padding(8.dp).align(Alignment.TopCenter).clip(
-//                            RoundedCornerShape(12.dp)
-//                        ),
-//                        contentScale = ContentScale.Crop,
-//                    )
-
-
         }
-
-//        Image(
-//            painterResource(Res.drawable.kagamin1000),
-//            "Track thumbnail",
-//            modifier = Modifier.fillMaxSize().align(Alignment.Center),
-//            contentScale = ContentScale.Crop,
-//        )
-
-//        PlaybackButtons(player = player, Modifier.fillMaxWidth().align(Alignment.BottomCenter))
-
-
     }
+}
+
+@Composable
+private fun TrackInfoText(track: DenpaTrack?, modifier: Modifier = Modifier) {
+    val text = remember(track) {
+        """
+        |${track?.name}
+        """.trimMargin()
+    }
+
+    Text(
+        text, fontSize = 10.sp,
+        modifier = modifier.verticalScroll(rememberScrollState()),
+        color = Colors.noteBackground
+    )
 }

@@ -46,7 +46,7 @@ data class UserSettings(
     var showSingerIcons: Boolean = false,
     var volume: Float = 0.5f,
     var random: Boolean = false,
-    var fade: Boolean = false,
+    var fade: Boolean = true,
     var repeat: Boolean = false,
 )
 

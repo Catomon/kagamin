@@ -27,14 +27,12 @@ fun CreatePlaylistTab(state: KagaminViewModel, modifier: Modifier) {
     ) {
         TextField(name, onValueChange = {
             name = it
-        }, isError = isError)
+        }, isError = isError, singleLine = true, label = { Text("New playlist") })
 
         Button(onClick = {
             if (isValidFileName(name)) {
                 state.currentPlaylistName = name
                 savePlaylist(name, emptyArray())
-                //state.playlists = chu.monscout.kagamin.loadPlaylists()
-                //name = ""
 
                 state.currentTab = Tabs.TRACKLIST
             } else

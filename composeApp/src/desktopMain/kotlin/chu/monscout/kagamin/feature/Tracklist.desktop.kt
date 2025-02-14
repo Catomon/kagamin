@@ -11,103 +11,66 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import chu.monscout.kagamin.audio.DenpaTrack
 import chu.monscout.kagamin.Colors
+import chu.monscout.kagamin.audio.DenpaTrack
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.selected
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
-import chu.monscout.kagamin.savePlaylist
 
 @Composable
 actual fun TrackItem(
     index: Int,
-    tracksManager: TracksManager,
     track: DenpaTrack,
-    clipboard: ClipboardManager,
-    coroutineScope: CoroutineScope,
-    state: KagaminViewModel
+    tracklistManager: TracklistManager,
+    state: KagaminViewModel,
+    onClick: () -> Unit,
+    modifier: Modifier
 ) {
-    val backColor =
+    val clipboard = LocalClipboardManager.current
+    val isHeader = index == -1
+    val backColor = if (isHeader) Colors.bars.copy(alpha = 0.50f) else
         if (index % 2 == 0) Colors.dividers.copy(alpha = 0.50f) else Colors.background.copy(alpha = 0.50f)
     ContextMenuArea(items = {
         listOf(
             ContextMenuItem("Select") {
-                tracksManager.select(index, track)
+                if (!isHeader)
+                tracklistManager.select(index, track)
             },
-            if (tracksManager.isAnySelected) {
+            if (tracklistManager.isAnySelected) {
                 ContextMenuItem("Deselect All") {
-                    tracksManager.deselectAll()
+                    tracklistManager.deselectAll()
                 }
             } else {
                 ContextMenuItem("Copy URI") {
                     clipboard.setText(AnnotatedString(track.uri))
                 }
             },
-            ContextMenuItem(if (tracksManager.isAnySelected) "Remove selected" else "Remove") {
-                coroutineScope.launch {
-                    if (tracksManager.isAnySelected) {
-                        tracksManager.selected.values.forEach { track ->
-                            state.isLoadingSong = track
-                            state.denpaPlayer.removeFromPlaylist(track)
-                            state.denpaPlayer.playlist.value =
-                                state.denpaPlayer.playlist.value
-                            savePlaylist(
-                                state.currentPlaylistName,
-                                state.denpaPlayer.playlist.value.toTypedArray()
-                            )
-                            //listState.scrollToItem(i, -60)
-                            state.isLoadingSong = null
-                        }
-
-                        tracksManager.deselectAll()
-                    } else {
-                        state.isLoadingSong = track
-                        state.denpaPlayer.removeFromPlaylist(track)
-                        state.denpaPlayer.playlist.value =
-                            state.denpaPlayer.playlist.value
-                        savePlaylist(
-                            state.currentPlaylistName,
-                            state.denpaPlayer.playlist.value.toTypedArray()
-                        )
-                        //listState.scrollToItem(i, -60)
-                        state.isLoadingSong = null
-                    }
-                }
+            ContextMenuItem(if (tracklistManager.isAnySelected) "Remove selected" else "Remove") {
+                tracklistManager.contextMenuRemovePressed(state, track)
             },
         )
     }) {
         Box(
-            modifier = Modifier.fillMaxWidth().height(32.dp)
+            modifier = modifier.fillMaxWidth().height(32.dp)
                 .background(color = backColor)
-                .let {
-                    if (state.currentTrack == track) it.border(
-                        2.dp,
-                        Colors.bars
-                    ) else it
-                }.clickable {
-                    if (tracksManager.isAnySelected) {
-                        tracksManager.select(index, track)
-                        return@clickable
-                    }
-                    if (state.isLoadingSong != null) return@clickable
-                    CoroutineScope(Dispatchers.Default).launch {
-                        state.isLoadingSong = track
-                        state.denpaPlayer.play(track)
-                        state.isLoadingSong = null
-                    }
+              .clickable {
+                    onClick()
                 }
                 .padding(4.dp),
             contentAlignment = Alignment.Center
@@ -117,15 +80,26 @@ actual fun TrackItem(
                 fontSize = 12.sp,
                 color = Color.White,
                 maxLines = 1,
-                modifier = Modifier.align(Alignment.CenterStart),
-                overflow = TextOverflow.Ellipsis
+                modifier = Modifier.align(Alignment.CenterStart).let {
+                    if (state.currentTrack == track && !isHeader) it.drawBehind {
+                        val strokeWidthPx = 1.dp.toPx()
+                        val verticalOffset = size.height - 2.sp.toPx()
+                        drawLine(
+                            color = Colors.noteText,
+                            strokeWidth = strokeWidthPx,
+                            start = Offset(0f, verticalOffset),
+                            end = Offset(size.width, verticalOffset)
+                        )
+                    } else it
+                },
+                overflow = TextOverflow.Ellipsis,
             )
 
             Row(
                 Modifier.align(Alignment.CenterEnd),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                if (tracksManager.selected.contains(index))
+                if (tracklistManager.selected.contains(index))
                     Icon(painterResource(Res.drawable.selected), null)
             }
         }

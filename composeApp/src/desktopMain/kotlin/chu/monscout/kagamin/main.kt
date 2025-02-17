@@ -46,6 +46,8 @@ import org.koin.java.KoinJavaComponent.get
 import java.awt.datatransfer.DataFlavor
 import java.io.File
 
+var isCompost = false
+
 fun main() {
     setDefaultUncaughtExceptionHandler()
 
@@ -60,6 +62,7 @@ fun main() {
             e.printStackTrace()
         }
 
+        isCompost = true
         AppContainer(::exitApplication)
     }
 }

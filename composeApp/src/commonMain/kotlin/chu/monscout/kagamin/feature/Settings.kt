@@ -45,7 +45,7 @@ fun SettingsScreen(
     val theme = state.settings.theme
 
     Box(modifier = modifier.fillMaxSize().background(Colors.background), contentAlignment = Alignment.Center) {
-        Text("ver. 1.0", Modifier.align(Alignment.BottomStart).padding(start = 6.dp))
+        Text("ver. 1.0.2", Modifier.align(Alignment.BottomStart).padding(start = 6.dp))
 
         Text("github.com/Catomon", Modifier.align(Alignment.BottomEnd).padding(end = 6.dp).clickable {
             openInBrowser("https://github.com/Catomon")

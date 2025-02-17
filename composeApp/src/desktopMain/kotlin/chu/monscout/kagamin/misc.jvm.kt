@@ -46,21 +46,23 @@ fun setDefaultUncaughtExceptionHandler() {
         File("last_error.txt").writeText(e.stackTraceToString())
         e.printStackTrace()
 
-        application {
-            Window(
-                onCloseRequest = ::exitApplication,
-                state = rememberWindowState(width = 300.dp, height = 250.dp),
-                visible = true,
-                title = "Error",
-            ) {
-                val clipboard = LocalClipboardManager.current
+        if (!isCompost) {
+            application {
+                Window(
+                    onCloseRequest = ::exitApplication,
+                    state = rememberWindowState(width = 300.dp, height = 250.dp),
+                    visible = true,
+                    title = "Error",
+                ) {
+                    val clipboard = LocalClipboardManager.current
 
-                Box(contentAlignment = Alignment.Center) {
-                    Text(e.stackTraceToString(), Modifier.fillMaxSize())
-                    Button({
-                        clipboard.setText(AnnotatedString(e.stackTraceToString()))
-                    }, Modifier.align(Alignment.BottomCenter)) {
-                        Text("Copy")
+                    Box(contentAlignment = Alignment.Center) {
+                        Text(e.stackTraceToString(), Modifier.fillMaxSize())
+                        Button({
+                            clipboard.setText(AnnotatedString(e.stackTraceToString()))
+                        }, Modifier.align(Alignment.BottomCenter)) {
+                            Text("Copy")
+                        }
                     }
                 }
             }

@@ -104,9 +104,12 @@ class DenpaPlayerJVM : BaseDenpaPlayer<DenpaTrackJVM>() {
     override fun nextTrack(): DenpaTrackJVM? {
         val nextDenpaTrack = super.nextTrack()
 
-        loader.player.stopTrack()
+        nextDenpaTrack ?: let {
+            stop()
+            return null
+        }
 
-        nextDenpaTrack ?: return null
+        loader.player.stopTrack()
 
         if (!nextDenpaTrack.uri.startsWith("http")) {
             if (filePlayTried >= playlist.value.size) {

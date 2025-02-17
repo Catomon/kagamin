@@ -2,13 +2,13 @@ package chu.monscout.kagamin.audio
 
 import chu.monscout.kagamin.appName
 import chu.monscout.kagamin.appNameEng
+import chu.monscout.kagamin.loadSettings
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.denpa
 import kagamin.composeapp.generated.resources.higurashi
 import kagamin.composeapp.generated.resources.nanahira
 import kagamin.composeapp.generated.resources.toromi
-import chu.monscout.kagamin.loadSettings
 import net.arikia.dev.drpc.DiscordEventHandlers
 import net.arikia.dev.drpc.DiscordRPC
 import net.arikia.dev.drpc.DiscordRichPresence
@@ -19,11 +19,22 @@ var discordRichDisabled = !loadSettings().discordIntegration
 var showSongDetails = true
 
 fun startDiscordRich() {
-    DiscordRPC.discordInitialize("1335867032759042058", DiscordEventHandlers(), true)
+    try {
+        DiscordRPC.discordInitialize("1335867032759042058", DiscordEventHandlers(), true)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        discordRichDisabled = true
+    }
+
 }
 
 fun stopDiscordRich() {
-    DiscordRPC.discordShutdown()
+    try {
+        DiscordRPC.discordShutdown()
+    } catch (e: Exception) {
+        e.printStackTrace()
+        discordRichDisabled = true
+    }
 }
 
 enum class Rich {
@@ -61,7 +72,11 @@ class Singer(
 val singers: Array<Singer> = arrayOf(
     Singer(arrayOf("Nanahira", "ななひら")).res(Res.drawable.nanahira),
     Singer(arrayOf("Toromi", "とろ美")).res(Res.drawable.toromi),
-    Singer("ひぐらしのなく頃に", "Higurashi").icons("higurashi", "higurashi_satoko", "higurashi_rena")
+    Singer("ひぐらしのなく頃に", "Higurashi").icons(
+        "higurashi",
+        "higurashi_satoko",
+        "higurashi_rena"
+    )
         .res(Res.drawable.higurashi),
     Singer("33.turbo"),
     Singer("Choko"),

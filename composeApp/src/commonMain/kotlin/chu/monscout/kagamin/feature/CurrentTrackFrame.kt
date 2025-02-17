@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -44,7 +43,6 @@ import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.fade
 import kagamin.composeapp.generated.resources.random
 import kagamin.composeapp.generated.resources.repeat_single
-import kagamin.composeapp.generated.resources.star64
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 
@@ -77,15 +75,12 @@ fun CurrentTrackFrame(
     }
 
     Box(modifier) {
-        if (currentTrack == null) {
-            //
-        } else {
             var image by remember(currentTrack) {
                 mutableStateOf<ImageBitmap?>(null)
             }
             var loadingThumb by remember { mutableStateOf(true) }
             LaunchedEffect(currentTrack) {
-                image = getThumbnail(currentTrack)
+                image = if (currentTrack != null) getThumbnail(currentTrack) else null
                 loadingThumb = false
             }
 
@@ -221,7 +216,7 @@ fun CurrentTrackFrame(
 
                 //TrackInfoText(currentTrack, Modifier.padding(horizontal = 16.dp))
             }
-        }
+
     }
 }
 

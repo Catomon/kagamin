@@ -14,7 +14,7 @@ import kotlinx.serialization.Serializable
 import chu.monscout.kagamin.loadSettings
 
 enum class Tabs {
-    TRACKLIST, PLAYLISTS, OPTIONS, ADD_TRACKS, CREATE_PLAYLIST,
+    TRACKLIST, PLAYLISTS, OPTIONS, ADD_TRACKS, CREATE_PLAYLIST, PLAYBACK
 }
 
 class KagaminViewModel : ViewModel() {

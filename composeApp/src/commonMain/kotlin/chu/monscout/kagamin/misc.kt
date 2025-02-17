@@ -4,21 +4,11 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.FilterQuality
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.toSize
 import chu.monscout.kagamin.audio.DenpaPlayer
 import chu.monscout.kagamin.audio.DenpaTrack
 import java.awt.Desktop
 import java.net.URI
 import java.util.Locale
-import kotlin.math.roundToInt
 
 expect fun <T : DenpaTrack> createDenpaTrack(uri: String, name: String): T
 
@@ -43,11 +33,20 @@ fun openGitHub() {
     openInBrowser(URI.create("https://github.com/Catomon"))
 }
 
+fun openInBrowser(url: String) {
+    openInBrowser(URI.create(url))
+}
+
 fun openInBrowser(uri: URI) {
-    val osName by lazy(LazyThreadSafetyMode.NONE) { System.getProperty("os.name").lowercase(Locale.getDefault()) }
+    val osName by lazy(LazyThreadSafetyMode.NONE) {
+        System.getProperty("os.name").lowercase(Locale.getDefault())
+    }
     val desktop = Desktop.getDesktop()
     when {
-        Desktop.isDesktopSupported() && desktop.isSupported(Desktop.Action.BROWSE) -> desktop.browse(uri)
+        Desktop.isDesktopSupported() && desktop.isSupported(Desktop.Action.BROWSE) -> desktop.browse(
+            uri
+        )
+
         "mac" in osName -> Runtime.getRuntime().exec("open $uri")
         "nix" in osName || "nux" in osName -> Runtime.getRuntime().exec("xdg-open $uri")
         //else -> throw RuntimeException("cannot open $uri")

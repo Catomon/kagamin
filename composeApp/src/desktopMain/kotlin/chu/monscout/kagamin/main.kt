@@ -9,7 +9,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -18,16 +22,22 @@ import androidx.compose.ui.draganddrop.DragAndDropEvent
 import androidx.compose.ui.draganddrop.DragAndDropTarget
 import androidx.compose.ui.draganddrop.awtTransferable
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowScope
+import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import chu.monscout.kagamin.feature.KagaminApp
 import chu.monscout.kagamin.feature.KagaminViewModel
 import com.github.catomon.yukinotes.di.appModule
 import kagamin.composeapp.generated.resources.Res
-import kagamin.composeapp.generated.resources.kagamin32
+import kagamin.composeapp.generated.resources.star_icon64
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
@@ -36,20 +46,114 @@ import org.koin.java.KoinJavaComponent.get
 import java.awt.datatransfer.DataFlavor
 import java.io.File
 
-fun main() = application {
-    startKoin {
-        modules(appModule)
+fun main() {
+    setDefaultUncaughtExceptionHandler()
+
+    application {
+        startKoin {
+            modules(appModule)
+        }
+
+        try {
+            System.setProperty("skiko.renderApi", "OPENGL")
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        AppContainer(::exitApplication)
+    }
+}
+
+@Composable
+fun AppContainer(onCloseRequest: () -> Unit) {
+    val windowState = rememberWindowState(width = 600.dp, height = 350.dp) // 212 328
+    val kagaminViewModel: KagaminViewModel = remember { get(KagaminViewModel::class.java) }
+    val layoutManager = remember { LayoutManager() }
+    val currentLayout by layoutManager.currentLayout
+
+    LaunchedEffect(currentLayout) {
+        when (currentLayout) {
+            LayoutManager.Layout.Default -> {
+                windowState.size = DpSize(600.dp, 350.dp)
+            }
+
+            LayoutManager.Layout.Compact -> {
+                windowState.size = DpSize(212.dp, 328.dp)
+            }
+
+            LayoutManager.Layout.Tiny -> TODO()
+        }
     }
 
-    System.setProperty("skiko.renderApi", "OPENGL")
+    CompositionLocalProvider(
+        LocalLayoutManager provides layoutManager
+    ) {
+        DefaultLayoutWindow(windowState, kagaminViewModel, onCloseRequest)
 
-    val windowState = rememberWindowState(width = 600.dp, height = 350.dp)
-    val kagaminViewModel: KagaminViewModel = get(KagaminViewModel::class.java)
+//        when (currentLayout) {
+//            LayoutManager.Layout.Default -> {
+//                DefaultLayoutWindow(windowState, kagaminViewModel, ::exitApplication)
+//            }
+//
+//            LayoutManager.Layout.Compact -> {
+//
+//            }
+//
+//            LayoutManager.Layout.Tiny -> {
+//
+//            }
+//        }
+    }
+}
+
+@Composable
+private fun DefaultLayoutWindow(
+    windowState: WindowState,
+    kagaminViewModel: KagaminViewModel,
+    onCloseRequest: () -> Unit
+) {
+    val layoutManager = LocalLayoutManager.current
 
     Window(
-        onCloseRequest = ::exitApplication,
+        onCloseRequest = onCloseRequest,
         title = "Kagamin",
-        icon = painterResource(Res.drawable.kagamin32),
+        icon = painterResource(Res.drawable.star_icon64),
+        state = windowState,
+        undecorated = true,
+        transparent = true,
+        onPreviewKeyEvent = {
+            if (it.type == KeyEventType.KeyDown && it.key == Key.F2) {
+                if (layoutManager.currentLayout.value == LayoutManager.Layout.Default) {
+                    layoutManager.currentLayout.value = LayoutManager.Layout.Compact
+                } else {
+                    layoutManager.currentLayout.value = LayoutManager.Layout.Default
+                }
+                false
+            } else {
+                false
+            }
+        }
+    ) {
+        CompositionLocalProvider(
+            LocalWindow provides this.window,
+        ) {
+            YukiTheme {
+                App(kagaminViewModel)
+            }
+        }
+    }
+}
+
+@Composable
+private fun CompactLayoutWindow(
+    windowState: WindowState,
+    kagaminViewModel: KagaminViewModel,
+    onCloseRequest: () -> Unit
+) {
+    Window(
+        onCloseRequest = onCloseRequest,
+        title = "Kagamin",
+        icon = painterResource(Res.drawable.star_icon64),
         state = windowState,
         undecorated = true,
         transparent = true,
@@ -58,14 +162,28 @@ fun main() = application {
             LocalWindow provides this.window,
         ) {
             YukiTheme {
-                App()
+                App(kagaminViewModel)
             }
         }
     }
 }
 
+val LocalLayoutManager = compositionLocalOf<LayoutManager> {
+    error("no layout manager provided")
+}
+
 val LocalWindow = compositionLocalOf<ComposeWindow> {
     error("No window")
+}
+
+class LayoutManager(
+    val currentLayout: MutableState<Layout> = mutableStateOf(Layout.Default)
+) {
+    enum class Layout {
+        Default,
+        Compact,
+        Tiny,
+    }
 }
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
@@ -90,9 +208,9 @@ fun WindowScope.App(kagaminViewModel: KagaminViewModel = get(KagaminViewModel::c
                         override fun onDrop(event: DragAndDropEvent): Boolean {
                             event.awtTransferable.let {
                                 if (it.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-                                    val droppedFiles =
-                                        it.getTransferData(DataFlavor.javaFileListFlavor) as List<File>
                                     try {
+                                        val droppedFiles =
+                                            it.getTransferData(DataFlavor.javaFileListFlavor) as List<File>
                                         val musicFiles = ArrayList<File>(1000)
                                         fun filterMusicFiles(files: List<File>) {
                                             for (file in files) {

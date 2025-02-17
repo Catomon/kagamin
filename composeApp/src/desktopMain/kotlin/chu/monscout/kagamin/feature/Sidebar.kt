@@ -15,6 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import chu.monscout.kagamin.Colors
+import chu.monscout.kagamin.LayoutManager
+import chu.monscout.kagamin.LocalLayoutManager
 import chu.monscout.kagamin.LocalWindow
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.add
@@ -24,6 +26,7 @@ import kagamin.composeapp.generated.resources.menu
 import kagamin.composeapp.generated.resources.minimize_window
 import kagamin.composeapp.generated.resources.music_note
 import kagamin.composeapp.generated.resources.playlists
+import kagamin.composeapp.generated.resources.tiny_star_icon
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -41,9 +44,11 @@ fun MinimizeButton(modifier: Modifier) {
 }
 
 @Composable
-fun Sidebar(state: KagaminViewModel, navController: NavHostController) {
+fun Sidebar(state: KagaminViewModel, navController: NavHostController, modifier: Modifier = Modifier) {
+    val layoutManager = LocalLayoutManager.current
+
     Column(
-        Modifier.fillMaxHeight().width(32.dp).background(color = Colors.bars.copy(alpha = 0.5f)),
+        modifier.fillMaxHeight().width(32.dp).background(color = Colors.bars.copy(alpha = 0.5f)),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -65,13 +70,21 @@ fun Sidebar(state: KagaminViewModel, navController: NavHostController) {
         TextButton(
             modifier = Modifier.weight(0.3f),
             onClick = {
-                if (state.currentTab == Tabs.TRACKLIST || state.currentTab == Tabs.CREATE_PLAYLIST)
-                    state.currentTab = Tabs.PLAYLISTS
-                else state.currentTab = Tabs.TRACKLIST
+                state.currentTab =  when (state.currentTab) {
+                    Tabs.TRACKLIST, Tabs.CREATE_PLAYLIST ->  Tabs.PLAYLISTS
+                    Tabs.PLAYBACK -> Tabs.TRACKLIST
+                    else -> if (layoutManager.currentLayout.value == LayoutManager.Layout.Default) Tabs.TRACKLIST else Tabs.PLAYBACK
+                }
             }
         ) {
             Image(
-                painterResource(if (state.currentTab == Tabs.TRACKLIST || state.currentTab == Tabs.CREATE_PLAYLIST) Res.drawable.music_note else Res.drawable.playlists),
+                painterResource(
+                    when (state.currentTab) {
+                        Tabs.TRACKLIST, Tabs.CREATE_PLAYLIST -> Res.drawable.music_note
+                        Tabs.PLAYBACK -> Res.drawable.playlists
+                        else -> if (layoutManager.currentLayout.value == LayoutManager.Layout.Default) Res.drawable.playlists else Res.drawable.tiny_star_icon
+                    }
+                ),
                 "Playlists/Tracklist tab swap button",
                 modifier = Modifier.size(32.dp)
             )
@@ -85,7 +98,7 @@ fun Sidebar(state: KagaminViewModel, navController: NavHostController) {
                         state.currentTab = Tabs.CREATE_PLAYLIST
                     }
 
-                    Tabs.TRACKLIST -> {
+                    Tabs.TRACKLIST, Tabs.PLAYBACK -> {
                         state.currentTab = Tabs.ADD_TRACKS
                     }
 

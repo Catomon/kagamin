@@ -73,8 +73,8 @@ android {
         applicationId = "chu.monscout.kagamin"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.0.1"
     }
     packaging {
         resources {
@@ -101,9 +101,9 @@ compose.desktop {
         mainClass = "chu.monscout.kagamin.MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Msi)//, TargetFormat.Dmg, , TargetFormat.Deb)
+            targetFormats(TargetFormat.Msi, TargetFormat.Exe)//, TargetFormat.Dmg, , TargetFormat.Deb)
             packageName = "Kagamin"
-            packageVersion = "1.0.0"
+            packageVersion = "1.0.1"
 
             modules("java.compiler", "java.instrument", "java.naming", "java.scripting", "java.security.jgss", "java.sql", "jdk.management", "jdk.unsupported")
 

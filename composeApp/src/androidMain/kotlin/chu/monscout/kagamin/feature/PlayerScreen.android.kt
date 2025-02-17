@@ -141,6 +141,10 @@ actual fun PlayerScreen(
                                             .align(Alignment.Center)
                                     )
                                 }
+
+                                Tabs.PLAYBACK -> {
+                                    //
+                                }
                             }
                         }
                     }

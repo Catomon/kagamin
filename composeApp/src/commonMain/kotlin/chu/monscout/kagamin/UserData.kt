@@ -44,7 +44,7 @@ class UserSettings(
     var theme: String = Themes.list.first().name,
     var alwaysOnTop: Boolean = false,
     var showSingerIcons: Boolean = false,
-    var volume: Float = 0.5f,
+    var volume: Float = 0.3f,
     var random: Boolean = false,
     var fade: Boolean = true,
     var repeat: Boolean = false,

@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.media3.common.MediaItem
 import androidx.navigation.NavHostController
 import chu.monscout.kagamin.Colors
@@ -85,7 +83,7 @@ actual fun PlayerScreen(
                         denpaPlayer,
                         Modifier
                             .fillMaxSize()
-                            .background(color = Colors.bars.copy(alpha = 0.5f))
+                            .background(color = Colors.barsTransparent)
                     )
                 } else {
                     Box(Modifier.fillMaxSize()) {
@@ -109,7 +107,7 @@ actual fun PlayerScreen(
                                             Text(
                                                 "Drop files or folders here",
                                                 textAlign = TextAlign.Center,
-                                                color = Colors.noteText
+                                                color = Colors.text2
                                             )
                                         }
                                     } else {

@@ -34,7 +34,7 @@ actual fun KagaminApp(
                     }
 
                     LayoutManager.Layout.Tiny -> {
-                        TODO()
+                        TinyPlayerScreen(kagaminViewModel.also { it.currentTab = Tabs.PLAYBACK }, navController)
                     }
                 }
             }

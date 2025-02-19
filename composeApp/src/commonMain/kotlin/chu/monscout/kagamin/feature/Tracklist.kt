@@ -1,29 +1,15 @@
 package chu.monscout.kagamin.feature
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateMap
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import chu.monscout.kagamin.Colors
 import chu.monscout.kagamin.audio.DenpaTrack
 import chu.monscout.kagamin.savePlaylist
 import kotlinx.coroutines.CoroutineScope
@@ -38,7 +24,7 @@ fun Tracklist(state: KagaminViewModel, tracks: List<DenpaTrack>, modifier: Modif
         remember(tracks) { tracks.mapIndexed { i, track -> (track.uri to i) }.toMap() }
     val currentTrack = state.currentTrack
 
-    val listState =  rememberLazyListState()
+    val listState = rememberLazyListState()
 
     Column(modifier) {
         if (currentTrack != null) {
@@ -57,9 +43,10 @@ fun Tracklist(state: KagaminViewModel, tracks: List<DenpaTrack>, modifier: Modif
         }
 
         LazyColumn(Modifier.fillMaxSize(), state = listState) {
-            items(tracks.size) { index ->
+            items(tracks.size, key = {
+                tracks[it].uri
+            }) { index ->
                 val track = tracks[index]
-
                 TrackItem(
                     index,
                     track,
@@ -72,7 +59,7 @@ fun Tracklist(state: KagaminViewModel, tracks: List<DenpaTrack>, modifier: Modif
                             else tracklistManager.select(index, track)
                             return@onClick
                         }
-                        if (state.isLoadingSong != null)   return@onClick
+                        if (state.isLoadingSong != null) return@onClick
                         CoroutineScope(Dispatchers.Default).launch {
                             state.isLoadingSong = track
                             state.denpaPlayer.play(track)
@@ -153,36 +140,3 @@ expect fun TrackItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 )
-
-@Composable
-fun CurrentTrackItem(
-    index: Int,
-    track: DenpaTrack,
-    state: KagaminViewModel
-) {
-    val backColor =
-        if (index % 2 == 0) Colors.dividers.copy(alpha = 0.50f) else Colors.background.copy(alpha = 0.50f)
-    Box(
-        modifier = Modifier.fillMaxWidth().height(32.dp)
-            .background(color = backColor)
-            .let {
-                if (state.currentTrack == track) it.border(
-                    2.dp,
-                    Colors.bars
-                ) else it
-            }.clickable {
-                //
-            }
-            .padding(4.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            track.name,
-            fontSize = 12.sp,
-            color = Color.White,
-            maxLines = 1,
-            modifier = Modifier.align(Alignment.CenterStart),
-            overflow = TextOverflow.Ellipsis
-        )
-    }
-}

@@ -28,15 +28,21 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.ApplicationScope
+import androidx.compose.ui.window.Tray
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowScope
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberTrayState
 import androidx.compose.ui.window.rememberWindowState
+import chu.monscout.kagamin.audio.DenpaPlayer
 import chu.monscout.kagamin.feature.KagaminApp
 import chu.monscout.kagamin.feature.KagaminViewModel
 import com.github.catomon.yukinotes.di.appModule
 import kagamin.composeapp.generated.resources.Res
+import kagamin.composeapp.generated.resources.pause_icon
+import kagamin.composeapp.generated.resources.play_icon
 import kagamin.composeapp.generated.resources.star_icon64
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -47,6 +53,7 @@ import java.awt.datatransfer.DataFlavor
 import java.io.File
 
 var isCompost = false
+var isOpenGl = false
 
 fun main() {
     setDefaultUncaughtExceptionHandler()
@@ -58,6 +65,7 @@ fun main() {
 
         try {
             System.setProperty("skiko.renderApi", "OPENGL")
+            isOpenGl = true
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -68,7 +76,7 @@ fun main() {
 }
 
 @Composable
-fun AppContainer(onCloseRequest: () -> Unit) {
+fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
     val windowState = rememberWindowState(width = 600.dp, height = 350.dp) // 212 328
     val kagaminViewModel: KagaminViewModel = remember { get(KagaminViewModel::class.java) }
     val layoutManager = remember { LayoutManager() }
@@ -84,33 +92,31 @@ fun AppContainer(onCloseRequest: () -> Unit) {
                 windowState.size = DpSize(212.dp, 328.dp)
             }
 
-            LayoutManager.Layout.Tiny -> TODO()
+            LayoutManager.Layout.Tiny -> {
+                windowState.size = DpSize(200.dp, 200.dp)
+            }
         }
     }
 
     CompositionLocalProvider(
         LocalLayoutManager provides layoutManager
     ) {
-        DefaultLayoutWindow(windowState, kagaminViewModel, onCloseRequest)
-
-//        when (currentLayout) {
-//            LayoutManager.Layout.Default -> {
-//                DefaultLayoutWindow(windowState, kagaminViewModel, ::exitApplication)
-//            }
-//
-//            LayoutManager.Layout.Compact -> {
-//
-//            }
-//
-//            LayoutManager.Layout.Tiny -> {
-//
-//            }
-//        }
+        PlayerWindow(windowState, kagaminViewModel, onCloseRequest)
     }
+
+    val trayState = rememberTrayState()
+    Tray(
+        painterResource(if (kagaminViewModel.playState == DenpaPlayer.PlayState.PLAYING) Res.drawable.pause_icon else Res.drawable.play_icon),
+        tooltip = kagaminViewModel.currentTrack?.name,
+        onAction = {
+            kagaminViewModel.onPlayPause()
+        },
+        state = trayState
+    )
 }
 
 @Composable
-private fun DefaultLayoutWindow(
+private fun PlayerWindow(
     windowState: WindowState,
     kagaminViewModel: KagaminViewModel,
     onCloseRequest: () -> Unit
@@ -123,43 +129,25 @@ private fun DefaultLayoutWindow(
         icon = painterResource(Res.drawable.star_icon64),
         state = windowState,
         undecorated = true,
-        transparent = true,
+        transparent = isOpenGl,
         onPreviewKeyEvent = {
             if (it.type == KeyEventType.KeyDown && it.key == Key.F2) {
-                if (layoutManager.currentLayout.value == LayoutManager.Layout.Default) {
-                    layoutManager.currentLayout.value = LayoutManager.Layout.Compact
-                } else {
-                    layoutManager.currentLayout.value = LayoutManager.Layout.Default
+                when (layoutManager.currentLayout.value) {
+                    LayoutManager.Layout.Default -> {
+                        layoutManager.currentLayout.value = LayoutManager.Layout.Compact
+                    }
+                    LayoutManager.Layout.Compact -> {
+                        layoutManager.currentLayout.value = LayoutManager.Layout.Tiny
+                    }
+                    LayoutManager.Layout.Tiny -> {
+                        layoutManager.currentLayout.value = LayoutManager.Layout.Default
+                    }
                 }
                 false
             } else {
                 false
             }
         }
-    ) {
-        CompositionLocalProvider(
-            LocalWindow provides this.window,
-        ) {
-            YukiTheme {
-                App(kagaminViewModel)
-            }
-        }
-    }
-}
-
-@Composable
-private fun CompactLayoutWindow(
-    windowState: WindowState,
-    kagaminViewModel: KagaminViewModel,
-    onCloseRequest: () -> Unit
-) {
-    Window(
-        onCloseRequest = onCloseRequest,
-        title = "Kagamin",
-        icon = painterResource(Res.drawable.star_icon64),
-        state = windowState,
-        undecorated = true,
-        transparent = true,
     ) {
         CompositionLocalProvider(
             LocalWindow provides this.window,
@@ -197,7 +185,7 @@ fun WindowScope.App(kagaminViewModel: KagaminViewModel = get(KagaminViewModel::c
             LocalSnackbarHostState.current
         KagaminApp(
             kagaminViewModel,
-            modifier = Modifier.clip(RoundedCornerShape(12.dp))
+            modifier = Modifier.let { if (isOpenGl) it.clip(RoundedCornerShape(12.dp)) else it }
                 .dragAndDropTarget({ true }, remember {
                     object : DragAndDropTarget {
                         override fun onStarted(event: DragAndDropEvent) {

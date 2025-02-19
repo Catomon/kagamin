@@ -28,84 +28,118 @@ fun YukiTheme(content: @Composable () -> Unit) {
 }
 
 object Themes {
-    val list = listOf(Violet, Pink, Blue)
+    val list = listOf(Violet, Pink, Blue, KagaminDark)
 
     fun forName(name: String) = list.find { it.name == name }
 
     fun forNameOrFirst(name: String) = list.find { it.name == name } ?: list.first()
 
-    object Pink : IYukiTheme {
-        override val name: String = "yuki"
-        override val background = Color(0xffe96c76)
-        override val surface = Color(0xfff799b4)
-        override val surfaceSecondary = Color(0xffee8890)
-        override val font = Color(0xFFFFFFFF)
-        override val fontSecondary = Color(0xFFFFE1EA)
-        override val bars = Color(0xffc94d63)
+    object Pink : IYukiTheme(
+        name = "yuki",
+        background = Color(0xffffffff),
+        background2 = Color(0xffc94d63),
+        surface = Color(0xfff799b4),
+        font = Color(0xFFFFFFFF),
+        fontSecondary = Color(0xFFFFE1EA),
+        bars = Color(0xffc94d63),
+    ) {
+
     }
 
-    object Violet : IYukiTheme {
-        override val name: String = "gami-kasa"
-        override val background = Color(0xff7852be)
-        override val surface = Color(0xff916dd6)
-        override val surfaceSecondary = Color(0xff8563cc)
-        override val font = Color(0xFFFFFFFF)
-        override val fontSecondary = Color(0xFFDECCFF)
-        override val bars = Color(0xff6232a9)
+    object Violet : IYukiTheme(
+        name = "gami-kasa",
+        background = Color(0xffffffff),
+        background2 = Color(0xff6232a9),
+        surface = Color(0xff916dd6),
+        font = Color(0xFFFFFFFF),
+        fontSecondary = Color(0xFFDECCFF),
+        bars = Color(0xff6232a9),
+    ) {
+        override val playerButtonIcon: Color = Color(0xffa272fd)
     }
 
-    object Blue : IYukiTheme {
-        override val name: String = "nata"
-        override val background = Color(0xff3a55af)
-        override val surface = Color(0xff6197de)
-        override val surfaceSecondary = Color(0xff3671c1)
-        override val font = Color(0xFFFFFFFF)
-        override val fontSecondary = Color(0xffd2e6ff)
-        override val bars = Color(0xff0f2e93)
+    object Blue : IYukiTheme(
+        name = "nata",
+        background = Color(0xffffffff),
+        background2 = Color(0xff0f2e93),
+        surface = Color(0xff6197de),
+        font = Color(0xFFFFFFFF),
+        fontSecondary = Color(0xffd2e6ff),
+        bars = Color(0xff0f2e93),
+    ) {
+
     }
 
-    interface IYukiTheme {
-        val name: String
-        val background: Color
-        val surface: Color
-        val surfaceSecondary: Color
-        val font: Color
-        val fontSecondary: Color
-        val bars: Color
+    //    object YukiLight : IYukiTheme(
+    //        name = "yuki-light",
+    //        background = Color(0xffffffff),
+    //        background2 = Color(0xff86c6ea),
+    //        surface = Color(0xffb3e7fd),
+    //        font =  Color(0xff49b5fc), //Color(0xffff4d7c)
+    //        fontSecondary = Color(0xff2d9ae1),
+    //        bars = Color(0xff0089de),
+    //    ) {
+    //        override val smallButtonIcon: Color = Color(0xffff4d7c)
+    //        override val playerButtonIcon: Color = Color(0xfffd7299)
+    //        override val onBars: Color = Color(0xfffd9bb7)
+    //        override val listItemA: Color = Color(0x80b3e7fd)
+    //        override val listItemB: Color = Color(0x8071c9fc)
+    //        override val barsTransparent: Color = bars.copy(0.50f)
+    //    }
+
+    object KagaminDark : IYukiTheme(
+        name = "kagamin-dark",
+        background = Color(0xffffffff),
+        background2 = Color(0xff8a8a8a),
+        surface = Color(0xffb2b2b2),
+        font =  Color(0xffffffff), //Color(0xffff4d7c)
+        fontSecondary = Color(0xffab0460),
+        bars = Color(0xff000000),
+    ) {
+        override val smallButtonIcon: Color = Color(0xffd51e82)
+        override val playerButtonIcon: Color = Color(0xffd51e82)
+        override val onBars: Color = Color(0xfffd72bb)
+        override val listItemA: Color = Color(0xe6de2d8d)
+        override val listItemB: Color = Color(0xe6d51e82)
+        override val barsTransparent: Color = bars.copy(0.95f)
+    }
+
+    open class IYukiTheme(
+        val name: String,
+        val background: Color,
+        val background2: Color,
+        val surface: Color,
+        val font: Color,
+        val fontSecondary: Color,
+        val bars: Color,
+    ) {
+        open val smallButtonIcon: Color = Color.White
+        open val playerButtonIcon: Color = surface
+        open val onBars: Color = surface
+        open val listItemA: Color = surface.copy(0.9f)
+        open val listItemB: Color = background2.copy(0.8f)
+        open val barsTransparent: Color = bars.copy(0.9f)
+        open val playerButtonIconTransparent get() = playerButtonIcon.copy(0.5f)
     }
 }
 
 object Colors {
     var currentYukiTheme = Themes.list.first()
 
-    private val violetDark = Color(50, 23, 131)
-    private val violet = Color(111, 79, 171)
-    private val lightRed = Color(245, 83, 95)
-
-    var noteBackground = Color(0xff916dd6)
-    var noteTextHeadline = Color(0xFFFFFFFF)
-    var noteText = Color(0xFFDECCFF)
-    var noteTextSmall = Color(0xFFDECCFF)
-    var background = Color(0xff7852be)
-    var bars = Color(0xFF66419F)
-    var dividers = Color(0xff8563cc)
+    val surface get() = currentYukiTheme.surface
+    val text get() = currentYukiTheme.font
+    val text2 get() = currentYukiTheme.fontSecondary
+    val background get() = currentYukiTheme.background
+    val bars get() = currentYukiTheme.bars
+    val barsTransparent get() = currentYukiTheme.barsTransparent
 
     init {
-        currentYukiTheme = Themes.list.find { it.name == loadSettings().theme } ?: Themes.list.first()
-        updateTheme()
+        currentYukiTheme =
+            Themes.list.find { it.name == loadSettings().theme } ?: Themes.list.first()
     }
 
-    fun updateTheme() {
-        noteBackground = currentYukiTheme.surface
-        noteTextHeadline = currentYukiTheme.font
-        noteText = currentYukiTheme.fontSecondary
-        noteTextSmall = currentYukiTheme.fontSecondary
-        background = currentYukiTheme.background
-        bars = currentYukiTheme.bars
-        dividers = currentYukiTheme.surfaceSecondary
-    }
-
-    val yukiColors = androidx.compose.material.Colors(
+    private val lightRed = Color(245, 83, 95)
+    var yukiColors = androidx.compose.material.Colors(
         primary = bars,
         primaryVariant = Color(0xFF3700B3),
         secondary = Color(0xFF03DAC6),

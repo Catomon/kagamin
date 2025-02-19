@@ -39,7 +39,7 @@ fun PlaybackButtons(player: DenpaPlayer<DenpaTrack>, modifier: Modifier = Modifi
                 painterResource(Res.drawable.prev),
                 "Previous",
                 modifier = Modifier.size(32.dp),
-                colorFilter = ColorFilter.tint(Colors.noteBackground)
+                colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon)
             )
         }
 
@@ -59,14 +59,14 @@ fun PlaybackButtons(player: DenpaPlayer<DenpaTrack>, modifier: Modifier = Modifi
                         painterResource(Res.drawable.play),
                         "Play",
                         modifier = Modifier.size(40.dp),
-                        colorFilter = ColorFilter.tint(Colors.noteBackground)
+                        colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon)
                     )
                 } else {
                     Image(
                         painterResource(Res.drawable.pause),
                         "Pause",
                         modifier = Modifier.size(40.dp),
-                        colorFilter = ColorFilter.tint(Colors.noteBackground)
+                        colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon)
                     )
                 }
             }
@@ -82,7 +82,7 @@ fun PlaybackButtons(player: DenpaPlayer<DenpaTrack>, modifier: Modifier = Modifi
                 painterResource(Res.drawable.next),
                 "Next",
                 modifier = Modifier.size(32.dp),
-                colorFilter = ColorFilter.tint(Colors.noteBackground)
+                colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon)
             )
         }
     }

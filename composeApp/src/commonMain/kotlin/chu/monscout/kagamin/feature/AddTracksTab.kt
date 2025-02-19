@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import chu.monscout.kagamin.Colors
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.folder
 import org.jetbrains.compose.resources.painterResource
@@ -32,7 +33,8 @@ fun AddTracksTab(state: KagaminViewModel, modifier: Modifier = Modifier) {
             "Drop files or folders here,\nor select from folder:",
             textAlign = TextAlign.Center,
             //color = Colors.noteText
-            modifier = Modifier.padding(horizontal = 8.dp)
+            modifier = Modifier.padding(horizontal = 8.dp),
+            color = Colors.text2
         )
 
         IconButton(onClick = {

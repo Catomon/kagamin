@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.RadioButton
 import androidx.compose.material.RadioButtonDefaults
@@ -15,8 +17,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import chu.monscout.kagamin.Colors
@@ -44,12 +47,12 @@ fun SettingsScreen(
     val settings = state.settings
     val theme = state.settings.theme
 
-    Box(modifier = modifier.fillMaxSize().background(Colors.background), contentAlignment = Alignment.Center) {
-        Text("ver. 1.0.2", Modifier.align(Alignment.BottomStart).padding(start = 6.dp))
+    Box(modifier = modifier.fillMaxSize().background(Colors.bars), contentAlignment = Alignment.Center) {
+        Text("ver. 1.0.2", Modifier.align(Alignment.BottomStart).padding(start = 6.dp), color = Colors.text)
 
         Text("github.com/Catomon", Modifier.align(Alignment.BottomEnd).padding(end = 6.dp).clickable {
             openInBrowser("https://github.com/Catomon")
-        }, fontStyle = FontStyle.Italic, color = Colors.bars)
+        }, fontStyle = FontStyle.Italic, color = Colors.text2)
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -62,7 +65,7 @@ fun SettingsScreen(
                 modifier = Modifier.weight(0.9f)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Theme")
+                    Text("Theme", color = Colors.text)
                     RadioButton(
                         theme == Themes.Violet.name,
                         colors = RadioButtonDefaults.colors(
@@ -74,8 +77,7 @@ fun SettingsScreen(
                             settings.theme = Themes.Violet.name
                             saveSettings(settings)
                             state.settings = loadSettings()
-                            Colors.updateTheme()
-                        })
+                        }, modifier = Modifier.drawBehind { drawCircle(color = Color.White, size.minDimension / 2.5f) })
                     RadioButton(
                         theme == Themes.Pink.name,
                         colors = RadioButtonDefaults.colors(Themes.Pink.bars, Themes.Pink.surface),
@@ -84,8 +86,7 @@ fun SettingsScreen(
                             settings.theme = Themes.Pink.name
                             saveSettings(settings)
                             state.settings = loadSettings()
-                            Colors.updateTheme()
-                        })
+                        }, modifier = Modifier.drawBehind { drawCircle(color = Color.White, size.minDimension / 2.5f) })
                     RadioButton(
                         theme == Themes.Blue.name,
                         colors = RadioButtonDefaults.colors(Themes.Blue.bars, Themes.Blue.surface),
@@ -94,14 +95,47 @@ fun SettingsScreen(
                             settings.theme = Themes.Blue.name
                             saveSettings(settings)
                             state.settings = loadSettings()
-                            Colors.updateTheme()
-                        })
+                        }, modifier = Modifier.drawBehind { drawCircle(color = Color.White, size.minDimension / 2.5f) })
                 }
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(
+                        theme == Themes.KagaminDark.name,
+                        colors = RadioButtonDefaults.colors(
+                            Themes.KagaminDark.bars,
+                            Themes.KagaminDark.barsTransparent
+                        ),
+                        onClick = {
+                            Colors.currentYukiTheme = Themes.KagaminDark
+                            settings.theme = Themes.KagaminDark.name
+                            saveSettings(settings)
+                            state.settings = loadSettings()
+                        }, modifier = Modifier.drawBehind { drawCircle(color = Color.White, size.minDimension / 2.5f) })
+//                    RadioButton(
+//                        theme == Themes.Pink.name,
+//                        colors = RadioButtonDefaults.colors(Themes.Pink.bars, Themes.Pink.surface),
+//                        onClick = {
+//                            Colors.currentYukiTheme = Themes.Pink
+//                            settings.theme = Themes.Pink.name
+//                            saveSettings(settings)
+//                            state.settings = loadSettings()
+//                        })
+//                    RadioButton(
+//                        theme == Themes.Blue.name,
+//                        colors = RadioButtonDefaults.colors(Themes.Blue.bars, Themes.Blue.surface),
+//                        onClick = {
+//                            Colors.currentYukiTheme = Themes.Blue
+//                            settings.theme = Themes.Blue.name
+//                            saveSettings(settings)
+//                            state.settings = loadSettings()
+//                        })
+                }
+
 
                 Button({
                     navController.popBackStack()
                 }) {
-                    Text("Return")
+                    Text("Return", color = Colors.text)
                 }
 
             }
@@ -120,7 +154,7 @@ fun SettingsScreen(
                 },
                 modifier = Modifier.padding(top = 12.dp)
             ) {
-                Text("Exit App")
+                Text("Exit App", color = Colors.text)
             }
         }
     }

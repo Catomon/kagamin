@@ -27,7 +27,7 @@ actual fun PlaylistItem(
     clear: () -> Unit
 ) {
         Column(
-            Modifier.background(color = if (i % 2 == 0) Colors.dividers.copy(alpha = 0.50f) else Colors.background.copy(alpha = 0.50f))
+            Modifier.background(color = if (i % 2 == 0) Colors.currentYukiTheme.listItemA else Colors.currentYukiTheme.listItemB)
                 .clickable {
                     state.currentPlaylistName = playlist.first
                     state.currentTab = Tabs.TRACKLIST
@@ -56,13 +56,13 @@ actual fun PlaylistItem(
                     "Tracks: ${playlist.second.tracks.size}",
                     modifier = Modifier.weight(0.5f),
                     fontSize = 10.sp,
-                    color = Colors.noteText
+                    color = Colors.text2
                 )
                 Text(
                     "Duration: ???",
                     modifier = Modifier.weight(0.5f),
                     fontSize = 10.sp,
-                    color = Colors.noteText
+                    color = Colors.text2
                 )
             }
     }

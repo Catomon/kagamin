@@ -36,7 +36,7 @@ actual fun TrackItem(
     modifier: Modifier
 ) {
     val backColor =
-        if (index % 2 == 0) Colors.dividers.copy(alpha = 0.50f) else Colors.background.copy(alpha = 0.50f)
+        if (index % 2 == 0) Colors.currentYukiTheme.listItemA else Colors.currentYukiTheme.listItemB
 
     Box(
         modifier = Modifier

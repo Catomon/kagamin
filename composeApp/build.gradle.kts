@@ -73,8 +73,8 @@ android {
         applicationId = "chu.monscout.kagamin"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 3
-        versionName = "1.0.2"
+        versionCode = 4
+        versionName = "1.0.3"
     }
     packaging {
         resources {
@@ -98,18 +98,25 @@ dependencies {
 
 compose.desktop {
     application {
+        javaHome = System.getenv("JDK_21")
+
         mainClass = "chu.monscout.kagamin.MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Msi, TargetFormat.Exe)//, TargetFormat.Dmg, , TargetFormat.Deb)
+            targetFormats(TargetFormat.Msi, TargetFormat.Rpm)//, TargetFormat.Dmg, )
             packageName = "Kagamin"
-            packageVersion = "1.0.2"
+            packageVersion = "1.0.3"
 
             modules("java.compiler", "java.instrument", "java.naming", "java.scripting", "java.security.jgss", "java.sql", "jdk.management", "jdk.unsupported")
 
             buildTypes.release.proguard {
 //                configurationFiles.from(project.file("compose-desktop.pro"))
                 isEnabled = false
+            }
+
+            linux {
+//                iconFile.set(project.file("kagamin.ico"))
+                shortcut = true
             }
 
             windows {

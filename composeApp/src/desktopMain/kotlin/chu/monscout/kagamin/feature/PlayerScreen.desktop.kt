@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import chu.monscout.kagamin.Colors
+import chu.monscout.kagamin.appName
 import chu.monscout.kagamin.createDenpaTrack
 import chu.monscout.kagamin.loadPlaylist
 import kagamin.composeapp.generated.resources.Res
@@ -72,11 +73,11 @@ actual fun PlayerScreen(
             painterResource(Res.drawable.stars_background), "Background",
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
-            colorFilter = ColorFilter.tint(Colors.bars)
+            colorFilter = ColorFilter.tint(Colors.currentYukiTheme.background2)
         )
 
         Row {
-            Column(Modifier.fillMaxHeight().background(color = Colors.bars.copy(alpha = 0.5f))) {
+            Column(Modifier.fillMaxHeight().background(color = Colors.barsTransparent)) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(4.dp)
@@ -84,12 +85,12 @@ actual fun PlayerScreen(
                     Image(
                         painterResource(Res.drawable.star64),
                         "App icon",
-                        colorFilter = ColorFilter.tint(Colors.noteBackground),
+                        colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon),
                         modifier = Modifier.size(24.dp).offset(y = (-3).dp)
                     )
                     Text(
-                        "Kagamin", //かがみん
-                        color = Colors.noteBackground,
+                        appName,
+                        color = Colors.currentYukiTheme.playerButtonIcon,
                         fontSize = 16.sp,
                         modifier = Modifier.height(32.dp)
                     )
@@ -119,7 +120,7 @@ actual fun PlayerScreen(
                                     Text(
                                         "Drop files or folders here",
                                         textAlign = TextAlign.Center,
-                                        color = Colors.noteText
+                                        color = Colors.text2
                                     )
                                 }
                             } else {
@@ -190,37 +191,37 @@ fun CompactPlayerScreen(
             painterResource(Res.drawable.stars_background), "Background",
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
-            colorFilter = ColorFilter.tint(Colors.bars)
+            colorFilter = ColorFilter.tint(Colors.currentYukiTheme.background2)
         )
 
         Row {
-            Column(Modifier.fillMaxHeight().background(color = Colors.bars.copy(alpha = 0.5f))) {
+            Column(Modifier.fillMaxHeight().weight(0.99f)) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(4.dp)
+                    modifier = Modifier.background(color = Colors.barsTransparent).padding(4.dp).fillMaxWidth()
                 ) {
                     Image(
                         painterResource(Res.drawable.star64),
                         "App icon",
-                        colorFilter = ColorFilter.tint(Colors.noteBackground),
+                        colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon),
                         modifier = Modifier.size(24.dp).offset(y = (-3).dp)
                     )
                     Text(
-                        "Kagamin", //かがみん
-                        color = Colors.noteBackground,
+                        appName,
+                        color = Colors.currentYukiTheme.playerButtonIcon,
                         fontSize = 16.sp,
                         modifier = Modifier.height(32.dp)
                     )
                 }
 
-                Box(Modifier.width(180.dp).fillMaxHeight()) {
+                Box(Modifier.weight(0.99f).fillMaxHeight()) {
                     AnimatedContent(state.currentTab) {
                         when (it) {
                             Tabs.PLAYBACK -> {
                                 CurrentTrackFrame(
                                     currentTrack,
                                     denpaPlayer,
-                                    Modifier.width(180.dp).fillMaxHeight())
+                                    Modifier.width(180.dp).fillMaxHeight().background(color = Colors.barsTransparent))
                             }
 
                             Tabs.PLAYLISTS -> {
@@ -237,7 +238,7 @@ fun CompactPlayerScreen(
                                         Text(
                                             "Drop files or folders here",
                                             textAlign = TextAlign.Center,
-                                            color = Colors.noteText
+                                            color = Colors.text2
                                         )
                                     }
                                 } else {
@@ -264,7 +265,122 @@ fun CompactPlayerScreen(
                 }
             }
 
-            Sidebar(state, navController, Modifier.weight(0.25f))
+            Sidebar(state, navController)
+        }
+    }
+}
+
+@Composable
+fun TinyPlayerScreen(
+    state: KagaminViewModel,
+    navController: NavHostController,
+    modifier: Modifier = Modifier,
+) {
+    val denpaPlayer = state.denpaPlayer
+    val playlist = state.playlist
+    val currentTrack = state.currentTrack
+    val playState = state.playState
+    val playMode = state.playMode
+    val currentPlaylistName = state.currentPlaylistName
+
+    LaunchedEffect(currentPlaylistName) {
+        CoroutineScope(Dispatchers.Default).launch {
+            state.isLoadingPlaylistFile = true
+            try {
+                val trackUris = loadPlaylist(currentPlaylistName)?.tracks
+                if (trackUris != null) {
+                    denpaPlayer.playlist.value = mutableListOf()
+                    trackUris.forEach {
+                        denpaPlayer.addToPlaylist(createDenpaTrack(it.uri, it.name))
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            state.isLoadingPlaylistFile = false
+        }
+    }
+
+    Box(modifier.background(color = Colors.background)) {
+        Image(
+            painterResource(Res.drawable.stars_background), "Background",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
+            colorFilter = ColorFilter.tint(Colors.currentYukiTheme.background2)
+        )
+
+        Row {
+            Column(Modifier.fillMaxHeight().weight(0.99f)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.background(color = Colors.barsTransparent).padding(4.dp).fillMaxWidth()
+                ) {
+                    Image(
+                        painterResource(Res.drawable.star64),
+                        "App icon",
+                        colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon),
+                        modifier = Modifier.size(24.dp).offset(y = (-3).dp)
+                    )
+                    Text(
+                        appName,
+                        color = Colors.currentYukiTheme.playerButtonIcon,
+                        fontSize = 16.sp,
+                        modifier = Modifier.height(32.dp)
+                    )
+                }
+
+                Box(Modifier.weight(0.99f).fillMaxHeight()) {
+                    AnimatedContent(state.currentTab) {
+                        when (it) {
+                            Tabs.PLAYBACK -> {
+                                CompactCurrentTrackFrame(
+                                    currentTrack,
+                                    denpaPlayer,
+                                    Modifier.width(180.dp).fillMaxHeight().background(color = Colors.barsTransparent))
+                            }
+
+                            Tabs.PLAYLISTS -> {
+                                Playlists(
+                                    state,
+                                    Modifier.align(Alignment.Center)
+                                        .fillMaxHeight()//.padding(start = 4.dp, end = 4.dp)
+                                )
+                            }
+
+                            Tabs.TRACKLIST -> {
+                                if (state.playlist.isEmpty()) {
+                                    Box(Modifier.fillMaxHeight(), contentAlignment = Alignment.Center) {
+                                        Text(
+                                            "Drop files or folders here",
+                                            textAlign = TextAlign.Center,
+                                            color = Colors.text2
+                                        )
+                                    }
+                                } else {
+                                    Tracklist(
+                                        state,
+                                        state.playlist,
+                                        Modifier.align(Alignment.Center)
+                                            .fillMaxHeight()//.padding(start = 16.dp, end = 16.dp)
+                                    )
+                                }
+                            }
+
+                            Tabs.OPTIONS -> TODO()
+
+                            Tabs.ADD_TRACKS -> {
+                                AddTracksTab(state, Modifier.fillMaxHeight().align(Alignment.Center))
+                            }
+
+                            Tabs.CREATE_PLAYLIST -> {
+                                CreatePlaylistTab(state, Modifier.fillMaxHeight().align(Alignment.Center))
+                            }
+                        }
+                    }
+                }
+            }
+
+            Sidebar(state, navController)
         }
     }
 }

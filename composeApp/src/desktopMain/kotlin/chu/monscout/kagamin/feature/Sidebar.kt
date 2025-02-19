@@ -3,7 +3,6 @@ package chu.monscout.kagamin.feature
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.size
@@ -12,6 +11,7 @@ import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import chu.monscout.kagamin.Colors
@@ -38,17 +38,22 @@ fun MinimizeButton(modifier: Modifier) {
         Image(
             painterResource(Res.drawable.minimize_window),
             "Minimize",
-            modifier = Modifier.size(32.dp)
+            modifier = Modifier.size(32.dp),
+            colorFilter = ColorFilter.tint(Colors.currentYukiTheme.smallButtonIcon)
         )
     }
 }
 
 @Composable
-fun Sidebar(state: KagaminViewModel, navController: NavHostController, modifier: Modifier = Modifier) {
+fun Sidebar(
+    state: KagaminViewModel,
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
     val layoutManager = LocalLayoutManager.current
 
     Column(
-        modifier.fillMaxHeight().width(32.dp).background(color = Colors.bars.copy(alpha = 0.5f)),
+        modifier.fillMaxHeight().width(32.dp).background(color = Colors.barsTransparent),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -63,15 +68,16 @@ fun Sidebar(state: KagaminViewModel, navController: NavHostController, modifier:
             Image(
                 painterResource(Res.drawable.menu),
                 "Menu",
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(32.dp),
+                colorFilter = ColorFilter.tint(Colors.currentYukiTheme.smallButtonIcon)
             )
         }
 
         TextButton(
             modifier = Modifier.weight(0.3f),
             onClick = {
-                state.currentTab =  when (state.currentTab) {
-                    Tabs.TRACKLIST, Tabs.CREATE_PLAYLIST ->  Tabs.PLAYLISTS
+                state.currentTab = when (state.currentTab) {
+                    Tabs.TRACKLIST, Tabs.CREATE_PLAYLIST -> Tabs.PLAYLISTS
                     Tabs.PLAYBACK -> Tabs.TRACKLIST
                     else -> if (layoutManager.currentLayout.value == LayoutManager.Layout.Default) Tabs.TRACKLIST else Tabs.PLAYBACK
                 }
@@ -86,7 +92,8 @@ fun Sidebar(state: KagaminViewModel, navController: NavHostController, modifier:
                     }
                 ),
                 "Playlists/Tracklist tab swap button",
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(32.dp),
+                colorFilter = ColorFilter.tint(Colors.currentYukiTheme.smallButtonIcon)
             )
         }
 
@@ -117,15 +124,32 @@ fun Sidebar(state: KagaminViewModel, navController: NavHostController, modifier:
                         Res.drawable.add
                 ),
                 "Add button",
-                modifier = Modifier.size(16.dp)
+                modifier = Modifier.size(16.dp),
+                colorFilter = ColorFilter.tint(Colors.currentYukiTheme.smallButtonIcon)
             )
         }
 
-        Box(Modifier.size(32.dp), contentAlignment = Alignment.Center) {
+        TextButton(
+            onClick = {
+                when (layoutManager.currentLayout.value) {
+                    LayoutManager.Layout.Default -> {
+                        layoutManager.currentLayout.value = LayoutManager.Layout.Compact
+                    }
+                    LayoutManager.Layout.Compact -> {
+                        layoutManager.currentLayout.value = LayoutManager.Layout.Tiny
+                    }
+                    LayoutManager.Layout.Tiny -> {
+                        layoutManager.currentLayout.value = LayoutManager.Layout.Default
+                    }
+                }
+            },
+            modifier = Modifier.size(32.dp)
+        ) {
             Image(
                 painterResource(Res.drawable.drag),
                 "drag window",
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(20.dp),
+                colorFilter = ColorFilter.tint(Colors.currentYukiTheme.smallButtonIcon)
             )
         }
     }

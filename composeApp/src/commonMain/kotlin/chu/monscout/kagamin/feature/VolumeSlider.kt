@@ -11,16 +11,16 @@ import chu.monscout.kagamin.Colors
 fun VolumeSlider(volume: Float, volumeChanged: (Float) -> Unit, modifier: Modifier = Modifier) {
     val interactionSource = MutableInteractionSource()
     val colors = SliderDefaults.colors(
-        Colors.noteBackground,
-        Colors.background,
-        Colors.noteBackground,
-        Colors.background,
-        Colors.background,
-        Colors.background,
-        Colors.background,
-        Colors.background,
-        Colors.background,
-        Colors.background
+        Colors.currentYukiTheme.playerButtonIcon,
+        Colors.currentYukiTheme.playerButtonIconTransparent,
+        Colors.currentYukiTheme.playerButtonIcon,
+        Colors.currentYukiTheme.playerButtonIconTransparent,
+        Colors.currentYukiTheme.playerButtonIconTransparent,
+        Colors.currentYukiTheme.playerButtonIconTransparent,
+        Colors.currentYukiTheme.playerButtonIconTransparent,
+        Colors.currentYukiTheme.playerButtonIconTransparent,
+        Colors.currentYukiTheme.playerButtonIconTransparent,
+        Colors.currentYukiTheme.playerButtonIconTransparent
     )
     Slider(
         value = volume,

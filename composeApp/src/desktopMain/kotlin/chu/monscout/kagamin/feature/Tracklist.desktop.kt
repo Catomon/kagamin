@@ -4,7 +4,6 @@ import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuItem
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,21 +14,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
-import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,13 +46,13 @@ actual fun TrackItem(
 ) {
     val clipboard = LocalClipboardManager.current
     val isHeader = index == -1
-    val backColor = if (isHeader) Colors.bars.copy(alpha = 0.50f) else
-        if (index % 2 == 0) Colors.dividers.copy(alpha = 0.50f) else Colors.background.copy(alpha = 0.50f)
+    val backColor = if (isHeader) Colors.barsTransparent else
+        if (index % 2 == 0) Colors.currentYukiTheme.listItemA else Colors.currentYukiTheme.listItemB
     ContextMenuArea(items = {
         listOf(
             ContextMenuItem("Select") {
                 if (!isHeader)
-                tracklistManager.select(index, track)
+                    tracklistManager.select(index, track)
             },
             if (tracklistManager.isAnySelected) {
                 ContextMenuItem("Deselect All") {
@@ -75,16 +68,22 @@ actual fun TrackItem(
             },
         )
     }) {
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(32.dp).fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.height(32.dp).fillMaxWidth(),
+            horizontalArrangement = Arrangement.Start
+        ) {
             if (index > -1 && state.currentTrack == track) {
                 Box(Modifier.height(32.dp).clip(
-                    RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp)).background(Colors.bars.copy(0.5f))
-                , contentAlignment = Alignment.Center) {
+                    RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp)
+                ).background(Colors.barsTransparent).clickable {
+                    state.onPlayPause()
+                }, contentAlignment = Alignment.Center) {
                     Image(
                         painterResource(if (state.playState == DenpaPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
                         "track playback state icon",
                         modifier = Modifier.size(16.dp),
-                        colorFilter = ColorFilter.tint(Colors.noteBackground)
+                        colorFilter = ColorFilter.tint(Colors.surface)
                     )
                 }
             }
@@ -101,21 +100,9 @@ actual fun TrackItem(
                 Text(
                     track.name,
                     fontSize = 12.sp,
-                    color = Color.White,
+                    color = Colors.text,
                     maxLines = 1,
-                    modifier = Modifier.align(Alignment.CenterStart)//.let {
-//                        if (state.currentTrack == track && !isHeader) it.drawBehind {
-//                            val strokeWidthPx = 1.dp.toPx()
-//                            val verticalOffset = size.height - 2.sp.toPx()
-//                            drawLine(
-//                                color = Colors.noteText,
-//                                strokeWidth = strokeWidthPx,
-//                                start = Offset(0f, verticalOffset),
-//                                end = Offset(size.width, verticalOffset)
-//                            )
-//                        } else it
-//                    },
-                            ,
+                    modifier = Modifier.align(Alignment.CenterStart),
                     overflow = TextOverflow.Ellipsis,
                 )
 

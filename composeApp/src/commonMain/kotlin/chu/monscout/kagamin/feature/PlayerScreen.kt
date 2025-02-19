@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import chu.monscout.kagamin.audio.DenpaPlayer
 import chu.monscout.kagamin.audio.DenpaTrack
 import chu.monscout.kagamin.createDenpaPlayer
 import kotlinx.serialization.Serializable
@@ -35,6 +36,14 @@ class KagaminViewModel : ViewModel() {
 
     var height by mutableStateOf(0)
     var width by mutableStateOf(0)
+
+    fun onPlayPause() {
+        when (denpaPlayer.playState.value) {
+            DenpaPlayer.PlayState.PLAYING -> denpaPlayer.pause()
+            DenpaPlayer.PlayState.PAUSED -> denpaPlayer.resume()
+            DenpaPlayer.PlayState.IDLE -> denpaPlayer.resume()
+        }
+    }
 }
 
 @Serializable

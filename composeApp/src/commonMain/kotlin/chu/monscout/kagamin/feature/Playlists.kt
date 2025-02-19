@@ -22,7 +22,9 @@ fun Playlists(state: KagaminViewModel, modifier: Modifier = Modifier) {
         state = rememberLazyListState(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        items(playlists.size) { i ->
+        items(playlists.size, key = {
+            playlists[it]
+        }) { i ->
             val playlist = playlists[i]
             PlaylistItem(
                 playlist,

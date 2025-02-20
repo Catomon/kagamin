@@ -36,31 +36,69 @@ object Themes {
 
     object Pink : IYukiTheme(
         name = "yuki",
-        background = Color(0xffffffff),
-        background2 = Color(0xffc94d63),
+        background = Color(0xffffbecf),
+        background2 = Color(0xffff618f),
         surface = Color(0xfff799b4),
         font = Color(0xFFFFFFFF),
         fontSecondary = Color(0xFFFFE1EA),
-        bars = Color(0xffc94d63),
+        bars = Color(0xffec588c),
     ) {
-
+        override val smallButtonIcon: Color = Color(0xffffffff)
+        override val playerButtonIcon: Color = Color(0xffffc3d2)
+        override val onBars: Color = Color(0xfff58a9e)
+        override val listItemA: Color = Color(0xcdff84a6)
+        override val listItemB: Color = Color(0xcdff618f)
+        override val barsTransparent: Color = bars.copy(0.8f)
     }
+
+    //more pink
+    //   object Pink : IYukiTheme(
+    //        name = "yuki",
+    //        background = Color(0xffffbecf),
+    //        background2 = Color(0xffff618f),
+    //        surface = Color(0xfff799b4),
+    //        font = Color(0xFFFFFFFF),
+    //        fontSecondary = Color(0xFFFFE1EA),
+    //        bars = Color(0xffec588c),
+    //    ) {
+    //
+    //    }
+
+    //blue + pnk
+    //    object Pink : IYukiTheme(
+    //        name = "yuki",
+    //        background = Color(0xffffbecf),
+    //        background2 = Color(0xffc94d63),
+    //        surface = Color(0xfff799b4),
+    //        font = Color(0xFFFFFFFF),
+    //        fontSecondary = Color(0xFFFFE1EA),
+    //        bars = Color(0xffe57189),
+    //    ) {
+    //        override val smallButtonIcon: Color = Color(0xfffdd0d9)
+    //        override val playerButtonIcon: Color = Color(0xfffdd0d9)
+    //        override val onBars: Color = Color(0xffe5667d)
+    //        override val listItemA: Color = Color(0xe585c5e9)
+    //        override val listItemB: Color = Color(0xe55eb0dc)
+    //        override val barsTransparent: Color = bars.copy(0.8f)
+    //    }
 
     object Violet : IYukiTheme(
         name = "gami-kasa",
-        background = Color(0xffffffff),
+        background = Color(0xffc09dff),
         background2 = Color(0xff6232a9),
         surface = Color(0xff916dd6),
         font = Color(0xFFFFFFFF),
         fontSecondary = Color(0xFFDECCFF),
         bars = Color(0xff6232a9),
     ) {
-        override val playerButtonIcon: Color = Color(0xffa272fd)
+        override val playerButtonIcon: Color = Color(0xff906cd4)
+        override val listItemA: Color = Color(0xcb753cc9)
+        override val listItemB: Color = Color(0xcb6232a9)
     }
 
     object Blue : IYukiTheme(
         name = "nata",
-        background = Color(0xffffffff),
+        background = Color(0xffadcfff),
         background2 = Color(0xff0f2e93),
         surface = Color(0xff6197de),
         font = Color(0xFFFFFFFF),
@@ -92,7 +130,7 @@ object Themes {
         background = Color(0xffffffff),
         background2 = Color(0xff8a8a8a),
         surface = Color(0xffb2b2b2),
-        font =  Color(0xffffffff), //Color(0xffff4d7c)
+        font = Color(0xffffffff), //Color(0xffff4d7c)
         fontSecondary = Color(0xffab0460),
         bars = Color(0xff000000),
     ) {

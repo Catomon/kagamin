@@ -94,7 +94,7 @@ fun CurrentTrackFrame(
                 Modifier.fillMaxWidth()
             )
 
-            PlaybackOptionsButtons(fade, playMode, player)
+            PlaybackOptionsButtons(player)
 
             var volume by player.volume
             VolumeSlider(
@@ -153,7 +153,7 @@ fun CompactCurrentTrackFrame(
             ) {
                 Spacer(Modifier.height(16.dp))
 
-                PlaybackOptionsButtons(fade, playMode, player)
+                PlaybackOptionsButtons(player)
 
                 PlaybackButtons(
                     player = player,
@@ -178,6 +178,8 @@ private fun TrackThumbnail(
     updateProgress: () -> Unit,
     progress: Float
 ) {
+    val progressColor = remember { Colors.bars.copy(0.5f) }
+
     var image by remember(currentTrack) {
         mutableStateOf<ImageBitmap?>(null)
     }
@@ -231,10 +233,10 @@ private fun TrackThumbnail(
             Row(modifier = Modifier.fillMaxSize()) {
                 Box(
                     modifier = Modifier.fillMaxHeight().let {
-                        val weight = progress; if (weight > 0) it.weight(weight) else it
-                    }.background(remember {
-                        Colors.barsTransparent
-                    })
+                        if (progress > 0) it.weight(progress) else it
+                    }.background(
+                        progressColor
+                    )
                 ) { }
 
                 Box(
@@ -248,25 +250,23 @@ private fun TrackThumbnail(
 
 @Composable
 private fun PlaybackOptionsButtons(
-    fade: Boolean,
-    playMode: DenpaPlayer.PlayMode,
     player: DenpaPlayer<DenpaTrack>
 ) {
-    var fade1 = fade
-    var playMode1 = playMode
+    var fade by player.fade
+    var playMode by player.playMode
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = Modifier.fillMaxWidth()
     ) {
         IconButton({
-            fade1 = !fade1
+            fade = !fade
         }, modifier = Modifier.size(32.dp)) {
             Image(
                 painterResource(Res.drawable.fade),
                 "crossfade",
                 colorFilter =
-                if (fade1)
+                if (fade)
                     ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon)
                 else
                     ColorFilter.tint(Colors.currentYukiTheme.playerButtonIconTransparent)
@@ -274,8 +274,8 @@ private fun PlaybackOptionsButtons(
         }
 
         IconButton({
-            playMode1 =
-                if (playMode1 != DenpaPlayer.PlayMode.REPEAT_TRACK)
+            playMode =
+                if (playMode != DenpaPlayer.PlayMode.REPEAT_TRACK)
                     DenpaPlayer.PlayMode.REPEAT_TRACK
                 else
                     DenpaPlayer.PlayMode.REPEAT_PLAYLIST
@@ -284,7 +284,7 @@ private fun PlaybackOptionsButtons(
                 painterResource(Res.drawable.repeat_single),
                 "repeat track",
                 colorFilter =
-                if (playMode1 == DenpaPlayer.PlayMode.REPEAT_TRACK)
+                if (playMode == DenpaPlayer.PlayMode.REPEAT_TRACK)
                     ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon)
                 else
                     ColorFilter.tint(Colors.currentYukiTheme.playerButtonIconTransparent)
@@ -293,7 +293,7 @@ private fun PlaybackOptionsButtons(
 
         IconButton({
             player.playMode.value =
-                if (playMode1 != DenpaPlayer.PlayMode.RANDOM)
+                if (playMode != DenpaPlayer.PlayMode.RANDOM)
                     DenpaPlayer.PlayMode.RANDOM
                 else
                     DenpaPlayer.PlayMode.REPEAT_PLAYLIST
@@ -302,7 +302,7 @@ private fun PlaybackOptionsButtons(
                 painterResource(Res.drawable.random),
                 "random mode",
                 colorFilter =
-                if (playMode1 == DenpaPlayer.PlayMode.RANDOM)
+                if (playMode == DenpaPlayer.PlayMode.RANDOM)
                     ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon)
                 else
                     ColorFilter.tint(Colors.currentYukiTheme.playerButtonIconTransparent)

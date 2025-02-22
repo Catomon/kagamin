@@ -36,12 +36,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope.Companion.DefaultFilterQuality
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chu.monscout.kagamin.Colors
@@ -171,6 +175,36 @@ fun CompactCurrentTrackFrame(
     }
 }
 
+fun getCropParameters(original: ImageBitmap): Pair<IntOffset, IntSize> {
+    val width = original.width
+    val height = original.height
+
+    var left = width
+    var right = 0
+    var top = height
+    var bottom = 0
+
+    val pixels = IntArray(width * height)
+    original.readPixels(pixels)
+
+    for (y in 0 until height) {
+        for (x in 0 until width) {
+            if (pixels[y * width + x] != Color.Black.toArgb()) {
+                if (x < left) left = x
+                if (x > right) right = x
+                if (y < top) top = y
+                if (y > bottom) bottom = y
+            }
+        }
+    }
+
+    val offset = IntOffset(left, top)
+    val size = IntSize(right - left + 1, bottom - top + 1)
+
+    return Pair(offset, size)
+}
+
+
 @Composable
 private fun TrackThumbnail(
     currentTrack: DenpaTrack?,
@@ -184,8 +218,21 @@ private fun TrackThumbnail(
         mutableStateOf<ImageBitmap?>(null)
     }
     var loadingThumb by remember { mutableStateOf(true) }
+    var offset by remember { mutableStateOf(IntOffset(0, 0))  }
+    var size by remember { mutableStateOf(IntSize(0, 0))  }
+
     LaunchedEffect(currentTrack) {
-        image = if (currentTrack != null) getThumbnail(currentTrack) else null
+        image = if (currentTrack != null) {
+            getThumbnail(currentTrack)?.let { thumbnail ->
+                val crop = getCropParameters(thumbnail)
+                size = crop.second
+                offset = crop.first
+
+                thumbnail
+            }
+        } else {
+            null
+        }
         loadingThumb = false
     }
 
@@ -218,7 +265,9 @@ private fun TrackThumbnail(
                         remember {
                             BitmapPainter(
                                 image!!,
-                                filterQuality = DefaultFilterQuality
+                                filterQuality = DefaultFilterQuality,
+                                srcOffset = offset,
+                                srcSize = size
                             )
                         },
                         "Track thumbnail",

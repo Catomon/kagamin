@@ -1,5 +1,6 @@
 package chu.monscout.kagamin.feature
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -14,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import chu.monscout.kagamin.Colors
 import chu.monscout.kagamin.isValidFileName
 import chu.monscout.kagamin.savePlaylist
 
@@ -24,7 +26,7 @@ fun CreatePlaylistTab(state: KagaminViewModel, modifier: Modifier) {
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier,
+        modifier = modifier.background(Colors.currentYukiTheme.listItemB),
         verticalArrangement = Arrangement.Center
     ) {
         TextField(name, onValueChange = {

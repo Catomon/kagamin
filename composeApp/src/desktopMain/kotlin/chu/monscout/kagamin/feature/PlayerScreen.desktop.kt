@@ -116,7 +116,7 @@ actual fun PlayerScreen(
 
                         Tabs.TRACKLIST -> {
                             if (state.playlist.isEmpty()) {
-                                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                Box(Modifier.fillMaxSize().background(Colors.currentYukiTheme.listItemB), contentAlignment = Alignment.Center) {
                                     Text(
                                         "Drop files or folders here",
                                         textAlign = TextAlign.Center,
@@ -234,7 +234,7 @@ fun CompactPlayerScreen(
 
                             Tabs.TRACKLIST -> {
                                 if (state.playlist.isEmpty()) {
-                                    Box(Modifier.fillMaxHeight(), contentAlignment = Alignment.Center) {
+                                    Box(Modifier.fillMaxHeight().background(Colors.currentYukiTheme.listItemB), contentAlignment = Alignment.Center) {
                                         Text(
                                             "Drop files or folders here",
                                             textAlign = TextAlign.Center,

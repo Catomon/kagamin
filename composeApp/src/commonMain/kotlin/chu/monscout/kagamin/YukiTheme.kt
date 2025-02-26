@@ -158,6 +158,7 @@ object Themes {
         open val listItemB: Color = background2.copy(0.8f)
         open val barsTransparent: Color = bars.copy(0.9f)
         open val playerButtonIconTransparent get() = playerButtonIcon.copy(0.5f)
+        open val progressOverThumbnail: Color = bars.copy(0.5f)
     }
 }
 

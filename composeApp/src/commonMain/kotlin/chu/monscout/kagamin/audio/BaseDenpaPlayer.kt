@@ -2,7 +2,6 @@ package chu.monscout.kagamin.audio
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import chu.monscout.kagamin.audio.DenpaPlayer
 import java.util.LinkedList
 
 abstract class BaseDenpaPlayer<T : DenpaTrack> : DenpaPlayer<T> {
@@ -38,7 +37,12 @@ abstract class BaseDenpaPlayer<T : DenpaTrack> : DenpaPlayer<T> {
     }
 
     override fun addToPlaylist(track: T) {
-        playlist.value = playlist.value.toMutableList().apply { add(track) }
+        playlist.value = playlist.value.toMutableList().apply {
+            if (any { it.uri == track.uri }) {
+                return
+            }
+            add(track)
+        }
     }
 
     override fun removeFromPlaylist(track: T) {

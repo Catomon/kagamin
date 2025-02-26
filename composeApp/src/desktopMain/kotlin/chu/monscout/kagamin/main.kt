@@ -41,6 +41,7 @@ import chu.monscout.kagamin.feature.KagaminApp
 import chu.monscout.kagamin.feature.KagaminViewModel
 import com.github.catomon.yukinotes.di.appModule
 import kagamin.composeapp.generated.resources.Res
+import kagamin.composeapp.generated.resources.kagamin_icon64
 import kagamin.composeapp.generated.resources.pause_icon
 import kagamin.composeapp.generated.resources.play_icon
 import kagamin.composeapp.generated.resources.star_icon64
@@ -123,13 +124,31 @@ private fun PlayerWindow(
 ) {
     val layoutManager = LocalLayoutManager.current
 
+    val resizable: Boolean
+    when (layoutManager.currentLayout.value) {
+        LayoutManager.Layout.Default -> {
+            resizable = true
+        }
+        LayoutManager.Layout.Compact -> {
+            resizable = false
+        }
+        LayoutManager.Layout.Tiny -> {
+            resizable = false
+        }
+        else -> {
+            resizable = true
+        }
+    }
+
     Window(
         onCloseRequest = onCloseRequest,
         title = "Kagamin",
-        icon = painterResource(Res.drawable.star_icon64),
+        icon = painterResource(Res.drawable.kagamin_icon64),
         state = windowState,
         undecorated = true,
+        resizable = resizable,
         transparent = isOpenGl,
+        alwaysOnTop = loadSettings().alwaysOnTop,
         onPreviewKeyEvent = {
             if (it.type == KeyEventType.KeyDown && it.key == Key.F2) {
                 when (layoutManager.currentLayout.value) {

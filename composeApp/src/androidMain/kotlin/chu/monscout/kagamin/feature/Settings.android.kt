@@ -1,20 +1,21 @@
 package chu.monscout.kagamin.feature
 
+import androidx.compose.material.Button
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import kotlinx.serialization.Serializable
-
-@Serializable
-object SettingsDestination {
-    override fun toString(): String {
-        return "settings"
-    }
-}
 
 @Composable
-expect fun SettingsScreen(
+actual fun SettingsScreen(
     state: KagaminViewModel,
     navController: NavHostController,
-    modifier: Modifier = Modifier
-)
+    modifier: Modifier
+) {
+    Text("TODO")
+    Button({
+        navController.popBackStack()
+    }) {
+        Text("Return")
+    }
+}

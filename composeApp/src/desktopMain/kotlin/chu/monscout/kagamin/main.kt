@@ -6,7 +6,6 @@ import androidx.compose.foundation.draganddrop.dragAndDropTarget
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -44,7 +43,6 @@ import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.kagamin_icon64
 import kagamin.composeapp.generated.resources.pause_icon
 import kagamin.composeapp.generated.resources.play_icon
-import kagamin.composeapp.generated.resources.star_icon64
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
@@ -52,14 +50,25 @@ import org.koin.core.context.GlobalContext.startKoin
 import org.koin.java.KoinJavaComponent.get
 import java.awt.datatransfer.DataFlavor
 import java.io.File
+import javax.swing.JOptionPane
 
-var isCompost = false
 var isOpenGl = false
+val isTraySupported = androidx.compose.ui.window.isTraySupported
 
 fun main() {
-    setDefaultUncaughtExceptionHandler()
+
+    Thread.setDefaultUncaughtExceptionHandler { _, e ->
+        JOptionPane.showMessageDialog(
+            null,
+            e.stackTraceToString(),
+            "Error",
+            JOptionPane.ERROR_MESSAGE
+        )
+    }
 
     application {
+        setExceptionHandler()
+
         startKoin {
             modules(appModule)
         }
@@ -71,7 +80,6 @@ fun main() {
             e.printStackTrace()
         }
 
-        isCompost = true
         AppContainer(::exitApplication)
     }
 }
@@ -105,15 +113,17 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
         PlayerWindow(windowState, kagaminViewModel, onCloseRequest)
     }
 
-    val trayState = rememberTrayState()
-    Tray(
-        painterResource(if (kagaminViewModel.playState == DenpaPlayer.PlayState.PLAYING) Res.drawable.pause_icon else Res.drawable.play_icon),
-        tooltip = kagaminViewModel.currentTrack?.name,
-        onAction = {
-            kagaminViewModel.onPlayPause()
-        },
-        state = trayState
-    )
+    if (isTraySupported) {
+        val trayState = rememberTrayState()
+        Tray(
+            painterResource(if (kagaminViewModel.playState == DenpaPlayer.PlayState.PLAYING) Res.drawable.pause_icon else Res.drawable.play_icon),
+            tooltip = kagaminViewModel.currentTrack?.name,
+            onAction = {
+                kagaminViewModel.onPlayPause()
+            },
+            state = trayState
+        )
+    }
 }
 
 @Composable
@@ -129,12 +139,15 @@ private fun PlayerWindow(
         LayoutManager.Layout.Default -> {
             resizable = true
         }
+
         LayoutManager.Layout.Compact -> {
             resizable = false
         }
+
         LayoutManager.Layout.Tiny -> {
             resizable = false
         }
+
         else -> {
             resizable = true
         }
@@ -155,9 +168,11 @@ private fun PlayerWindow(
                     LayoutManager.Layout.Default -> {
                         layoutManager.currentLayout.value = LayoutManager.Layout.Compact
                     }
+
                     LayoutManager.Layout.Compact -> {
                         layoutManager.currentLayout.value = LayoutManager.Layout.Tiny
                     }
+
                     LayoutManager.Layout.Tiny -> {
                         layoutManager.currentLayout.value = LayoutManager.Layout.Default
                     }

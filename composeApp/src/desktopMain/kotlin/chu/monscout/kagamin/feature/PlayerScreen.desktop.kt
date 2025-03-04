@@ -99,7 +99,8 @@ actual fun PlayerScreen(
                 CurrentTrackFrame(
                     currentTrack,
                     denpaPlayer,
-                    Modifier.width(180.dp).fillMaxHeight())
+                    Modifier.width(180.dp).fillMaxHeight()
+                )
             }
 
 
@@ -116,7 +117,11 @@ actual fun PlayerScreen(
 
                         Tabs.TRACKLIST -> {
                             if (state.playlist.isEmpty()) {
-                                Box(Modifier.fillMaxSize().background(Colors.currentYukiTheme.listItemB), contentAlignment = Alignment.Center) {
+                                Box(
+                                    Modifier.fillMaxSize()
+                                        .background(Colors.currentYukiTheme.listItemB),
+                                    contentAlignment = Alignment.Center
+                                ) {
                                     Text(
                                         "Drop files or folders here",
                                         textAlign = TextAlign.Center,
@@ -198,7 +203,8 @@ fun CompactPlayerScreen(
             Column(Modifier.fillMaxHeight().weight(0.99f)) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.background(color = Colors.barsTransparent).padding(4.dp).fillMaxWidth()
+                    modifier = Modifier.background(color = Colors.barsTransparent).padding(4.dp)
+                        .fillMaxWidth()
                 ) {
                     Image(
                         painterResource(Res.drawable.star64),
@@ -221,7 +227,9 @@ fun CompactPlayerScreen(
                                 CurrentTrackFrame(
                                     currentTrack,
                                     denpaPlayer,
-                                    Modifier.width(180.dp).fillMaxHeight().background(color = Colors.barsTransparent))
+                                    Modifier.width(180.dp).fillMaxHeight()
+                                        .background(color = Colors.barsTransparent)
+                                )
                             }
 
                             Tabs.PLAYLISTS -> {
@@ -234,7 +242,11 @@ fun CompactPlayerScreen(
 
                             Tabs.TRACKLIST -> {
                                 if (state.playlist.isEmpty()) {
-                                    Box(Modifier.fillMaxHeight().background(Colors.currentYukiTheme.listItemB), contentAlignment = Alignment.Center) {
+                                    Box(
+                                        Modifier.fillMaxHeight()
+                                            .background(Colors.currentYukiTheme.listItemB),
+                                        contentAlignment = Alignment.Center
+                                    ) {
                                         Text(
                                             "Drop files or folders here",
                                             textAlign = TextAlign.Center,
@@ -254,11 +266,17 @@ fun CompactPlayerScreen(
                             Tabs.OPTIONS -> TODO()
 
                             Tabs.ADD_TRACKS -> {
-                                AddTracksTab(state, Modifier.fillMaxHeight().align(Alignment.Center))
+                                AddTracksTab(
+                                    state,
+                                    Modifier.fillMaxHeight().align(Alignment.Center)
+                                )
                             }
 
                             Tabs.CREATE_PLAYLIST -> {
-                                CreatePlaylistTab(state, Modifier.fillMaxHeight().align(Alignment.Center))
+                                CreatePlaylistTab(
+                                    state,
+                                    Modifier.fillMaxHeight().align(Alignment.Center)
+                                )
                             }
                         }
                     }
@@ -313,7 +331,8 @@ fun TinyPlayerScreen(
             Column(Modifier.fillMaxHeight().weight(0.99f)) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.background(color = Colors.barsTransparent).padding(4.dp).fillMaxWidth()
+                    modifier = Modifier.background(color = Colors.barsTransparent).padding(4.dp)
+                        .fillMaxWidth()
                 ) {
                     Image(
                         painterResource(Res.drawable.star64),
@@ -336,7 +355,9 @@ fun TinyPlayerScreen(
                                 CompactCurrentTrackFrame(
                                     currentTrack,
                                     denpaPlayer,
-                                    Modifier.width(180.dp).fillMaxHeight().background(color = Colors.barsTransparent))
+                                    Modifier.width(180.dp).fillMaxHeight()
+                                        .background(color = Colors.barsTransparent)
+                                )
                             }
 
                             Tabs.PLAYLISTS -> {
@@ -349,7 +370,10 @@ fun TinyPlayerScreen(
 
                             Tabs.TRACKLIST -> {
                                 if (state.playlist.isEmpty()) {
-                                    Box(Modifier.fillMaxHeight(), contentAlignment = Alignment.Center) {
+                                    Box(
+                                        Modifier.fillMaxHeight(),
+                                        contentAlignment = Alignment.Center
+                                    ) {
                                         Text(
                                             "Drop files or folders here",
                                             textAlign = TextAlign.Center,
@@ -369,11 +393,17 @@ fun TinyPlayerScreen(
                             Tabs.OPTIONS -> TODO()
 
                             Tabs.ADD_TRACKS -> {
-                                AddTracksTab(state, Modifier.fillMaxHeight().align(Alignment.Center))
+                                AddTracksTab(
+                                    state,
+                                    Modifier.fillMaxHeight().align(Alignment.Center)
+                                )
                             }
 
                             Tabs.CREATE_PLAYLIST -> {
-                                CreatePlaylistTab(state, Modifier.fillMaxHeight().align(Alignment.Center))
+                                CreatePlaylistTab(
+                                    state,
+                                    Modifier.fillMaxHeight().align(Alignment.Center)
+                                )
                             }
                         }
                     }

@@ -86,7 +86,7 @@ fun main() {
 
 @Composable
 fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
-    val windowState = rememberWindowState(width = 600.dp, height = 350.dp) // 212 328
+    val windowState = rememberWindowState(width = 500.dp, height = 350.dp)
     val kagaminViewModel: KagaminViewModel = remember { get(KagaminViewModel::class.java) }
     val layoutManager = remember { LayoutManager() }
     val currentLayout by layoutManager.currentLayout
@@ -94,15 +94,15 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
     LaunchedEffect(currentLayout) {
         when (currentLayout) {
             LayoutManager.Layout.Default -> {
-                windowState.size = DpSize(600.dp, 350.dp)
+                windowState.size = DpSize(500.dp, 350.dp)
             }
 
             LayoutManager.Layout.Compact -> {
-                windowState.size = DpSize(212.dp, 328.dp)
+                windowState.size = DpSize(192.dp, 328.dp)
             }
 
             LayoutManager.Layout.Tiny -> {
-                windowState.size = DpSize(200.dp, 200.dp)
+                windowState.size = DpSize(192.dp, 200.dp)
             }
         }
     }

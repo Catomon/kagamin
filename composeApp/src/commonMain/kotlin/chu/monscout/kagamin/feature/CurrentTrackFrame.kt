@@ -261,7 +261,7 @@ private fun TrackThumbnail(
 
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier.height(160.dp).padding(8.dp)
+        modifier = Modifier.size(160.dp).padding(8.dp)
             .clip(
                 RoundedCornerShape(12.dp)
             ).pointerInput(currentTrack) {

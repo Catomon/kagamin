@@ -3,6 +3,7 @@ package chu.monscout.kagamin.feature
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import chu.monscout.kagamin.Colors
-import chu.monscout.kagamin.appName
 import chu.monscout.kagamin.createDenpaTrack
 import chu.monscout.kagamin.loadPlaylist
 import kagamin.composeapp.generated.resources.Res
@@ -76,20 +76,31 @@ actual fun PlayerScreen(
             colorFilter = ColorFilter.tint(Colors.currentYukiTheme.background2)
         )
 
-        Row {
-            Column(Modifier.fillMaxHeight().background(color = Colors.barsTransparent)) {
+        Row() {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxHeight()
+                    .background(color = Colors.barsTransparent)
+            ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(4.dp)
+                    modifier = Modifier.padding(horizontal = 12.dp).padding(top = 8.dp)
+                        .height(32.dp)
                 ) {
+                    Text(
+                        "Kag",
+                        color = Colors.currentYukiTheme.playerButtonIcon,
+                        fontSize = 16.sp,
+                        modifier = Modifier.height(32.dp)
+                    )
                     Image(
                         painterResource(Res.drawable.star64),
                         "App icon",
                         colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon),
-                        modifier = Modifier.size(24.dp).offset(y = (-3).dp)
+                        modifier = Modifier.size(32.dp).offset(y = (-3).dp)
                     )
                     Text(
-                        appName,
+                        "min",
                         color = Colors.currentYukiTheme.playerButtonIcon,
                         fontSize = 16.sp,
                         modifier = Modifier.height(32.dp)
@@ -99,7 +110,7 @@ actual fun PlayerScreen(
                 CurrentTrackFrame(
                     currentTrack,
                     denpaPlayer,
-                    Modifier.width(180.dp).fillMaxHeight()
+                    Modifier.width(160.dp).fillMaxHeight()
                 )
             }
 
@@ -200,20 +211,31 @@ fun CompactPlayerScreen(
         )
 
         Row {
-            Column(Modifier.fillMaxHeight().weight(0.99f)) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxHeight().weight(0.99f)
+            ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.background(color = Colors.barsTransparent).padding(4.dp)
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.background(color = Colors.barsTransparent)
+                        .padding(horizontal = 12.dp).padding(top = 8.dp).height(32.dp)
                         .fillMaxWidth()
                 ) {
+                    Text(
+                        "Kag",
+                        color = Colors.currentYukiTheme.playerButtonIcon,
+                        fontSize = 16.sp,
+                        modifier = Modifier.height(32.dp)
+                    )
                     Image(
                         painterResource(Res.drawable.star64),
                         "App icon",
                         colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon),
-                        modifier = Modifier.size(24.dp).offset(y = (-3).dp)
+                        modifier = Modifier.size(32.dp).offset(y = (-3).dp)
                     )
                     Text(
-                        appName,
+                        "min",
                         color = Colors.currentYukiTheme.playerButtonIcon,
                         fontSize = 16.sp,
                         modifier = Modifier.height(32.dp)
@@ -227,7 +249,7 @@ fun CompactPlayerScreen(
                                 CurrentTrackFrame(
                                     currentTrack,
                                     denpaPlayer,
-                                    Modifier.width(180.dp).fillMaxHeight()
+                                    Modifier.width(160.dp).fillMaxHeight()
                                         .background(color = Colors.barsTransparent)
                                 )
                             }
@@ -328,20 +350,31 @@ fun TinyPlayerScreen(
         )
 
         Row {
-            Column(Modifier.fillMaxHeight().weight(0.99f)) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxHeight().weight(0.99f)
+            ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.background(color = Colors.barsTransparent).padding(4.dp)
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.background(color = Colors.barsTransparent)
+                        .padding(horizontal = 12.dp).padding(top = 8.dp).height(32.dp)
                         .fillMaxWidth()
                 ) {
+                    Text(
+                        "Kag",
+                        color = Colors.currentYukiTheme.playerButtonIcon,
+                        fontSize = 16.sp,
+                        modifier = Modifier.height(32.dp)
+                    )
                     Image(
                         painterResource(Res.drawable.star64),
                         "App icon",
                         colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon),
-                        modifier = Modifier.size(24.dp).offset(y = (-3).dp)
+                        modifier = Modifier.size(32.dp).offset(y = (-3).dp)
                     )
                     Text(
-                        appName,
+                        "min",
                         color = Colors.currentYukiTheme.playerButtonIcon,
                         fontSize = 16.sp,
                         modifier = Modifier.height(32.dp)
@@ -355,7 +388,7 @@ fun TinyPlayerScreen(
                                 CompactCurrentTrackFrame(
                                     currentTrack,
                                     denpaPlayer,
-                                    Modifier.width(180.dp).fillMaxHeight()
+                                    Modifier.width(160.dp).fillMaxHeight()
                                         .background(color = Colors.barsTransparent)
                                 )
                             }

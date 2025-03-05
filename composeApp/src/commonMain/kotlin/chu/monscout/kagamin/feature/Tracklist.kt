@@ -1,15 +1,23 @@
 package chu.monscout.kagamin.feature
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import chu.monscout.kagamin.Colors
 import chu.monscout.kagamin.audio.DenpaTrack
 import chu.monscout.kagamin.savePlaylist
 import kotlinx.coroutines.CoroutineScope
@@ -40,9 +48,11 @@ fun Tracklist(state: KagaminViewModel, tracks: List<DenpaTrack>, modifier: Modif
                     }
                 }
             )
+        } else {
+            Box(modifier = Modifier.background(Colors.barsTransparent).height(32.dp).fillMaxWidth())
         }
 
-        LazyColumn(Modifier.fillMaxSize(), state = listState) {
+        LazyColumn(Modifier.fillMaxWidth(), state = listState) {
             items(tracks.size, key = {
                 tracks[it].uri
             }) { index ->
@@ -70,6 +80,8 @@ fun Tracklist(state: KagaminViewModel, tracks: List<DenpaTrack>, modifier: Modif
                 )
             }
         }
+
+        Box(Modifier.fillMaxSize().background(Colors.currentYukiTheme.listItemB))
     }
 }
 

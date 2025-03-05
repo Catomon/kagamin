@@ -273,7 +273,7 @@ private fun TrackThumbnail(
                 }
             }
     ) {
-        AnimatedContent(image, modifier = Modifier.fillMaxSize()) {
+        AnimatedContent(image, modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp))) {
             if (!loadingThumb && image == null) { //this still executes idc
                 Box(
                     Modifier.fillMaxSize()

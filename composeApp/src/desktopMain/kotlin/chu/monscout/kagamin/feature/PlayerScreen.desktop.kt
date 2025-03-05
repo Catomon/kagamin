@@ -1,6 +1,10 @@
 package chu.monscout.kagamin.feature
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,11 +19,13 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
@@ -37,6 +43,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 actual fun PlayerScreen(
     state: KagaminViewModel,
@@ -68,10 +75,10 @@ actual fun PlayerScreen(
         }
     }
 
-    Box(modifier.background(color = Colors.background)) {
+    Box(modifier.background(color = Colors.background, shape = RoundedCornerShape(16.dp))) {
         Image(
             painterResource(Res.drawable.stars_background), "Background",
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(16.dp)),
             contentScale = ContentScale.Crop,
             colorFilter = ColorFilter.tint(Colors.currentYukiTheme.background2)
         )
@@ -116,7 +123,9 @@ actual fun PlayerScreen(
 
 
             Box(Modifier.weight(0.75f)) {
-                AnimatedContent(state.currentTab) {
+                AnimatedContent(targetState = state.currentTab, transitionSpec = {
+                    slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
+                }) {
                     when (it) {
                         Tabs.PLAYLISTS -> {
                             Playlists(
@@ -202,10 +211,10 @@ fun CompactPlayerScreen(
         }
     }
 
-    Box(modifier.background(color = Colors.background)) {
+    Box(modifier.background(color = Colors.background, shape = RoundedCornerShape(16.dp))) {
         Image(
             painterResource(Res.drawable.stars_background), "Background",
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(16.dp)),
             contentScale = ContentScale.Crop,
             colorFilter = ColorFilter.tint(Colors.currentYukiTheme.background2)
         )
@@ -243,7 +252,9 @@ fun CompactPlayerScreen(
                 }
 
                 Box(Modifier.weight(0.99f).fillMaxHeight()) {
-                    AnimatedContent(state.currentTab) {
+                    AnimatedContent(targetState = state.currentTab, transitionSpec = {
+                        slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
+                    }) {
                         when (it) {
                             Tabs.PLAYBACK -> {
                                 CurrentTrackFrame(
@@ -341,10 +352,10 @@ fun TinyPlayerScreen(
         }
     }
 
-    Box(modifier.background(color = Colors.background)) {
+    Box(modifier.background(color = Colors.background, shape = RoundedCornerShape(16.dp))) {
         Image(
             painterResource(Res.drawable.stars_background), "Background",
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(16.dp)),
             contentScale = ContentScale.Crop,
             colorFilter = ColorFilter.tint(Colors.currentYukiTheme.background2)
         )
@@ -382,7 +393,9 @@ fun TinyPlayerScreen(
                 }
 
                 Box(Modifier.weight(0.99f).fillMaxHeight()) {
-                    AnimatedContent(state.currentTab) {
+                    AnimatedContent(targetState = state.currentTab, transitionSpec = {
+                        slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
+                    }) {
                         when (it) {
                             Tabs.PLAYBACK -> {
                                 CompactCurrentTrackFrame(
@@ -404,7 +417,8 @@ fun TinyPlayerScreen(
                             Tabs.TRACKLIST -> {
                                 if (state.playlist.isEmpty()) {
                                     Box(
-                                        Modifier.fillMaxHeight(),
+                                        Modifier.fillMaxHeight()
+                                            .background(Colors.currentYukiTheme.listItemB),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text(

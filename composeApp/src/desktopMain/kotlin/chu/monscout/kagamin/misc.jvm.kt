@@ -35,8 +35,10 @@ import java.awt.event.MouseEvent
 import java.awt.event.MouseMotionAdapter
 import java.io.File
 
+val osName = System.getProperty("os.name").lowercase()
+
 actual val userDataFolder: File =
-    File(System.getProperty("user.home"), "AppData/Roaming/Kagamin")
+    File(System.getProperty("user.home"), if (osName.contains("win")) "AppData/Roaming/Kagamin" else ".local/share/Kagamin")
 
 actual fun <T : DenpaTrack> createDenpaTrack(uri: String, name: String): T {
     return DenpaTrackJVM(uri = uri, name = name) as T

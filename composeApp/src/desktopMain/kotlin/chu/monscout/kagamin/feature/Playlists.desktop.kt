@@ -91,12 +91,12 @@ actual fun PlaylistItem(
                         fontSize = 10.sp,
                         color = Colors.text2
                     )
-                    Text(
-                        "Duration: ???",
-                        modifier = Modifier.weight(0.5f),
-                        fontSize = 10.sp,
-                        color = Colors.text2
-                    )
+//                    Text(
+//                        "Duration: ???",
+//                        modifier = Modifier.weight(0.5f),
+//                        fontSize = 10.sp,
+//                        color = Colors.text2
+//                    )
                 }
             }
         }

@@ -52,11 +52,10 @@ import java.awt.datatransfer.DataFlavor
 import java.io.File
 import javax.swing.JOptionPane
 
-var isOpenGl = false
+var isTransparent = false
 val isTraySupported = androidx.compose.ui.window.isTraySupported
 
 fun main() {
-
     Thread.setDefaultUncaughtExceptionHandler { _, e ->
         JOptionPane.showMessageDialog(
             null,
@@ -73,9 +72,17 @@ fun main() {
             modules(appModule)
         }
 
+        println(osName)
+
         try {
-            System.setProperty("skiko.renderApi", "OPENGL")
-            isOpenGl = true
+            if (osName.contains("win")) {
+                System.setProperty("skiko.renderApi", "OPENGL")
+                println("skiko.renderApi = OPENGL")
+            } else {
+                System.setProperty("skiko.renderApi", "SOFTWARE_FAST")
+                println("skiko.renderApi = SOFTWARE_FAST")
+            }
+            isTransparent = true
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -160,7 +167,7 @@ private fun PlayerWindow(
         state = windowState,
         undecorated = true,
         resizable = resizable,
-        transparent = isOpenGl,
+        transparent = isTransparent,
         alwaysOnTop = loadSettings().alwaysOnTop,
         onPreviewKeyEvent = {
             if (it.type == KeyEventType.KeyDown && it.key == Key.F2) {
@@ -219,7 +226,7 @@ fun WindowScope.App(kagaminViewModel: KagaminViewModel = get(KagaminViewModel::c
             LocalSnackbarHostState.current
         KagaminApp(
             kagaminViewModel,
-            modifier = Modifier.let { if (isOpenGl) it.clip(RoundedCornerShape(12.dp)) else it }
+            modifier = Modifier.let { if (isTransparent) it.clip(RoundedCornerShape(12.dp)) else it }
                 .dragAndDropTarget({ true }, remember {
                     object : DragAndDropTarget {
                         override fun onStarted(event: DragAndDropEvent) {

@@ -106,7 +106,10 @@ private val AudioTrack.trackInfoString: String get() = info.author + " - " + inf
 
 val AudioTrack.trackName: String
     get() = if (info.uri.contains("https://")) info.title
-    else identifier.substring(identifier.lastIndexOf('\\') + 1).removeSuffix(".mp3")
+    else identifier
+        .substring(identifier.lastIndexOf('\\') + 1)
+        .substring(identifier.lastIndexOf('/') + 1)
+        .removeSuffix(".mp3")
 
 val DenpaTrack.songAuthorPlusTitle get() = "$author - $name"
 

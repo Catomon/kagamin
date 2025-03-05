@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowScope
 import androidx.compose.ui.window.application
@@ -41,28 +42,28 @@ actual fun <T : DenpaTrack> createDenpaTrack(uri: String, name: String): T {
     return DenpaTrackJVM(uri = uri, name = name) as T
 }
 
-fun setDefaultUncaughtExceptionHandler() {
+fun ApplicationScope.setExceptionHandler() {
     Thread.setDefaultUncaughtExceptionHandler { _, e ->
         File("last_error.txt").writeText(e.stackTraceToString())
         e.printStackTrace()
 
-        if (!isCompost) {
-            application {
-                Window(
-                    onCloseRequest = ::exitApplication,
-                    state = rememberWindowState(width = 300.dp, height = 250.dp),
-                    visible = true,
-                    title = "Error",
-                ) {
-                    val clipboard = LocalClipboardManager.current
+        exitApplication()
 
-                    Box(contentAlignment = Alignment.Center) {
-                        Text(e.stackTraceToString(), Modifier.fillMaxSize())
-                        Button({
-                            clipboard.setText(AnnotatedString(e.stackTraceToString()))
-                        }, Modifier.align(Alignment.BottomCenter)) {
-                            Text("Copy")
-                        }
+        application {
+            Window(
+                onCloseRequest = ::exitApplication,
+                state = rememberWindowState(width = 300.dp, height = 250.dp),
+                visible = true,
+                title = "Error",
+            ) {
+                val clipboard = LocalClipboardManager.current
+
+                Box(contentAlignment = Alignment.Center) {
+                    Text(e.stackTraceToString(), Modifier.fillMaxSize())
+                    Button({
+                        clipboard.setText(AnnotatedString(e.stackTraceToString()))
+                    }, Modifier.align(Alignment.BottomCenter)) {
+                        Text("Copy")
                     }
                 }
             }

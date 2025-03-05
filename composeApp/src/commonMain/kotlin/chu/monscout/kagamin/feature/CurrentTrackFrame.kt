@@ -2,6 +2,8 @@ package chu.monscout.kagamin.feature
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
@@ -52,6 +54,7 @@ import chu.monscout.kagamin.Colors
 import chu.monscout.kagamin.audio.DenpaPlayer
 import chu.monscout.kagamin.audio.DenpaTrack
 import kagamin.composeapp.generated.resources.Res
+import kagamin.composeapp.generated.resources.def_thumb
 import kagamin.composeapp.generated.resources.fade
 import kagamin.composeapp.generated.resources.random
 import kagamin.composeapp.generated.resources.repeat_single
@@ -140,10 +143,28 @@ fun CompactCurrentTrackFrame(
     val isHovered by interactionSource.collectIsHoveredAsState()
 
     Box(modifier.hoverable(interactionSource), contentAlignment = Alignment.Center) {
-        TrackThumbnail(currentTrack, player, updateProgress, progress)
+
+        val targetValue = remember(
+            currentTrack,
+            isHovered,
+            progress
+        ) { if (isHovered) 1f else progress }
+        val floatAnimation by animateFloatAsState(targetValue)
+
+        val targetProgressColor: Color =
+            remember(isHovered) { if (isHovered) Colors.barsTransparent else Colors.currentYukiTheme.progressOverThumbnail }
+        val aniColor = animateColorAsState(targetProgressColor)
+
+        TrackThumbnail(
+            currentTrack,
+            player,
+            updateProgress,
+            floatAnimation,
+            progressColor = aniColor.value
+        )
 
         AnimatedVisibility(
-            isHovered || currentTrack == null,
+            isHovered,
             enter = fadeIn(),
             exit = fadeOut(),
             modifier = Modifier.height(144.dp).width(153.dp).clip(
@@ -153,7 +174,7 @@ fun CompactCurrentTrackFrame(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
-                modifier = Modifier.let { if (currentTrack != null) it.background(Colors.barsTransparent) else it },
+                //modifier = Modifier.let { if (currentTrack != null) it.background(Colors.barsTransparent) else it },
             ) {
                 Spacer(Modifier.height(16.dp))
 
@@ -210,18 +231,20 @@ private fun TrackThumbnail(
     currentTrack: DenpaTrack?,
     player: DenpaPlayer<DenpaTrack>,
     updateProgress: () -> Unit,
-    progress: Float
+    progress: Float,
+    progressColor: Color = Colors.currentYukiTheme.progressOverThumbnail
 ) {
-    val progressColor = remember { Colors.bars.copy(0.5f) }
+    //val progressColor = remember { Colors.bars.copy(0.5f) }
 
     var image by remember(currentTrack) {
         mutableStateOf<ImageBitmap?>(null)
     }
-    var loadingThumb by remember { mutableStateOf(true) }
-    var offset by remember { mutableStateOf(IntOffset(0, 0))  }
-    var size by remember { mutableStateOf(IntSize(0, 0))  }
+    var loadingThumb by remember(currentTrack) { mutableStateOf(true) }
+    var offset by remember { mutableStateOf(IntOffset(0, 0)) }
+    var size by remember { mutableStateOf(IntSize(0, 0)) }
 
     LaunchedEffect(currentTrack) {
+        loadingThumb = true
         image = if (currentTrack != null) {
             getThumbnail(currentTrack)?.let { thumbnail ->
                 val crop = getCropParameters(thumbnail)
@@ -238,7 +261,7 @@ private fun TrackThumbnail(
 
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier.height(160.dp).padding(8.dp)
+        modifier = Modifier.size(160.dp).padding(8.dp)
             .clip(
                 RoundedCornerShape(12.dp)
             ).pointerInput(currentTrack) {
@@ -254,7 +277,14 @@ private fun TrackThumbnail(
             if (!loadingThumb && image == null) { //this still executes idc
                 Box(
                     Modifier.fillMaxSize()
-                ) {}
+                ) {
+                    Image(
+                        painterResource(Res.drawable.def_thumb),
+                        "Track thumbnail",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
             } else {
                 if (loadingThumb || image == null) {
                     Box(

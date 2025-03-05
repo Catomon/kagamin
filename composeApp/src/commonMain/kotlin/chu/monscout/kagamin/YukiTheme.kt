@@ -91,7 +91,7 @@ object Themes {
         fontSecondary = Color(0xFFDECCFF),
         bars = Color(0xff6232a9),
     ) {
-        override val playerButtonIcon: Color = Color(0xff906cd4)
+        override val playerButtonIcon: Color = Color(0xff9775d5)
         override val listItemA: Color = Color(0xcb753cc9)
         override val listItemB: Color = Color(0xcb6232a9)
     }
@@ -105,7 +105,9 @@ object Themes {
         fontSecondary = Color(0xffd2e6ff),
         bars = Color(0xff0f2e93),
     ) {
-
+//        override val playerButtonIcon: Color = Color(0xff9775d5)
+        override val listItemA: Color = Color(0xcc1840c5)
+        override val listItemB: Color = Color(0xcc1037b4)
     }
 
     //    object YukiLight : IYukiTheme(
@@ -158,6 +160,7 @@ object Themes {
         open val listItemB: Color = background2.copy(0.8f)
         open val barsTransparent: Color = bars.copy(0.9f)
         open val playerButtonIconTransparent get() = playerButtonIcon.copy(0.5f)
+        open val progressOverThumbnail: Color = bars.copy(0.5f)
     }
 }
 

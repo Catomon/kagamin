@@ -1,5 +1,6 @@
 package chu.monscout.kagamin.feature
 
+import androidx.compose.foundation.background
 import chu.monscout.kagamin.DenpaFilePicker
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,7 +27,7 @@ fun AddTracksTab(state: KagaminViewModel, modifier: Modifier = Modifier) {
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier,
+        modifier = modifier.background(Colors.currentYukiTheme.listItemB),
         verticalArrangement = Arrangement.Center
     ) {
         Text(

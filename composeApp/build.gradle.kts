@@ -98,7 +98,7 @@ dependencies {
 
 compose.desktop {
     application {
-//        javaHome = System.getenv("JDK_21")
+        javaHome = System.getenv("JDK_21")
 
         mainClass = "chu.monscout.kagamin.MainKt"
 
@@ -116,7 +116,7 @@ compose.desktop {
 
             linux {
                 ///home/neeko/Android/jdk-17.0.14+7
-                javaHome = "/home/neeko/Android/java-21-openjdk" //System.getenv("JDK_17")
+//                javaHome = "/home/neeko/Android/java-21-openjdk" //System.getenv("JDK_17")
                 iconFile.set(project.file("kagamin.png"))
                 shortcut = true
             }

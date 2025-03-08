@@ -210,7 +210,10 @@ fun getCropParameters(original: ImageBitmap): Pair<IntOffset, IntSize> {
 
     for (y in 0 until height) {
         for (x in 0 until width) {
-            if (pixels[y * width + x] != Color.Black.toArgb()) {
+            val pixel = pixels[y * width + x]
+            val color = Color(pixel)
+
+            if (color.red * 255 + color.green * 255 + color.blue * 255 > 120) {
                 if (x < left) left = x
                 if (x > right) right = x
                 if (y < top) top = y

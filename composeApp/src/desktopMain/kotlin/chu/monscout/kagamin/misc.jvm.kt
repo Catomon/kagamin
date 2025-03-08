@@ -8,9 +8,12 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
@@ -44,7 +47,7 @@ actual fun <T : DenpaTrack> createDenpaTrack(uri: String, name: String): T {
     return DenpaTrackJVM(uri = uri, name = name) as T
 }
 
-fun ApplicationScope.setExceptionHandler() {
+fun ApplicationScope.setComposeExceptionHandler() {
     Thread.setDefaultUncaughtExceptionHandler { _, e ->
         File("last_error.txt").writeText(e.stackTraceToString())
         e.printStackTrace()
@@ -144,4 +147,22 @@ private class DragHandler(private val window: Window) {
     }
 
     private fun Point.toComposeOffset() = IntOffset(x, y)
+}
+
+val LocalLayoutManager = compositionLocalOf<LayoutManager> {
+    error("no layout manager provided")
+}
+
+val LocalWindow = compositionLocalOf<ComposeWindow> {
+    error("No window")
+}
+
+class LayoutManager(
+    val currentLayout: MutableState<Layout> = mutableStateOf(Layout.Default)
+) {
+    enum class Layout {
+        Default,
+        Compact,
+        Tiny,
+    }
 }

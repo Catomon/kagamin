@@ -94,6 +94,7 @@ object Themes {
         override val playerButtonIcon: Color = Color(0xff9775d5)
         override val listItemA: Color = Color(0xcb753cc9)
         override val listItemB: Color = Color(0xcb6232a9)
+        override val thinBorder: Color = Color(0xff5522a2)
     }
 
     object Blue : IYukiTheme(
@@ -161,6 +162,7 @@ object Themes {
         open val barsTransparent: Color = bars.copy(0.9f)
         open val playerButtonIconTransparent get() = playerButtonIcon.copy(0.5f)
         open val progressOverThumbnail: Color = bars.copy(0.5f)
+        open val thinBorder: Color = bars
     }
 }
 

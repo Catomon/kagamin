@@ -27,6 +27,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -94,24 +96,7 @@ actual fun PlayerScreen(
                     modifier = Modifier.padding(horizontal = 12.dp).padding(top = 8.dp)
                         .height(32.dp)
                 ) {
-                    Text(
-                        "Kag",
-                        color = Colors.currentYukiTheme.playerButtonIcon,
-                        fontSize = 16.sp,
-                        modifier = Modifier.height(32.dp)
-                    )
-                    Image(
-                        painterResource(Res.drawable.star64),
-                        "App icon",
-                        colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon),
-                        modifier = Modifier.size(32.dp).offset(y = (-3).dp)
-                    )
-                    Text(
-                        "min",
-                        color = Colors.currentYukiTheme.playerButtonIcon,
-                        fontSize = 16.sp,
-                        modifier = Modifier.height(32.dp)
-                    )
+                    AppName()
                 }
 
                 CurrentTrackFrame(
@@ -231,24 +216,7 @@ fun CompactPlayerScreen(
                         .padding(horizontal = 12.dp).padding(top = 8.dp).height(32.dp)
                         .fillMaxWidth()
                 ) {
-                    Text(
-                        "Kag",
-                        color = Colors.currentYukiTheme.playerButtonIcon,
-                        fontSize = 16.sp,
-                        modifier = Modifier.height(32.dp)
-                    )
-                    Image(
-                        painterResource(Res.drawable.star64),
-                        "App icon",
-                        colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon),
-                        modifier = Modifier.size(32.dp).offset(y = (-3).dp)
-                    )
-                    Text(
-                        "min",
-                        color = Colors.currentYukiTheme.playerButtonIcon,
-                        fontSize = 16.sp,
-                        modifier = Modifier.height(32.dp)
-                    )
+                    AppName()
                 }
 
                 Box(Modifier.weight(0.99f).fillMaxHeight()) {
@@ -372,24 +340,7 @@ fun TinyPlayerScreen(
                         .padding(horizontal = 12.dp).padding(top = 8.dp).height(32.dp)
                         .fillMaxWidth()
                 ) {
-                    Text(
-                        "Kag",
-                        color = Colors.currentYukiTheme.playerButtonIcon,
-                        fontSize = 16.sp,
-                        modifier = Modifier.height(32.dp)
-                    )
-                    Image(
-                        painterResource(Res.drawable.star64),
-                        "App icon",
-                        colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon),
-                        modifier = Modifier.size(32.dp).offset(y = (-3).dp)
-                    )
-                    Text(
-                        "min",
-                        color = Colors.currentYukiTheme.playerButtonIcon,
-                        fontSize = 16.sp,
-                        modifier = Modifier.height(32.dp)
-                    )
+                    AppName()
                 }
 
                 Box(Modifier.weight(0.99f).fillMaxHeight()) {
@@ -461,3 +412,69 @@ fun TinyPlayerScreen(
         }
     }
 }
+
+@Composable
+private fun AppName() {
+   AppNameNormal()
+}
+
+@Composable
+private fun AppNameNormal() {
+    Text(
+        text = "Kag",
+        color = Colors.currentYukiTheme.playerButtonIcon,
+        fontSize = 18.sp,
+        modifier = Modifier.height(32.dp),
+    )
+    Image(
+        painterResource(Res.drawable.star64),
+        "App icon",
+        colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon),
+        modifier = Modifier.size(32.dp).offset(y = (-3).dp)
+    )
+    Text(
+        text = "min",
+        color = Colors.currentYukiTheme.playerButtonIcon,
+        fontSize = 18.sp,
+        modifier = Modifier.height(32.dp),
+    )
+}
+
+@Composable
+private fun AppNameOutlined() {
+    OutlinedText(
+        text = "Kag",
+        fillColor = Colors.currentYukiTheme.playerButtonIcon,
+        outlineColor = Colors.currentYukiTheme.thinBorder,
+        fontSize = 18.sp,
+        modifier = Modifier.height(32.dp),
+        outlineDrawStyle = Stroke(4f)
+    )
+    Box(contentAlignment = Alignment.Center, modifier = Modifier.size(32.dp)) {
+        Image(
+            painterResource(Res.drawable.star64),
+            "App icon",
+            colorFilter = ColorFilter.tint(Colors.currentYukiTheme.thinBorder),
+            modifier = Modifier.size(32.dp).offset(y = (-3).dp)
+                .graphicsLayer(
+                    scaleX = 1.25f,
+                    scaleY = 1.25f
+                )
+        )
+        Image(
+            painterResource(Res.drawable.star64),
+            "App icon",
+            colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon),
+            modifier = Modifier.size(30.dp).offset(y = (-3).dp)
+        )
+    }
+    OutlinedText(
+        text = "min",
+        fillColor = Colors.currentYukiTheme.playerButtonIcon,
+        outlineColor = Colors.currentYukiTheme.thinBorder,
+        fontSize = 18.sp,
+        modifier = Modifier.height(32.dp),
+        outlineDrawStyle = Stroke(4f)
+    )
+}
+

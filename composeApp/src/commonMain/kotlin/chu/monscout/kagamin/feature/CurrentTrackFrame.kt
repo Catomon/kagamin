@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -43,7 +44,6 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope.Companion.DefaultFilterQuality
 import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.IntOffset
@@ -264,10 +264,12 @@ private fun TrackThumbnail(
 
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier.size(160.dp).padding(8.dp)
-            .clip(
-                RoundedCornerShape(12.dp)
-            ).pointerInput(currentTrack) {
+        modifier = Modifier
+            .size(160.dp)
+            .padding(8.dp)
+//            .border(2.dp, Colors.currentYukiTheme.thinBorder, RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(12.dp))
+            .pointerInput(currentTrack) {
                 if (currentTrack == null) return@pointerInput
                 val width = this.size.width
                 detectTapGestures {

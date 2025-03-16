@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import chu.monscout.kagamin.PlaylistData
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -43,7 +44,7 @@ fun Playlists(state: KagaminViewModel, modifier: Modifier = Modifier) {
         }
     } else {
         Column(modifier) {
-            Box(modifier = Modifier.background(Colors.barsTransparent).height(32.dp).fillMaxWidth(), contentAlignment = Alignment.CenterStart) {
+            Box(modifier = Modifier.background(Colors.barsTransparent).height(32.dp).fillMaxWidth().padding(horizontal = 4.dp), contentAlignment = Alignment.CenterStart) {
                 Text(state.currentPlaylistName, fontSize = 12.sp)
             }
 

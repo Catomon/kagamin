@@ -5,14 +5,20 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Button
+import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import chu.monscout.kagamin.Colors
@@ -129,8 +135,9 @@ private fun SwapLayoutButton(layoutManager: LayoutManager) {
 }
 
 @Composable
-private fun AddButton(state: KagaminViewModel, modifier: Modifier = Modifier) {
-    TextButton(modifier = modifier, onClick = {
+fun AddButton(state: KagaminViewModel, modifier: Modifier = Modifier) {
+    TextButton(shape = CircleShape, modifier = modifier.padding(4.dp).size(32.dp).background(color = Colors.barsTransparent, shape = CircleShape).clip(
+        CircleShape), onClick = {
         when (state.currentTab) {
             Tabs.PLAYLISTS -> {
                 state.currentTab = Tabs.CREATE_PLAYLIST
@@ -152,7 +159,7 @@ private fun AddButton(state: KagaminViewModel, modifier: Modifier = Modifier) {
                 else Res.drawable.add
             ),
             "Add button",
-            modifier = Modifier.size(16.dp),
+            modifier = Modifier.size(16.dp).graphicsLayer(scaleX = 1.25f, scaleY = 1.25f),
             colorFilter = ColorFilter.tint(Colors.currentYukiTheme.smallButtonIcon)
         )
     }

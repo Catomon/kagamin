@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
@@ -78,7 +77,8 @@ actual fun TrackItem(
                     RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp)
                 ).background(Colors.barsTransparent).clickable {
                     state.onPlayPause()
-                }, contentAlignment = Alignment.Center) {
+                }, contentAlignment = Alignment.Center
+                ) {
                     Image(
                         painterResource(if (state.playState == DenpaPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
                         "track playback state icon",

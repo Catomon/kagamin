@@ -1,7 +1,6 @@
 package chu.monscout.kagamin.feature
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
@@ -154,6 +153,9 @@ actual fun PlayerScreen(
                         }
                     }
                 }
+
+                if (state.currentTab != Tabs.PLAYBACK)
+                    AddButton(state, modifier.align(Alignment.BottomEnd))
             }
 
             Sidebar(state, navController)
@@ -272,6 +274,9 @@ fun CompactPlayerScreen(
                             }
                         }
                     }
+
+                    if (state.currentTab != Tabs.PLAYBACK)
+                        AddButton(state, modifier.align(Alignment.BottomEnd))
                 }
             }
 
@@ -391,6 +396,9 @@ fun TinyPlayerScreen(
                             }
                         }
                     }
+
+                    if (state.currentTab != Tabs.PLAYBACK)
+                        AddButton(state, modifier.align(Alignment.BottomEnd))
                 }
             }
 
@@ -449,8 +457,8 @@ private fun AppNameOutlined(modifier: Modifier = Modifier) {
                 "App icon",
                 colorFilter = ColorFilter.tint(Colors.currentYukiTheme.thinBorder),
                 modifier = Modifier.size(32.dp).offset(y = (-3).dp).graphicsLayer(
-                        scaleX = 1.25f, scaleY = 1.25f
-                    )
+                    scaleX = 1.25f, scaleY = 1.25f
+                )
             )
             Image(
                 painterResource(Res.drawable.star64),

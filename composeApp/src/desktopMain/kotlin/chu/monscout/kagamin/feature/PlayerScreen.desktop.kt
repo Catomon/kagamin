@@ -7,6 +7,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,7 +46,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 actual fun PlayerScreen(
     state: KagaminViewModel,
@@ -79,7 +79,8 @@ actual fun PlayerScreen(
 
     Box(modifier.background(color = Colors.background, shape = RoundedCornerShape(16.dp))) {
         Image(
-            painterResource(Res.drawable.stars_background), "Background",
+            painterResource(Res.drawable.stars_background),
+            "Background",
             modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(16.dp)),
             contentScale = ContentScale.Crop,
             colorFilter = ColorFilter.tint(Colors.currentYukiTheme.background2)
@@ -88,21 +89,16 @@ actual fun PlayerScreen(
         Row() {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxHeight()
-                    .background(color = Colors.barsTransparent)
+                modifier = Modifier.fillMaxHeight().background(color = Colors.barsTransparent)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(horizontal = 12.dp).padding(top = 8.dp)
-                        .height(32.dp)
-                ) {
-                    AppName()
-                }
+                AppName(Modifier.padding(horizontal = 12.dp).padding(top = 8.dp).height(32.dp)
+                    .clickable {
+                        if (navController.currentDestination?.route != SettingsDestination.toString())
+                            navController.navigate(SettingsDestination.toString())
+                    })
 
                 CurrentTrackFrame(
-                    currentTrack,
-                    denpaPlayer,
-                    Modifier.width(160.dp).fillMaxHeight()
+                    currentTrack, denpaPlayer, Modifier.width(160.dp).fillMaxHeight()
                 )
             }
 
@@ -198,7 +194,8 @@ fun CompactPlayerScreen(
 
     Box(modifier.background(color = Colors.background, shape = RoundedCornerShape(16.dp))) {
         Image(
-            painterResource(Res.drawable.stars_background), "Background",
+            painterResource(Res.drawable.stars_background),
+            "Background",
             modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(16.dp)),
             contentScale = ContentScale.Crop,
             colorFilter = ColorFilter.tint(Colors.currentYukiTheme.background2)
@@ -209,15 +206,11 @@ fun CompactPlayerScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxHeight().weight(0.99f)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.background(color = Colors.barsTransparent)
-                        .padding(horizontal = 12.dp).padding(top = 8.dp).height(32.dp)
-                        .fillMaxWidth()
-                ) {
-                    AppName()
-                }
+                AppName(Modifier.background(color = Colors.barsTransparent)
+                    .padding(horizontal = 12.dp).padding(top = 8.dp).height(32.dp).fillMaxWidth()
+                    .clickable(onClickLabel = "Open options") {
+                        navController.navigate(SettingsDestination.toString())
+                    })
 
                 Box(Modifier.weight(0.99f).fillMaxHeight()) {
                     AnimatedContent(targetState = state.currentTab, transitionSpec = {
@@ -268,15 +261,13 @@ fun CompactPlayerScreen(
 
                             Tabs.ADD_TRACKS -> {
                                 AddTracksTab(
-                                    state,
-                                    Modifier.fillMaxHeight().align(Alignment.Center)
+                                    state, Modifier.fillMaxHeight().align(Alignment.Center)
                                 )
                             }
 
                             Tabs.CREATE_PLAYLIST -> {
                                 CreatePlaylistTab(
-                                    state,
-                                    Modifier.fillMaxHeight().align(Alignment.Center)
+                                    state, Modifier.fillMaxHeight().align(Alignment.Center)
                                 )
                             }
                         }
@@ -322,7 +313,8 @@ fun TinyPlayerScreen(
 
     Box(modifier.background(color = Colors.background, shape = RoundedCornerShape(16.dp))) {
         Image(
-            painterResource(Res.drawable.stars_background), "Background",
+            painterResource(Res.drawable.stars_background),
+            "Background",
             modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(16.dp)),
             contentScale = ContentScale.Crop,
             colorFilter = ColorFilter.tint(Colors.currentYukiTheme.background2)
@@ -333,15 +325,11 @@ fun TinyPlayerScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxHeight().weight(0.99f)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.background(color = Colors.barsTransparent)
-                        .padding(horizontal = 12.dp).padding(top = 8.dp).height(32.dp)
-                        .fillMaxWidth()
-                ) {
-                    AppName()
-                }
+                AppName(Modifier.background(color = Colors.barsTransparent)
+                    .padding(horizontal = 12.dp).padding(top = 8.dp).height(32.dp).fillMaxWidth()
+                    .clickable {
+                        navController.navigate(SettingsDestination.toString())
+                    })
 
                 Box(Modifier.weight(0.99f).fillMaxHeight()) {
                     AnimatedContent(targetState = state.currentTab, transitionSpec = {
@@ -392,15 +380,13 @@ fun TinyPlayerScreen(
 
                             Tabs.ADD_TRACKS -> {
                                 AddTracksTab(
-                                    state,
-                                    Modifier.fillMaxHeight().align(Alignment.Center)
+                                    state, Modifier.fillMaxHeight().align(Alignment.Center)
                                 )
                             }
 
                             Tabs.CREATE_PLAYLIST -> {
                                 CreatePlaylistTab(
-                                    state,
-                                    Modifier.fillMaxHeight().align(Alignment.Center)
+                                    state, Modifier.fillMaxHeight().align(Alignment.Center)
                                 )
                             }
                         }
@@ -414,67 +400,73 @@ fun TinyPlayerScreen(
 }
 
 @Composable
-private fun AppName() {
-   AppNameNormal()
+private fun AppName(modifier: Modifier = Modifier) {
+    AppNameNormal(modifier)
 }
 
 @Composable
-private fun AppNameNormal() {
-    Text(
-        text = "Kag",
-        color = Colors.currentYukiTheme.playerButtonIcon,
-        fontSize = 18.sp,
-        modifier = Modifier.height(32.dp),
-    )
-    Image(
-        painterResource(Res.drawable.star64),
-        "App icon",
-        colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon),
-        modifier = Modifier.size(32.dp).offset(y = (-3).dp)
-    )
-    Text(
-        text = "min",
-        color = Colors.currentYukiTheme.playerButtonIcon,
-        fontSize = 18.sp,
-        modifier = Modifier.height(32.dp),
-    )
-}
-
-@Composable
-private fun AppNameOutlined() {
-    OutlinedText(
-        text = "Kag",
-        fillColor = Colors.currentYukiTheme.playerButtonIcon,
-        outlineColor = Colors.currentYukiTheme.thinBorder,
-        fontSize = 18.sp,
-        modifier = Modifier.height(32.dp),
-        outlineDrawStyle = Stroke(4f)
-    )
-    Box(contentAlignment = Alignment.Center, modifier = Modifier.size(32.dp)) {
-        Image(
-            painterResource(Res.drawable.star64),
-            "App icon",
-            colorFilter = ColorFilter.tint(Colors.currentYukiTheme.thinBorder),
-            modifier = Modifier.size(32.dp).offset(y = (-3).dp)
-                .graphicsLayer(
-                    scaleX = 1.25f,
-                    scaleY = 1.25f
-                )
+private fun AppNameNormal(modifier: Modifier = Modifier) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = modifier
+    ) {
+        Text(
+            text = "Kag",
+            color = Colors.currentYukiTheme.playerButtonIcon,
+            fontSize = 18.sp,
+            modifier = Modifier.height(32.dp),
         )
         Image(
             painterResource(Res.drawable.star64),
             "App icon",
             colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon),
-            modifier = Modifier.size(30.dp).offset(y = (-3).dp)
+            modifier = Modifier.size(32.dp).offset(y = (-3).dp)
+        )
+        Text(
+            text = "min",
+            color = Colors.currentYukiTheme.playerButtonIcon,
+            fontSize = 18.sp,
+            modifier = Modifier.height(32.dp),
         )
     }
-    OutlinedText(
-        text = "min",
-        fillColor = Colors.currentYukiTheme.playerButtonIcon,
-        outlineColor = Colors.currentYukiTheme.thinBorder,
-        fontSize = 18.sp,
-        modifier = Modifier.height(32.dp),
-        outlineDrawStyle = Stroke(4f)
-    )
+}
+
+@Composable
+private fun AppNameOutlined(modifier: Modifier = Modifier) {
+    Row(modifier) {
+        OutlinedText(
+            text = "Kag",
+            fillColor = Colors.currentYukiTheme.playerButtonIcon,
+            outlineColor = Colors.currentYukiTheme.thinBorder,
+            fontSize = 18.sp,
+            modifier = Modifier.height(32.dp),
+            outlineDrawStyle = Stroke(4f)
+        )
+        Box(contentAlignment = Alignment.Center, modifier = Modifier.size(32.dp)) {
+            Image(
+                painterResource(Res.drawable.star64),
+                "App icon",
+                colorFilter = ColorFilter.tint(Colors.currentYukiTheme.thinBorder),
+                modifier = Modifier.size(32.dp).offset(y = (-3).dp).graphicsLayer(
+                        scaleX = 1.25f, scaleY = 1.25f
+                    )
+            )
+            Image(
+                painterResource(Res.drawable.star64),
+                "App icon",
+                colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon),
+                modifier = Modifier.size(30.dp).offset(y = (-3).dp)
+            )
+        }
+        OutlinedText(
+            text = "min",
+            fillColor = Colors.currentYukiTheme.playerButtonIcon,
+            outlineColor = Colors.currentYukiTheme.thinBorder,
+            fontSize = 18.sp,
+            modifier = Modifier.height(32.dp),
+            outlineDrawStyle = Stroke(4f)
+        )
+    }
 }
 

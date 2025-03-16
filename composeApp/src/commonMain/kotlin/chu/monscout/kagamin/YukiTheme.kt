@@ -93,7 +93,7 @@ object Themes {
     ) {
         override val playerButtonIcon: Color = Color(0xff9775d5)
         override val listItemA: Color = Color(0xcb753cc9)
-        override val listItemB: Color = Color(0xcb6232a9)
+        override val listItemB: Color = Color(0xcb6632b2)
         override val thinBorder: Color = Color(0xff5522a2)
     }
 
@@ -154,7 +154,7 @@ object Themes {
         val fontSecondary: Color,
         val bars: Color,
     ) {
-        open val smallButtonIcon: Color = Color.White
+        open val smallButtonIcon: Color = surface
         open val playerButtonIcon: Color = surface
         open val onBars: Color = surface
         open val listItemA: Color = surface.copy(0.9f)

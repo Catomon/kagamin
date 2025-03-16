@@ -291,7 +291,7 @@ private fun TrackThumbnail(
                     )
                 }
             } else {
-                if (loadingThumb || image == null) {
+                if (image == null) {
                     Box(
                         Modifier.fillMaxSize()
                     ) {}

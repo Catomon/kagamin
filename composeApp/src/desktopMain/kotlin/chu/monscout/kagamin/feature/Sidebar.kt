@@ -11,6 +11,7 @@ import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -46,9 +47,7 @@ fun MinimizeButton(modifier: Modifier) {
 
 @Composable
 fun Sidebar(
-    state: KagaminViewModel,
-    navController: NavHostController,
-    modifier: Modifier = Modifier
+    state: KagaminViewModel, navController: NavHostController, modifier: Modifier = Modifier
 ) {
     val layoutManager = LocalLayoutManager.current
 
@@ -59,98 +58,170 @@ fun Sidebar(
     ) {
         MinimizeButton(modifier = Modifier.size(32.dp))
 
-        TextButton(
-            modifier = Modifier.weight(0.15f),
-            onClick = {
-                navController.navigate(SettingsDestination.toString())
-            }
+        Column(
+            Modifier.width(32.dp).weight(1f),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceEvenly
         ) {
-            Image(
-                painterResource(Res.drawable.menu),
-                "Menu",
-                modifier = Modifier.size(32.dp),
-                colorFilter = ColorFilter.tint(Colors.currentYukiTheme.smallButtonIcon)
+            if (layoutManager.currentLayout.value != LayoutManager.Layout.Default) {
+                PlaybackTabButton(
+                    {
+                        if (state.currentTab != Tabs.PLAYBACK) {
+                            state.currentTab = Tabs.PLAYBACK
+                        }
+                    },
+                    color = if (state.currentTab == Tabs.PLAYBACK) Color.White else Colors.currentYukiTheme.smallButtonIcon,
+                    Modifier.weight(0.333f)
+                )
+            }
+
+            TracklistTabButton(
+                {
+                    if (state.currentTab != Tabs.TRACKLIST) {
+                        state.currentTab = Tabs.TRACKLIST
+                    }
+                },
+                color = if (state.currentTab == Tabs.TRACKLIST) Color.White else Colors.currentYukiTheme.smallButtonIcon,
+                Modifier.weight(0.333f)
+            )
+
+            PlaylistsTabButton(
+                {
+                    if (state.currentTab != Tabs.PLAYLISTS) {
+                        state.currentTab = Tabs.PLAYLISTS
+                    }
+                },
+                color = if (state.currentTab == Tabs.PLAYLISTS) Color.White else Colors.currentYukiTheme.smallButtonIcon,
+                Modifier.weight(0.333f)
             )
         }
 
-        TextButton(
-            modifier = Modifier.weight(0.3f),
-            onClick = {
-                state.currentTab = when (state.currentTab) {
-                    Tabs.TRACKLIST, Tabs.CREATE_PLAYLIST -> Tabs.PLAYLISTS
-                    Tabs.PLAYBACK -> Tabs.TRACKLIST
-                    else -> if (layoutManager.currentLayout.value == LayoutManager.Layout.Default) Tabs.TRACKLIST else Tabs.PLAYBACK
+        SwapLayoutButton(layoutManager)
+    }
+}
+
+@Composable
+private fun SwapLayoutButton(layoutManager: LayoutManager) {
+    TextButton(
+        onClick = {
+            when (layoutManager.currentLayout.value) {
+                LayoutManager.Layout.Default -> {
+                    layoutManager.currentLayout.value = LayoutManager.Layout.Compact
+                }
+
+                LayoutManager.Layout.Compact -> {
+                    layoutManager.currentLayout.value = LayoutManager.Layout.Tiny
+                }
+
+                LayoutManager.Layout.Tiny -> {
+                    layoutManager.currentLayout.value = LayoutManager.Layout.Default
                 }
             }
-        ) {
-            Image(
-                painterResource(
-                    when (state.currentTab) {
-                        Tabs.TRACKLIST, Tabs.CREATE_PLAYLIST -> Res.drawable.music_note
-                        Tabs.PLAYBACK -> Res.drawable.playlists
-                        else -> if (layoutManager.currentLayout.value == LayoutManager.Layout.Default) Res.drawable.playlists else Res.drawable.tiny_star_icon
-                    }
-                ),
-                "Playlists/Tracklist tab swap button",
-                modifier = Modifier.size(32.dp),
-                colorFilter = ColorFilter.tint(Colors.currentYukiTheme.smallButtonIcon)
-            )
-        }
+        }, modifier = Modifier.size(32.dp)
+    ) {
+        Image(
+            painterResource(Res.drawable.drag),
+            "drag window",
+            modifier = Modifier.size(20.dp),
+            colorFilter = ColorFilter.tint(Colors.currentYukiTheme.smallButtonIcon)
+        )
+    }
+}
 
-        TextButton(
-            modifier = Modifier.weight(0.3f),
-            onClick = {
-                when (state.currentTab) {
-                    Tabs.PLAYLISTS -> {
-                        state.currentTab = Tabs.CREATE_PLAYLIST
-                    }
-
-                    Tabs.TRACKLIST, Tabs.PLAYBACK -> {
-                        state.currentTab = Tabs.ADD_TRACKS
-                    }
-
-                    else -> {
-                        state.currentTab =
-                            if (state.currentTab == Tabs.ADD_TRACKS) Tabs.TRACKLIST else Tabs.PLAYLISTS
-                    }
-                }
+@Composable
+private fun AddButton(state: KagaminViewModel, modifier: Modifier = Modifier) {
+    TextButton(modifier = modifier, onClick = {
+        when (state.currentTab) {
+            Tabs.PLAYLISTS -> {
+                state.currentTab = Tabs.CREATE_PLAYLIST
             }
-        ) {
-            Image(
-                painterResource(
-                    if (state.currentTab == Tabs.ADD_TRACKS || state.currentTab == Tabs.CREATE_PLAYLIST)
-                        Res.drawable.arrow_left
-                    else
-                        Res.drawable.add
-                ),
-                "Add button",
-                modifier = Modifier.size(16.dp),
-                colorFilter = ColorFilter.tint(Colors.currentYukiTheme.smallButtonIcon)
-            )
-        }
 
-        TextButton(
-            onClick = {
-                when (layoutManager.currentLayout.value) {
-                    LayoutManager.Layout.Default -> {
-                        layoutManager.currentLayout.value = LayoutManager.Layout.Compact
-                    }
-                    LayoutManager.Layout.Compact -> {
-                        layoutManager.currentLayout.value = LayoutManager.Layout.Tiny
-                    }
-                    LayoutManager.Layout.Tiny -> {
-                        layoutManager.currentLayout.value = LayoutManager.Layout.Default
-                    }
-                }
-            },
-            modifier = Modifier.size(32.dp)
-        ) {
-            Image(
-                painterResource(Res.drawable.drag),
-                "drag window",
-                modifier = Modifier.size(20.dp),
-                colorFilter = ColorFilter.tint(Colors.currentYukiTheme.smallButtonIcon)
-            )
+            Tabs.TRACKLIST, Tabs.PLAYBACK -> {
+                state.currentTab = Tabs.ADD_TRACKS
+            }
+
+            else -> {
+                state.currentTab =
+                    if (state.currentTab == Tabs.ADD_TRACKS) Tabs.TRACKLIST else Tabs.PLAYLISTS
+            }
         }
+    }) {
+        Image(
+            painterResource(
+                if (state.currentTab == Tabs.ADD_TRACKS || state.currentTab == Tabs.CREATE_PLAYLIST) Res.drawable.arrow_left
+                else Res.drawable.add
+            ),
+            "Add button",
+            modifier = Modifier.size(16.dp),
+            colorFilter = ColorFilter.tint(Colors.currentYukiTheme.smallButtonIcon)
+        )
+    }
+}
+
+@Composable
+private fun TracklistTabButton(
+    onClick: () -> Unit,
+    color: Color = Colors.currentYukiTheme.smallButtonIcon,
+    modifier: Modifier = Modifier
+) {
+    TextButton(
+        modifier = modifier, onClick = onClick
+    ) {
+        Image(
+            painterResource(Res.drawable.music_note),
+            "Tracklist tab",
+            modifier = Modifier.size(32.dp),
+            colorFilter = ColorFilter.tint(color)
+        )
+    }
+}
+
+@Composable
+private fun PlaylistsTabButton(
+    onClick: () -> Unit,
+    color: Color = Colors.currentYukiTheme.smallButtonIcon,
+    modifier: Modifier = Modifier
+) {
+    TextButton(
+        modifier = modifier, onClick = onClick
+    ) {
+        Image(
+            painterResource(Res.drawable.playlists),
+            "Tracklist tab",
+            modifier = Modifier.size(32.dp),
+            colorFilter = ColorFilter.tint(color)
+        )
+    }
+}
+
+@Composable
+private fun PlaybackTabButton(
+    onClick: () -> Unit,
+    color: Color = Colors.currentYukiTheme.smallButtonIcon,
+    modifier: Modifier = Modifier
+) {
+    TextButton(
+        modifier = modifier, onClick = onClick
+    ) {
+        Image(
+            painterResource(Res.drawable.tiny_star_icon),
+            "Tracklist tab",
+            modifier = Modifier.size(32.dp),
+            colorFilter = ColorFilter.tint(color)
+        )
+    }
+}
+
+@Composable
+private fun MenuButton(navController: NavHostController, modifier: Modifier) {
+    TextButton(modifier = modifier, onClick = {
+        navController.navigate(SettingsDestination.toString())
+    }) {
+        Image(
+            painterResource(Res.drawable.menu),
+            "Menu",
+            modifier = Modifier.size(32.dp),
+            colorFilter = ColorFilter.tint(Colors.currentYukiTheme.smallButtonIcon)
+        )
     }
 }

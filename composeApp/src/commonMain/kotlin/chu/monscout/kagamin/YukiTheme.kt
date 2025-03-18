@@ -49,6 +49,7 @@ object Themes {
         override val listItemA: Color = Color(0xcdff84a6)
         override val listItemB: Color = Color(0xcdff618f)
         override val barsTransparent: Color = bars.copy(0.8f)
+        override val thinBorder: Color = Color(0xffea417c)
     }
 
     //more pink
@@ -109,6 +110,7 @@ object Themes {
 //        override val playerButtonIcon: Color = Color(0xff9775d5)
         override val listItemA: Color = Color(0xcc1840c5)
         override val listItemB: Color = Color(0xcc1037b4)
+        override val thinBorder: Color = Color(0xff042386)
     }
 
     //    object YukiLight : IYukiTheme(
@@ -143,6 +145,7 @@ object Themes {
         override val listItemA: Color = Color(0xe6de2d8d)
         override val listItemB: Color = Color(0xe6d51e82)
         override val barsTransparent: Color = bars.copy(0.95f)
+        override val progressOverThumbnail: Color = bars.copy(0.25f)
     }
 
     open class IYukiTheme(

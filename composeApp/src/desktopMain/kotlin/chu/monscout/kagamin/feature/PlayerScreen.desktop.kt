@@ -26,6 +26,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
@@ -155,7 +156,7 @@ actual fun PlayerScreen(
                 }
 
                 if (state.currentTab != Tabs.PLAYBACK)
-                    AddButton(state, modifier.align(Alignment.BottomEnd))
+                    AddButton(state, Modifier.align(Alignment.BottomEnd))
             }
 
             Sidebar(state, navController)
@@ -276,7 +277,7 @@ fun CompactPlayerScreen(
                     }
 
                     if (state.currentTab != Tabs.PLAYBACK)
-                        AddButton(state, modifier.align(Alignment.BottomEnd))
+                        AddButton(state, Modifier.align(Alignment.BottomEnd))
                 }
             }
 
@@ -398,7 +399,7 @@ fun TinyPlayerScreen(
                     }
 
                     if (state.currentTab != Tabs.PLAYBACK)
-                        AddButton(state, modifier.align(Alignment.BottomEnd))
+                        AddButton(state, Modifier.align(Alignment.BottomEnd))
                 }
             }
 
@@ -409,7 +410,7 @@ fun TinyPlayerScreen(
 
 @Composable
 private fun AppName(modifier: Modifier = Modifier) {
-    AppNameNormal(modifier)
+    AppNameWShadow(modifier)
 }
 
 @Composable
@@ -437,6 +438,61 @@ private fun AppNameNormal(modifier: Modifier = Modifier) {
             fontSize = 18.sp,
             modifier = Modifier.height(32.dp),
         )
+    }
+}
+
+@Composable
+private fun AppNameWShadow(modifier: Modifier = Modifier) {
+    Box(contentAlignment = Alignment.Center, modifier = modifier) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.graphicsLayer(translationY = 3f)
+        ) {
+            Text(
+                text = "Kag",
+                color = Colors.currentYukiTheme.thinBorder,
+                fontSize = 18.sp,
+                modifier = Modifier.height(32.dp),
+            )
+            Image(
+                painterResource(Res.drawable.star64),
+                "App icon",
+                colorFilter = ColorFilter.tint(Colors.currentYukiTheme.thinBorder),
+                modifier = Modifier.size(32.dp).offset(y = (-3).dp)
+            )
+            Text(
+                text = "min",
+                color = Colors.currentYukiTheme.thinBorder,
+                fontSize = 18.sp,
+                modifier = Modifier.height(32.dp),
+            )
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier
+        ) {
+            Text(
+                text = "Kag",
+                color = Colors.currentYukiTheme.playerButtonIcon,
+                fontSize = 18.sp,
+                modifier = Modifier.height(32.dp),
+            )
+            Image(
+                painterResource(Res.drawable.star64),
+                "App icon",
+                colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon),
+                modifier = Modifier.size(32.dp).offset(y = (-3).dp)
+            )
+            Text(
+                text = "min",
+                color = Colors.currentYukiTheme.playerButtonIcon,
+                fontSize = 18.sp,
+                modifier = Modifier.height(32.dp),
+            )
+        }
     }
 }
 

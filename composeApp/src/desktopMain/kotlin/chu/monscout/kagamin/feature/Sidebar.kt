@@ -42,7 +42,7 @@ fun MinimizeButton(modifier: Modifier) {
     TextButton({
         window.isMinimized = true
     }, modifier = modifier) {
-        Image(
+        ImageWithShadow(
             painterResource(Res.drawable.minimize_window),
             "Minimize",
             modifier = Modifier.size(32.dp),
@@ -125,7 +125,7 @@ private fun SwapLayoutButton(layoutManager: LayoutManager) {
             }
         }, modifier = Modifier.size(32.dp)
     ) {
-        Image(
+        ImageWithShadow(
             painterResource(Res.drawable.drag),
             "drag window",
             modifier = Modifier.size(20.dp),
@@ -153,7 +153,7 @@ fun AddButton(state: KagaminViewModel, modifier: Modifier = Modifier) {
             }
         }
     }) {
-        Image(
+        ImageWithShadow(
             painterResource(
                 if (state.currentTab == Tabs.ADD_TRACKS || state.currentTab == Tabs.CREATE_PLAYLIST) Res.drawable.arrow_left
                 else Res.drawable.add
@@ -174,7 +174,7 @@ private fun TracklistTabButton(
     TextButton(
         modifier = modifier, onClick = onClick
     ) {
-        Image(
+        ImageWithShadow(
             painterResource(Res.drawable.music_note),
             "Tracklist tab",
             modifier = Modifier.size(32.dp),
@@ -192,7 +192,7 @@ private fun PlaylistsTabButton(
     TextButton(
         modifier = modifier, onClick = onClick
     ) {
-        Image(
+        ImageWithShadow(
             painterResource(Res.drawable.playlists),
             "Tracklist tab",
             modifier = Modifier.size(32.dp),
@@ -210,7 +210,7 @@ private fun PlaybackTabButton(
     TextButton(
         modifier = modifier, onClick = onClick
     ) {
-        Image(
+        ImageWithShadow(
             painterResource(Res.drawable.tiny_star_icon),
             "Tracklist tab",
             modifier = Modifier.size(32.dp),
@@ -224,7 +224,7 @@ private fun MenuButton(navController: NavHostController, modifier: Modifier) {
     TextButton(modifier = modifier, onClick = {
         navController.navigate(SettingsDestination.toString())
     }) {
-        Image(
+        ImageWithShadow(
             painterResource(Res.drawable.menu),
             "Menu",
             modifier = Modifier.size(32.dp),

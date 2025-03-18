@@ -17,6 +17,9 @@ import androidx.compose.ui.draganddrop.DragAndDropEvent
 import androidx.compose.ui.draganddrop.DragAndDropTarget
 import androidx.compose.ui.draganddrop.awtTransferable
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -175,6 +178,14 @@ private fun WindowScope.AppFrame(kagaminViewModel: KagaminViewModel = get(Kagami
                         it
                             .padding(8.dp)
                             .customShadow()
+                            .drawBehind {
+                                drawRoundRect(
+                                    color = Colors.currentYukiTheme.thinBorder,
+                                    topLeft = Offset(0f, 2f),
+                                    size = this.size.copy(),
+                                    cornerRadius = CornerRadius(12f)
+                                )
+                            }
                             .clip(RoundedCornerShape(12.dp))
 //                            .border(
 //                                2.dp,

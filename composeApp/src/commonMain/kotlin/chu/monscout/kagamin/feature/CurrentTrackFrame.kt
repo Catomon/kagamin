@@ -8,7 +8,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -39,10 +38,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope.Companion.DefaultFilterQuality
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -107,7 +112,7 @@ fun CurrentTrackFrame(
             VolumeSlider(
                 volume,
                 { newVolume -> volume = newVolume; player.setVolume(newVolume) },
-                Modifier.fillMaxWidth().padding(horizontal = 18.dp)
+                Modifier.fillMaxWidth().padding(horizontal = 10.dp)
             )
         }
     }
@@ -189,7 +194,7 @@ fun CompactCurrentTrackFrame(
                 VolumeSlider(
                     volume,
                     { newVolume -> volume = newVolume; player.setVolume(newVolume) },
-                    Modifier.fillMaxWidth().padding(horizontal = 18.dp)
+                    Modifier.fillMaxWidth().padding(horizontal = 10.dp)
                 )
             }
         }
@@ -267,6 +272,14 @@ private fun TrackThumbnail(
         modifier = Modifier
             .size(160.dp)
             .padding(8.dp)
+            .drawBehind {
+                drawRoundRect(
+                    color = Colors.currentYukiTheme.thinBorder,
+                    topLeft = Offset(0f, 2f),
+                    size = this.size.copy(),
+                    cornerRadius = CornerRadius(12f)
+                )
+            }
 //            .border(2.dp, Colors.currentYukiTheme.thinBorder, RoundedCornerShape(12.dp))
             .clip(RoundedCornerShape(12.dp))
             .pointerInput(currentTrack) {
@@ -346,7 +359,7 @@ private fun PlaybackOptionsButtons(
         IconButton({
             fade = !fade
         }, modifier = Modifier.size(32.dp)) {
-            Image(
+            ImageWithShadow(
                 painterResource(Res.drawable.fade),
                 "crossfade",
                 colorFilter =
@@ -364,7 +377,7 @@ private fun PlaybackOptionsButtons(
                 else
                     DenpaPlayer.PlayMode.REPEAT_PLAYLIST
         }, modifier = Modifier.size(32.dp)) {
-            Image(
+            ImageWithShadow(
                 painterResource(Res.drawable.repeat_single),
                 "repeat track",
                 colorFilter =
@@ -382,7 +395,7 @@ private fun PlaybackOptionsButtons(
                 else
                     DenpaPlayer.PlayMode.REPEAT_PLAYLIST
         }, modifier = Modifier.size(32.dp)) {
-            Image(
+            ImageWithShadow(
                 painterResource(Res.drawable.random),
                 "random mode",
                 colorFilter =

@@ -1,7 +1,6 @@
 package chu.monscout.kagamin.feature
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
@@ -35,7 +34,7 @@ fun PlaybackButtons(player: DenpaPlayer<DenpaTrack>, modifier: Modifier = Modifi
                 player.prevTrack()
             }
         ) {
-            Image(
+            ImageWithShadow(
                 painterResource(Res.drawable.prev),
                 "Previous",
                 modifier = Modifier.size(32.dp),
@@ -55,14 +54,14 @@ fun PlaybackButtons(player: DenpaPlayer<DenpaTrack>, modifier: Modifier = Modifi
         ) {
             AnimatedContent(player.playState) {
                 if (it.value != DenpaPlayer.PlayState.PLAYING) {
-                    Image(
+                    ImageWithShadow(
                         painterResource(Res.drawable.play),
                         "Play",
                         modifier = Modifier.size(40.dp),
                         colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon)
                     )
                 } else {
-                    Image(
+                    ImageWithShadow(
                         painterResource(Res.drawable.pause),
                         "Pause",
                         modifier = Modifier.size(40.dp),
@@ -78,7 +77,7 @@ fun PlaybackButtons(player: DenpaPlayer<DenpaTrack>, modifier: Modifier = Modifi
                 player.nextTrack()
             }
         ) {
-            Image(
+            ImageWithShadow(
                 painterResource(Res.drawable.next),
                 "Next",
                 modifier = Modifier.size(32.dp),

@@ -4,10 +4,8 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,9 +13,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
@@ -25,22 +21,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import chu.monscout.kagamin.Colors
 import chu.monscout.kagamin.createDenpaTrack
 import chu.monscout.kagamin.loadPlaylist
 import kagamin.composeapp.generated.resources.Res
-import kagamin.composeapp.generated.resources.star64
-import kagamin.composeapp.generated.resources.stars_background
+import kagamin.composeapp.generated.resources.add
+import kagamin.composeapp.generated.resources.arrow_left
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -78,13 +67,7 @@ actual fun PlayerScreen(
     }
 
     Box(modifier.background(color = Colors.background, shape = RoundedCornerShape(16.dp))) {
-        Image(
-            painterResource(Res.drawable.stars_background),
-            "Background",
-            modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(16.dp)),
-            contentScale = ContentScale.Crop,
-            colorFilter = ColorFilter.tint(Colors.currentYukiTheme.background2)
-        )
+        BackgroundImage()
 
         Row() {
             Column(
@@ -156,7 +139,28 @@ actual fun PlayerScreen(
                 }
 
                 if (state.currentTab != Tabs.PLAYBACK)
-                    AddButton(state, Modifier.align(Alignment.BottomEnd))
+                       AddButton(painterResource(
+                        if (state.currentTab == Tabs.ADD_TRACKS || state.currentTab == Tabs.CREATE_PLAYLIST) Res.drawable.arrow_left
+                        else Res.drawable.add
+                    ), {
+                        
+                        when (state.currentTab) {
+                            Tabs.PLAYLISTS -> {
+                                state.currentTab = Tabs.CREATE_PLAYLIST
+                            }
+
+                            Tabs.TRACKLIST, Tabs.PLAYBACK -> {
+                                state.currentTab = Tabs.ADD_TRACKS
+                            }
+
+                            else -> {
+                                state.currentTab =
+                                    if (state.currentTab == Tabs.ADD_TRACKS) Tabs.TRACKLIST else Tabs.PLAYLISTS
+                            }
+                        }
+
+                    }, Modifier.align(Alignment.BottomEnd)
+                    )
             }
 
             Sidebar(state, navController)
@@ -196,13 +200,7 @@ fun CompactPlayerScreen(
     }
 
     Box(modifier.background(color = Colors.background, shape = RoundedCornerShape(16.dp))) {
-        Image(
-            painterResource(Res.drawable.stars_background),
-            "Background",
-            modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(16.dp)),
-            contentScale = ContentScale.Crop,
-            colorFilter = ColorFilter.tint(Colors.currentYukiTheme.background2)
-        )
+        BackgroundImage()
 
         Row {
             Column(
@@ -277,7 +275,28 @@ fun CompactPlayerScreen(
                     }
 
                     if (state.currentTab != Tabs.PLAYBACK)
-                        AddButton(state, Modifier.align(Alignment.BottomEnd))
+                           AddButton(painterResource(
+                        if (state.currentTab == Tabs.ADD_TRACKS || state.currentTab == Tabs.CREATE_PLAYLIST) Res.drawable.arrow_left
+                        else Res.drawable.add
+                    ), {
+                        
+                        when (state.currentTab) {
+                            Tabs.PLAYLISTS -> {
+                                state.currentTab = Tabs.CREATE_PLAYLIST
+                            }
+
+                            Tabs.TRACKLIST, Tabs.PLAYBACK -> {
+                                state.currentTab = Tabs.ADD_TRACKS
+                            }
+
+                            else -> {
+                                state.currentTab =
+                                    if (state.currentTab == Tabs.ADD_TRACKS) Tabs.TRACKLIST else Tabs.PLAYLISTS
+                            }
+                        }
+
+                    }, Modifier.align(Alignment.BottomEnd)
+                    )
                 }
             }
 
@@ -318,13 +337,7 @@ fun TinyPlayerScreen(
     }
 
     Box(modifier.background(color = Colors.background, shape = RoundedCornerShape(16.dp))) {
-        Image(
-            painterResource(Res.drawable.stars_background),
-            "Background",
-            modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(16.dp)),
-            contentScale = ContentScale.Crop,
-            colorFilter = ColorFilter.tint(Colors.currentYukiTheme.background2)
-        )
+        BackgroundImage()
 
         Row {
             Column(
@@ -399,7 +412,28 @@ fun TinyPlayerScreen(
                     }
 
                     if (state.currentTab != Tabs.PLAYBACK)
-                        AddButton(state, Modifier.align(Alignment.BottomEnd))
+                           AddButton(painterResource(
+                        if (state.currentTab == Tabs.ADD_TRACKS || state.currentTab == Tabs.CREATE_PLAYLIST) Res.drawable.arrow_left
+                        else Res.drawable.add
+                    ), {
+                        
+                        when (state.currentTab) {
+                            Tabs.PLAYLISTS -> {
+                                state.currentTab = Tabs.CREATE_PLAYLIST
+                            }
+
+                            Tabs.TRACKLIST, Tabs.PLAYBACK -> {
+                                state.currentTab = Tabs.ADD_TRACKS
+                            }
+
+                            else -> {
+                                state.currentTab =
+                                    if (state.currentTab == Tabs.ADD_TRACKS) Tabs.TRACKLIST else Tabs.PLAYLISTS
+                            }
+                        }
+
+                    }, Modifier.align(Alignment.BottomEnd)
+                    )
                 }
             }
 
@@ -407,130 +441,3 @@ fun TinyPlayerScreen(
         }
     }
 }
-
-@Composable
-private fun AppName(modifier: Modifier = Modifier) {
-    AppNameWShadow(modifier)
-}
-
-@Composable
-private fun AppNameNormal(modifier: Modifier = Modifier) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center,
-        modifier = modifier
-    ) {
-        Text(
-            text = "Kag",
-            color = Colors.currentYukiTheme.playerButtonIcon,
-            fontSize = 18.sp,
-            modifier = Modifier.height(32.dp),
-        )
-        Image(
-            painterResource(Res.drawable.star64),
-            "App icon",
-            colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon),
-            modifier = Modifier.size(32.dp).offset(y = (-3).dp)
-        )
-        Text(
-            text = "min",
-            color = Colors.currentYukiTheme.playerButtonIcon,
-            fontSize = 18.sp,
-            modifier = Modifier.height(32.dp),
-        )
-    }
-}
-
-@Composable
-private fun AppNameWShadow(modifier: Modifier = Modifier) {
-    Box(contentAlignment = Alignment.Center, modifier = modifier) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.graphicsLayer(translationY = 3f)
-        ) {
-            Text(
-                text = "Kag",
-                color = Colors.currentYukiTheme.thinBorder,
-                fontSize = 18.sp,
-                modifier = Modifier.height(32.dp),
-            )
-            Image(
-                painterResource(Res.drawable.star64),
-                "App icon",
-                colorFilter = ColorFilter.tint(Colors.currentYukiTheme.thinBorder),
-                modifier = Modifier.size(32.dp).offset(y = (-3).dp)
-            )
-            Text(
-                text = "min",
-                color = Colors.currentYukiTheme.thinBorder,
-                fontSize = 18.sp,
-                modifier = Modifier.height(32.dp),
-            )
-        }
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier
-        ) {
-            Text(
-                text = "Kag",
-                color = Colors.currentYukiTheme.playerButtonIcon,
-                fontSize = 18.sp,
-                modifier = Modifier.height(32.dp),
-            )
-            Image(
-                painterResource(Res.drawable.star64),
-                "App icon",
-                colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon),
-                modifier = Modifier.size(32.dp).offset(y = (-3).dp)
-            )
-            Text(
-                text = "min",
-                color = Colors.currentYukiTheme.playerButtonIcon,
-                fontSize = 18.sp,
-                modifier = Modifier.height(32.dp),
-            )
-        }
-    }
-}
-
-@Composable
-private fun AppNameOutlined(modifier: Modifier = Modifier) {
-    Row(modifier) {
-        OutlinedText(
-            text = "Kag",
-            fillColor = Colors.currentYukiTheme.playerButtonIcon,
-            outlineColor = Colors.currentYukiTheme.thinBorder,
-            fontSize = 18.sp,
-            modifier = Modifier.height(32.dp),
-            outlineDrawStyle = Stroke(4f)
-        )
-        Box(contentAlignment = Alignment.Center, modifier = Modifier.size(32.dp)) {
-            Image(
-                painterResource(Res.drawable.star64),
-                "App icon",
-                colorFilter = ColorFilter.tint(Colors.currentYukiTheme.thinBorder),
-                modifier = Modifier.size(32.dp).offset(y = (-3).dp).graphicsLayer(
-                    scaleX = 1.25f, scaleY = 1.25f
-                )
-            )
-            Image(
-                painterResource(Res.drawable.star64),
-                "App icon",
-                colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon),
-                modifier = Modifier.size(30.dp).offset(y = (-3).dp)
-            )
-        }
-        OutlinedText(
-            text = "min",
-            fillColor = Colors.currentYukiTheme.playerButtonIcon,
-            outlineColor = Colors.currentYukiTheme.thinBorder,
-            fontSize = 18.sp,
-            modifier = Modifier.height(32.dp),
-            outlineDrawStyle = Stroke(4f)
-        )
-    }
-}
-

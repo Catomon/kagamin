@@ -41,11 +41,11 @@ class DenpaPlayerAndy(context: Context) : BaseDenpaPlayer<DenpaTrackAndy>() {
     override val position: Long get() = player.contentPosition
 
     init {
-        player.addListener(object : Player.Listener {
-            override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-                nextTrack()
-            }
-        })
+//        player.addListener(object : Player.Listener {
+//            override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+//                nextTrack()
+//            }
+//        })
     }
 
     override fun create() {

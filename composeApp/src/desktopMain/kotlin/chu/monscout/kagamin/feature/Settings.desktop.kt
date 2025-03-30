@@ -52,7 +52,10 @@ actual fun SettingsScreen(
         modifier = modifier.fillMaxSize().background(Colors.bars),
         contentAlignment = Alignment.Center
     ) {
-        Column(Modifier.align(Alignment.BottomEnd).padding(end = 6.dp), horizontalAlignment = Alignment.End) {
+        Column(
+            Modifier.align(Alignment.BottomEnd).padding(end = 6.dp),
+            horizontalAlignment = Alignment.End
+        ) {
             Text(
                 "ver. 1.0.4",
                 color = Colors.text2
@@ -87,12 +90,23 @@ actual fun SettingsScreen(
                         state.settings = loadSettings()
                     })
                 }
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Crossfade")
+
+                    Checkbox(settings.crossfade, {
+                        settings.crossfade = it
+                        saveSettings(settings)
+                        state.settings = loadSettings()
+                    })
+                }
             }
         }
 
         Column(Modifier.align(Alignment.BottomStart)) {
             Button({
-                navController.popBackStack()
+                if (navController.currentDestination?.route == SettingsDestination.toString())
+                    navController.popBackStack()
                 val prev = currentLayout.value
                 currentLayout.value = LayoutManager.Layout.entries.first { it != prev }
                 currentLayout.value = prev
@@ -103,7 +117,7 @@ actual fun SettingsScreen(
             Button(
                 {
                     val player = state.denpaPlayer
-                    settings.fade = player.fade.value
+                    settings.crossfade = player.crossfade.value
                     settings.repeat = player.playMode.value == DenpaPlayer.PlayMode.REPEAT_TRACK
                     settings.volume = player.volume.value
                     settings.random = player.playMode.value == DenpaPlayer.PlayMode.RANDOM

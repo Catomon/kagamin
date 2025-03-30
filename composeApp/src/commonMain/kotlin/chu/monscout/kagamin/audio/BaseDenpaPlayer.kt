@@ -13,7 +13,7 @@ abstract class BaseDenpaPlayer<T : DenpaTrack> : DenpaPlayer<T> {
     override val playlist: MutableState<MutableList<T>> = mutableStateOf(mutableListOf())
     override val currentTrack: MutableState<T?> = mutableStateOf(null)
     override val volume: MutableState<Float> = mutableStateOf(0.5f)
-    override val fade: MutableState<Boolean> = mutableStateOf(false)
+    override val crossfade: MutableState<Boolean> = mutableStateOf(false)
 
     override fun create() {
 

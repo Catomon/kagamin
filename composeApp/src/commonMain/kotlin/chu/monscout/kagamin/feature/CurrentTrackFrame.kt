@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -28,10 +29,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.IconButton
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -39,16 +42,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope.Companion.DefaultFilterQuality
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.IntOffset
@@ -60,9 +66,9 @@ import chu.monscout.kagamin.audio.DenpaPlayer
 import chu.monscout.kagamin.audio.DenpaTrack
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.def_thumb
-import kagamin.composeapp.generated.resources.fade
 import kagamin.composeapp.generated.resources.random
 import kagamin.composeapp.generated.resources.repeat_single
+import kagamin.composeapp.generated.resources.volume
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 
@@ -70,26 +76,22 @@ expect fun getThumbnail(denpaTrack: DenpaTrack): ImageBitmap?
 
 @Composable
 fun CurrentTrackFrame(
-    currentTrack: DenpaTrack?,
-    player: DenpaPlayer<DenpaTrack>,
-    modifier: Modifier = Modifier
+    currentTrack: DenpaTrack?, player: DenpaPlayer<DenpaTrack>, modifier: Modifier = Modifier
 ) {
     val playMode by player.playMode
-    val fade by player.fade
+    val crossfade by player.crossfade
 
     var progress by remember { mutableStateOf(-1f) }
     val updateProgress = {
         progress = when (currentTrack) {
             null -> 0f
-            else -> if (currentTrack.duration > 0 && currentTrack.duration < Long.MAX_VALUE)
-                player.position.toFloat() / currentTrack.duration else -1f
+            else -> if (currentTrack.duration > 0 && currentTrack.duration < Long.MAX_VALUE) player.position.toFloat() / currentTrack.duration else -1f
         }
     }
 
     LaunchedEffect(currentTrack) {
         while (true) {
-            if (player.playState.value == DenpaPlayer.PlayState.PLAYING)
-                updateProgress()
+            if (player.playState.value == DenpaPlayer.PlayState.PLAYING) updateProgress()
             delay(1000)
         }
     }
@@ -102,17 +104,60 @@ fun CurrentTrackFrame(
             TrackThumbnail(currentTrack, player, updateProgress, progress)
 
             PlaybackButtons(
-                player = player,
-                Modifier.fillMaxWidth()
+                player = player, Modifier.fillMaxWidth()
             )
 
             PlaybackOptionsButtons(player)
 
-            var volume by player.volume
-            VolumeSlider(
-                volume,
-                { newVolume -> volume = newVolume; player.setVolume(newVolume) },
-                Modifier.fillMaxWidth().padding(horizontal = 10.dp)
+            TrackProgressIndicator(currentTrack, player, updateProgress, progress)
+        }
+    }
+}
+
+@Composable
+private fun TrackProgressIndicator(
+    currentTrack: DenpaTrack?,
+    player: DenpaPlayer<DenpaTrack>,
+    updateProgress: () -> Unit,
+    progress: Float
+) {
+    Column(verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(horizontal = 20.dp)
+            .pointerHoverIcon(
+                PointerIcon.Hand
+            ).pointerInput(currentTrack) {
+                if (currentTrack == null) return@pointerInput
+                val width = this.size.width
+                detectTapGestures {
+                    player.seek((currentTrack.duration * (it.x / width)).toLong())
+                    updateProgress()
+                }
+            }) {
+        LinearProgressIndicator(
+            progress = progress,
+            Modifier.fillMaxWidth().padding(top = 18.dp),
+            color = Colors.currentYukiTheme.playerButtonIcon,
+            strokeCap = StrokeCap.Round
+        )
+
+        Row(
+            Modifier.fillMaxWidth().graphicsLayer(translationY = -8f),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                (player.position / 1000L / 60L).toString() + " : " + (player.position / 1000L % 60),
+                fontSize = 10.sp,
+                color = Colors.currentYukiTheme.playerButtonIconTransparent
+            )
+//                    Text(" - ", fontSize = 10.sp, color = Colors.currentYukiTheme.playerButtonIconTransparent)
+            Text(
+                ((currentTrack?.duration
+                    ?: 0L) / 1000L / 60L).toString() + " : " + ((currentTrack?.duration
+                    ?: 0L) / 1000L % 60),
+                fontSize = 10.sp,
+                color = Colors.currentYukiTheme.playerButtonIconTransparent
             )
         }
     }
@@ -120,26 +165,22 @@ fun CurrentTrackFrame(
 
 @Composable
 fun CompactCurrentTrackFrame(
-    currentTrack: DenpaTrack?,
-    player: DenpaPlayer<DenpaTrack>,
-    modifier: Modifier = Modifier
+    currentTrack: DenpaTrack?, player: DenpaPlayer<DenpaTrack>, modifier: Modifier = Modifier
 ) {
     val playMode by player.playMode
-    val fade by player.fade
+    val crossfade by player.crossfade
 
     var progress by remember { mutableStateOf(-1f) }
     val updateProgress = {
         progress = when (currentTrack) {
             null -> 0f
-            else -> if (currentTrack.duration > 0 && currentTrack.duration < Long.MAX_VALUE)
-                player.position.toFloat() / currentTrack.duration else -1f
+            else -> if (currentTrack.duration > 0 && currentTrack.duration < Long.MAX_VALUE) player.position.toFloat() / currentTrack.duration else -1f
         }
     }
 
     LaunchedEffect(currentTrack) {
         while (true) {
-            if (player.playState.value == DenpaPlayer.PlayState.PLAYING)
-                updateProgress()
+            if (player.playState.value == DenpaPlayer.PlayState.PLAYING) updateProgress()
             delay(1000)
         }
     }
@@ -150,9 +191,7 @@ fun CompactCurrentTrackFrame(
     Box(modifier.hoverable(interactionSource), contentAlignment = Alignment.Center) {
 
         val targetValue = remember(
-            currentTrack,
-            isHovered,
-            progress
+            currentTrack, isHovered, progress
         ) { if (isHovered) 1f else progress }
         val floatAnimation by animateFloatAsState(targetValue)
 
@@ -161,11 +200,7 @@ fun CompactCurrentTrackFrame(
         val aniColor = animateColorAsState(targetProgressColor)
 
         TrackThumbnail(
-            currentTrack,
-            player,
-            updateProgress,
-            floatAnimation,
-            progressColor = aniColor.value
+            currentTrack, player, updateProgress, floatAnimation, progressColor = aniColor.value
         )
 
         AnimatedVisibility(
@@ -186,16 +221,10 @@ fun CompactCurrentTrackFrame(
                 PlaybackOptionsButtons(player)
 
                 PlaybackButtons(
-                    player = player,
-                    Modifier.fillMaxWidth()
+                    player = player, Modifier.fillMaxWidth()
                 )
 
-                var volume by player.volume
-                VolumeSlider(
-                    volume,
-                    { newVolume -> volume = newVolume; player.setVolume(newVolume) },
-                    Modifier.fillMaxWidth().padding(horizontal = 10.dp)
-                )
+                TrackProgressIndicator(currentTrack, player, updateProgress, progress)
             }
         }
     }
@@ -267,30 +296,24 @@ private fun TrackThumbnail(
         loadingThumb = false
     }
 
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .size(160.dp)
-            .padding(8.dp)
-            .drawBehind {
-                drawRoundRect(
-                    color = Colors.currentYukiTheme.thinBorder,
-                    topLeft = Offset(0f, 2f),
-                    size = this.size.copy(),
-                    cornerRadius = CornerRadius(12f)
-                )
-            }
+    Box(contentAlignment = Alignment.Center,
+        modifier = Modifier.size(160.dp).padding(8.dp).drawBehind {
+            drawRoundRect(
+                color = Colors.currentYukiTheme.thinBorder,
+                topLeft = Offset(0f, 2f),
+                size = this.size.copy(),
+                cornerRadius = CornerRadius(12f)
+            )
+        }
 //            .border(2.dp, Colors.currentYukiTheme.thinBorder, RoundedCornerShape(12.dp))
-            .clip(RoundedCornerShape(12.dp))
-            .pointerInput(currentTrack) {
+            .clip(RoundedCornerShape(12.dp)).pointerInput(currentTrack) {
                 if (currentTrack == null) return@pointerInput
                 val width = this.size.width
                 detectTapGestures {
                     player.seek((currentTrack.duration * (it.x / width)).toLong())
                     updateProgress()
                 }
-            }
-    ) {
+            }) {
         AnimatedContent(image, modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp))) {
             if (!loadingThumb && image == null) { //this still executes idc
                 Box(
@@ -326,22 +349,19 @@ private fun TrackThumbnail(
             }
         }
 
-        if (progress >= 0)
-            Row(modifier = Modifier.fillMaxSize()) {
-                Box(
-                    modifier = Modifier.fillMaxHeight().let {
-                        if (progress > 0) it.weight(progress) else it
-                    }.background(
-                        progressColor
-                    )
-                ) { }
+        if (progress >= 0) Row(modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier.fillMaxHeight().let {
+                    if (progress > 0) it.weight(progress) else it
+                }.background(
+                    progressColor
+                )
+            ) { }
 
-                Box(
-                    modifier = Modifier.fillMaxHeight().let {
-                        val weight =
-                            1f - progress; if (weight > 0) it.weight(weight) else it
-                    }) { }
-            }
+            Box(modifier = Modifier.fillMaxHeight().let {
+                val weight = 1f - progress; if (weight > 0) it.weight(weight) else it
+            }) { }
+        }
     }
 }
 
@@ -349,61 +369,93 @@ private fun TrackThumbnail(
 private fun PlaybackOptionsButtons(
     player: DenpaPlayer<DenpaTrack>
 ) {
-    var fade by player.fade
     var playMode by player.playMode
+    var volume by player.volume
+    var showVolumeSlider by remember { mutableStateOf(false) }
+    var timer by remember { mutableFloatStateOf(0f) }
+
+    LaunchedEffect(showVolumeSlider, volume) {
+        if (showVolumeSlider) {
+            delay(3000)
+            showVolumeSlider = false
+        }
+    }
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth().height(32.dp)
     ) {
         IconButton({
-            fade = !fade
-        }, modifier = Modifier.size(32.dp)) {
+            showVolumeSlider = !showVolumeSlider
+        }, modifier = Modifier.size(32.dp).onFocusChanged { focusState ->
+            showVolumeSlider = focusState.isFocused
+        }.focusable().pointerInput(Unit) {
+            awaitPointerEventScope {
+                while (true) {
+                    val event = awaitPointerEvent()
+                    when (event.type) {
+                        PointerEventType.Enter -> {
+                            showVolumeSlider = true
+                        }
+
+                        PointerEventType.Exit -> {
+//                            showVolumeSlider = false
+                        }
+                    }
+                }
+            }
+        }) {
             ImageWithShadow(
-                painterResource(Res.drawable.fade),
-                "crossfade",
-                colorFilter =
-                if (fade)
-                    ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon)
-                else
-                    ColorFilter.tint(Colors.currentYukiTheme.playerButtonIconTransparent)
+                painterResource(Res.drawable.volume),
+                "volume",
+                colorFilter = if (showVolumeSlider) ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon)
+                else ColorFilter.tint(Colors.currentYukiTheme.playerButtonIconTransparent)
             )
         }
-
-        IconButton({
-            playMode =
-                if (playMode != DenpaPlayer.PlayMode.REPEAT_TRACK)
-                    DenpaPlayer.PlayMode.REPEAT_TRACK
-                else
-                    DenpaPlayer.PlayMode.REPEAT_PLAYLIST
-        }, modifier = Modifier.size(32.dp)) {
-            ImageWithShadow(
-                painterResource(Res.drawable.repeat_single),
-                "repeat track",
-                colorFilter =
-                if (playMode == DenpaPlayer.PlayMode.REPEAT_TRACK)
-                    ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon)
-                else
-                    ColorFilter.tint(Colors.currentYukiTheme.playerButtonIconTransparent)
-            )
+        AnimatedVisibility(showVolumeSlider) {
+            if (showVolumeSlider) {
+                VolumeSlider(
+                    volume,
+                    { newVolume -> volume = newVolume; player.setVolume(newVolume) },
+                    Modifier.width(80.dp)
+                )
+            }
         }
+        AnimatedVisibility(!showVolumeSlider) {
 
-        IconButton({
-            player.playMode.value =
-                if (playMode != DenpaPlayer.PlayMode.RANDOM)
-                    DenpaPlayer.PlayMode.RANDOM
-                else
-                    DenpaPlayer.PlayMode.REPEAT_PLAYLIST
-        }, modifier = Modifier.size(32.dp)) {
-            ImageWithShadow(
-                painterResource(Res.drawable.random),
-                "random mode",
-                colorFilter =
-                if (playMode == DenpaPlayer.PlayMode.RANDOM)
-                    ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon)
-                else
-                    ColorFilter.tint(Colors.currentYukiTheme.playerButtonIconTransparent)
-            )
+            IconButton({
+                playMode =
+                    if (playMode != DenpaPlayer.PlayMode.REPEAT_TRACK) DenpaPlayer.PlayMode.REPEAT_TRACK
+                    else DenpaPlayer.PlayMode.REPEAT_PLAYLIST
+            }, modifier = Modifier.size(32.dp)) {
+                ImageWithShadow(
+                    painterResource(Res.drawable.repeat_single),
+                    "repeat track",
+                    colorFilter = if (playMode == DenpaPlayer.PlayMode.REPEAT_TRACK) ColorFilter.tint(
+                        Colors.currentYukiTheme.playerButtonIcon
+                    )
+                    else ColorFilter.tint(Colors.currentYukiTheme.playerButtonIconTransparent)
+                )
+            }
+
+        }
+        AnimatedVisibility(!showVolumeSlider) {
+            IconButton({
+                player.playMode.value =
+                    if (playMode != DenpaPlayer.PlayMode.RANDOM) DenpaPlayer.PlayMode.RANDOM
+                    else DenpaPlayer.PlayMode.REPEAT_PLAYLIST
+            }, modifier = Modifier.size(32.dp)) {
+                ImageWithShadow(
+                    painterResource(Res.drawable.random),
+                    "random mode",
+                    colorFilter = if (playMode == DenpaPlayer.PlayMode.RANDOM) ColorFilter.tint(
+                        Colors.currentYukiTheme.playerButtonIcon
+                    )
+                    else ColorFilter.tint(Colors.currentYukiTheme.playerButtonIconTransparent)
+                )
+            }
+
         }
     }
 }
@@ -417,7 +469,8 @@ private fun TrackInfoText(track: DenpaTrack?, modifier: Modifier = Modifier) {
     }
 
     Text(
-        text, fontSize = 10.sp,
+        text,
+        fontSize = 10.sp,
         modifier = modifier.verticalScroll(rememberScrollState()),
         color = Colors.currentYukiTheme.playerButtonIcon
     )

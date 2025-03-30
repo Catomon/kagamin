@@ -15,7 +15,6 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason
 import chu.monscout.kagamin.loadSettings
 import java.io.File
-import java.net.URI
 import java.util.UUID
 
 class DenpaTrackJVM(
@@ -61,7 +60,7 @@ class DenpaPlayerJVM : BaseDenpaPlayer<DenpaTrackJVM>() {
 //        loader.playerManager.loadItem(nipah, EmptyAudioResultHandler())
 
         val settings = loadSettings()
-        fade.value = settings.fade
+        crossfade.value = settings.crossfade
         if (settings.random)
             playMode.value = DenpaPlayer.PlayMode.RANDOM
         else
@@ -174,7 +173,7 @@ class DenpaPlayerJVM : BaseDenpaPlayer<DenpaTrackJVM>() {
     override fun setVolume(volume: Float) {
         super.setVolume(volume)
 
-        loader.player.volume = (110 * volume).toInt()
+        loader.player.volume = (60 * volume).toInt()
     }
 
     override fun seek(position: Long) {

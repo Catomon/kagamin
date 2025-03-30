@@ -15,6 +15,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
 import chu.monscout.kagamin.Colors
 import chu.monscout.kagamin.audio.DenpaTrack
 import chu.monscout.kagamin.savePlaylist
@@ -68,7 +69,7 @@ fun Tracklist(state: KagaminViewModel, tracks: List<DenpaTrack>, modifier: Modif
                             return@onClick
                         }
                         if (state.isLoadingSong != null) return@onClick
-                        CoroutineScope(Dispatchers.Default).launch {
+                        state.viewModelScope.launch {
                             state.isLoadingSong = track
                             state.denpaPlayer.play(track)
                             state.isLoadingSong = null

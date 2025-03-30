@@ -1,53 +1,57 @@
 package chu.monscout.kagamin.feature
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.Image
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
-import androidx.media3.common.MediaItem
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import chu.monscout.kagamin.Colors
-import chu.monscout.kagamin.audio.DenpaTrackAndy
+import chu.monscout.kagamin.DenpaFilePicker
 import chu.monscout.kagamin.createDenpaTrack
+import chu.monscout.kagamin.loadPlaylist
 import kagamin.composeapp.generated.resources.Res
-import kagamin.composeapp.generated.resources.stars_background
+import kagamin.composeapp.generated.resources.add
+import kagamin.composeapp.generated.resources.arrow_left
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import chu.monscout.kagamin.loadPlaylist
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
 actual fun PlayerScreen(
     state: KagaminViewModel,
     navController: NavHostController,
-    modifier: Modifier
+    modifier: Modifier,
 ) {
     val denpaPlayer = state.denpaPlayer
     val playlist = state.playlist
-    val currentTrack = state.currentTrack ?: DenpaTrackAndy(MediaItem.EMPTY)
+    val currentTrack = state.currentTrack
     val playState = state.playState
     val playMode = state.playMode
     val currentPlaylistName = state.currentPlaylistName
+    val showFilePicker = remember { mutableStateOf(false) }
 
-    var showPlaylist by remember { mutableStateOf(false) }
+    DenpaFilePicker(showFilePicker, state.denpaPlayer, state.currentPlaylistName)
 
     LaunchedEffect(currentPlaylistName) {
         CoroutineScope(Dispatchers.Default).launch {
@@ -67,91 +71,132 @@ actual fun PlayerScreen(
         }
     }
 
-    Box(modifier.background(color = Colors.background)) {
-        Image(
-            painterResource(Res.drawable.stars_background), "Background",
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop,
-            colorFilter = ColorFilter.tint(Colors.bars)
-        )
+    Box(modifier.background(color = Colors.background, shape = RoundedCornerShape(16.dp))) {
+        BackgroundImage()
 
-        Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.SpaceBetween) {
-            AnimatedContent(showPlaylist) {
-                if (!it) {
-                    CurrentTrackFrame(
-                        currentTrack,
-                        denpaPlayer,
-                        Modifier
-                            .fillMaxSize()
-                            .background(color = Colors.barsTransparent)
-                    )
-                } else {
-                    Box(Modifier.fillMaxSize()) {
-                        AnimatedContent(state.currentTab) {
-                            when (it) {
-                                Tabs.PLAYLISTS -> {
-                                    Playlists(
-                                        state,
+        Column(Modifier.fillMaxSize()) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(0.99f)
+                    .fillMaxWidth()
+            ) {
+                AppName(Modifier
+                    .background(color = Colors.barsTransparent)
+                    .padding(horizontal = 12.dp)
+                    .padding(top = 8.dp)
+                    .height(32.dp)
+                    .fillMaxWidth()
+                    .clickable(onClickLabel = "Open options") {
+                        navController.navigate(SettingsDestination.toString())
+                    })
+
+                Box(
+                    Modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth()
+                        .weight(0.99f)
+                ) {
+                    AnimatedContent(targetState = state.currentTab, transitionSpec = {
+                        slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
+                    }) {
+                        when (it) {
+                            Tabs.PLAYBACK -> {
+                                CurrentTrackFrame(
+                                    currentTrack,
+                                    denpaPlayer,
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .fillMaxHeight()
+                                        .width(160.dp)
+                                        .background(color = Colors.barsTransparent)
+                                )
+                            }
+
+                            Tabs.PLAYLISTS -> {
+                                Playlists(
+                                    state,
+                                    Modifier
+                                        .align(Alignment.Center)
+                                        .fillMaxHeight()//.padding(start = 4.dp, end = 4.dp)
+                                )
+                            }
+
+                            Tabs.TRACKLIST -> {
+                                if (state.playlist.isEmpty()) {
+                                    Box(
                                         Modifier
-                                            .align(Alignment.Center)
-                                            .fillMaxSize()//.padding(start = 4.dp, end = 4.dp)
-                                    )
-                                }
-
-                                Tabs.TRACKLIST -> {
-                                    if (state.playlist.isEmpty()) {
-                                        Box(
-                                            Modifier.fillMaxSize(),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Text(
-                                                "Drop files or folders here",
-                                                textAlign = TextAlign.Center,
-                                                color = Colors.text2
-                                            )
-                                        }
-                                    } else {
-                                        Tracklist(
-                                            state,
-                                            state.playlist,
-                                            Modifier
-                                                .align(Alignment.Center)
-                                                .fillMaxSize()//.padding(start = 16.dp, end = 16.dp)
+                                            .fillMaxHeight()
+                                            .background(Colors.currentYukiTheme.listItemB),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            "Drop files or folders here",
+                                            textAlign = TextAlign.Center,
+                                            color = Colors.text2
                                         )
                                     }
-                                }
-
-                                Tabs.OPTIONS -> TODO()
-
-                                Tabs.ADD_TRACKS -> {
-                                    AddTracksTab(
-                                        state, Modifier
-                                            .fillMaxSize()
-                                            .align(Alignment.Center)
-                                    )
-                                }
-
-                                Tabs.CREATE_PLAYLIST -> {
-                                    CreatePlaylistTab(
+                                } else {
+                                    Tracklist(
                                         state,
+                                        state.playlist,
                                         Modifier
-                                            .fillMaxSize()
                                             .align(Alignment.Center)
+                                            .fillMaxHeight()//.padding(start = 16.dp, end = 16.dp)
                                     )
                                 }
+                            }
 
-                                Tabs.PLAYBACK -> {
-                                    //
-                                }
+                            Tabs.OPTIONS -> TODO()
+
+                            Tabs.ADD_TRACKS -> {
+                                AddTracksTab(
+                                    state, Modifier
+                                        .fillMaxHeight()
+                                        .align(Alignment.Center)
+                                )
+                            }
+
+                            Tabs.CREATE_PLAYLIST -> {
+                                CreatePlaylistTab(
+                                    state, Modifier
+                                        .fillMaxHeight()
+                                        .fillMaxWidth()
+                                        .align(Alignment.Center)
+                                )
                             }
                         }
                     }
-                }
 
-                //Sidebar(state, navController)
+                    if (state.currentTab != Tabs.PLAYBACK)
+                        AddButton(
+                            painterResource(
+                                if (state.currentTab == Tabs.ADD_TRACKS || state.currentTab == Tabs.CREATE_PLAYLIST) Res.drawable.arrow_left
+                                else Res.drawable.add
+                            ),
+                            onClick = {
+                                when (state.currentTab) {
+                                    Tabs.PLAYLISTS -> {
+                                        state.currentTab = Tabs.CREATE_PLAYLIST
+                                    }
+
+                                    Tabs.TRACKLIST, Tabs.PLAYBACK -> {
+                                        showFilePicker.value = true
+                                    }
+
+                                    else -> {
+                                        state.currentTab =
+                                            if (state.currentTab == Tabs.ADD_TRACKS) Tabs.TRACKLIST else Tabs.PLAYLISTS
+                                    }
+                                }
+
+                            }, modifier = Modifier.align(Alignment.BottomEnd)
+                        )
+                }
             }
 
-            BottomBar(onPlaylistButtonClick = { showPlaylist = !showPlaylist }, Modifier.fillMaxWidth())
+            BottomBar(state, navController)
         }
     }
 }

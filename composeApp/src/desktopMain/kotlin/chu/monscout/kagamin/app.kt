@@ -36,9 +36,9 @@ import androidx.compose.ui.window.rememberTrayState
 import androidx.compose.ui.window.rememberWindowState
 import chu.monscout.kagamin.WindowConfig.isTraySupported
 import chu.monscout.kagamin.audio.DenpaPlayer
-import chu.monscout.kagamin.feature.KagaminApp
-import chu.monscout.kagamin.feature.KagaminViewModel
-import chu.monscout.kagamin.feature.customShadow
+import chu.monscout.kagamin.ui.KagaminApp
+import chu.monscout.kagamin.ui.KagaminViewModel
+import chu.monscout.kagamin.ui.customShadow
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.kagamin_icon64
 import kagamin.composeapp.generated.resources.pause_icon

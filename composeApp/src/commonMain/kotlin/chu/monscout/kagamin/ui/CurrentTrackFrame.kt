@@ -29,7 +29,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.IconButton
-import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -48,13 +47,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope.Companion.DefaultFilterQuality
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.PointerIcon
-import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.IntOffset
@@ -110,56 +106,18 @@ fun CurrentTrackFrame(
 
             PlaybackOptionsButtons(player)
 
-            TrackProgressIndicator(currentTrack, player, updateProgress, progress)
-        }
-    }
-}
-
-@Composable
-private fun TrackProgressIndicator(
-    currentTrack: DenpaTrack?,
-    player: DenpaPlayer<DenpaTrack>,
-    updateProgress: () -> Unit,
-    progress: Float
-) {
-    Column(verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(horizontal = 20.dp)
-            .pointerHoverIcon(
-                PointerIcon.Hand
-            ).pointerInput(currentTrack) {
-                if (currentTrack == null) return@pointerInput
-                val width = this.size.width
-                detectTapGestures {
-                    player.seek((currentTrack.duration * (it.x / width)).toLong())
-                    updateProgress()
-                }
-            }) {
-        LinearProgressIndicator(
-            progress = progress,
-            Modifier.fillMaxWidth().padding(top = 18.dp),
-            color = Colors.currentYukiTheme.playerButtonIcon,
-            strokeCap = StrokeCap.Round
-        )
-
-        Row(
-            Modifier.fillMaxWidth().graphicsLayer(translationY = -8f),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                (player.position / 1000L / 60L).toString() + ":" + (player.position / 1000L % 60),
-                fontSize = 10.sp,
-                color = Colors.currentYukiTheme.playerButtonIconTransparent
-            )
-//                    Text(" - ", fontSize = 10.sp, color = Colors.currentYukiTheme.playerButtonIconTransparent)
-            Text(
-                ((currentTrack?.duration
-                    ?: 0L) / 1000L / 60L).toString() + ":" + ((currentTrack?.duration
-                    ?: 0L) / 1000L % 60),
-                fontSize = 10.sp,
-                color = Colors.currentYukiTheme.playerButtonIconTransparent
-            )
+            Box {
+                TrackProgressIndicator(
+                    currentTrack,
+                    player,
+                    updateProgress,
+                    progress,
+                    color = Colors.currentYukiTheme.thinBorder,
+                    textColor = Colors.currentYukiTheme.thinBorder,
+                    Modifier.graphicsLayer(translationY = 2f)
+                )
+                TrackProgressIndicator(currentTrack, player, updateProgress, progress)
+            }
         }
     }
 }
@@ -376,87 +334,95 @@ private fun PlaybackOptionsButtons(
     var timer by remember { mutableFloatStateOf(0f) }
 
     LaunchedEffect(showVolumeSlider, volume) {
-        if (showVolumeSlider) {
-            delay(3000)
-            showVolumeSlider = false
+        timer = 0f
+
+        while (true) {
+            timer += 0.1f
+            if (timer >= 3f) {
+                showVolumeSlider = false
+            }
+
+            delay(100)
         }
     }
 
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        modifier = Modifier.fillMaxWidth().height(32.dp)
-    ) {
-        IconButton({
-            showVolumeSlider = !showVolumeSlider
-        }, modifier = Modifier.size(32.dp).onFocusChanged { focusState ->
-            showVolumeSlider = focusState.isFocused
-        }.focusable().pointerInput(Unit) {
-            awaitPointerEventScope {
-                while (true) {
-                    val event = awaitPointerEvent()
-                    when (event.type) {
-                        PointerEventType.Enter -> {
-                            showVolumeSlider = true
-                        }
+    AnimatedContent(showVolumeSlider) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            modifier = Modifier.fillMaxWidth().height(32.dp)
+        ) {
+            IconButton({
+                showVolumeSlider = !showVolumeSlider
+            }, modifier = Modifier.size(32.dp).onFocusChanged { focusState ->
+                showVolumeSlider = focusState.isFocused
+            }.focusable().pointerInput(Unit) {
+                awaitPointerEventScope {
+                    while (true) {
+                        val event = awaitPointerEvent()
+                        when (event.type) {
+                            PointerEventType.Enter -> {
+                                showVolumeSlider = false
+                                showVolumeSlider = true
+                            }
 
-                        PointerEventType.Exit -> {
+                            PointerEventType.Exit -> {
 //                            showVolumeSlider = false
+                            }
                         }
                     }
                 }
+            }) {
+                ImageWithShadow(
+                    painterResource(Res.drawable.volume),
+                    "volume",
+                    colorFilter = if (showVolumeSlider) ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon)
+                    else ColorFilter.tint(Colors.currentYukiTheme.playerButtonIconTransparent)
+                )
             }
-        }) {
-            ImageWithShadow(
-                painterResource(Res.drawable.volume),
-                "volume",
-                colorFilter = if (showVolumeSlider) ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon)
-                else ColorFilter.tint(Colors.currentYukiTheme.playerButtonIconTransparent)
-            )
-        }
-        AnimatedVisibility(showVolumeSlider) {
-            if (showVolumeSlider) {
+
+            if (it) {
                 VolumeSlider(
                     volume,
                     { newVolume -> volume = newVolume; player.setVolume(newVolume) },
-                    Modifier.width(80.dp)
+                    Modifier.width(85.dp)
                 )
             }
-        }
-        AnimatedVisibility(!showVolumeSlider) {
 
-            IconButton({
-                playMode =
-                    if (playMode != DenpaPlayer.PlayMode.REPEAT_TRACK) DenpaPlayer.PlayMode.REPEAT_TRACK
-                    else DenpaPlayer.PlayMode.REPEAT_PLAYLIST
-            }, modifier = Modifier.size(32.dp)) {
-                ImageWithShadow(
-                    painterResource(Res.drawable.repeat_single),
-                    "repeat track",
-                    colorFilter = if (playMode == DenpaPlayer.PlayMode.REPEAT_TRACK) ColorFilter.tint(
-                        Colors.currentYukiTheme.playerButtonIcon
+            if (!it) {
+                IconButton({
+                    playMode =
+                        if (playMode != DenpaPlayer.PlayMode.REPEAT_TRACK) DenpaPlayer.PlayMode.REPEAT_TRACK
+                        else DenpaPlayer.PlayMode.REPEAT_PLAYLIST
+                }, modifier = Modifier.size(32.dp)) {
+                    ImageWithShadow(
+                        painterResource(Res.drawable.repeat_single),
+                        "repeat track",
+                        colorFilter = if (playMode == DenpaPlayer.PlayMode.REPEAT_TRACK) ColorFilter.tint(
+                            Colors.currentYukiTheme.playerButtonIcon
+                        )
+                        else ColorFilter.tint(Colors.currentYukiTheme.playerButtonIconTransparent)
                     )
-                    else ColorFilter.tint(Colors.currentYukiTheme.playerButtonIconTransparent)
-                )
+                }
+
             }
 
-        }
-        AnimatedVisibility(!showVolumeSlider) {
-            IconButton({
-                player.playMode.value =
-                    if (playMode != DenpaPlayer.PlayMode.RANDOM) DenpaPlayer.PlayMode.RANDOM
-                    else DenpaPlayer.PlayMode.REPEAT_PLAYLIST
-            }, modifier = Modifier.size(32.dp)) {
-                ImageWithShadow(
-                    painterResource(Res.drawable.random),
-                    "random mode",
-                    colorFilter = if (playMode == DenpaPlayer.PlayMode.RANDOM) ColorFilter.tint(
-                        Colors.currentYukiTheme.playerButtonIcon
+            if (!it) {
+                IconButton({
+                    player.playMode.value =
+                        if (playMode != DenpaPlayer.PlayMode.RANDOM) DenpaPlayer.PlayMode.RANDOM
+                        else DenpaPlayer.PlayMode.REPEAT_PLAYLIST
+                }, modifier = Modifier.size(32.dp)) {
+                    ImageWithShadow(
+                        painterResource(Res.drawable.random),
+                        "random mode",
+                        colorFilter = if (playMode == DenpaPlayer.PlayMode.RANDOM) ColorFilter.tint(
+                            Colors.currentYukiTheme.playerButtonIcon
+                        )
+                        else ColorFilter.tint(Colors.currentYukiTheme.playerButtonIconTransparent)
                     )
-                    else ColorFilter.tint(Colors.currentYukiTheme.playerButtonIconTransparent)
-                )
+                }
             }
-
         }
     }
 }

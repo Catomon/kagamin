@@ -20,13 +20,13 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chu.monscout.kagamin.Colors
-import chu.monscout.kagamin.audio.DenpaPlayer
-import chu.monscout.kagamin.audio.DenpaTrack
+import chu.monscout.kagamin.audio.AudioPlayer
+import chu.monscout.kagamin.audio.AudioTrack
 
 @Composable
 fun TrackProgressIndicator(
-    currentTrack: DenpaTrack?,
-    player: DenpaPlayer<DenpaTrack>,
+    currentTrack: AudioTrack?,
+    player: AudioPlayer<AudioTrack>,
     updateProgress: () -> Unit,
     progress: Float,
     color: Color = Colors.currentYukiTheme.playerButtonIcon,
@@ -48,7 +48,7 @@ fun TrackProgressIndicator(
             }) {
         LinearProgressIndicator(
             progress = progress,
-            Modifier.fillMaxWidth().padding(top = 18.dp),
+            Modifier.fillMaxWidth().padding(top = 16.dp),
             color = color,
             strokeCap = StrokeCap.Round
         )

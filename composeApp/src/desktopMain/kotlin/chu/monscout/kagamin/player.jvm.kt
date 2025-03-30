@@ -1,7 +1,7 @@
 package chu.monscout.kagamin
 
-import chu.monscout.kagamin.audio.DenpaPlayer
-import chu.monscout.kagamin.audio.DenpaPlayerJVM
-import chu.monscout.kagamin.audio.DenpaTrack
+import chu.monscout.kagamin.audio.AudioPlayer
+import chu.monscout.kagamin.audio.AudioPlayerJVM
+import chu.monscout.kagamin.audio.AudioTrack
 
-actual val createDenpaPlayer: DenpaPlayer<DenpaTrack> get() = DenpaPlayerJVM() as DenpaPlayer<DenpaTrack>
+actual val createAudioPlayer: AudioPlayer<AudioTrack> get() = AudioPlayerJVM() as AudioPlayer<AudioTrack>

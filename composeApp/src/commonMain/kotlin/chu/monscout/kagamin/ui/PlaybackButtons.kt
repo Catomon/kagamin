@@ -11,8 +11,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
-import chu.monscout.kagamin.audio.DenpaPlayer
-import chu.monscout.kagamin.audio.DenpaTrack
+import chu.monscout.kagamin.audio.AudioPlayer
+import chu.monscout.kagamin.audio.AudioTrack
 import chu.monscout.kagamin.Colors
 import chu.monscout.kagamin.ui.components.ImageWithShadow
 import kagamin.composeapp.generated.resources.Res
@@ -23,7 +23,7 @@ import kagamin.composeapp.generated.resources.prev
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun PlaybackButtons(player: DenpaPlayer<DenpaTrack>, modifier: Modifier = Modifier) {
+fun PlaybackButtons(player: AudioPlayer<AudioTrack>, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier.height(48.dp),//.background(Colors.noteBackground.copy(alpha = 0.75f)),
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -47,14 +47,14 @@ fun PlaybackButtons(player: DenpaPlayer<DenpaTrack>, modifier: Modifier = Modifi
             modifier = Modifier.size(40.dp),
             onClick = {
                 when (player.playState.value) {
-                    DenpaPlayer.PlayState.PLAYING -> player.pause()
-                    DenpaPlayer.PlayState.PAUSED -> player.resume()
-                    DenpaPlayer.PlayState.IDLE -> player.resume()
+                    AudioPlayer.PlayState.PLAYING -> player.pause()
+                    AudioPlayer.PlayState.PAUSED -> player.resume()
+                    AudioPlayer.PlayState.IDLE -> player.resume()
                 }
             }
         ) {
             AnimatedContent(player.playState) {
-                if (it.value != DenpaPlayer.PlayState.PLAYING) {
+                if (it.value != AudioPlayer.PlayState.PLAYING) {
                     ImageWithShadow(
                         painterResource(Res.drawable.play),
                         "Play",

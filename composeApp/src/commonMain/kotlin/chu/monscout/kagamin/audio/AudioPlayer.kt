@@ -3,7 +3,7 @@ package chu.monscout.kagamin.audio
 import androidx.compose.runtime.MutableState
 import java.util.LinkedList
 
-interface DenpaPlayer<T : DenpaTrack> {
+interface AudioPlayer<T : AudioTrack> {
 
     enum class PlayMode {
         ONCE,

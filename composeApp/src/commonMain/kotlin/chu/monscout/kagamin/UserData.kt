@@ -1,6 +1,6 @@
 package chu.monscout.kagamin
 
-import chu.monscout.kagamin.audio.DenpaTrack
+import chu.monscout.kagamin.audio.AudioTrack
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -64,7 +64,7 @@ fun removePlaylist(name: String) {
     file.delete()
 }
 
-fun savePlaylist(name: String, tracks: Array<DenpaTrack>) {
+fun savePlaylist(name: String, tracks: Array<AudioTrack>) {
     val playlistsFolder = File(userDataFolder.path + "/playlists")
     if (!playlistsFolder.exists())
         playlistsFolder.mkdirs()

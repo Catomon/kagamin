@@ -26,8 +26,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chu.monscout.kagamin.Colors
-import chu.monscout.kagamin.audio.DenpaPlayer
-import chu.monscout.kagamin.audio.DenpaTrack
+import chu.monscout.kagamin.audio.AudioPlayer
+import chu.monscout.kagamin.audio.AudioTrack
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.pause
 import kagamin.composeapp.generated.resources.play
@@ -37,7 +37,7 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 actual fun TrackItem(
     index: Int,
-    track: DenpaTrack,
+    track: AudioTrack,
     tracklistManager: TracklistManager,
     state: KagaminViewModel,
     onClick: () -> Unit,
@@ -80,7 +80,7 @@ actual fun TrackItem(
                 }, contentAlignment = Alignment.Center
                 ) {
                     Image(
-                        painterResource(if (state.playState == DenpaPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
+                        painterResource(if (state.playState == AudioPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
                         "track playback state icon",
                         modifier = Modifier.size(16.dp),
                         colorFilter = ColorFilter.tint(Colors.surface)

@@ -2,7 +2,7 @@ package chu.monscout.kagamin.audio
 
 import kotlin.random.Random
 
-interface DenpaTrack {
+interface AudioTrack {
     val uri: String
     val id: String
     val author: String
@@ -10,10 +10,10 @@ interface DenpaTrack {
     val duration: Long get() = Long.MAX_VALUE
 }
 
-val emptyDenpaTrack
-    get() = object : DenpaTrack {
+val emptyAudioTrack
+    get() = object : AudioTrack {
         override val uri: String = "uri"
         override val id: String = "id"
-        override val author: String = "DenpaAuthor${Random.nextInt(0, 11)}"
-        override val name: String = "Denpa Song Name"
+        override val author: String = "Author${Random.nextInt(0, 11)}"
+        override val name: String = "Song Name"
     }

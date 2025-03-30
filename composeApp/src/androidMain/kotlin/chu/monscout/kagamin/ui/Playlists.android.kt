@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chu.monscout.kagamin.Colors
 import chu.monscout.kagamin.PlaylistData
-import chu.monscout.kagamin.audio.DenpaPlayer
+import chu.monscout.kagamin.audio.AudioPlayer
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.pause
 import kagamin.composeapp.generated.resources.play
@@ -51,7 +51,7 @@ actual fun PlaylistItem(
                 }, contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painterResource(if (state.playState == DenpaPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
+                    painterResource(if (state.playState == AudioPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
                     "current playlist playback state icon",
                     modifier = Modifier
                         .size(16.dp)

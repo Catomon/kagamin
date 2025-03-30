@@ -1,10 +1,9 @@
 package chu.monscout.kagamin
 
-import android.content.Context
-import chu.monscout.kagamin.audio.DenpaPlayer
-import chu.monscout.kagamin.audio.DenpaPlayerAndy
-import chu.monscout.kagamin.audio.DenpaTrack
+import chu.monscout.kagamin.audio.AudioPlayer
+import chu.monscout.kagamin.audio.AudioPlayerAndy
+import chu.monscout.kagamin.audio.AudioTrack
 
-actual val createDenpaPlayer: DenpaPlayer<DenpaTrack> = DenpaPlayerAndy(
+actual val createAudioPlayer: AudioPlayer<AudioTrack> = AudioPlayerAndy(
     playerContext?.invoke() ?: throw IllegalStateException("playerContext == null")
-) as DenpaPlayer<DenpaTrack>
+) as AudioPlayer<AudioTrack>

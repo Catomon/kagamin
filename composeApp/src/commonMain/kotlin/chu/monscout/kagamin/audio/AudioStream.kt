@@ -7,7 +7,7 @@ import javax.sound.sampled.DataLine
 import javax.sound.sampled.SourceDataLine
 import kotlin.concurrent.thread
 
-class DenpaStream(
+class AudioStream(
     val stream: AudioInputStream,
     private val audioFormat: AudioFormat = stream.format
 ) {

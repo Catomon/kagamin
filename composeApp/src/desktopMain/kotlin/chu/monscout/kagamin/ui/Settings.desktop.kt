@@ -27,7 +27,7 @@ import chu.monscout.kagamin.LayoutManager
 import chu.monscout.kagamin.LocalLayoutManager
 import chu.monscout.kagamin.Themes
 import chu.monscout.kagamin.UserSettings
-import chu.monscout.kagamin.audio.DenpaPlayer
+import chu.monscout.kagamin.audio.AudioPlayer
 import chu.monscout.kagamin.loadSettings
 import chu.monscout.kagamin.openInBrowser
 import chu.monscout.kagamin.saveSettings
@@ -118,9 +118,9 @@ actual fun SettingsScreen(
                 {
                     val player = state.denpaPlayer
                     settings.crossfade = player.crossfade.value
-                    settings.repeat = player.playMode.value == DenpaPlayer.PlayMode.REPEAT_TRACK
+                    settings.repeat = player.playMode.value == AudioPlayer.PlayMode.REPEAT_TRACK
                     settings.volume = player.volume.value
-                    settings.random = player.playMode.value == DenpaPlayer.PlayMode.RANDOM
+                    settings.random = player.playMode.value == AudioPlayer.PlayMode.RANDOM
                     saveSettings(settings)
                     exitProcess(1)
                 },

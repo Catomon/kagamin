@@ -35,7 +35,7 @@ import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.rememberTrayState
 import androidx.compose.ui.window.rememberWindowState
 import chu.monscout.kagamin.WindowConfig.isTraySupported
-import chu.monscout.kagamin.audio.DenpaPlayer
+import chu.monscout.kagamin.audio.AudioPlayer
 import chu.monscout.kagamin.ui.KagaminApp
 import chu.monscout.kagamin.ui.KagaminViewModel
 import chu.monscout.kagamin.ui.customShadow
@@ -87,7 +87,7 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
     if (isTraySupported) {
         val trayState = rememberTrayState()
         Tray(
-            painterResource(if (kagaminViewModel.playState == DenpaPlayer.PlayState.PLAYING) Res.drawable.pause_icon else Res.drawable.play_icon),
+            painterResource(if (kagaminViewModel.playState == AudioPlayer.PlayState.PLAYING) Res.drawable.pause_icon else Res.drawable.play_icon),
             tooltip = kagaminViewModel.currentTrack?.name,
             onAction = {
                 kagaminViewModel.onPlayPause()

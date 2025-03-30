@@ -24,9 +24,9 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowScope
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import chu.monscout.kagamin.audio.DenpaPlayer
-import chu.monscout.kagamin.audio.DenpaTrack
-import chu.monscout.kagamin.audio.DenpaTrackJVM
+import chu.monscout.kagamin.audio.AudioPlayer
+import chu.monscout.kagamin.audio.AudioTrack
+import chu.monscout.kagamin.audio.AudioTrackJVM
 import com.darkrockstudios.libraries.mpfilepicker.MultipleFilePicker
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -43,8 +43,8 @@ val osName = System.getProperty("os.name").lowercase()
 actual val userDataFolder: File =
     File(System.getProperty("user.home"), if (osName.contains("win")) "AppData/Roaming/Kagamin" else ".local/share/Kagamin")
 
-actual fun <T : DenpaTrack> createDenpaTrack(uri: String, name: String): T {
-    return DenpaTrackJVM(uri = uri, name = name) as T
+actual fun <T : AudioTrack> createDenpaTrack(uri: String, name: String): T {
+    return AudioTrackJVM(uri = uri, name = name) as T
 }
 
 fun ApplicationScope.setComposeExceptionHandler() {
@@ -79,7 +79,7 @@ fun ApplicationScope.setComposeExceptionHandler() {
 @Composable
 actual fun DenpaFilePicker(
     show: MutableState<Boolean>,
-    denpaPlayer: DenpaPlayer<DenpaTrack>,
+    audioPlayer: AudioPlayer<AudioTrack>,
     currentPlaylistName: String
 ) {
     val a = LocalSnackbarHostState.current
@@ -88,9 +88,9 @@ actual fun DenpaFilePicker(
         show.value = false
         if (files != null) {
             //it.platformFile desk - File, android - Uri
-            denpaPlayer.load(files.map { it.path })
+            audioPlayer.load(files.map { it.path })
 
-            savePlaylist(currentPlaylistName, denpaPlayer.playlist.value.toTypedArray())
+            savePlaylist(currentPlaylistName, audioPlayer.playlist.value.toTypedArray())
         }
 
         //fixme

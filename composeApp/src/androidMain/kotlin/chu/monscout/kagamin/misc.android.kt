@@ -4,19 +4,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
-import chu.monscout.kagamin.audio.DenpaPlayer
-import chu.monscout.kagamin.audio.DenpaTrack
-import chu.monscout.kagamin.audio.DenpaTrackAndy
+import chu.monscout.kagamin.audio.AudioPlayer
+import chu.monscout.kagamin.audio.AudioTrack
+import chu.monscout.kagamin.audio.AudioTrackAndy
 import com.darkrockstudios.libraries.mpfilepicker.MultipleFilePicker
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
 import java.util.UUID
 
-actual fun <T : DenpaTrack> createDenpaTrack(uri: String, name: String): T {
+actual fun <T : AudioTrack> createDenpaTrack(uri: String, name: String): T {
     val uri = File(uri).toUri()
     println(uri)
-    return DenpaTrackAndy(
+    return AudioTrackAndy(
         MediaItem.Builder().setUri(uri).setMediaId(UUID.randomUUID().toString(),).build()
     ) as T
 }
@@ -24,7 +24,7 @@ actual fun <T : DenpaTrack> createDenpaTrack(uri: String, name: String): T {
 @Composable
 actual fun DenpaFilePicker(
     show: MutableState<Boolean>,
-    denpaPlayer: DenpaPlayer<DenpaTrack>,
+    audioPlayer: AudioPlayer<AudioTrack>,
     currentPlaylistName: String
 ) {
     val a = LocalSnackbarHostState.current
@@ -33,9 +33,9 @@ actual fun DenpaFilePicker(
         show.value = false
         if (files != null) {
             //it.platformFile desk - File, android - Uri
-            denpaPlayer.load(files.map { it.platformFile.toString() })
+            audioPlayer.load(files.map { it.platformFile.toString() })
 
-            savePlaylist(currentPlaylistName, denpaPlayer.playlist.value.toTypedArray())
+            savePlaylist(currentPlaylistName, audioPlayer.playlist.value.toTypedArray())
         }
 
         //fixme

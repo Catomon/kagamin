@@ -17,13 +17,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import chu.monscout.kagamin.Colors
-import chu.monscout.kagamin.audio.DenpaTrack
+import chu.monscout.kagamin.audio.AudioTrack
 import chu.monscout.kagamin.savePlaylist
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun Tracklist(state: KagaminViewModel, tracks: List<DenpaTrack>, modifier: Modifier = Modifier) {
+fun Tracklist(state: KagaminViewModel, tracks: List<AudioTrack>, modifier: Modifier = Modifier) {
     val coroutineScope = rememberCoroutineScope()
     val tracklistManager = remember { TracklistManager(coroutineScope) }
     val tracksIndex =
@@ -86,18 +86,18 @@ fun Tracklist(state: KagaminViewModel, tracks: List<DenpaTrack>, modifier: Modif
 data class TracklistManager(
     val coroutineScope: CoroutineScope,
 ) {
-    val selected: SnapshotStateMap<Int, DenpaTrack> = mutableStateMapOf()
+    val selected: SnapshotStateMap<Int, AudioTrack> = mutableStateMapOf()
     val isAnySelected get() = selected.isNotEmpty()
 
-    fun select(index: Int, track: DenpaTrack) {
+    fun select(index: Int, track: AudioTrack) {
         selected[index] = track
     }
 
-    fun isSelected(index: Int, track: DenpaTrack): Boolean {
+    fun isSelected(index: Int, track: AudioTrack): Boolean {
         return selected.contains(index)
     }
 
-    fun deselect(index: Int, track: DenpaTrack) {
+    fun deselect(index: Int, track: AudioTrack) {
         selected.remove(index)
     }
 
@@ -107,7 +107,7 @@ data class TracklistManager(
 
     fun contextMenuRemovePressed(
         state: KagaminViewModel,
-        track: DenpaTrack
+        track: AudioTrack
     ) {
         coroutineScope.launch {
             if (isAnySelected) {
@@ -144,7 +144,7 @@ data class TracklistManager(
 @Composable
 expect fun TrackItem(
     index: Int,
-    track: DenpaTrack,
+    track: AudioTrack,
     tracklistManager: TracklistManager,
     state: KagaminViewModel,
     onClick: () -> Unit,

@@ -58,8 +58,8 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chu.monscout.kagamin.Colors
-import chu.monscout.kagamin.audio.DenpaPlayer
-import chu.monscout.kagamin.audio.DenpaTrack
+import chu.monscout.kagamin.audio.AudioPlayer
+import chu.monscout.kagamin.audio.AudioTrack
 import chu.monscout.kagamin.ui.components.ImageWithShadow
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.def_thumb
@@ -69,11 +69,11 @@ import kagamin.composeapp.generated.resources.volume
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 
-expect fun getThumbnail(denpaTrack: DenpaTrack): ImageBitmap?
+expect fun getThumbnail(audioTrack: AudioTrack): ImageBitmap?
 
 @Composable
 fun CurrentTrackFrame(
-    currentTrack: DenpaTrack?, player: DenpaPlayer<DenpaTrack>, modifier: Modifier = Modifier
+    currentTrack: AudioTrack?, player: AudioPlayer<AudioTrack>, modifier: Modifier = Modifier
 ) {
     val playMode by player.playMode
     val crossfade by player.crossfade
@@ -88,7 +88,7 @@ fun CurrentTrackFrame(
 
     LaunchedEffect(currentTrack) {
         while (true) {
-            if (player.playState.value == DenpaPlayer.PlayState.PLAYING) updateProgress()
+            if (player.playState.value == AudioPlayer.PlayState.PLAYING) updateProgress()
             delay(1000)
         }
     }
@@ -124,7 +124,7 @@ fun CurrentTrackFrame(
 
 @Composable
 fun CompactCurrentTrackFrame(
-    currentTrack: DenpaTrack?, player: DenpaPlayer<DenpaTrack>, modifier: Modifier = Modifier
+    currentTrack: AudioTrack?, player: AudioPlayer<AudioTrack>, modifier: Modifier = Modifier
 ) {
     val playMode by player.playMode
     val crossfade by player.crossfade
@@ -139,7 +139,7 @@ fun CompactCurrentTrackFrame(
 
     LaunchedEffect(currentTrack) {
         while (true) {
-            if (player.playState.value == DenpaPlayer.PlayState.PLAYING) updateProgress()
+            if (player.playState.value == AudioPlayer.PlayState.PLAYING) updateProgress()
             delay(1000)
         }
     }
@@ -183,7 +183,18 @@ fun CompactCurrentTrackFrame(
                     player = player, Modifier.fillMaxWidth()
                 )
 
-                TrackProgressIndicator(currentTrack, player, updateProgress, progress)
+                Box {
+                    TrackProgressIndicator(
+                        currentTrack,
+                        player,
+                        updateProgress,
+                        progress,
+                        color = Colors.currentYukiTheme.thinBorder,
+                        textColor = Colors.currentYukiTheme.thinBorder,
+                        Modifier.graphicsLayer(translationY = 2f)
+                    )
+                    TrackProgressIndicator(currentTrack, player, updateProgress, progress)
+                }
             }
         }
     }
@@ -224,8 +235,8 @@ fun getCropParameters(original: ImageBitmap): Pair<IntOffset, IntSize> {
 
 @Composable
 private fun TrackThumbnail(
-    currentTrack: DenpaTrack?,
-    player: DenpaPlayer<DenpaTrack>,
+    currentTrack: AudioTrack?,
+    player: AudioPlayer<AudioTrack>,
     updateProgress: () -> Unit,
     progress: Float,
     progressColor: Color = Colors.currentYukiTheme.progressOverThumbnail
@@ -326,7 +337,7 @@ private fun TrackThumbnail(
 
 @Composable
 private fun PlaybackOptionsButtons(
-    player: DenpaPlayer<DenpaTrack>
+    player: AudioPlayer<AudioTrack>
 ) {
     var playMode by player.playMode
     var volume by player.volume
@@ -392,13 +403,13 @@ private fun PlaybackOptionsButtons(
             if (!it) {
                 IconButton({
                     playMode =
-                        if (playMode != DenpaPlayer.PlayMode.REPEAT_TRACK) DenpaPlayer.PlayMode.REPEAT_TRACK
-                        else DenpaPlayer.PlayMode.REPEAT_PLAYLIST
+                        if (playMode != AudioPlayer.PlayMode.REPEAT_TRACK) AudioPlayer.PlayMode.REPEAT_TRACK
+                        else AudioPlayer.PlayMode.REPEAT_PLAYLIST
                 }, modifier = Modifier.size(32.dp)) {
                     ImageWithShadow(
                         painterResource(Res.drawable.repeat_single),
                         "repeat track",
-                        colorFilter = if (playMode == DenpaPlayer.PlayMode.REPEAT_TRACK) ColorFilter.tint(
+                        colorFilter = if (playMode == AudioPlayer.PlayMode.REPEAT_TRACK) ColorFilter.tint(
                             Colors.currentYukiTheme.playerButtonIcon
                         )
                         else ColorFilter.tint(Colors.currentYukiTheme.playerButtonIconTransparent)
@@ -410,13 +421,13 @@ private fun PlaybackOptionsButtons(
             if (!it) {
                 IconButton({
                     player.playMode.value =
-                        if (playMode != DenpaPlayer.PlayMode.RANDOM) DenpaPlayer.PlayMode.RANDOM
-                        else DenpaPlayer.PlayMode.REPEAT_PLAYLIST
+                        if (playMode != AudioPlayer.PlayMode.RANDOM) AudioPlayer.PlayMode.RANDOM
+                        else AudioPlayer.PlayMode.REPEAT_PLAYLIST
                 }, modifier = Modifier.size(32.dp)) {
                     ImageWithShadow(
                         painterResource(Res.drawable.random),
                         "random mode",
-                        colorFilter = if (playMode == DenpaPlayer.PlayMode.RANDOM) ColorFilter.tint(
+                        colorFilter = if (playMode == AudioPlayer.PlayMode.RANDOM) ColorFilter.tint(
                             Colors.currentYukiTheme.playerButtonIcon
                         )
                         else ColorFilter.tint(Colors.currentYukiTheme.playerButtonIconTransparent)
@@ -428,7 +439,7 @@ private fun PlaybackOptionsButtons(
 }
 
 @Composable
-private fun TrackInfoText(track: DenpaTrack?, modifier: Modifier = Modifier) {
+private fun TrackInfoText(track: AudioTrack?, modifier: Modifier = Modifier) {
     val text = remember(track) {
         """
         |${track?.name}

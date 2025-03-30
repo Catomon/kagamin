@@ -1,6 +1,6 @@
 package chu.monscout.kagamin
 
-import chu.monscout.kagamin.audio.DenpaPlayer
-import chu.monscout.kagamin.audio.DenpaTrack
+import chu.monscout.kagamin.audio.AudioPlayer
+import chu.monscout.kagamin.audio.AudioTrack
 
-expect val createDenpaPlayer: DenpaPlayer<DenpaTrack>
+expect val createAudioPlayer: AudioPlayer<AudioTrack>

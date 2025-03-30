@@ -4,13 +4,13 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.compositionLocalOf
-import chu.monscout.kagamin.audio.DenpaPlayer
-import chu.monscout.kagamin.audio.DenpaTrack
+import chu.monscout.kagamin.audio.AudioPlayer
+import chu.monscout.kagamin.audio.AudioTrack
 import java.awt.Desktop
 import java.net.URI
 import java.util.Locale
 
-expect fun <T : DenpaTrack> createDenpaTrack(uri: String, name: String): T
+expect fun <T : AudioTrack> createDenpaTrack(uri: String, name: String): T
 
 val LocalSnackbarHostState = compositionLocalOf<SnackbarHostState> {
     error("No Snackbar Host State provided")
@@ -19,7 +19,7 @@ val LocalSnackbarHostState = compositionLocalOf<SnackbarHostState> {
 @Composable
 expect fun DenpaFilePicker(
     show: MutableState<Boolean>,
-    denpaPlayer: DenpaPlayer<DenpaTrack>,
+    audioPlayer: AudioPlayer<AudioTrack>,
     currentPlaylistName: String
 )
 

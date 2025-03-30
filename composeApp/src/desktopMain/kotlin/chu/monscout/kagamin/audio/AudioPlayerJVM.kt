@@ -15,39 +15,10 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason
 import chu.monscout.kagamin.loadSettings
 import java.io.File
-import java.util.UUID
 
-class DenpaTrackJVM(
-    override val uri: String,
-    override val id: String = UUID.randomUUID().toString(),
-    override var author: String = "",
-    override var name: String = "",
-    override var duration: Long = Long.MAX_VALUE
-) : DenpaTrack {
-
-    var audioTrack: AudioTrack? = null
-        set(value) {
-            field = value
-            author = audioTrack?.info?.author ?: ""
-            name = audioTrack?.trackName ?: ""
-            duration = audioTrack?.duration ?: Long.MAX_VALUE
-        }
-
-    constructor(audioTrack: AudioTrack) : this(
-        audioTrack.info.uri,
-        audioTrack.info.identifier,
-        audioTrack.info.author,
-        audioTrack.trackName
-    )
-
-    override fun equals(other: Any?): Boolean {
-        return other is DenpaTrack && uri == other.uri
-    }
-}
-
-class DenpaPlayerJVM : BaseDenpaPlayer<DenpaTrackJVM>() {
-    private val loader = DenpaLoader(DenpaLoadResulHandler())
-    private val stream = DenpaStream(loader.createAudioInputStream())
+class AudioPlayerJVM : BaseAudioPlayer<AudioTrackJVM>() {
+    private val loader = AudioLoader(DenpaLoadResulHandler())
+    private val stream = AudioStream(loader.createAudioInputStream())
     private val audioEventListener = DenpaAudioEventListener()
     override val position: Long get() = loader.player.playingTrack?.position ?: 0L
 
@@ -62,10 +33,10 @@ class DenpaPlayerJVM : BaseDenpaPlayer<DenpaTrackJVM>() {
         val settings = loadSettings()
         crossfade.value = settings.crossfade
         if (settings.random)
-            playMode.value = DenpaPlayer.PlayMode.RANDOM
+            playMode.value = AudioPlayer.PlayMode.RANDOM
         else
             if (settings.repeat)
-                playMode.value = DenpaPlayer.PlayMode.REPEAT_TRACK
+                playMode.value = AudioPlayer.PlayMode.REPEAT_TRACK
         setVolume(settings.volume)
     }
 
@@ -79,7 +50,7 @@ class DenpaPlayerJVM : BaseDenpaPlayer<DenpaTrackJVM>() {
         }
     }
 
-    override fun play(track: DenpaTrackJVM): Boolean {
+    override fun play(track: AudioTrackJVM): Boolean {
         if (track.audioTrack == null) {
             super.play(track)
             load(listOf(track.uri))
@@ -89,7 +60,7 @@ class DenpaPlayerJVM : BaseDenpaPlayer<DenpaTrackJVM>() {
         return if (!loader.player.startTrack(track.audioTrack!!.makeClone(), false) and super.play(track)) nextTrack() != null else true
     }
 
-    override fun prevTrack(): DenpaTrackJVM? {
+    override fun prevTrack(): AudioTrackJVM? {
         val nextDenpaTrack = super.prevTrack()
 
         loader.player.stopTrack()
@@ -100,7 +71,7 @@ class DenpaPlayerJVM : BaseDenpaPlayer<DenpaTrackJVM>() {
 
     private var filePlayTried = 0
 
-    override fun nextTrack(): DenpaTrackJVM? {
+    override fun nextTrack(): AudioTrackJVM? {
         val nextDenpaTrack = super.nextTrack()
 
         nextDenpaTrack ?: let {
@@ -131,7 +102,7 @@ class DenpaPlayerJVM : BaseDenpaPlayer<DenpaTrackJVM>() {
         return nextDenpaTrack
     }
 
-    override fun queue(track: DenpaTrackJVM) {
+    override fun queue(track: AudioTrackJVM) {
         super.queue(track)
 
         //scheduler.queue(track.uri)
@@ -141,11 +112,11 @@ class DenpaPlayerJVM : BaseDenpaPlayer<DenpaTrackJVM>() {
         super.freeQueue()
     }
 
-    override fun addToPlaylist(track: DenpaTrackJVM) {
+    override fun addToPlaylist(track: AudioTrackJVM) {
         super.addToPlaylist(track)
     }
 
-    override fun removeFromPlaylist(track: DenpaTrackJVM) {
+    override fun removeFromPlaylist(track: AudioTrackJVM) {
         super.removeFromPlaylist(track)
     }
 
@@ -200,12 +171,12 @@ class DenpaPlayerJVM : BaseDenpaPlayer<DenpaTrackJVM>() {
                 return
             }
 
-            addToPlaylist(DenpaTrackJVM(track))
+            addToPlaylist(AudioTrackJVM(track))
         }
 
         override fun playlistLoaded(playlist: AudioPlaylist) {
             playlist.tracks.forEach {
-                addToPlaylist(DenpaTrackJVM(it))
+                addToPlaylist(AudioTrackJVM(it))
             }
         }
 
@@ -254,7 +225,7 @@ class DenpaPlayerJVM : BaseDenpaPlayer<DenpaTrackJVM>() {
                     @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
                     when (event.endReason) {
                         AudioTrackEndReason.FINISHED -> {
-                            if (playMode.value != DenpaPlayer.PlayMode.ONCE)
+                            if (playMode.value != AudioPlayer.PlayMode.ONCE)
                                 nextTrack()
                         }
                         AudioTrackEndReason.LOAD_FAILED -> {

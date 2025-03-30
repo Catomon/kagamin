@@ -8,7 +8,7 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventListener
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
 import javax.sound.sampled.AudioInputStream
 
-class DenpaLoader(
+class AudioLoader(
     var resultHandler: AudioLoadResultHandler
 ) {
 

@@ -6,13 +6,13 @@ import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import java.util.UUID
 
-class DenpaTrackAndy(
+class AudioTrackAndy(
     override val uri: String,
     override val id: String = UUID.randomUUID().toString(),
     override var author: String = "",
     override var name: String = "",
     override var duration: Long = Long.MAX_VALUE
-) : DenpaTrack {
+) : AudioTrack {
 
     var mediaItem: MediaItem? = null
     set(value) {
@@ -36,7 +36,7 @@ class DenpaTrackAndy(
     }
 }
 
-class DenpaPlayerAndy(context: Context) : BaseDenpaPlayer<DenpaTrackAndy>() {
+class AudioPlayerAndy(context: Context) : BaseAudioPlayer<AudioTrackAndy>() {
     private val player: ExoPlayer = ExoPlayer.Builder(context).build()
     override val position: Long get() = player.contentPosition
 
@@ -55,11 +55,11 @@ class DenpaPlayerAndy(context: Context) : BaseDenpaPlayer<DenpaTrackAndy>() {
 
     override fun load(uris: List<String>) {
         uris.forEach { uri ->
-            addToPlaylist(DenpaTrackAndy(MediaItem.fromUri(uri)))
+            addToPlaylist(AudioTrackAndy(MediaItem.fromUri(uri)))
         }
     }
 
-    override fun play(track: DenpaTrackAndy): Boolean {
+    override fun play(track: AudioTrackAndy): Boolean {
         if (!player.isCommandAvailable(Player.COMMAND_STOP)) return false
 
         player.stop()
@@ -77,7 +77,7 @@ class DenpaPlayerAndy(context: Context) : BaseDenpaPlayer<DenpaTrackAndy>() {
         return super.play(track)
     }
 
-    override fun prevTrack(): DenpaTrackAndy? {
+    override fun prevTrack(): AudioTrackAndy? {
         val nextDenpaTrack = super.prevTrack()
 
         player.stop()
@@ -91,7 +91,7 @@ class DenpaPlayerAndy(context: Context) : BaseDenpaPlayer<DenpaTrackAndy>() {
         return nextDenpaTrack
     }
 
-    override fun nextTrack(): DenpaTrackAndy? {
+    override fun nextTrack(): AudioTrackAndy? {
         val nextDenpaTrack = super.nextTrack()
 
         player.stop()
@@ -104,15 +104,15 @@ class DenpaPlayerAndy(context: Context) : BaseDenpaPlayer<DenpaTrackAndy>() {
         return nextDenpaTrack
     }
 
-    override fun addToPlaylist(track: DenpaTrackAndy) {
+    override fun addToPlaylist(track: AudioTrackAndy) {
         super.addToPlaylist(track)
     }
 
-    override fun removeFromPlaylist(track: DenpaTrackAndy) {
+    override fun removeFromPlaylist(track: AudioTrackAndy) {
         super.removeFromPlaylist(track)
     }
 
-    override fun queue(track: DenpaTrackAndy) {
+    override fun queue(track: AudioTrackAndy) {
         super.queue(track)
 
         //player.addMediaItem(track.mediaItem)

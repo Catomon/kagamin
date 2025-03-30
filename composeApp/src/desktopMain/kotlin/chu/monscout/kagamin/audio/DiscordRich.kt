@@ -111,9 +111,9 @@ val AudioTrack.trackName: String
         .substring(identifier.lastIndexOf('/') + 1)
         .removeSuffix(".mp3")
 
-val DenpaTrack.songAuthorPlusTitle get() = "$author - $name"
+val chu.monscout.kagamin.audio.AudioTrack.songAuthorPlusTitle get() = "$author - $name"
 
-fun registeredSingerBySongName(track: DenpaTrack): Singer =
+fun registeredSingerBySongName(track: chu.monscout.kagamin.audio.AudioTrack): Singer =
     registeredSingerBySongName(track.songAuthorPlusTitle)
 
 fun registeredSingerBySongName(songName: String = defaultSingerName): Singer {

@@ -8,9 +8,9 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import chu.monscout.kagamin.audio.DenpaPlayer
-import chu.monscout.kagamin.audio.DenpaTrack
-import chu.monscout.kagamin.createDenpaPlayer
+import chu.monscout.kagamin.audio.AudioPlayer
+import chu.monscout.kagamin.audio.AudioTrack
+import chu.monscout.kagamin.createAudioPlayer
 import kotlinx.serialization.Serializable
 import chu.monscout.kagamin.loadSettings
 
@@ -19,7 +19,7 @@ enum class Tabs {
 }
 
 class KagaminViewModel : ViewModel() {
-    val denpaPlayer = createDenpaPlayer
+    val denpaPlayer = createAudioPlayer
     val playlist by denpaPlayer.playlist
     val currentTrack by denpaPlayer.currentTrack
     val playState by denpaPlayer.playState
@@ -29,7 +29,7 @@ class KagaminViewModel : ViewModel() {
     var showPlaylistsPane by mutableStateOf(false)
     var showOptionsPane by mutableStateOf(false)
     var isLoadingPlaylistFile by mutableStateOf(false)
-    var isLoadingSong by mutableStateOf<DenpaTrack?>(null)
+    var isLoadingSong by mutableStateOf<AudioTrack?>(null)
     var currentTab by mutableStateOf(Tabs.TRACKLIST)
 
     var settings by mutableStateOf(loadSettings())
@@ -39,9 +39,9 @@ class KagaminViewModel : ViewModel() {
 
     fun onPlayPause() {
         when (denpaPlayer.playState.value) {
-            DenpaPlayer.PlayState.PLAYING -> denpaPlayer.pause()
-            DenpaPlayer.PlayState.PAUSED -> denpaPlayer.resume()
-            DenpaPlayer.PlayState.IDLE -> denpaPlayer.resume()
+            AudioPlayer.PlayState.PLAYING -> denpaPlayer.pause()
+            AudioPlayer.PlayState.PAUSED -> denpaPlayer.resume()
+            AudioPlayer.PlayState.IDLE -> denpaPlayer.resume()
         }
     }
 }

@@ -1,2 +1,2 @@
 Kagamin is a music player, Kotlin Multiplatform project targeting Android, Desktop.
-![Kagamin_4SF930leYy](https://github.com/user-attachments/assets/75d3d010-0d82-47c5-aff7-fea45a9142e0)
+![Kagamin_X2XOBFAZHd](https://github.com/user-attachments/assets/3c75d498-1a4f-4341-bb97-bb6882b58c21)

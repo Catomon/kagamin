@@ -98,7 +98,7 @@ actual fun SettingsScreen(
 
             Button(
                 {
-                    val player = state.denpaPlayer
+                    val player = state.audioPlayer
                     settings.crossfade = player.crossfade.value
                     settings.repeat = player.playMode.value == AudioPlayer.PlayMode.REPEAT_TRACK
                     settings.volume = player.volume.value

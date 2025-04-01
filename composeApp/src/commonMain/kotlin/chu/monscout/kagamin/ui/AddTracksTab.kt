@@ -1,7 +1,7 @@
 package chu.monscout.kagamin.ui
 
 import androidx.compose.foundation.background
-import chu.monscout.kagamin.DenpaFilePicker
+import chu.monscout.kagamin.MultiFilePicker
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -23,7 +23,7 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun AddTracksTab(state: KagaminViewModel, modifier: Modifier = Modifier) {
     val showFilePicker = remember { mutableStateOf(false) }
-    DenpaFilePicker(showFilePicker, state.denpaPlayer, state.currentPlaylistName)
+    MultiFilePicker(showFilePicker, state.audioPlayer, state.currentPlaylistName)
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

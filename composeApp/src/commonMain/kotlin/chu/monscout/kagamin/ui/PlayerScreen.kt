@@ -19,11 +19,11 @@ enum class Tabs {
 }
 
 class KagaminViewModel : ViewModel() {
-    val denpaPlayer = createAudioPlayer
-    val playlist by denpaPlayer.playlist
-    val currentTrack by denpaPlayer.currentTrack
-    val playState by denpaPlayer.playState
-    val playMode by denpaPlayer.playMode
+    val audioPlayer = createAudioPlayer
+    val playlist by audioPlayer.playlist
+    val currentTrack by audioPlayer.currentTrack
+    val playState by audioPlayer.playState
+    val playMode by audioPlayer.playMode
     var currentPlaylistName by mutableStateOf("default")
     var showSongUrlInput by mutableStateOf(false)
     var showPlaylistsPane by mutableStateOf(false)
@@ -38,10 +38,10 @@ class KagaminViewModel : ViewModel() {
     var width by mutableStateOf(0)
 
     fun onPlayPause() {
-        when (denpaPlayer.playState.value) {
-            AudioPlayer.PlayState.PLAYING -> denpaPlayer.pause()
-            AudioPlayer.PlayState.PAUSED -> denpaPlayer.resume()
-            AudioPlayer.PlayState.IDLE -> denpaPlayer.resume()
+        when (audioPlayer.playState.value) {
+            AudioPlayer.PlayState.PLAYING -> audioPlayer.pause()
+            AudioPlayer.PlayState.PAUSED -> audioPlayer.resume()
+            AudioPlayer.PlayState.IDLE -> audioPlayer.resume()
         }
     }
 }

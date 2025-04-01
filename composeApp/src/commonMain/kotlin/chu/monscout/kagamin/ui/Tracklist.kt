@@ -21,6 +21,7 @@ import chu.monscout.kagamin.audio.AudioTrack
 import chu.monscout.kagamin.savePlaylist
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.io.File
 
 @Composable
 fun Tracklist(state: KagaminViewModel, tracks: List<AudioTrack>, modifier: Modifier = Modifier) {
@@ -70,7 +71,7 @@ fun Tracklist(state: KagaminViewModel, tracks: List<AudioTrack>, modifier: Modif
                         if (state.isLoadingSong != null) return@onClick
                         state.viewModelScope.launch {
                             state.isLoadingSong = track
-                            state.denpaPlayer.play(track)
+                            state.audioPlayer.play(track)
                             state.isLoadingSong = null
                         }
                     },
@@ -105,6 +106,32 @@ data class TracklistManager(
         selected.clear()
     }
 
+    fun deleteFile(track: AudioTrack): Boolean {
+        print("Deleting file ${track.uri}.. ")
+        try {
+            if (File(track.uri).delete()) {
+                println("ok.")
+                return true
+            }
+            else {
+                println("fail.")
+                return false
+            }
+
+        } catch (e: Exception) {
+            println("fail.")
+            e.printStackTrace()
+        }
+
+        return false
+    }
+
+    fun deleteSelectedFiles() {
+        selected.values.forEach { track ->
+            deleteFile(track)
+        }
+    }
+
     fun contextMenuRemovePressed(
         state: KagaminViewModel,
         track: AudioTrack
@@ -113,12 +140,12 @@ data class TracklistManager(
             if (isAnySelected) {
                 selected.values.forEach { track ->
                     state.isLoadingSong = track
-                    state.denpaPlayer.removeFromPlaylist(track)
-                    state.denpaPlayer.playlist.value =
-                        state.denpaPlayer.playlist.value
+                    state.audioPlayer.removeFromPlaylist(track)
+                    state.audioPlayer.playlist.value =
+                        state.audioPlayer.playlist.value
                     savePlaylist(
                         state.currentPlaylistName,
-                        state.denpaPlayer.playlist.value.toTypedArray()
+                        state.audioPlayer.playlist.value.toTypedArray()
                     )
                     //listState.scrollToItem(i, -60)
                     state.isLoadingSong = null
@@ -127,12 +154,12 @@ data class TracklistManager(
                 deselectAll()
             } else {
                 state.isLoadingSong = track
-                state.denpaPlayer.removeFromPlaylist(track)
-                state.denpaPlayer.playlist.value =
-                    state.denpaPlayer.playlist.value
+                state.audioPlayer.removeFromPlaylist(track)
+                state.audioPlayer.playlist.value =
+                    state.audioPlayer.playlist.value
                 savePlaylist(
                     state.currentPlaylistName,
-                    state.denpaPlayer.playlist.value.toTypedArray()
+                    state.audioPlayer.playlist.value.toTypedArray()
                 )
                 //listState.scrollToItem(i, -60)
                 state.isLoadingSong = null

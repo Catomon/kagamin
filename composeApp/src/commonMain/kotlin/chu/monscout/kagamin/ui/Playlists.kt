@@ -74,7 +74,7 @@ fun Playlists(state: KagaminViewModel, modifier: Modifier = Modifier) {
                             )
 
                             if (state.currentPlaylistName == playlist.first)
-                                state.denpaPlayer.playlist.value = mutableListOf()
+                                state.audioPlayer.playlist.value = mutableListOf()
 
                             playlists = loadPlaylists()
                         }

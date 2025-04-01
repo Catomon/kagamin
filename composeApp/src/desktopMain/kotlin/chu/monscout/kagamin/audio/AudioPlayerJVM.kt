@@ -17,9 +17,9 @@ import chu.monscout.kagamin.loadSettings
 import java.io.File
 
 class AudioPlayerJVM : BaseAudioPlayer<AudioTrackJVM>() {
-    private val loader = AudioLoader(DenpaLoadResulHandler())
+    private val loader = AudioLoader(AudioLoadResulHandlerImpl())
     private val stream = AudioStream(loader.createAudioInputStream())
-    private val audioEventListener = DenpaAudioEventListener()
+    private val audioEventListener = AudioEventListenerImpl()
     override val position: Long get() = loader.player.playingTrack?.position ?: 0L
 
     init {
@@ -61,35 +61,35 @@ class AudioPlayerJVM : BaseAudioPlayer<AudioTrackJVM>() {
     }
 
     override fun prevTrack(): AudioTrackJVM? {
-        val nextDenpaTrack = super.prevTrack()
+        val nextAudioTrack = super.prevTrack()
 
         loader.player.stopTrack()
-        play(nextDenpaTrack ?: return null)
+        play(nextAudioTrack ?: return null)
 
-        return nextDenpaTrack
+        return nextAudioTrack
     }
 
     private var filePlayTried = 0
 
     override fun nextTrack(): AudioTrackJVM? {
-        val nextDenpaTrack = super.nextTrack()
+        val nextAudioTrack = super.nextTrack()
 
-        nextDenpaTrack ?: let {
+        nextAudioTrack ?: let {
             stop()
             return null
         }
 
         loader.player.stopTrack()
 
-        if (!nextDenpaTrack.uri.startsWith("http")) {
+        if (!nextAudioTrack.uri.startsWith("http")) {
             if (filePlayTried >= playlist.value.size) {
                 println("playlist has no files to play")
                 return null
             }
             filePlayTried++
 
-            if (!File(nextDenpaTrack.uri).exists()) {
-                println("track file does not exist: ${nextDenpaTrack.uri}")
+            if (!File(nextAudioTrack.uri).exists()) {
+                println("track file does not exist: ${nextAudioTrack.uri}")
 
                 return nextTrack()
             }
@@ -97,9 +97,9 @@ class AudioPlayerJVM : BaseAudioPlayer<AudioTrackJVM>() {
 
         filePlayTried = 0
 
-        play(nextDenpaTrack)
+        play(nextAudioTrack)
 
-        return nextDenpaTrack
+        return nextAudioTrack
     }
 
     override fun queue(track: AudioTrackJVM) {
@@ -162,7 +162,7 @@ class AudioPlayerJVM : BaseAudioPlayer<AudioTrackJVM>() {
         stream.stop = true
     }
 
-    inner class DenpaLoadResulHandler : AudioLoadResultHandler {
+    inner class AudioLoadResulHandlerImpl : AudioLoadResultHandler {
         override fun trackLoaded(track: AudioTrack) {
             if (currentTrack.value != null && currentTrack.value?.uri == track.info.uri) {
                 currentTrack.value?.audioTrack = track
@@ -189,7 +189,7 @@ class AudioPlayerJVM : BaseAudioPlayer<AudioTrackJVM>() {
         }
     }
 
-    inner class DenpaAudioEventListener : AudioEventListener {
+    inner class AudioEventListenerImpl : AudioEventListener {
 
         private val player = loader.player
 

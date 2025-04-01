@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import chu.monscout.kagamin.Colors
 import chu.monscout.kagamin.LayoutManager
@@ -52,24 +53,17 @@ actual fun SettingsScreen(
         modifier = modifier.fillMaxSize().background(Colors.bars),
         contentAlignment = Alignment.Center
     ) {
-        Column(
-            Modifier.align(Alignment.BottomEnd).padding(end = 6.dp),
-            horizontalAlignment = Alignment.End
-        ) {
-            Text(
-                "ver. 1.0.4",
-                color = Colors.text2
-            )
+        AppName(Modifier.align(Alignment.TopCenter).padding(top = 10.dp))
 
-            Text(
-                "github.com/Catomon",
-                Modifier.clickable {
-                    openInBrowser("https://github.com/Catomon")
-                },
-                fontStyle = FontStyle.Italic,
-                color = Colors.text2
-            )
-        }
+        Text(
+            "ver. 1.0.4 github.com/Catomon",
+            Modifier.clickable {
+                openInBrowser("https://github.com/Catomon")
+            }.padding(start = 3.dp).align(Alignment.BottomCenter),
+            fontStyle = FontStyle.Italic,
+            color = Colors.text2,
+            fontSize = 12.sp
+        )
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -77,7 +71,7 @@ actual fun SettingsScreen(
             modifier = modifier.fillMaxSize()
         ) {
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
+                horizontalAlignment = Alignment.Start,
             ) {
                 ThemeRadioButtons(theme, settings, state)
 
@@ -103,31 +97,29 @@ actual fun SettingsScreen(
             }
         }
 
-        Column(Modifier.align(Alignment.BottomStart)) {
-            Button({
-                if (navController.currentDestination?.route == SettingsDestination.toString())
-                    navController.popBackStack()
-                val prev = currentLayout.value
-                currentLayout.value = LayoutManager.Layout.entries.first { it != prev }
-                currentLayout.value = prev
-            }) {
-                Text("Return", color = Colors.text)
-            }
+        Button({
+            if (navController.currentDestination?.route == SettingsDestination.toString())
+                navController.popBackStack()
+            val prev = currentLayout.value
+            currentLayout.value = LayoutManager.Layout.entries.first { it != prev }
+            currentLayout.value = prev
+        }, modifier = Modifier.align(Alignment.BottomStart).padding(start = 10.dp)) {
+            Text("Return", color = Colors.text)
+        }
 
-            Button(
-                {
-                    val player = state.denpaPlayer
-                    settings.crossfade = player.crossfade.value
-                    settings.repeat = player.playMode.value == AudioPlayer.PlayMode.REPEAT_TRACK
-                    settings.volume = player.volume.value
-                    settings.random = player.playMode.value == AudioPlayer.PlayMode.RANDOM
-                    saveSettings(settings)
-                    exitProcess(1)
-                },
-                modifier = Modifier.padding(top = 12.dp)
-            ) {
-                Text("Exit App", color = Colors.text)
-            }
+        Button(
+            {
+                val player = state.audioPlayer
+                settings.crossfade = player.crossfade.value
+                settings.repeat = player.playMode.value == AudioPlayer.PlayMode.REPEAT_TRACK
+                settings.volume = player.volume.value
+                settings.random = player.playMode.value == AudioPlayer.PlayMode.RANDOM
+                saveSettings(settings)
+                exitProcess(1)
+            },
+            modifier = Modifier.align(Alignment.BottomEnd).padding(end = 10.dp)
+        ) {
+            Text("Exit App", color = Colors.text)
         }
     }
 }
@@ -137,65 +129,63 @@ private fun ThemeRadioButtons(
     theme: String,
     settings: UserSettings,
     state: KagaminViewModel,
+    modifier: Modifier = Modifier
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Text("Theme", color = Colors.text)
-
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                RadioButton(
-                    theme == Themes.Violet.name,
-                    colors = RadioButtonDefaults.colors(
-                        Themes.Violet.bars,
-                        Themes.Violet.surface
-                    ),
-                    onClick = {
-                        Colors.currentYukiTheme = Themes.Violet
-                        settings.theme = Themes.Violet.name
-                        saveSettings(settings)
-                        state.settings = loadSettings()
-                    },
-                    modifier = Modifier.drawBehind {
-                        drawCircle(
-                            color = Color.White,
-                            size.minDimension / 2.5f
-                        )
-                    })
-                RadioButton(
-                    theme == Themes.Pink.name,
-                    colors = RadioButtonDefaults.colors(Themes.Pink.bars, Themes.Pink.surface),
-                    onClick = {
-                        Colors.currentYukiTheme = Themes.Pink
-                        settings.theme = Themes.Pink.name
-                        saveSettings(settings)
-                        state.settings = loadSettings()
-                    },
-                    modifier = Modifier.drawBehind {
-                        drawCircle(
-                            color = Color.White,
-                            size.minDimension / 2.5f
-                        )
-                    })
-                RadioButton(
-                    theme == Themes.Blue.name,
-                    colors = RadioButtonDefaults.colors(Themes.Blue.bars, Themes.Blue.surface),
-                    onClick = {
-                        Colors.currentYukiTheme = Themes.Blue
-                        settings.theme = Themes.Blue.name
-                        saveSettings(settings)
-                        state.settings = loadSettings()
-                    },
-                    modifier = Modifier.drawBehind {
-                        drawCircle(
-                            color = Color.White,
-                            size.minDimension / 2.5f
-                        )
-                    })
-            }
-
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+    ) {
+        Text("Themes:", color = Colors.text)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            RadioButton(
+                theme == Themes.Violet.name,
+                colors = RadioButtonDefaults.colors(
+                    Themes.Violet.bars,
+                    Themes.Violet.surface
+                ),
+                onClick = {
+                    Colors.currentYukiTheme = Themes.Violet
+                    settings.theme = Themes.Violet.name
+                    saveSettings(settings)
+                    state.settings = loadSettings()
+                },
+                modifier = Modifier.drawBehind {
+                    drawCircle(
+                        color = Color.White,
+                        size.minDimension / 2.5f
+                    )
+                })
+            RadioButton(
+                theme == Themes.Pink.name,
+                colors = RadioButtonDefaults.colors(Themes.Pink.bars, Themes.Pink.surface),
+                onClick = {
+                    Colors.currentYukiTheme = Themes.Pink
+                    settings.theme = Themes.Pink.name
+                    saveSettings(settings)
+                    state.settings = loadSettings()
+                },
+                modifier = Modifier.drawBehind {
+                    drawCircle(
+                        color = Color.White,
+                        size.minDimension / 2.5f
+                    )
+                })
+            RadioButton(
+                theme == Themes.Blue.name,
+                colors = RadioButtonDefaults.colors(Themes.Blue.bars, Themes.Blue.surface),
+                onClick = {
+                    Colors.currentYukiTheme = Themes.Blue
+                    settings.theme = Themes.Blue.name
+                    saveSettings(settings)
+                    state.settings = loadSettings()
+                },
+                modifier = Modifier.drawBehind {
+                    drawCircle(
+                        color = Color.White,
+                        size.minDimension / 2.5f
+                    )
+                })
             Row(verticalAlignment = Alignment.CenterVertically) {
                 RadioButton(
                     theme == Themes.KagaminDark.name,

@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.util.UUID
 
-actual fun <T : AudioTrack> createDenpaTrack(uri: String, name: String): T {
+actual fun <T : AudioTrack> createAudioTrack(uri: String, name: String): T {
     val uri = File(uri).toUri()
     println(uri)
     return AudioTrackAndy(
@@ -22,7 +22,7 @@ actual fun <T : AudioTrack> createDenpaTrack(uri: String, name: String): T {
 }
 
 @Composable
-actual fun DenpaFilePicker(
+actual fun MultiFilePicker(
     show: MutableState<Boolean>,
     audioPlayer: AudioPlayer<AudioTrack>,
     currentPlaylistName: String

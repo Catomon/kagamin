@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -39,6 +40,9 @@ import chu.monscout.kagamin.audio.AudioPlayer
 import chu.monscout.kagamin.ui.KagaminApp
 import chu.monscout.kagamin.ui.KagaminViewModel
 import chu.monscout.kagamin.ui.customShadow
+import chu.monscout.kagamin.ui.windows.ConfirmWindow
+import chu.monscout.kagamin.ui.windows.ConfirmWindowState
+import chu.monscout.kagamin.ui.windows.LocalConfirmWindow
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.kagamin_icon64
 import kagamin.composeapp.generated.resources.pause_icon
@@ -54,9 +58,14 @@ import java.io.File
 fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
     val windowState =
         rememberWindowState(width = WindowConfig.WIDTH.dp, height = WindowConfig.HEIGHT.dp)
+
     val kagaminViewModel: KagaminViewModel = remember { get(KagaminViewModel::class.java) }
+
     val layoutManager = remember { LayoutManager() }
     val currentLayout by layoutManager.currentLayout
+
+    val confirmWindowState = remember { mutableStateOf(ConfirmWindowState()) }
+
     LaunchedEffect(currentLayout) {
         when (currentLayout) {
             LayoutManager.Layout.Default -> {
@@ -79,7 +88,8 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
     }
 
     CompositionLocalProvider(
-        LocalLayoutManager provides layoutManager
+        LocalLayoutManager provides layoutManager,
+        LocalConfirmWindow provides confirmWindowState
     ) {
         AppWindow(windowState, kagaminViewModel, onCloseRequest)
     }
@@ -94,6 +104,10 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
             },
             state = trayState
         )
+    }
+
+    if (confirmWindowState.value.isVisible) {
+        ConfirmWindow(confirmWindowState.value)
     }
 }
 
@@ -242,10 +256,10 @@ private fun createTrackDragAndDropTarget(
 
                     filterMusicFiles(droppedFiles)
 
-                    kagaminViewModel.denpaPlayer.load(musicFiles.map { it.path })
+                    kagaminViewModel.audioPlayer.load(musicFiles.map { it.path })
                     savePlaylist(
                         kagaminViewModel.currentPlaylistName,
-                        kagaminViewModel.denpaPlayer.playlist.value.toTypedArray()
+                        kagaminViewModel.audioPlayer.playlist.value.toTypedArray()
                     )
 
                     //fixme

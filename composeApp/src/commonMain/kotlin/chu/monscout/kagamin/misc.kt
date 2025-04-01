@@ -10,14 +10,14 @@ import java.awt.Desktop
 import java.net.URI
 import java.util.Locale
 
-expect fun <T : AudioTrack> createDenpaTrack(uri: String, name: String): T
+expect fun <T : AudioTrack> createAudioTrack(uri: String, name: String): T
 
 val LocalSnackbarHostState = compositionLocalOf<SnackbarHostState> {
     error("No Snackbar Host State provided")
 }
 
 @Composable
-expect fun DenpaFilePicker(
+expect fun MultiFilePicker(
     show: MutableState<Boolean>,
     audioPlayer: AudioPlayer<AudioTrack>,
     currentPlaylistName: String

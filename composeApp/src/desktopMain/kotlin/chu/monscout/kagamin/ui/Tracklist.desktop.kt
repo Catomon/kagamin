@@ -25,13 +25,18 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import chu.monscout.kagamin.Colors
+import chu.monscout.kagamin.LocalSnackbarHostState
 import chu.monscout.kagamin.audio.AudioPlayer
 import chu.monscout.kagamin.audio.AudioTrack
+import chu.monscout.kagamin.ui.windows.ConfirmWindowState
+import chu.monscout.kagamin.ui.windows.LocalConfirmWindow
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.pause
 import kagamin.composeapp.generated.resources.play
 import kagamin.composeapp.generated.resources.selected
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -44,6 +49,8 @@ actual fun TrackItem(
     modifier: Modifier
 ) {
     val clipboard = LocalClipboardManager.current
+    val confirmationWindow = LocalConfirmWindow.current
+    val snackbar = LocalSnackbarHostState.current
     val isHeader = index == -1
     val backColor = if (isHeader) Colors.barsTransparent else
         if (index % 2 == 0) Colors.currentYukiTheme.listItemA else Colors.currentYukiTheme.listItemB
@@ -65,6 +72,50 @@ actual fun TrackItem(
             ContextMenuItem(if (tracklistManager.isAnySelected) "Remove selected" else "Remove") {
                 tracklistManager.contextMenuRemovePressed(state, track)
             },
+            ContextMenuItem(if (tracklistManager.selected.size <= 1) "Delete file" else "Delete files") {
+                if (tracklistManager.selected.size < 1) {
+                    confirmationWindow.value = ConfirmWindowState(
+                        true,
+                        onConfirm = {
+                            if (state.currentTrack == track)
+                                state.audioPlayer.stop()
+
+                            state.viewModelScope.launch {
+                                tracklistManager.deleteFile(track)
+                                snackbar.showSnackbar("Deleting the file..")
+                            }
+                            tracklistManager.contextMenuRemovePressed(state, track)
+                        },
+                        onCancel = {
+
+                        },
+                        onClose = {
+                            confirmationWindow.value = ConfirmWindowState()
+                        }
+                    )
+                } else {
+                    confirmationWindow.value = ConfirmWindowState(
+                        true,
+                        onConfirm = {
+                            if (tracklistManager.selected.any { it.value == track })
+                                state.audioPlayer.stop()
+
+                            tracklistManager.deleteSelectedFiles()
+                            tracklistManager.contextMenuRemovePressed(state, track)
+
+                            state.viewModelScope.launch {
+                                snackbar.showSnackbar("Deleting files..")
+                            }
+                        },
+                        onCancel = {
+
+                        },
+                        onClose = {
+                            confirmationWindow.value = ConfirmWindowState()
+                        }
+                    )
+                }
+            },
         )
     }) {
         Row(
@@ -73,11 +124,12 @@ actual fun TrackItem(
             horizontalArrangement = Arrangement.Start
         ) {
             if (index > -1 && state.currentTrack == track) {
-                Box(Modifier.height(32.dp).clip(
-                    RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp)
-                ).background(Colors.barsTransparent).clickable {
-                    state.onPlayPause()
-                }, contentAlignment = Alignment.Center
+                Box(
+                    Modifier.height(32.dp).clip(
+                        RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp)
+                    ).background(Colors.barsTransparent).clickable {
+                        state.onPlayPause()
+                    }, contentAlignment = Alignment.Center
                 ) {
                     Image(
                         painterResource(if (state.playState == AudioPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),

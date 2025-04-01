@@ -25,7 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import chu.monscout.kagamin.Colors
-import chu.monscout.kagamin.createDenpaTrack
+import chu.monscout.kagamin.createAudioTrack
 import chu.monscout.kagamin.loadPlaylist
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.add
@@ -41,7 +41,7 @@ actual fun PlayerScreen(
     navController: NavHostController,
     modifier: Modifier,
 ) {
-    val denpaPlayer = state.denpaPlayer
+    val audioPlayer = state.audioPlayer
     val playlist = state.playlist
     val currentTrack = state.currentTrack
     val playState = state.playState
@@ -54,9 +54,9 @@ actual fun PlayerScreen(
             try {
                 val trackUris = loadPlaylist(currentPlaylistName)?.tracks
                 if (trackUris != null) {
-                    denpaPlayer.playlist.value = mutableListOf()
+                    audioPlayer.playlist.value = mutableListOf()
                     trackUris.forEach {
-                        denpaPlayer.addToPlaylist(createDenpaTrack(it.uri, it.name))
+                        audioPlayer.addToPlaylist(createAudioTrack(it.uri, it.name))
                     }
                 }
             } catch (e: Exception) {
@@ -81,7 +81,7 @@ actual fun PlayerScreen(
                     })
 
                 CurrentTrackFrame(
-                    currentTrack, denpaPlayer, Modifier.width(160.dp).fillMaxHeight()
+                    currentTrack, audioPlayer, Modifier.width(160.dp).fillMaxHeight()
                 )
             }
 
@@ -174,7 +174,7 @@ fun CompactPlayerScreen(
     navController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
-    val denpaPlayer = state.denpaPlayer
+    val audioPlayer = state.audioPlayer
     val playlist = state.playlist
     val currentTrack = state.currentTrack
     val playState = state.playState
@@ -187,9 +187,9 @@ fun CompactPlayerScreen(
             try {
                 val trackUris = loadPlaylist(currentPlaylistName)?.tracks
                 if (trackUris != null) {
-                    denpaPlayer.playlist.value = mutableListOf()
+                    audioPlayer.playlist.value = mutableListOf()
                     trackUris.forEach {
-                        denpaPlayer.addToPlaylist(createDenpaTrack(it.uri, it.name))
+                        audioPlayer.addToPlaylist(createAudioTrack(it.uri, it.name))
                     }
                 }
             } catch (e: Exception) {
@@ -221,7 +221,7 @@ fun CompactPlayerScreen(
                             Tabs.PLAYBACK -> {
                                 CurrentTrackFrame(
                                     currentTrack,
-                                    denpaPlayer,
+                                    audioPlayer,
                                     Modifier.width(160.dp).fillMaxHeight()
                                         .background(color = Colors.barsTransparent)
                                 )
@@ -311,7 +311,7 @@ fun TinyPlayerScreen(
     navController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
-    val denpaPlayer = state.denpaPlayer
+    val audioPlayer = state.audioPlayer
     val playlist = state.playlist
     val currentTrack = state.currentTrack
     val playState = state.playState
@@ -324,9 +324,9 @@ fun TinyPlayerScreen(
             try {
                 val trackUris = loadPlaylist(currentPlaylistName)?.tracks
                 if (trackUris != null) {
-                    denpaPlayer.playlist.value = mutableListOf()
+                    audioPlayer.playlist.value = mutableListOf()
                     trackUris.forEach {
-                        denpaPlayer.addToPlaylist(createDenpaTrack(it.uri, it.name))
+                        audioPlayer.addToPlaylist(createAudioTrack(it.uri, it.name))
                     }
                 }
             } catch (e: Exception) {
@@ -358,7 +358,7 @@ fun TinyPlayerScreen(
                             Tabs.PLAYBACK -> {
                                 CompactCurrentTrackFrame(
                                     currentTrack,
-                                    denpaPlayer,
+                                    audioPlayer,
                                     Modifier.width(160.dp).fillMaxHeight()
                                         .background(color = Colors.barsTransparent)
                                 )

@@ -43,7 +43,7 @@ val osName = System.getProperty("os.name").lowercase()
 actual val userDataFolder: File =
     File(System.getProperty("user.home"), if (osName.contains("win")) "AppData/Roaming/Kagamin" else ".local/share/Kagamin")
 
-actual fun <T : AudioTrack> createDenpaTrack(uri: String, name: String): T {
+actual fun <T : AudioTrack> createAudioTrack(uri: String, name: String): T {
     return AudioTrackJVM(uri = uri, name = name) as T
 }
 
@@ -77,7 +77,7 @@ fun ApplicationScope.setComposeExceptionHandler() {
 }
 
 @Composable
-actual fun DenpaFilePicker(
+actual fun MultiFilePicker(
     show: MutableState<Boolean>,
     audioPlayer: AudioPlayer<AudioTrack>,
     currentPlaylistName: String

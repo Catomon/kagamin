@@ -78,30 +78,30 @@ class AudioPlayerAndy(context: Context) : BaseAudioPlayer<AudioTrackAndy>() {
     }
 
     override fun prevTrack(): AudioTrackAndy? {
-        val nextDenpaTrack = super.prevTrack()
+        val nextAudioTrack = super.prevTrack()
 
         player.stop()
 
-        if (nextDenpaTrack != null) {
-            player.addMediaItem(nextDenpaTrack.mediaItem ?: nextDenpaTrack.createMediaItem())
+        if (nextAudioTrack != null) {
+            player.addMediaItem(nextAudioTrack.mediaItem ?: nextAudioTrack.createMediaItem())
             player.prepare()
             player.play()
         }
 
-        return nextDenpaTrack
+        return nextAudioTrack
     }
 
     override fun nextTrack(): AudioTrackAndy? {
-        val nextDenpaTrack = super.nextTrack()
+        val nextAudioTrack = super.nextTrack()
 
         player.stop()
-        if (nextDenpaTrack != null) {
-            player.addMediaItem(nextDenpaTrack.mediaItem ?: nextDenpaTrack.createMediaItem())
+        if (nextAudioTrack != null) {
+            player.addMediaItem(nextAudioTrack.mediaItem ?: nextAudioTrack.createMediaItem())
             player.prepare()
             player.play()
         }
 
-        return nextDenpaTrack
+        return nextAudioTrack
     }
 
     override fun addToPlaylist(track: AudioTrackAndy) {

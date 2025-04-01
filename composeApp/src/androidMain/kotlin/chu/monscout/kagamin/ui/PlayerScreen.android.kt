@@ -26,8 +26,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import chu.monscout.kagamin.Colors
-import chu.monscout.kagamin.DenpaFilePicker
-import chu.monscout.kagamin.createDenpaTrack
+import chu.monscout.kagamin.MultiFilePicker
+import chu.monscout.kagamin.createAudioTrack
 import chu.monscout.kagamin.loadPlaylist
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.add
@@ -43,7 +43,7 @@ actual fun PlayerScreen(
     navController: NavHostController,
     modifier: Modifier,
 ) {
-    val denpaPlayer = state.denpaPlayer
+    val audioPlayer = state.audioPlayer
     val playlist = state.playlist
     val currentTrack = state.currentTrack
     val playState = state.playState
@@ -51,7 +51,7 @@ actual fun PlayerScreen(
     val currentPlaylistName = state.currentPlaylistName
     val showFilePicker = remember { mutableStateOf(false) }
 
-    DenpaFilePicker(showFilePicker, state.denpaPlayer, state.currentPlaylistName)
+    MultiFilePicker(showFilePicker, state.audioPlayer, state.currentPlaylistName)
 
     LaunchedEffect(currentPlaylistName) {
         CoroutineScope(Dispatchers.Default).launch {
@@ -59,9 +59,9 @@ actual fun PlayerScreen(
             try {
                 val trackUris = loadPlaylist(currentPlaylistName)?.tracks
                 if (trackUris != null) {
-                    denpaPlayer.playlist.value = mutableListOf()
+                    audioPlayer.playlist.value = mutableListOf()
                     trackUris.forEach {
-                        denpaPlayer.addToPlaylist(createDenpaTrack(it.uri, it.name))
+                        audioPlayer.addToPlaylist(createAudioTrack(it.uri, it.name))
                     }
                 }
             } catch (e: Exception) {
@@ -105,7 +105,7 @@ actual fun PlayerScreen(
                             Tabs.PLAYBACK -> {
                                 CurrentTrackFrame(
                                     currentTrack,
-                                    denpaPlayer,
+                                    audioPlayer,
                                     Modifier
                                         .fillMaxWidth()
                                         .fillMaxHeight()

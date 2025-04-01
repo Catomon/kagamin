@@ -363,40 +363,41 @@ private fun PlaybackOptionsButtons(
             horizontalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier.fillMaxWidth().height(32.dp)
         ) {
-            IconButton({
-                showVolumeSlider = !showVolumeSlider
-            }, modifier = Modifier.size(32.dp).onFocusChanged { focusState ->
-                showVolumeSlider = focusState.isFocused
-            }.focusable().pointerInput(Unit) {
-                awaitPointerEventScope {
-                    while (true) {
-                        val event = awaitPointerEvent()
-                        when (event.type) {
-                            PointerEventType.Enter -> {
-                                showVolumeSlider = false
-                                showVolumeSlider = true
-                            }
+            if (!it)
+                IconButton({
+                    showVolumeSlider = !showVolumeSlider
+                }, modifier = Modifier.size(32.dp).onFocusChanged { focusState ->
+                    showVolumeSlider = focusState.isFocused
+                }.focusable().pointerInput(Unit) {
+                    awaitPointerEventScope {
+                        while (true) {
+                            val event = awaitPointerEvent()
+                            when (event.type) {
+                                PointerEventType.Enter -> {
+                                    showVolumeSlider = false
+                                    showVolumeSlider = true
+                                }
 
-                            PointerEventType.Exit -> {
+                                PointerEventType.Exit -> {
 //                            showVolumeSlider = false
+                                }
                             }
                         }
                     }
+                }) {
+                    ImageWithShadow(
+                        painterResource(Res.drawable.volume),
+                        "volume",
+                        colorFilter = if (showVolumeSlider) ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon)
+                        else ColorFilter.tint(Colors.currentYukiTheme.playerButtonIconTransparent)
+                    )
                 }
-            }) {
-                ImageWithShadow(
-                    painterResource(Res.drawable.volume),
-                    "volume",
-                    colorFilter = if (showVolumeSlider) ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon)
-                    else ColorFilter.tint(Colors.currentYukiTheme.playerButtonIconTransparent)
-                )
-            }
 
             if (it) {
                 VolumeSlider(
                     volume,
                     { newVolume -> volume = newVolume; player.setVolume(newVolume) },
-                    Modifier.width(85.dp)
+                    Modifier.fillMaxWidth().padding(12.dp)
                 )
             }
 

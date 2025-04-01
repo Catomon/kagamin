@@ -52,9 +52,10 @@ actual fun PlaylistItem(
     }) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(56.dp)) {
             if (state.currentPlaylistName == playlist.first) {
-                Box(Modifier.fillMaxHeight().clip(
-                    RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp)
-                ).background(Colors.barsTransparent).clickable {
+                Box(Modifier.fillMaxHeight()//.clip(
+                    //RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp)
+                //)
+                    .background(Colors.barsTransparent).clickable {
                     state.onPlayPause()
                 }, contentAlignment = Alignment.Center) {
                     Image(

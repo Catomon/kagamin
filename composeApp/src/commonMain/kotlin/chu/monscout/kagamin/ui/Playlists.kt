@@ -45,7 +45,7 @@ fun Playlists(state: KagaminViewModel, modifier: Modifier = Modifier) {
     } else {
         Column(modifier) {
             Box(modifier = Modifier.background(Colors.barsTransparent).height(32.dp).fillMaxWidth().padding(horizontal = 4.dp), contentAlignment = Alignment.CenterStart) {
-                Text(state.currentPlaylistName, fontSize = 12.sp)
+                Text(state.currentPlaylistName, fontSize = 12.sp, color = Colors.currentYukiTheme.playerButtonIcon)
             }
 
             LazyColumn(

@@ -125,9 +125,9 @@ actual fun TrackItem(
         ) {
             if (index > -1 && state.currentTrack == track) {
                 Box(
-                    Modifier.height(32.dp).clip(
-                        RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp)
-                    ).background(Colors.barsTransparent).clickable {
+                    Modifier.height(32.dp)//.clip(
+                 //           RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp)
+                        .background(Colors.barsTransparent).clickable {
                         state.onPlayPause()
                     }, contentAlignment = Alignment.Center
                 ) {
@@ -152,7 +152,7 @@ actual fun TrackItem(
                 Text(
                     track.name,
                     fontSize = 12.sp,
-                    color = Colors.text,
+                    color = if (isHeader) Colors.currentYukiTheme.playerButtonIcon else Colors.text,
                     maxLines = 1,
                     modifier = Modifier.align(Alignment.CenterStart),
                     overflow = TextOverflow.Ellipsis,

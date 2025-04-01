@@ -24,7 +24,8 @@ import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun AppName(modifier: Modifier = Modifier) {
-    AppNameWShadow(modifier)
+//    AppNameWShadow(modifier)
+    AppNameWShadowJap(modifier)
 }
 
 @Composable
@@ -52,6 +53,49 @@ private fun AppNameNormal(modifier: Modifier = Modifier) {
             fontSize = 18.sp,
             modifier = Modifier.height(32.dp),
         )
+    }
+}
+
+@Composable
+private fun AppNameWShadowJap(modifier: Modifier = Modifier) {
+    Box(contentAlignment = Alignment.Center, modifier = modifier) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.graphicsLayer(translationY = 3f)
+        ) {
+            Image(
+                painterResource(Res.drawable.star64),
+                "App icon",
+                colorFilter = ColorFilter.tint(Colors.currentYukiTheme.thinBorder),
+                modifier = Modifier.size(32.dp).offset(y = (-3).dp)
+            )
+            Text(
+                text = "かがみん",
+                color = Colors.currentYukiTheme.thinBorder,
+                fontSize = 18.sp,
+                modifier = Modifier.height(32.dp),
+            )
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier
+        ) {
+            Image(
+                painterResource(Res.drawable.star64),
+                "App icon",
+                colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon),
+                modifier = Modifier.size(32.dp).offset(y = (-3).dp)
+            )
+            Text(
+                text = "かがみん",
+                color = Colors.currentYukiTheme.playerButtonIcon,
+                fontSize = 18.sp,
+                modifier = Modifier.height(32.dp),
+            )
+        }
     }
 }
 

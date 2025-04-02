@@ -56,7 +56,7 @@ actual fun SettingsScreen(
         AppName(Modifier.align(Alignment.TopCenter).padding(top = 10.dp))
 
         Text(
-            "ver. 1.0.4 github.com/Catomon",
+            "ver. 1.0.7 github.com/Catomon",
             Modifier.clickable {
                 openInBrowser("https://github.com/Catomon")
             }.padding(start = 3.dp).align(Alignment.BottomCenter),

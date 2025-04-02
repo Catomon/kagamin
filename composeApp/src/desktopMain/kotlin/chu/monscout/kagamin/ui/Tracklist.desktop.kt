@@ -158,8 +158,6 @@ actual fun TrackItem(
                     overflow = TextOverflow.Ellipsis,
                 )
 
-
-
                 Row(
                     Modifier.align(Alignment.CenterEnd),
                     verticalAlignment = Alignment.CenterVertically

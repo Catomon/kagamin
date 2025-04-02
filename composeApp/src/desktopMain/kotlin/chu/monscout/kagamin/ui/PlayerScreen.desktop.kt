@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -74,7 +75,7 @@ actual fun PlayerScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxHeight().background(color = Colors.barsTransparent)
             ) {
-                AppName(Modifier.padding(horizontal = 12.dp).padding(top = 8.dp).height(32.dp)
+                AppName(Modifier.padding(horizontal = 12.dp).height(25.dp).graphicsLayer(translationY = 2f)
                     .clickable {
                         if (navController.currentDestination?.route != SettingsDestination.toString())
                             navController.navigate(SettingsDestination.toString())
@@ -207,11 +208,13 @@ fun CompactPlayerScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxHeight().weight(0.99f)
             ) {
-                AppName(Modifier.background(color = Colors.barsTransparent)
-                    .padding(horizontal = 12.dp).padding(top = 8.dp).height(32.dp).fillMaxWidth()
-                    .clickable(onClickLabel = "Open options") {
-                        navController.navigate(SettingsDestination.toString())
-                    })
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth().background(color = Colors.barsTransparent)) {
+                    AppName(Modifier
+                        .height(25.dp).graphicsLayer(translationY = 2f)
+                        .clickable(onClickLabel = "Open options") {
+                            navController.navigate(SettingsDestination.toString())
+                        })
+                }
 
                 Box(Modifier.weight(0.99f).fillMaxHeight()) {
                     AnimatedContent(targetState = state.currentTab, transitionSpec = {
@@ -344,11 +347,13 @@ fun TinyPlayerScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxHeight().weight(0.99f)
             ) {
-                AppName(Modifier.background(color = Colors.barsTransparent)
-                    .padding(horizontal = 12.dp).padding(top = 8.dp).height(32.dp).fillMaxWidth()
-                    .clickable {
-                        navController.navigate(SettingsDestination.toString())
-                    })
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth().background(color = Colors.barsTransparent)) {
+                    AppName(Modifier
+                        .height(25.dp).graphicsLayer(translationY = 2f)
+                        .clickable {
+                            navController.navigate(SettingsDestination.toString())
+                        })
+                }
 
                 Box(Modifier.weight(0.99f).fillMaxHeight()) {
                     AnimatedContent(targetState = state.currentTab, transitionSpec = {

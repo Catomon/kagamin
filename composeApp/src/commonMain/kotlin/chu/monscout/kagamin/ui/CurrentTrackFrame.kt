@@ -98,13 +98,13 @@ fun CurrentTrackFrame(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            TrackThumbnail(currentTrack, player, updateProgress, progress)
+            TrackThumbnail(currentTrack, player, updateProgress, progress, modifier = Modifier.padding(8.dp))
 
             PlaybackButtons(
-                player = player, Modifier.fillMaxWidth()
+                player = player, Modifier.width(133.dp)
             )
 
-            PlaybackOptionsButtons(player)
+            PlaybackOptionsButtons(player, Modifier.width(133.dp))
 
             Box {
                 TrackProgressIndicator(
@@ -159,7 +159,7 @@ fun CompactCurrentTrackFrame(
         val aniColor = animateColorAsState(targetProgressColor)
 
         TrackThumbnail(
-            currentTrack, player, updateProgress, floatAnimation, progressColor = aniColor.value
+            currentTrack, player, updateProgress, floatAnimation, progressColor = aniColor.value, modifier = Modifier.padding(8.dp)
         )
 
         AnimatedVisibility(
@@ -177,10 +177,10 @@ fun CompactCurrentTrackFrame(
             ) {
                 Spacer(Modifier.height(16.dp))
 
-                PlaybackOptionsButtons(player)
+                PlaybackOptionsButtons(player, Modifier.width(133.dp))
 
                 PlaybackButtons(
-                    player = player, Modifier.fillMaxWidth()
+                    player = player, Modifier.width(133.dp)
                 )
 
                 Box {
@@ -239,7 +239,8 @@ private fun TrackThumbnail(
     player: AudioPlayer<AudioTrack>,
     updateProgress: () -> Unit,
     progress: Float,
-    progressColor: Color = Colors.currentYukiTheme.progressOverThumbnail
+    progressColor: Color = Colors.currentYukiTheme.progressOverThumbnail,
+    modifier: Modifier = Modifier
 ) {
     //val progressColor = remember { Colors.bars.copy(0.5f) }
 
@@ -267,7 +268,7 @@ private fun TrackThumbnail(
     }
 
     Box(contentAlignment = Alignment.Center,
-        modifier = Modifier.size(160.dp).padding(8.dp).drawBehind {
+        modifier = modifier.size(145.dp).drawBehind {
             drawRoundRect(
                 color = Colors.currentYukiTheme.thinBorder,
                 topLeft = Offset(0f, 2f),
@@ -337,7 +338,8 @@ private fun TrackThumbnail(
 
 @Composable
 private fun PlaybackOptionsButtons(
-    player: AudioPlayer<AudioTrack>
+    player: AudioPlayer<AudioTrack>,
+    modifier: Modifier = Modifier
 ) {
     var playMode by player.playMode
     var volume by player.volume
@@ -360,8 +362,8 @@ private fun PlaybackOptionsButtons(
     AnimatedContent(showVolumeSlider) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier.fillMaxWidth().height(32.dp)
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = modifier.height(32.dp)
         ) {
             if (!it)
                 IconButton({
@@ -397,7 +399,7 @@ private fun PlaybackOptionsButtons(
                 VolumeSlider(
                     volume,
                     { newVolume -> volume = newVolume; player.setVolume(newVolume) },
-                    Modifier.fillMaxWidth().padding(12.dp)
+                    Modifier.fillMaxWidth()
                 )
             }
 

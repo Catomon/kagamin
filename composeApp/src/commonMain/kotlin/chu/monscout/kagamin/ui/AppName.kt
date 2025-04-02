@@ -64,17 +64,21 @@ private fun AppNameWShadowJap(modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier.graphicsLayer(translationY = 3f)
         ) {
+            Text(
+                text = "かが",
+                color = Colors.currentYukiTheme.thinBorder,
+                fontSize = 18.sp,
+            )
             Image(
                 painterResource(Res.drawable.star64),
                 "App icon",
                 colorFilter = ColorFilter.tint(Colors.currentYukiTheme.thinBorder),
-                modifier = Modifier.size(32.dp).offset(y = (-3).dp)
+                modifier = Modifier.size(25.dp)
             )
             Text(
-                text = "かがみん",
+                text = "みん",
                 color = Colors.currentYukiTheme.thinBorder,
                 fontSize = 18.sp,
-                modifier = Modifier.height(32.dp),
             )
         }
 
@@ -83,17 +87,21 @@ private fun AppNameWShadowJap(modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier
         ) {
+            Text(
+                text = "かが",
+                color = Colors.currentYukiTheme.playerButtonIcon,
+                fontSize = 18.sp,
+            )
             Image(
                 painterResource(Res.drawable.star64),
                 "App icon",
                 colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon),
-                modifier = Modifier.size(32.dp).offset(y = (-3).dp)
+                modifier = Modifier.size(25.dp)
             )
             Text(
-                text = "かがみん",
+                text = "みん",
                 color = Colors.currentYukiTheme.playerButtonIcon,
                 fontSize = 18.sp,
-                modifier = Modifier.height(32.dp),
             )
         }
     }
@@ -111,19 +119,17 @@ private fun AppNameWShadow(modifier: Modifier = Modifier) {
                 text = "Kag",
                 color = Colors.currentYukiTheme.thinBorder,
                 fontSize = 18.sp,
-                modifier = Modifier.height(32.dp),
             )
             Image(
                 painterResource(Res.drawable.star64),
                 "App icon",
                 colorFilter = ColorFilter.tint(Colors.currentYukiTheme.thinBorder),
-                modifier = Modifier.size(32.dp).offset(y = (-3).dp)
+                modifier = Modifier.size(25.dp)
             )
             Text(
                 text = "min",
                 color = Colors.currentYukiTheme.thinBorder,
                 fontSize = 18.sp,
-                modifier = Modifier.height(32.dp),
             )
         }
 
@@ -136,19 +142,17 @@ private fun AppNameWShadow(modifier: Modifier = Modifier) {
                 text = "Kag",
                 color = Colors.currentYukiTheme.playerButtonIcon,
                 fontSize = 18.sp,
-                modifier = Modifier.height(32.dp),
             )
             Image(
                 painterResource(Res.drawable.star64),
                 "App icon",
                 colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon),
-                modifier = Modifier.size(32.dp).offset(y = (-3).dp)
+                modifier = Modifier.size(25.dp)
             )
             Text(
                 text = "min",
                 color = Colors.currentYukiTheme.playerButtonIcon,
                 fontSize = 18.sp,
-                modifier = Modifier.height(32.dp),
             )
         }
     }

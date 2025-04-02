@@ -26,7 +26,7 @@ import org.jetbrains.compose.resources.painterResource
 fun PlaybackButtons(player: AudioPlayer<AudioTrack>, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier.height(48.dp),//.background(Colors.noteBackground.copy(alpha = 0.75f)),
-        horizontalArrangement = Arrangement.SpaceEvenly,
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(

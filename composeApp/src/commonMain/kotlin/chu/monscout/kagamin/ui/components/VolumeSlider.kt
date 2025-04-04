@@ -1,4 +1,4 @@
-package chu.monscout.kagamin.ui
+package chu.monscout.kagamin.ui.components
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box

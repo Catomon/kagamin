@@ -1,4 +1,4 @@
-package chu.monscout.kagamin.ui
+package chu.monscout.kagamin.ui.screens
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

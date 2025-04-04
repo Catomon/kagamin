@@ -32,7 +32,7 @@ fun ConfirmWindow(
     confirmWindowState: ConfirmWindowState
 ) {
     Window(
-        visible = true,
+        visible = confirmWindowState.isVisible,
         onCloseRequest = {
             confirmWindowState.onCancel()
             confirmWindowState.onClose()

@@ -10,6 +10,12 @@ import androidx.navigation.compose.rememberNavController
 import chu.monscout.kagamin.LayoutManager
 import chu.monscout.kagamin.LocalLayoutManager
 import chu.monscout.kagamin.LocalSnackbarHostState
+import chu.monscout.kagamin.ui.screens.CompactPlayerScreen
+import chu.monscout.kagamin.ui.screens.KagaminViewModel
+import chu.monscout.kagamin.ui.screens.PlayerScreenDestination
+import chu.monscout.kagamin.ui.screens.SettingsDestination
+import chu.monscout.kagamin.ui.screens.Tabs
+import chu.monscout.kagamin.ui.screens.TinyPlayerScreen
 
 @Composable
 actual fun KagaminApp(
@@ -26,7 +32,9 @@ actual fun KagaminApp(
             composable(PlayerScreenDestination.toString()) {
                 when (LocalLayoutManager.current.currentLayout.value) {
                     LayoutManager.Layout.Default -> {
-                        PlayerScreen(kagaminViewModel.also { it.currentTab = Tabs.TRACKLIST }, navController)
+                        chu.monscout.kagamin.ui.screens.PlayerScreen(kagaminViewModel.also {
+                            it.currentTab = Tabs.TRACKLIST
+                        }, navController)
                     }
 
                     LayoutManager.Layout.Compact -> {
@@ -40,7 +48,7 @@ actual fun KagaminApp(
             }
 
             composable(SettingsDestination.toString()) {
-                SettingsScreen(kagaminViewModel, navController)
+                chu.monscout.kagamin.ui.screens.SettingsScreen(kagaminViewModel, navController)
             }
         }
     }

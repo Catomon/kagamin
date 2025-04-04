@@ -9,6 +9,11 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import chu.monscout.kagamin.ui.screens.KagaminViewModel
+import chu.monscout.kagamin.ui.screens.PlayerScreen
+import chu.monscout.kagamin.ui.screens.PlayerScreenDestination
+import chu.monscout.kagamin.ui.screens.SettingsDestination
+import chu.monscout.kagamin.ui.screens.SettingsScreen
 
 @Composable
 actual fun KagaminApp(

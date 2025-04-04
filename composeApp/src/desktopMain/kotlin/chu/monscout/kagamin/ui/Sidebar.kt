@@ -19,6 +19,9 @@ import chu.monscout.kagamin.LayoutManager
 import chu.monscout.kagamin.LocalLayoutManager
 import chu.monscout.kagamin.LocalWindow
 import chu.monscout.kagamin.ui.components.ImageWithShadow
+import chu.monscout.kagamin.ui.screens.KagaminViewModel
+import chu.monscout.kagamin.ui.screens.SettingsDestination
+import chu.monscout.kagamin.ui.screens.Tabs
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.drag
 import kagamin.composeapp.generated.resources.menu

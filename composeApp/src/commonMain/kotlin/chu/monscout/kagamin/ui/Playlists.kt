@@ -25,6 +25,7 @@ import chu.monscout.kagamin.Colors
 import chu.monscout.kagamin.loadPlaylists
 import chu.monscout.kagamin.removePlaylist
 import chu.monscout.kagamin.savePlaylist
+import chu.monscout.kagamin.ui.screens.KagaminViewModel
 
 @Composable
 fun Playlists(state: KagaminViewModel, modifier: Modifier = Modifier) {
@@ -45,7 +46,7 @@ fun Playlists(state: KagaminViewModel, modifier: Modifier = Modifier) {
     } else {
         Column(modifier) {
             Box(modifier = Modifier.background(Colors.barsTransparent).height(32.dp).fillMaxWidth().padding(horizontal = 4.dp), contentAlignment = Alignment.CenterStart) {
-                Text(state.currentPlaylistName, fontSize = 12.sp, color = Colors.currentYukiTheme.playerButtonIcon)
+                Text(state.currentPlaylistName, fontSize = 10.sp, color = Colors.currentYukiTheme.playerButtonIcon)
             }
 
             LazyColumn(

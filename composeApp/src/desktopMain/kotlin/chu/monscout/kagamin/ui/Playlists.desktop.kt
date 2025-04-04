@@ -15,17 +15,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chu.monscout.kagamin.Colors
 import chu.monscout.kagamin.audio.AudioPlayer
+import chu.monscout.kagamin.ui.screens.KagaminViewModel
+import chu.monscout.kagamin.ui.screens.Tabs
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.pause
 import kagamin.composeapp.generated.resources.play
@@ -79,7 +79,7 @@ actual fun PlaylistItem(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        playlist.first, fontSize = 12.sp, color = Colors.text,
+                        playlist.first, fontSize = 10.sp, color = Colors.text,
                         maxLines = 1
                     )
                 }

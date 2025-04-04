@@ -1,4 +1,4 @@
-package chu.monscout.kagamin.ui
+package chu.monscout.kagamin.ui.components
 
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap

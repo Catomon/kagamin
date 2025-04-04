@@ -12,13 +12,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
@@ -30,6 +28,7 @@ import chu.monscout.kagamin.Colors
 import chu.monscout.kagamin.LocalSnackbarHostState
 import chu.monscout.kagamin.audio.AudioPlayer
 import chu.monscout.kagamin.audio.AudioTrack
+import chu.monscout.kagamin.ui.screens.KagaminViewModel
 import chu.monscout.kagamin.ui.windows.ConfirmWindowState
 import chu.monscout.kagamin.ui.windows.LocalConfirmWindow
 import kagamin.composeapp.generated.resources.Res
@@ -151,7 +150,7 @@ actual fun TrackItem(
             ) {
                 Text(
                     track.name,
-                    fontSize = 12.sp,
+                    fontSize = 10.sp,
                     color = if (isHeader) Colors.currentYukiTheme.playerButtonIcon else Colors.text,
                     maxLines = 1,
                     modifier = Modifier.align(Alignment.CenterStart),

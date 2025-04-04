@@ -1,4 +1,4 @@
-package chu.monscout.kagamin.ui
+package chu.monscout.kagamin.ui.components
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -39,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.onFocusChanged
@@ -60,7 +61,6 @@ import androidx.compose.ui.unit.sp
 import chu.monscout.kagamin.Colors
 import chu.monscout.kagamin.audio.AudioPlayer
 import chu.monscout.kagamin.audio.AudioTrack
-import chu.monscout.kagamin.ui.components.ImageWithShadow
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.def_thumb
 import kagamin.composeapp.generated.resources.random
@@ -98,7 +98,7 @@ fun CurrentTrackFrame(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            TrackThumbnail(currentTrack, player, updateProgress, progress, modifier = Modifier.padding(8.dp))
+            TrackThumbnail(currentTrack, player, updateProgress, progress, modifier = Modifier.padding(8.dp).size(145.dp))
 
             PlaybackButtons(
                 player = player, Modifier.width(133.dp)
@@ -159,7 +159,7 @@ fun CompactCurrentTrackFrame(
         val aniColor = animateColorAsState(targetProgressColor)
 
         TrackThumbnail(
-            currentTrack, player, updateProgress, floatAnimation, progressColor = aniColor.value, modifier = Modifier.padding(8.dp)
+            currentTrack, player, updateProgress, floatAnimation, progressColor = aniColor.value, modifier = Modifier.padding(8.dp).size(145.dp)
         )
 
         AnimatedVisibility(
@@ -234,20 +234,23 @@ fun getCropParameters(original: ImageBitmap): Pair<IntOffset, IntSize> {
 
 
 @Composable
-private fun TrackThumbnail(
+fun TrackThumbnail(
     currentTrack: AudioTrack?,
     player: AudioPlayer<AudioTrack>,
     updateProgress: () -> Unit,
     progress: Float,
     progressColor: Color = Colors.currentYukiTheme.progressOverThumbnail,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    contentScale: ContentScale = ContentScale.Crop,
+    blur: Boolean = false,
+    controlProgress: Boolean = true
 ) {
     //val progressColor = remember { Colors.bars.copy(0.5f) }
 
-    var image by remember(currentTrack) {
+    var image by remember {
         mutableStateOf<ImageBitmap?>(null)
     }
-    var loadingThumb by remember(currentTrack) { mutableStateOf(true) }
+    var loadingThumb by remember { mutableStateOf(true) }
     var offset by remember { mutableStateOf(IntOffset(0, 0)) }
     var size by remember { mutableStateOf(IntSize(0, 0)) }
 
@@ -268,7 +271,7 @@ private fun TrackThumbnail(
     }
 
     Box(contentAlignment = Alignment.Center,
-        modifier = modifier.size(145.dp).drawBehind {
+        modifier = modifier.drawBehind {
             drawRoundRect(
                 color = Colors.currentYukiTheme.thinBorder,
                 topLeft = Offset(0f, 2f),
@@ -277,12 +280,18 @@ private fun TrackThumbnail(
             )
         }
 //            .border(2.dp, Colors.currentYukiTheme.thinBorder, RoundedCornerShape(12.dp))
-            .clip(RoundedCornerShape(12.dp)).pointerInput(currentTrack) {
-                if (currentTrack == null) return@pointerInput
-                val width = this.size.width
-                detectTapGestures {
-                    player.seek((currentTrack.duration * (it.x / width)).toLong())
-                    updateProgress()
+            .clip(RoundedCornerShape(12.dp)).let {
+                if (controlProgress) {
+                    it.pointerInput(currentTrack) {
+                        if (currentTrack == null) return@pointerInput
+                        val width = this.size.width
+                        detectTapGestures {
+                            player.seek((currentTrack.duration * (it.x / width)).toLong())
+                            updateProgress()
+                        }
+                    }
+                } else {
+                    it
                 }
             }) {
         AnimatedContent(image, modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp))) {
@@ -293,8 +302,8 @@ private fun TrackThumbnail(
                     Image(
                         painterResource(Res.drawable.def_thumb),
                         "Track thumbnail",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize(),
+                        contentScale = contentScale,
+                        modifier = Modifier.fillMaxSize().let { if (blur) it.blur(5.dp) else it }
                     )
                 }
             } else {
@@ -313,8 +322,8 @@ private fun TrackThumbnail(
                             )
                         },
                         "Track thumbnail",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize(),
+                        contentScale = contentScale,
+                        modifier = Modifier.fillMaxSize().let { if (blur) it.blur(7.dp) else it }
                     )
                 }
             }

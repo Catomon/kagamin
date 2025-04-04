@@ -19,6 +19,7 @@ import androidx.lifecycle.viewModelScope
 import chu.monscout.kagamin.Colors
 import chu.monscout.kagamin.audio.AudioTrack
 import chu.monscout.kagamin.savePlaylist
+import chu.monscout.kagamin.ui.screens.KagaminViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.io.File
@@ -69,10 +70,16 @@ fun Tracklist(state: KagaminViewModel, tracks: List<AudioTrack>, modifier: Modif
                             return@onClick
                         }
                         if (state.isLoadingSong != null) return@onClick
-                        state.viewModelScope.launch {
-                            state.isLoadingSong = track
-                            state.audioPlayer.play(track)
-                            state.isLoadingSong = null
+
+                        if (track.uri.startsWith("http")) {
+                             state.videoUrl = track.uri
+                        } else {
+                            state.videoUrl = ""
+                            state.viewModelScope.launch {
+                                state.isLoadingSong = track
+                                state.audioPlayer.play(track) //todo state.playSong()
+                                state.isLoadingSong = null
+                            }
                         }
                     },
                     modifier = Modifier
@@ -84,7 +91,7 @@ fun Tracklist(state: KagaminViewModel, tracks: List<AudioTrack>, modifier: Modif
     }
 }
 
-data class TracklistManager(
+class TracklistManager(
     val coroutineScope: CoroutineScope,
 ) {
     val selected: SnapshotStateMap<Int, AudioTrack> = mutableStateMapOf()

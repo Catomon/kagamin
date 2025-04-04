@@ -1,4 +1,4 @@
-package chu.monscout.kagamin.ui
+package chu.monscout.kagamin.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -17,7 +17,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chu.monscout.kagamin.Colors
-import chu.monscout.kagamin.ui.components.OutlinedText
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.star64
 import org.jetbrains.compose.resources.painterResource

@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.dp
 import chu.monscout.kagamin.Colors
 import chu.monscout.kagamin.isValidFileName
 import chu.monscout.kagamin.savePlaylist
+import chu.monscout.kagamin.ui.screens.KagaminViewModel
+import chu.monscout.kagamin.ui.screens.Tabs
 
 @Composable
 fun CreatePlaylistTab(state: KagaminViewModel, modifier: Modifier) {

@@ -1,4 +1,4 @@
-package chu.monscout.kagamin.ui
+package chu.monscout.kagamin.ui.screens
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,6 +31,7 @@ class KagaminViewModel : ViewModel() {
     var isLoadingPlaylistFile by mutableStateOf(false)
     var isLoadingSong by mutableStateOf<AudioTrack?>(null)
     var currentTab by mutableStateOf(Tabs.TRACKLIST)
+    var videoUrl by mutableStateOf("")
 
     var settings by mutableStateOf(loadSettings())
 

@@ -59,8 +59,8 @@ kotlin {
             implementation(libs.lavaplayer)
             implementation("org.slf4j:slf4j-api:2.0.7")
             implementation("org.slf4j:slf4j-simple:2.0.7")
-            implementation("dev.lavalink.youtube:common:1.11.4")
-//            implementation("dev.arbjerg:lavaplayer:2.1.2")
+//            implementation("dev.lavalink.youtube:common:1.11.4")
+            implementation(libs.mediaplayer.kmp)
         }
     }
 }

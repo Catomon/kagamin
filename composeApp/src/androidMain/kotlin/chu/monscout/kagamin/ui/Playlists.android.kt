@@ -24,6 +24,8 @@ import androidx.compose.ui.unit.sp
 import chu.monscout.kagamin.Colors
 import chu.monscout.kagamin.PlaylistData
 import chu.monscout.kagamin.audio.AudioPlayer
+import chu.monscout.kagamin.ui.screens.KagaminViewModel
+import chu.monscout.kagamin.ui.screens.Tabs
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.pause
 import kagamin.composeapp.generated.resources.play

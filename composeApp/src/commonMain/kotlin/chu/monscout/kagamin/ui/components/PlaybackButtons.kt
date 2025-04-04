@@ -1,4 +1,4 @@
-package chu.monscout.kagamin.ui
+package chu.monscout.kagamin.ui.components
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
@@ -14,7 +14,6 @@ import androidx.compose.ui.unit.dp
 import chu.monscout.kagamin.audio.AudioPlayer
 import chu.monscout.kagamin.audio.AudioTrack
 import chu.monscout.kagamin.Colors
-import chu.monscout.kagamin.ui.components.ImageWithShadow
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.next
 import kagamin.composeapp.generated.resources.pause

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
@@ -20,6 +21,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -35,6 +37,7 @@ import chu.monscout.kagamin.ui.CreatePlaylistTab
 import chu.monscout.kagamin.ui.Playlists
 import chu.monscout.kagamin.ui.Sidebar
 import chu.monscout.kagamin.ui.Tracklist
+import chu.monscout.kagamin.ui.components.TrackThumbnail
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.add
 import kagamin.composeapp.generated.resources.arrow_left
@@ -75,7 +78,18 @@ fun TinyPlayerScreen(
     }
 
     Box(modifier.background(color = Colors.background, shape = RoundedCornerShape(16.dp))) {
-        BackgroundImage()
+        TrackThumbnail(
+            currentTrack,
+            audioPlayer,
+            {},
+            0f,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
+            blur = true,
+            controlProgress = false
+        )
+
+//        BackgroundImage()
 
         Row {
             Column(

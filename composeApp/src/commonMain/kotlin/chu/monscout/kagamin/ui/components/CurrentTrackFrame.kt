@@ -301,7 +301,7 @@ fun TrackThumbnail(
                 ) {
                     Image(
                         painterResource(Res.drawable.def_thumb),
-                        "Track thumbnail",
+                        "Default track thumbnail",
                         contentScale = contentScale,
                         modifier = Modifier.fillMaxSize().let { if (blur) it.blur(5.dp) else it }
                     )
@@ -323,7 +323,7 @@ fun TrackThumbnail(
                         },
                         "Track thumbnail",
                         contentScale = contentScale,
-                        modifier = Modifier.fillMaxSize().let { if (blur) it.blur(7.dp) else it }
+                        modifier = Modifier.fillMaxSize().let { if (blur) it.blur(5.dp) else it }
                     )
                 }
             }

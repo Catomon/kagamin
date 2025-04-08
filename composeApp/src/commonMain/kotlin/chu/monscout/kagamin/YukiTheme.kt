@@ -28,11 +28,42 @@ fun YukiTheme(content: @Composable () -> Unit) {
 }
 
 object Themes {
-    val list = listOf(Violet, Pink, Blue, KagaminDark)
+    val list = listOf(Violet, Pink, Blue, KagaminDark, White)
 
     fun forName(name: String) = list.find { it.name == name }
 
     fun forNameOrFirst(name: String) = list.find { it.name == name } ?: list.first()
+
+    object White : IYukiTheme(
+        name = "white",
+        background = Color(0xffc9c9c9),
+        background2 = Color(0xff626262),
+        surface = Color(0xffd9d9d9),
+        font = Color(0xff111111),
+        fontSecondary = Color(0xff464646),
+        bars = Color(0xffffffff),
+    ) {
+        override val playerButtonIcon: Color = Color(0xffb6b6b6)
+        override val listItemA: Color = Color(0xcbeaeaea)
+        override val listItemB: Color = Color(0xcbcccccc)
+        override val thinBorder: Color = Color(0xff5b5b5b)
+        override val selectedButton: Color = fontSecondary
+    }
+
+    object Grey : IYukiTheme(
+        name = "grey",
+        background = Color(0xffc9c9c9),
+        background2 = Color(0xff626262),
+        surface = Color(0xffd9d9d9),
+        font = Color(0xff111111),
+        fontSecondary = Color(0xff464646),
+        bars = Color(0xff3d3d3d),
+    ) {
+        override val playerButtonIcon: Color = Color(0xffb6b6b6)
+        override val listItemA: Color = Color(0xcbcecece)
+        override val listItemB: Color = Color(0xcbb6b6b6)
+        override val thinBorder: Color = Color(0xff5b5b5b)
+    }
 
     object Pink : IYukiTheme(
         name = "yuki",
@@ -50,6 +81,7 @@ object Themes {
         override val listItemB: Color = Color(0xcdff618f)
         override val barsTransparent: Color = bars.copy(0.8f)
         override val thinBorder: Color = Color(0xffea417c)
+        override val selectedButton: Color = background2
     }
 
     //more pink
@@ -166,6 +198,7 @@ object Themes {
         open val playerButtonIconTransparent get() = playerButtonIcon.copy(0.5f)
         open val progressOverThumbnail: Color = bars.copy(0.5f)
         open val thinBorder: Color = bars
+        open val selectedButton: Color = Color.White
     }
 }
 

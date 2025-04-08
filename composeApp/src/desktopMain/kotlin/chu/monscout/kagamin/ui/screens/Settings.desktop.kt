@@ -206,6 +206,25 @@ private fun ThemeRadioButtons(
                             size.minDimension / 2.5f
                         )
                     })
+
+//                RadioButton(
+//                    theme == Themes.White.name,
+//                    colors = RadioButtonDefaults.colors(
+//                        Themes.White.bars,
+//                        Themes.White.barsTransparent
+//                    ),
+//                    onClick = {
+//                        Colors.currentYukiTheme = Themes.White
+//                        settings.theme = Themes.White.name
+//                        saveSettings(settings)
+//                        state.settings = loadSettings()
+//                    },
+//                    modifier = Modifier.drawBehind {
+//                        drawCircle(
+//                            color = Color.White,
+//                            size.minDimension / 2.5f
+//                        )
+//                    })
             }
         }
     }

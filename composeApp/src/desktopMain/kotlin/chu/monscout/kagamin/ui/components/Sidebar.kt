@@ -1,4 +1,4 @@
-package chu.monscout.kagamin.ui
+package chu.monscout.kagamin.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -18,7 +18,9 @@ import chu.monscout.kagamin.Colors
 import chu.monscout.kagamin.LayoutManager
 import chu.monscout.kagamin.LocalLayoutManager
 import chu.monscout.kagamin.LocalWindow
-import chu.monscout.kagamin.ui.components.ImageWithShadow
+import chu.monscout.kagamin.ui.PlaybackTabButton
+import chu.monscout.kagamin.ui.PlaylistsTabButton
+import chu.monscout.kagamin.ui.TracklistTabButton
 import chu.monscout.kagamin.ui.screens.KagaminViewModel
 import chu.monscout.kagamin.ui.screens.SettingsDestination
 import chu.monscout.kagamin.ui.screens.Tabs
@@ -68,7 +70,7 @@ fun Sidebar(
                             state.currentTab = Tabs.PLAYBACK
                         }
                     },
-                    color = if (state.currentTab == Tabs.PLAYBACK) Color.White else Colors.currentYukiTheme.smallButtonIcon,
+                    color = if (state.currentTab == Tabs.PLAYBACK) Colors.currentYukiTheme.selectedButton else Colors.currentYukiTheme.smallButtonIcon,
                     Modifier.weight(0.333f)
                 )
             }
@@ -79,7 +81,7 @@ fun Sidebar(
                         state.currentTab = Tabs.TRACKLIST
                     }
                 },
-                color = if (state.currentTab == Tabs.TRACKLIST) Color.White else Colors.currentYukiTheme.smallButtonIcon,
+                color = if (state.currentTab == Tabs.TRACKLIST) Colors.currentYukiTheme.selectedButton else Colors.currentYukiTheme.smallButtonIcon,
                 Modifier.weight(0.333f)
             )
 
@@ -89,8 +91,28 @@ fun Sidebar(
                         state.currentTab = Tabs.PLAYLISTS
                     }
                 },
-                color = if (state.currentTab == Tabs.PLAYLISTS) Color.White else Colors.currentYukiTheme.smallButtonIcon,
+                color = if (state.currentTab == Tabs.PLAYLISTS) Colors.currentYukiTheme.selectedButton else Colors.currentYukiTheme.smallButtonIcon,
                 Modifier.weight(0.333f)
+            )
+
+            AddButton(onClick = {
+                when (state.currentTab) {
+                    Tabs.PLAYLISTS -> {
+                        state.currentTab = Tabs.CREATE_PLAYLIST
+                    }
+
+                    Tabs.TRACKLIST, Tabs.PLAYBACK -> {
+                        state.currentTab = Tabs.ADD_TRACKS
+                    }
+
+                    else -> {
+                        state.currentTab =
+                            if (state.currentTab == Tabs.ADD_TRACKS) Tabs.TRACKLIST else Tabs.PLAYLISTS
+                    }
+                }
+            },
+                modifier = Modifier.weight(0.333f),
+                color = if (state.currentTab == Tabs.ADD_TRACKS || state.currentTab == Tabs.CREATE_PLAYLIST) Colors.currentYukiTheme.selectedButton else Colors.currentYukiTheme.smallButtonIcon
             )
         }
 

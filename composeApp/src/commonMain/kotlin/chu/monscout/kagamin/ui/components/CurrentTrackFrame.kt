@@ -68,6 +68,7 @@ import kagamin.composeapp.generated.resources.repeat_single
 import kagamin.composeapp.generated.resources.volume
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
+import kotlin.math.abs
 
 expect fun getThumbnail(audioTrack: AudioTrack): ImageBitmap?
 
@@ -98,7 +99,13 @@ fun CurrentTrackFrame(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            TrackThumbnail(currentTrack, player, updateProgress, progress, modifier = Modifier.padding(8.dp).size(145.dp))
+            TrackThumbnail(
+                currentTrack,
+                player,
+                updateProgress,
+                progress,
+                modifier = Modifier.padding(8.dp).size(145.dp)
+            )
 
             PlaybackButtons(
                 player = player, Modifier.width(133.dp)
@@ -159,7 +166,12 @@ fun CompactCurrentTrackFrame(
         val aniColor = animateColorAsState(targetProgressColor)
 
         TrackThumbnail(
-            currentTrack, player, updateProgress, floatAnimation, progressColor = aniColor.value, modifier = Modifier.padding(8.dp).size(145.dp)
+            currentTrack,
+            player,
+            updateProgress,
+            floatAnimation,
+            progressColor = aniColor.value,
+            modifier = Modifier.padding(8.dp).size(145.dp)
         )
 
         AnimatedVisibility(
@@ -212,12 +224,17 @@ fun getCropParameters(original: ImageBitmap): Pair<IntOffset, IntSize> {
     val pixels = IntArray(width * height)
     original.readPixels(pixels)
 
+//    val topColor = Color(pixels[width / 2 ])
+    val leftColor = Color(pixels[(height / 2) * width])
+
     for (y in 0 until height) {
         for (x in 0 until width) {
             val pixel = pixels[y * width + x]
             val color = Color(pixel)
+            val isHorizontalBarsColor = false //abs((color.red * 255 + color.green * 255 + color.blue * 255) - (leftColor.red * 255 + leftColor.green * 255 + leftColor.blue * 255)) < 25
+            val isVerticalBarsColor = color.red * 255 + color.green * 255 + color.blue * 255 > 120
 
-            if (color.red * 255 + color.green * 255 + color.blue * 255 > 120) {
+            if (isHorizontalBarsColor || isVerticalBarsColor) { //0.47f
                 if (x < left) left = x
                 if (x > right) right = x
                 if (y < top) top = y

@@ -31,11 +31,10 @@ import chu.monscout.kagamin.loadPlaylist
 import chu.monscout.kagamin.ui.components.AddButton
 import chu.monscout.kagamin.ui.AddTracksTab
 import chu.monscout.kagamin.ui.components.AppName
-import chu.monscout.kagamin.ui.components.BackgroundImage
 import chu.monscout.kagamin.ui.components.CompactCurrentTrackFrame
 import chu.monscout.kagamin.ui.CreatePlaylistTab
 import chu.monscout.kagamin.ui.Playlists
-import chu.monscout.kagamin.ui.Sidebar
+import chu.monscout.kagamin.ui.components.Sidebar
 import chu.monscout.kagamin.ui.Tracklist
 import chu.monscout.kagamin.ui.components.TrackThumbnail
 import kagamin.composeapp.generated.resources.Res
@@ -167,31 +166,6 @@ fun TinyPlayerScreen(
                             }
                         }
                     }
-
-                    if (state.currentTab != Tabs.PLAYBACK)
-                        AddButton(
-                            painterResource(
-                                if (state.currentTab == Tabs.ADD_TRACKS || state.currentTab == Tabs.CREATE_PLAYLIST) Res.drawable.arrow_left
-                                else Res.drawable.add
-                            ), {
-
-                                when (state.currentTab) {
-                                    Tabs.PLAYLISTS -> {
-                                        state.currentTab = Tabs.CREATE_PLAYLIST
-                                    }
-
-                                    Tabs.TRACKLIST, Tabs.PLAYBACK -> {
-                                        state.currentTab = Tabs.ADD_TRACKS
-                                    }
-
-                                    else -> {
-                                        state.currentTab =
-                                            if (state.currentTab == Tabs.ADD_TRACKS) Tabs.TRACKLIST else Tabs.PLAYLISTS
-                                    }
-                                }
-
-                            }, Modifier.align(Alignment.BottomEnd)
-                        )
                 }
             }
 

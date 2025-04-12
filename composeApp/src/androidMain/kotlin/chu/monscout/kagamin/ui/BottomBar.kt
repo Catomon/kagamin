@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import chu.monscout.kagamin.Colors
+import chu.monscout.kagamin.ui.theme.Colors
 import chu.monscout.kagamin.ui.screens.KagaminViewModel
 import chu.monscout.kagamin.ui.screens.Tabs
 

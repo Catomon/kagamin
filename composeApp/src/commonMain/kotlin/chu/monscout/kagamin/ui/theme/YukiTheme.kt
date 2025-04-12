@@ -1,4 +1,4 @@
-package chu.monscout.kagamin
+package chu.monscout.kagamin.ui.theme
 
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SnackbarHostState
@@ -8,6 +8,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
+import chu.monscout.kagamin.LocalSnackbarHostState
+import chu.monscout.kagamin.loadSettings
 import kagamin.composeapp.generated.resources.BadComic_Regular
 import kagamin.composeapp.generated.resources.Res
 import org.jetbrains.compose.resources.Font

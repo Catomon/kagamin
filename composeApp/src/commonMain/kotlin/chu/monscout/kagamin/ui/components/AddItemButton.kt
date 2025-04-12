@@ -8,7 +8,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import chu.monscout.kagamin.Colors
+import chu.monscout.kagamin.ui.theme.Colors
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.add
 import org.jetbrains.compose.resources.painterResource

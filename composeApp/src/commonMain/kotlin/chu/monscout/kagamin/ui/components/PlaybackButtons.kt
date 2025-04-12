@@ -13,7 +13,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
 import chu.monscout.kagamin.audio.AudioPlayer
 import chu.monscout.kagamin.audio.AudioTrack
-import chu.monscout.kagamin.Colors
+import chu.monscout.kagamin.ui.theme.Colors
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.next
 import kagamin.composeapp.generated.resources.pause

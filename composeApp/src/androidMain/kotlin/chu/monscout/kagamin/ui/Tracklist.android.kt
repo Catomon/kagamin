@@ -22,7 +22,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import chu.monscout.kagamin.Colors
+import chu.monscout.kagamin.ui.theme.Colors
 import chu.monscout.kagamin.audio.AudioPlayer
 import chu.monscout.kagamin.audio.AudioTrack
 import chu.monscout.kagamin.ui.screens.KagaminViewModel

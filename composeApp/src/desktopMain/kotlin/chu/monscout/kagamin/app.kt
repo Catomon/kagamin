@@ -40,6 +40,8 @@ import chu.monscout.kagamin.audio.AudioPlayer
 import chu.monscout.kagamin.ui.KagaminApp
 import chu.monscout.kagamin.ui.screens.KagaminViewModel
 import chu.monscout.kagamin.ui.customShadow
+import chu.monscout.kagamin.ui.theme.Colors
+import chu.monscout.kagamin.ui.theme.YukiTheme
 import chu.monscout.kagamin.ui.windows.ConfirmWindow
 import chu.monscout.kagamin.ui.windows.ConfirmWindowState
 import chu.monscout.kagamin.ui.windows.LocalConfirmWindow

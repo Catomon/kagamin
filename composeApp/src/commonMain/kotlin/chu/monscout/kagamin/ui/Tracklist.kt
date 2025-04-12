@@ -16,7 +16,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
-import chu.monscout.kagamin.Colors
+import chu.monscout.kagamin.ui.theme.Colors
 import chu.monscout.kagamin.audio.AudioTrack
 import chu.monscout.kagamin.savePlaylist
 import chu.monscout.kagamin.ui.screens.KagaminViewModel

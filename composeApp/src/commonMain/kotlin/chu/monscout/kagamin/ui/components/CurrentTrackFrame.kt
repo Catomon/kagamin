@@ -58,7 +58,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import chu.monscout.kagamin.Colors
+import chu.monscout.kagamin.ui.theme.Colors
 import chu.monscout.kagamin.audio.AudioPlayer
 import chu.monscout.kagamin.audio.AudioTrack
 import kagamin.composeapp.generated.resources.Res
@@ -68,7 +68,6 @@ import kagamin.composeapp.generated.resources.repeat_single
 import kagamin.composeapp.generated.resources.volume
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
-import kotlin.math.abs
 
 expect fun getThumbnail(audioTrack: AudioTrack): ImageBitmap?
 

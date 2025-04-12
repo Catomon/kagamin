@@ -26,7 +26,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import chu.monscout.kagamin.Colors
+import chu.monscout.kagamin.ui.theme.Colors
 import chu.monscout.kagamin.audio.AudioPlayer
 import chu.monscout.kagamin.createAudioTrack
 import chu.monscout.kagamin.loadPlaylist
@@ -35,17 +35,12 @@ import chu.monscout.kagamin.ui.CreatePlaylistTab
 import chu.monscout.kagamin.ui.Playlists
 import chu.monscout.kagamin.ui.components.Sidebar
 import chu.monscout.kagamin.ui.Tracklist
-import chu.monscout.kagamin.ui.components.AddButton
 import chu.monscout.kagamin.ui.components.AppName
 import chu.monscout.kagamin.ui.components.CurrentTrackFrame
 import chu.monscout.kagamin.ui.components.TrackThumbnail
-import kagamin.composeapp.generated.resources.Res
-import kagamin.composeapp.generated.resources.add
-import kagamin.composeapp.generated.resources.arrow_left
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.painterResource
 
 @Composable
 actual fun PlayerScreen(

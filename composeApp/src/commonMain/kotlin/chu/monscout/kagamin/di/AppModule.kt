@@ -4,5 +4,5 @@ import chu.monscout.kagamin.ui.screens.KagaminViewModel
 import org.koin.dsl.module
 
 val appModule = module {
-    factory { KagaminViewModel() }
+    single { KagaminViewModel() }
 }

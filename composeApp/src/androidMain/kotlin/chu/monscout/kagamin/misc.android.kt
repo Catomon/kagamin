@@ -15,10 +15,9 @@ import java.util.UUID
 
 actual fun <T : AudioTrack> createAudioTrack(uri: String, name: String): T {
     val uri = File(uri).toUri()
-    println(uri)
     return AudioTrackAndy(
         MediaItem.Builder().setUri(uri).setMediaId(UUID.randomUUID().toString(),).build()
-    ) as T
+    ).also { it.name = name } as T
 }
 
 @Composable

@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
-import chu.monscout.kagamin.Colors
+import chu.monscout.kagamin.ui.theme.Colors
 
 @Composable
 fun ImageWithShadow(

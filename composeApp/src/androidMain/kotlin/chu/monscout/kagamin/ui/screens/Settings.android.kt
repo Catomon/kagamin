@@ -21,9 +21,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import chu.monscout.kagamin.Colors
-import chu.monscout.kagamin.Themes
-import chu.monscout.kagamin.UserSettings
+import chu.monscout.kagamin.ui.theme.Colors
+import chu.monscout.kagamin.ui.theme.Themes
+import chu.monscout.kagamin.data.AppSettings
 import chu.monscout.kagamin.audio.AudioPlayer
 import chu.monscout.kagamin.loadSettings
 import chu.monscout.kagamin.openInBrowser
@@ -117,7 +117,7 @@ actual fun SettingsScreen(
 @Composable
 private fun ThemeRadioButtons(
     theme: String,
-    settings: UserSettings,
+    settings: AppSettings,
     state: KagaminViewModel,
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {

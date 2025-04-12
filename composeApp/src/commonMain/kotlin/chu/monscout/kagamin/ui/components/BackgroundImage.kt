@@ -7,14 +7,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import chu.monscout.kagamin.Colors
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.bg
-import kagamin.composeapp.generated.resources.stars_background
 import org.jetbrains.compose.resources.painterResource
 
 @Composable

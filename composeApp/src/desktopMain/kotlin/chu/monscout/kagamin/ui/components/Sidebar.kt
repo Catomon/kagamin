@@ -20,9 +20,9 @@ import chu.monscout.kagamin.LocalWindow
 import chu.monscout.kagamin.ui.PlaybackTabButton
 import chu.monscout.kagamin.ui.PlaylistsTabButton
 import chu.monscout.kagamin.ui.TracklistTabButton
-import chu.monscout.kagamin.ui.screens.KagaminViewModel
+import chu.monscout.kagamin.ui.viewmodel.KagaminViewModel
 import chu.monscout.kagamin.ui.screens.SettingsDestination
-import chu.monscout.kagamin.ui.screens.Tabs
+import chu.monscout.kagamin.ui.util.Tabs
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.drag
 import kagamin.composeapp.generated.resources.menu

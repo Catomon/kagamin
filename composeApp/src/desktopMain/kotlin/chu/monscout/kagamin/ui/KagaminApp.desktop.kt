@@ -11,10 +11,10 @@ import chu.monscout.kagamin.LayoutManager
 import chu.monscout.kagamin.LocalLayoutManager
 import chu.monscout.kagamin.LocalSnackbarHostState
 import chu.monscout.kagamin.ui.screens.CompactPlayerScreen
-import chu.monscout.kagamin.ui.screens.KagaminViewModel
+import chu.monscout.kagamin.ui.viewmodel.KagaminViewModel
 import chu.monscout.kagamin.ui.screens.PlayerScreenDestination
 import chu.monscout.kagamin.ui.screens.SettingsDestination
-import chu.monscout.kagamin.ui.screens.Tabs
+import chu.monscout.kagamin.ui.util.Tabs
 import chu.monscout.kagamin.ui.screens.TinyPlayerScreen
 
 @Composable

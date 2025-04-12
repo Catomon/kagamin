@@ -33,6 +33,7 @@ import chu.monscout.kagamin.loadSettings
 import chu.monscout.kagamin.openInBrowser
 import chu.monscout.kagamin.saveSettings
 import chu.monscout.kagamin.ui.components.AppName
+import chu.monscout.kagamin.ui.viewmodel.KagaminViewModel
 import kotlin.system.exitProcess
 
 @Composable

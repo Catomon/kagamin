@@ -28,7 +28,7 @@ import chu.monscout.kagamin.ui.theme.Colors
 import chu.monscout.kagamin.LocalSnackbarHostState
 import chu.monscout.kagamin.audio.AudioPlayer
 import chu.monscout.kagamin.audio.AudioTrack
-import chu.monscout.kagamin.ui.screens.KagaminViewModel
+import chu.monscout.kagamin.ui.viewmodel.KagaminViewModel
 import chu.monscout.kagamin.ui.windows.ConfirmWindowState
 import chu.monscout.kagamin.ui.windows.LocalConfirmWindow
 import kagamin.composeapp.generated.resources.Res

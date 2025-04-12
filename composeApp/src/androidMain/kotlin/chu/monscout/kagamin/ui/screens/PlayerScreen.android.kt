@@ -39,6 +39,8 @@ import chu.monscout.kagamin.ui.CreatePlaylistTab
 import chu.monscout.kagamin.ui.components.CurrentTrackFrame
 import chu.monscout.kagamin.ui.Playlists
 import chu.monscout.kagamin.ui.Tracklist
+import chu.monscout.kagamin.ui.util.Tabs
+import chu.monscout.kagamin.ui.viewmodel.KagaminViewModel
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.add
 import kagamin.composeapp.generated.resources.arrow_left

@@ -19,7 +19,7 @@ import androidx.lifecycle.viewModelScope
 import chu.monscout.kagamin.ui.theme.Colors
 import chu.monscout.kagamin.audio.AudioTrack
 import chu.monscout.kagamin.savePlaylist
-import chu.monscout.kagamin.ui.screens.KagaminViewModel
+import chu.monscout.kagamin.ui.viewmodel.KagaminViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.io.File

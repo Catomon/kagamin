@@ -8,7 +8,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -20,7 +19,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -28,12 +26,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -42,16 +38,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope.Companion.DefaultFilterQuality
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.IntOffset
@@ -63,9 +56,6 @@ import chu.monscout.kagamin.audio.AudioPlayer
 import chu.monscout.kagamin.audio.AudioTrack
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.def_thumb
-import kagamin.composeapp.generated.resources.random
-import kagamin.composeapp.generated.resources.repeat_single
-import kagamin.composeapp.generated.resources.volume
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 
@@ -359,125 +349,4 @@ fun TrackThumbnail(
             }) { }
         }
     }
-}
-
-@Composable
-private fun PlaybackOptionsButtons(
-    player: AudioPlayer<AudioTrack>,
-    modifier: Modifier = Modifier
-) {
-    var playMode by player.playMode
-    var volume by player.volume
-    var showVolumeSlider by remember { mutableStateOf(false) }
-    var timer by remember { mutableFloatStateOf(0f) }
-
-    LaunchedEffect(showVolumeSlider, volume) {
-        timer = 0f
-
-        while (true) {
-            timer += 0.1f
-            if (timer >= 3f) {
-                showVolumeSlider = false
-            }
-
-            delay(100)
-        }
-    }
-
-    AnimatedContent(showVolumeSlider) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = modifier.height(32.dp)
-        ) {
-            if (!it)
-                IconButton({
-                    showVolumeSlider = !showVolumeSlider
-                }, modifier = Modifier.size(32.dp).onFocusChanged { focusState ->
-                    showVolumeSlider = focusState.isFocused
-                }.focusable().pointerInput(Unit) {
-                    awaitPointerEventScope {
-                        while (true) {
-                            val event = awaitPointerEvent()
-                            when (event.type) {
-                                PointerEventType.Enter -> {
-                                    showVolumeSlider = false
-                                    showVolumeSlider = true
-                                }
-
-                                PointerEventType.Exit -> {
-//                            showVolumeSlider = false
-                                }
-                            }
-                        }
-                    }
-                }) {
-                    ImageWithShadow(
-                        painterResource(Res.drawable.volume),
-                        "volume",
-                        colorFilter = if (showVolumeSlider) ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon)
-                        else ColorFilter.tint(Colors.currentYukiTheme.playerButtonIconTransparent)
-                    )
-                }
-
-            if (it) {
-                VolumeSlider(
-                    volume,
-                    { newVolume -> volume = newVolume; player.setVolume(newVolume) },
-                    Modifier.fillMaxWidth()
-                )
-            }
-
-            if (!it) {
-                IconButton({
-                    playMode =
-                        if (playMode != AudioPlayer.PlayMode.REPEAT_TRACK) AudioPlayer.PlayMode.REPEAT_TRACK
-                        else AudioPlayer.PlayMode.REPEAT_PLAYLIST
-                }, modifier = Modifier.size(32.dp)) {
-                    ImageWithShadow(
-                        painterResource(Res.drawable.repeat_single),
-                        "repeat track",
-                        colorFilter = if (playMode == AudioPlayer.PlayMode.REPEAT_TRACK) ColorFilter.tint(
-                            Colors.currentYukiTheme.playerButtonIcon
-                        )
-                        else ColorFilter.tint(Colors.currentYukiTheme.playerButtonIconTransparent)
-                    )
-                }
-
-            }
-
-            if (!it) {
-                IconButton({
-                    player.playMode.value =
-                        if (playMode != AudioPlayer.PlayMode.RANDOM) AudioPlayer.PlayMode.RANDOM
-                        else AudioPlayer.PlayMode.REPEAT_PLAYLIST
-                }, modifier = Modifier.size(32.dp)) {
-                    ImageWithShadow(
-                        painterResource(Res.drawable.random),
-                        "random mode",
-                        colorFilter = if (playMode == AudioPlayer.PlayMode.RANDOM) ColorFilter.tint(
-                            Colors.currentYukiTheme.playerButtonIcon
-                        )
-                        else ColorFilter.tint(Colors.currentYukiTheme.playerButtonIconTransparent)
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun TrackInfoText(track: AudioTrack?, modifier: Modifier = Modifier) {
-    val text = remember(track) {
-        """
-        |${track?.name}
-        """.trimMargin()
-    }
-
-    Text(
-        text,
-        fontSize = 10.sp,
-        modifier = modifier.verticalScroll(rememberScrollState()),
-        color = Colors.currentYukiTheme.playerButtonIcon
-    )
 }

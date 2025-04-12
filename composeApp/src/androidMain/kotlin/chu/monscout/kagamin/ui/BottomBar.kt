@@ -12,8 +12,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import chu.monscout.kagamin.ui.theme.Colors
-import chu.monscout.kagamin.ui.screens.KagaminViewModel
-import chu.monscout.kagamin.ui.screens.Tabs
+import chu.monscout.kagamin.ui.viewmodel.KagaminViewModel
+import chu.monscout.kagamin.ui.util.Tabs
 
 @Composable
 fun BottomBar(

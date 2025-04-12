@@ -21,12 +21,16 @@ fun removePlaylist(name: String) {
 }
 
 fun savePlaylist(name: String, tracks: Array<AudioTrack>) {
+    savePlaylist(name, tracks.map { TrackData(it.uri, it.name) })
+}
+
+fun savePlaylist(name: String, tracks: List<TrackData>) {
     val playlistsFolder = File(userDataFolder.path + "/playlists")
     if (!playlistsFolder.exists())
         playlistsFolder.mkdirs()
 
     val file = File(userDataFolder.path + "/playlists/$name.pl")
-    val playlistData = PlaylistData(tracks.map { TrackData(it.uri, it.name) }.toTypedArray())
+    val playlistData = PlaylistData(tracks.toTypedArray())
     if (!file.exists()) {
         file.createNewFile()
     }

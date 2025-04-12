@@ -25,11 +25,10 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import chu.monscout.kagamin.ui.theme.Colors
 import chu.monscout.kagamin.audio.AudioPlayer
-import chu.monscout.kagamin.createAudioTrack
-import chu.monscout.kagamin.loadPlaylist
 import chu.monscout.kagamin.ui.AddTracksTab
 import chu.monscout.kagamin.ui.CreatePlaylistTab
 import chu.monscout.kagamin.ui.Playlists
@@ -38,6 +37,8 @@ import chu.monscout.kagamin.ui.Tracklist
 import chu.monscout.kagamin.ui.components.AppName
 import chu.monscout.kagamin.ui.components.CurrentTrackFrame
 import chu.monscout.kagamin.ui.components.TrackThumbnail
+import chu.monscout.kagamin.ui.util.Tabs
+import chu.monscout.kagamin.ui.viewmodel.KagaminViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -57,20 +58,8 @@ actual fun PlayerScreen(
     val videoUrl = state.videoUrl
 
     LaunchedEffect(currentPlaylistName) {
-        CoroutineScope(Dispatchers.Default).launch {
-            state.isLoadingPlaylistFile = true
-            try {
-                val trackUris = loadPlaylist(currentPlaylistName)?.tracks
-                if (trackUris != null) {
-                    audioPlayer.playlist.value = mutableListOf()
-                    trackUris.forEach {
-                        audioPlayer.addToPlaylist(createAudioTrack(it.uri, it.name))
-                    }
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-            state.isLoadingPlaylistFile = false
+        state.viewModelScope.launch {
+            state.reloadPlaylist()
         }
     }
 
@@ -113,7 +102,6 @@ actual fun PlayerScreen(
                     )
                 }
             }
-
 
             Box(Modifier.weight(0.75f)) {
                 AnimatedContent(targetState = state.currentTab, transitionSpec = {

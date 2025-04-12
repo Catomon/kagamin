@@ -38,7 +38,7 @@ import androidx.compose.ui.window.rememberWindowState
 import chu.monscout.kagamin.WindowConfig.isTraySupported
 import chu.monscout.kagamin.audio.AudioPlayer
 import chu.monscout.kagamin.ui.KagaminApp
-import chu.monscout.kagamin.ui.screens.KagaminViewModel
+import chu.monscout.kagamin.ui.viewmodel.KagaminViewModel
 import chu.monscout.kagamin.ui.customShadow
 import chu.monscout.kagamin.ui.theme.Colors
 import chu.monscout.kagamin.ui.theme.YukiTheme

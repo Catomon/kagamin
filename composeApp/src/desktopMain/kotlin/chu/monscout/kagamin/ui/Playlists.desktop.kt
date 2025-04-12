@@ -24,8 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chu.monscout.kagamin.ui.theme.Colors
 import chu.monscout.kagamin.audio.AudioPlayer
-import chu.monscout.kagamin.ui.screens.KagaminViewModel
-import chu.monscout.kagamin.ui.screens.Tabs
+import chu.monscout.kagamin.ui.viewmodel.KagaminViewModel
+import chu.monscout.kagamin.ui.util.Tabs
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.pause
 import kagamin.composeapp.generated.resources.play
@@ -38,10 +38,14 @@ actual fun PlaylistItem(
     playlists: List<Pair<String, PlaylistData>>,
     i: Int,
     remove: () -> Unit,
-    clear: () -> Unit
+    clear: () -> Unit,
+    shuffle: () -> Unit
 ) {
     ContextMenuArea(items = {
         listOf(
+            ContextMenuItem("Shuffle") {
+                shuffle()
+            },
             ContextMenuItem("Clear") {
                 clear()
             },

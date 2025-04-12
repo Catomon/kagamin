@@ -36,6 +36,8 @@ import chu.monscout.kagamin.ui.Playlists
 import chu.monscout.kagamin.ui.components.Sidebar
 import chu.monscout.kagamin.ui.Tracklist
 import chu.monscout.kagamin.ui.components.TrackThumbnail
+import chu.monscout.kagamin.ui.util.Tabs
+import chu.monscout.kagamin.ui.viewmodel.KagaminViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

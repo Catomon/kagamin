@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import chu.monscout.kagamin.ui.theme.Colors
 import chu.monscout.kagamin.MultiFilePicker
@@ -39,6 +40,7 @@ import chu.monscout.kagamin.ui.CreatePlaylistTab
 import chu.monscout.kagamin.ui.components.CurrentTrackFrame
 import chu.monscout.kagamin.ui.Playlists
 import chu.monscout.kagamin.ui.Tracklist
+import chu.monscout.kagamin.ui.components.CurrentTrackFrame2
 import chu.monscout.kagamin.ui.util.Tabs
 import chu.monscout.kagamin.ui.viewmodel.KagaminViewModel
 import kagamin.composeapp.generated.resources.Res
@@ -98,11 +100,11 @@ actual fun PlayerScreen(
                     .background(color = Colors.barsTransparent)
                     .padding(horizontal = 12.dp)
                     .padding(top = 8.dp)
-                    .height(32.dp)
+                    .height(50.dp)
                     .fillMaxWidth()
                     .clickable(onClickLabel = "Open options") {
                         navController.navigate(SettingsDestination.toString())
-                    })
+                    }, height = 50.dp, 36.sp)
 
                 Box(
                     Modifier
@@ -115,14 +117,11 @@ actual fun PlayerScreen(
                     }) {
                         when (it) {
                             Tabs.PLAYBACK -> {
-                                CurrentTrackFrame(
+                                CurrentTrackFrame2(
                                     currentTrack,
                                     audioPlayer,
                                     Modifier
-                                        .fillMaxWidth()
-                                        .fillMaxHeight()
-                                        .width(160.dp)
-                                        .background(color = Colors.barsTransparent)
+                                        .fillMaxSize().background(color = Colors.barsTransparent).padding(horizontal = 48.dp)
                                 )
                             }
 
@@ -131,7 +130,7 @@ actual fun PlayerScreen(
                                     state,
                                     Modifier
                                         .align(Alignment.Center)
-                                        .fillMaxHeight()//.padding(start = 4.dp, end = 4.dp)
+                                        .fillMaxSize()
                                 )
                             }
 
@@ -139,8 +138,8 @@ actual fun PlayerScreen(
                                 if (state.playlist.isEmpty()) {
                                     Box(
                                         Modifier
-                                            .fillMaxHeight()
-                                            .background(Colors.currentYukiTheme.listItemB),
+                                            .fillMaxSize()
+                                            .background(Colors.theme.listItemB),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text(
@@ -155,7 +154,7 @@ actual fun PlayerScreen(
                                         state.playlist,
                                         Modifier
                                             .align(Alignment.Center)
-                                            .fillMaxHeight()//.padding(start = 16.dp, end = 16.dp)
+                                            .fillMaxSize()
                                     )
                                 }
                             }
@@ -203,7 +202,7 @@ actual fun PlayerScreen(
                                     }
                                 }
 
-                            }, modifier = Modifier.align(Alignment.BottomEnd), if (state.currentTab == Tabs.ADD_TRACKS || state.currentTab == Tabs.CREATE_PLAYLIST) Color.White else Colors.currentYukiTheme.smallButtonIcon
+                            }, modifier = Modifier.align(Alignment.BottomEnd), if (state.currentTab == Tabs.ADD_TRACKS || state.currentTab == Tabs.CREATE_PLAYLIST) Color.White else Colors.theme.smallButtonIcon
                         )
                 }
             }

@@ -7,7 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import chu.monscout.kagamin.ui.KagaminApp
-import chu.monscout.kagamin.ui.theme.YukiTheme
+import chu.monscout.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.yukinotes.di.appModule
 import org.koin.core.context.GlobalContext.startKoin
 
@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity() {
             val context = this
             playerContext = { context }
 
-            YukiTheme {
+            KagaminTheme {
                 App()
             }
         }

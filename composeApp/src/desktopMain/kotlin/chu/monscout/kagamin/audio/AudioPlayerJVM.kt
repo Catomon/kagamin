@@ -144,7 +144,7 @@ class AudioPlayerJVM : BaseAudioPlayer<AudioTrackJVM>() {
     override fun setVolume(volume: Float) {
         super.setVolume(volume)
 
-        loader.player.volume = (60 * volume).toInt()
+        loader.player.volume = (50 * volume).toInt()
     }
 
     override fun seek(position: Long) {

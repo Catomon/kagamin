@@ -14,6 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chu.monscout.kagamin.ui.theme.Colors
@@ -22,13 +24,13 @@ import kagamin.composeapp.generated.resources.star64
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun AppName(modifier: Modifier = Modifier) {
+fun AppName(modifier: Modifier = Modifier,  height: Dp = 32.dp, fontSize: TextUnit = 18.sp) {
 //    AppNameWShadow(modifier)
-    AppNameWShadowJap(modifier)
+    AppNameWShadowJap(modifier, height, fontSize)
 }
 
 @Composable
-private fun AppNameNormal(modifier: Modifier = Modifier) {
+private fun AppNameNormal(modifier: Modifier = Modifier, height: Dp = 32.dp, fontSize: TextUnit = 18.sp) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
@@ -36,27 +38,27 @@ private fun AppNameNormal(modifier: Modifier = Modifier) {
     ) {
         Text(
             text = "Kag",
-            color = Colors.currentYukiTheme.playerButtonIcon,
-            fontSize = 18.sp,
-            modifier = Modifier.height(32.dp),
+            color = Colors.theme.playerButtonIcon,
+            fontSize = fontSize,
+            modifier = Modifier.height(height),
         )
         Image(
             painterResource(Res.drawable.star64),
             "App icon",
-            colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon),
-            modifier = Modifier.size(32.dp).offset(y = (-3).dp)
+            colorFilter = ColorFilter.tint(Colors.theme.playerButtonIcon),
+            modifier = Modifier.size(height).offset(y = (-3).dp)
         )
         Text(
             text = "min",
-            color = Colors.currentYukiTheme.playerButtonIcon,
+            color = Colors.theme.playerButtonIcon,
             fontSize = 18.sp,
-            modifier = Modifier.height(32.dp),
+            modifier = Modifier.height(height),
         )
     }
 }
 
 @Composable
-private fun AppNameWShadowJap(modifier: Modifier = Modifier) {
+private fun AppNameWShadowJap(modifier: Modifier = Modifier, height: Dp = 32.dp, fontSize: TextUnit = 18.sp) {
     Box(contentAlignment = Alignment.Center, modifier = modifier) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -65,19 +67,19 @@ private fun AppNameWShadowJap(modifier: Modifier = Modifier) {
         ) {
             Text(
                 text = "かが",
-                color = Colors.currentYukiTheme.thinBorder,
-                fontSize = 18.sp,
+                color = Colors.theme.thinBorder,
+                fontSize = fontSize,
             )
             Image(
                 painterResource(Res.drawable.star64),
                 "App icon",
-                colorFilter = ColorFilter.tint(Colors.currentYukiTheme.thinBorder),
-                modifier = Modifier.size(25.dp)
+                colorFilter = ColorFilter.tint(Colors.theme.thinBorder),
+                modifier = Modifier.size(height)
             )
             Text(
                 text = "みん",
-                color = Colors.currentYukiTheme.thinBorder,
-                fontSize = 18.sp,
+                color = Colors.theme.thinBorder,
+                fontSize = fontSize,
             )
         }
 
@@ -88,19 +90,19 @@ private fun AppNameWShadowJap(modifier: Modifier = Modifier) {
         ) {
             Text(
                 text = "かが",
-                color = Colors.currentYukiTheme.playerButtonIcon,
-                fontSize = 18.sp,
+                color = Colors.theme.playerButtonIcon,
+                fontSize = fontSize,
             )
             Image(
                 painterResource(Res.drawable.star64),
                 "App icon",
-                colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon),
-                modifier = Modifier.size(25.dp)
+                colorFilter = ColorFilter.tint(Colors.theme.playerButtonIcon),
+                modifier = Modifier.size(height)
             )
             Text(
                 text = "みん",
-                color = Colors.currentYukiTheme.playerButtonIcon,
-                fontSize = 18.sp,
+                color = Colors.theme.playerButtonIcon,
+                fontSize = fontSize,
             )
         }
     }
@@ -116,18 +118,18 @@ private fun AppNameWShadow(modifier: Modifier = Modifier) {
         ) {
             Text(
                 text = "Kag",
-                color = Colors.currentYukiTheme.thinBorder,
+                color = Colors.theme.thinBorder,
                 fontSize = 18.sp,
             )
             Image(
                 painterResource(Res.drawable.star64),
                 "App icon",
-                colorFilter = ColorFilter.tint(Colors.currentYukiTheme.thinBorder),
+                colorFilter = ColorFilter.tint(Colors.theme.thinBorder),
                 modifier = Modifier.size(25.dp)
             )
             Text(
                 text = "min",
-                color = Colors.currentYukiTheme.thinBorder,
+                color = Colors.theme.thinBorder,
                 fontSize = 18.sp,
             )
         }
@@ -139,18 +141,18 @@ private fun AppNameWShadow(modifier: Modifier = Modifier) {
         ) {
             Text(
                 text = "Kag",
-                color = Colors.currentYukiTheme.playerButtonIcon,
+                color = Colors.theme.playerButtonIcon,
                 fontSize = 18.sp,
             )
             Image(
                 painterResource(Res.drawable.star64),
                 "App icon",
-                colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon),
+                colorFilter = ColorFilter.tint(Colors.theme.playerButtonIcon),
                 modifier = Modifier.size(25.dp)
             )
             Text(
                 text = "min",
-                color = Colors.currentYukiTheme.playerButtonIcon,
+                color = Colors.theme.playerButtonIcon,
                 fontSize = 18.sp,
             )
         }
@@ -162,8 +164,8 @@ private fun AppNameOutlined(modifier: Modifier = Modifier) {
     Row(modifier) {
         OutlinedText(
             text = "Kag",
-            fillColor = Colors.currentYukiTheme.playerButtonIcon,
-            outlineColor = Colors.currentYukiTheme.thinBorder,
+            fillColor = Colors.theme.playerButtonIcon,
+            outlineColor = Colors.theme.thinBorder,
             fontSize = 18.sp,
             modifier = Modifier.height(32.dp),
             outlineDrawStyle = Stroke(4f)
@@ -172,7 +174,7 @@ private fun AppNameOutlined(modifier: Modifier = Modifier) {
             Image(
                 painterResource(Res.drawable.star64),
                 "App icon",
-                colorFilter = ColorFilter.tint(Colors.currentYukiTheme.thinBorder),
+                colorFilter = ColorFilter.tint(Colors.theme.thinBorder),
                 modifier = Modifier.size(32.dp).offset(y = (-3).dp).graphicsLayer(
                     scaleX = 1.25f, scaleY = 1.25f
                 )
@@ -180,14 +182,14 @@ private fun AppNameOutlined(modifier: Modifier = Modifier) {
             Image(
                 painterResource(Res.drawable.star64),
                 "App icon",
-                colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon),
+                colorFilter = ColorFilter.tint(Colors.theme.playerButtonIcon),
                 modifier = Modifier.size(30.dp).offset(y = (-3).dp)
             )
         }
         OutlinedText(
             text = "min",
-            fillColor = Colors.currentYukiTheme.playerButtonIcon,
-            outlineColor = Colors.currentYukiTheme.thinBorder,
+            fillColor = Colors.theme.playerButtonIcon,
+            outlineColor = Colors.theme.thinBorder,
             fontSize = 18.sp,
             modifier = Modifier.height(32.dp),
             outlineDrawStyle = Stroke(4f)

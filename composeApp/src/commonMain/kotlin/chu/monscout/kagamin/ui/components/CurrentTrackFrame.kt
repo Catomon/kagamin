@@ -23,10 +23,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -50,10 +47,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import chu.monscout.kagamin.ui.theme.Colors
 import chu.monscout.kagamin.audio.AudioPlayer
 import chu.monscout.kagamin.audio.AudioTrack
+import chu.monscout.kagamin.ui.theme.Colors
+import chu.monscout.kagamin.ui.util.getCropParameters
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.def_thumb
 import kotlinx.coroutines.delay
@@ -108,11 +105,11 @@ fun CurrentTrackFrame(
                     player,
                     updateProgress,
                     progress,
-                    color = Colors.currentYukiTheme.thinBorder,
-                    textColor = Colors.currentYukiTheme.thinBorder,
-                    Modifier.graphicsLayer(translationY = 2f)
+                    color = Colors.theme.thinBorder,
+                    textColor = Colors.theme.thinBorder,
+                    Modifier.graphicsLayer(translationY = 2f).padding(horizontal = 20.dp)
                 )
-                TrackProgressIndicator(currentTrack, player, updateProgress, progress)
+                TrackProgressIndicator(currentTrack, player, updateProgress, progress, modifier = Modifier.padding(horizontal = 20.dp))
             }
         }
     }
@@ -151,7 +148,7 @@ fun CompactCurrentTrackFrame(
         val floatAnimation by animateFloatAsState(targetValue)
 
         val targetProgressColor: Color =
-            remember(isHovered) { if (isHovered) Colors.barsTransparent else Colors.currentYukiTheme.progressOverThumbnail }
+            remember(isHovered) { if (isHovered) Colors.barsTransparent else Colors.theme.progressOverThumbnail }
         val aniColor = animateColorAsState(targetProgressColor)
 
         TrackThumbnail(
@@ -190,54 +187,16 @@ fun CompactCurrentTrackFrame(
                         player,
                         updateProgress,
                         progress,
-                        color = Colors.currentYukiTheme.thinBorder,
-                        textColor = Colors.currentYukiTheme.thinBorder,
-                        Modifier.graphicsLayer(translationY = 2f)
+                        color = Colors.theme.thinBorder,
+                        textColor = Colors.theme.thinBorder,
+                        Modifier.graphicsLayer(translationY = 2f).padding(horizontal = 20.dp)
                     )
-                    TrackProgressIndicator(currentTrack, player, updateProgress, progress)
+                    TrackProgressIndicator(currentTrack, player, updateProgress, progress, modifier = Modifier.padding(horizontal = 20.dp))
                 }
             }
         }
     }
 }
-
-fun getCropParameters(original: ImageBitmap): Pair<IntOffset, IntSize> {
-    val width = original.width
-    val height = original.height
-
-    var left = width
-    var right = 0
-    var top = height
-    var bottom = 0
-
-    val pixels = IntArray(width * height)
-    original.readPixels(pixels)
-
-//    val topColor = Color(pixels[width / 2 ])
-    val leftColor = Color(pixels[(height / 2) * width])
-
-    for (y in 0 until height) {
-        for (x in 0 until width) {
-            val pixel = pixels[y * width + x]
-            val color = Color(pixel)
-            val isHorizontalBarsColor = false //abs((color.red * 255 + color.green * 255 + color.blue * 255) - (leftColor.red * 255 + leftColor.green * 255 + leftColor.blue * 255)) < 25
-            val isVerticalBarsColor = color.red * 255 + color.green * 255 + color.blue * 255 > 120
-
-            if (isHorizontalBarsColor || isVerticalBarsColor) { //0.47f
-                if (x < left) left = x
-                if (x > right) right = x
-                if (y < top) top = y
-                if (y > bottom) bottom = y
-            }
-        }
-    }
-
-    val offset = IntOffset(left, top)
-    val size = IntSize(right - left + 1, bottom - top + 1)
-
-    return Pair(offset, size)
-}
-
 
 @Composable
 fun TrackThumbnail(
@@ -245,7 +204,7 @@ fun TrackThumbnail(
     player: AudioPlayer<AudioTrack>,
     updateProgress: () -> Unit,
     progress: Float,
-    progressColor: Color = Colors.currentYukiTheme.progressOverThumbnail,
+    progressColor: Color = Colors.theme.progressOverThumbnail,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
     blur: Boolean = false,
@@ -279,7 +238,7 @@ fun TrackThumbnail(
     Box(contentAlignment = Alignment.Center,
         modifier = modifier.drawBehind {
             drawRoundRect(
-                color = Colors.currentYukiTheme.thinBorder,
+                color = Colors.theme.thinBorder,
                 topLeft = Offset(0f, 2f),
                 size = this.size.copy(),
                 cornerRadius = CornerRadius(12f)

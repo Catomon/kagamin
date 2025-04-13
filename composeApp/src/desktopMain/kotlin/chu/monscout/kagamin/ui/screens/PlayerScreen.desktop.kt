@@ -39,8 +39,6 @@ import chu.monscout.kagamin.ui.components.CurrentTrackFrame
 import chu.monscout.kagamin.ui.components.TrackThumbnail
 import chu.monscout.kagamin.ui.util.Tabs
 import chu.monscout.kagamin.ui.viewmodel.KagaminViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
@@ -120,7 +118,7 @@ actual fun PlayerScreen(
                             if (state.playlist.isEmpty()) {
                                 Box(
                                     Modifier.fillMaxSize()
-                                        .background(Colors.currentYukiTheme.listItemB),
+                                        .background(Colors.theme.listItemB),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
@@ -161,4 +159,3 @@ actual fun PlayerScreen(
         }
     }
 }
-

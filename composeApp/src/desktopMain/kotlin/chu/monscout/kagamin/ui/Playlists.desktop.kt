@@ -72,7 +72,7 @@ actual fun PlaylistItem(
             }
 
             Column(
-                Modifier.fillMaxHeight().background(color = if (i % 2 == 0) Colors.currentYukiTheme.listItemA else Colors.currentYukiTheme.listItemB)
+                Modifier.fillMaxHeight().background(color = if (i % 2 == 0) Colors.theme.listItemA else Colors.theme.listItemB)
                     .clickable {
                         state.currentPlaylistName = playlist.first
                         state.currentTab = Tabs.TRACKLIST

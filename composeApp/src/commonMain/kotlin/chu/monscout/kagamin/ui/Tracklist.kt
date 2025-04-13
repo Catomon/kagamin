@@ -87,7 +87,7 @@ fun Tracklist(state: KagaminViewModel, tracks: List<AudioTrack>, modifier: Modif
             }
         }
 
-        Box(Modifier.fillMaxSize().background(Colors.currentYukiTheme.listItemB))
+        Box(Modifier.fillMaxSize().background(Colors.theme.listItemB))
     }
 }
 

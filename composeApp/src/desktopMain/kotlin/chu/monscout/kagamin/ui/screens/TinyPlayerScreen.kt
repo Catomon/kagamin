@@ -129,7 +129,7 @@ fun TinyPlayerScreen(
                                 if (state.playlist.isEmpty()) {
                                     Box(
                                         Modifier.fillMaxHeight()
-                                            .background(Colors.currentYukiTheme.listItemB),
+                                            .background(Colors.theme.listItemB),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text(

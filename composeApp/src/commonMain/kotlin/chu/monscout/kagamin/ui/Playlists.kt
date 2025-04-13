@@ -34,7 +34,7 @@ fun Playlists(state: KagaminViewModel, modifier: Modifier = Modifier) {
     if (playlists.isEmpty()) {
         Box(
             modifier
-                .background(Colors.currentYukiTheme.listItemB),
+                .background(Colors.theme.listItemB),
             contentAlignment = Alignment.Center
         ) {
             Text(
@@ -52,7 +52,7 @@ fun Playlists(state: KagaminViewModel, modifier: Modifier = Modifier) {
                 Text(
                     state.currentPlaylistName,
                     fontSize = 10.sp,
-                    color = Colors.currentYukiTheme.playerButtonIcon
+                    color = Colors.theme.playerButtonIcon
                 )
             }
 
@@ -97,7 +97,7 @@ fun Playlists(state: KagaminViewModel, modifier: Modifier = Modifier) {
                 }
             }
 
-            Box(Modifier.fillMaxSize().background(Colors.currentYukiTheme.listItemB))
+            Box(Modifier.fillMaxSize().background(Colors.theme.listItemB))
         }
     }
 }

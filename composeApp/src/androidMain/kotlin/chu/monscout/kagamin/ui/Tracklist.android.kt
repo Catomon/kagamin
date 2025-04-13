@@ -44,7 +44,7 @@ actual fun TrackItem(
     val clipboard = LocalClipboardManager.current
     val isHeader = index == -1
     val backColor = if (isHeader) Colors.barsTransparent else
-        if (index % 2 == 0) Colors.currentYukiTheme.listItemA else Colors.currentYukiTheme.listItemB
+        if (index % 2 == 0) Colors.theme.listItemA else Colors.theme.listItemB
 
     Row(
         verticalAlignment = Alignment.CenterVertically,

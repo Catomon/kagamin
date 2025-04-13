@@ -18,7 +18,7 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun TracklistTabButton(
     onClick: () -> Unit,
-    color: Color = Colors.currentYukiTheme.smallButtonIcon,
+    color: Color = Colors.theme.smallButtonIcon,
     modifier: Modifier = Modifier
 ) {
     TextButton(
@@ -36,7 +36,7 @@ fun TracklistTabButton(
 @Composable
 fun PlaylistsTabButton(
     onClick: () -> Unit,
-    color: Color = Colors.currentYukiTheme.smallButtonIcon,
+    color: Color = Colors.theme.smallButtonIcon,
     modifier: Modifier = Modifier
 ) {
     TextButton(
@@ -54,7 +54,7 @@ fun PlaylistsTabButton(
 @Composable
 fun PlaybackTabButton(
     onClick: () -> Unit,
-    color: Color = Colors.currentYukiTheme.smallButtonIcon,
+    color: Color = Colors.theme.smallButtonIcon,
     modifier: Modifier = Modifier
 ) {
     TextButton(

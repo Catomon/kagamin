@@ -41,7 +41,7 @@ import chu.monscout.kagamin.ui.KagaminApp
 import chu.monscout.kagamin.ui.viewmodel.KagaminViewModel
 import chu.monscout.kagamin.ui.customShadow
 import chu.monscout.kagamin.ui.theme.Colors
-import chu.monscout.kagamin.ui.theme.YukiTheme
+import chu.monscout.kagamin.ui.theme.KagaminTheme
 import chu.monscout.kagamin.ui.windows.ConfirmWindow
 import chu.monscout.kagamin.ui.windows.ConfirmWindowState
 import chu.monscout.kagamin.ui.windows.LocalConfirmWindow
@@ -173,7 +173,7 @@ private fun AppWindow(
         CompositionLocalProvider(
             LocalWindow provides this.window,
         ) {
-            YukiTheme {
+            KagaminTheme {
                 AppFrame(kagaminViewModel)
             }
         }
@@ -196,7 +196,7 @@ private fun WindowScope.AppFrame(kagaminViewModel: KagaminViewModel = get(Kagami
                             .customShadow()
                             .drawBehind {
                                 drawRoundRect(
-                                    color = Colors.currentYukiTheme.thinBorder,
+                                    color = Colors.theme.thinBorder,
                                     topLeft = Offset(0f, 2f),
                                     size = this.size.copy(),
                                     cornerRadius = CornerRadius(12f)
@@ -212,7 +212,7 @@ private fun WindowScope.AppFrame(kagaminViewModel: KagaminViewModel = get(Kagami
                         it.customShadow(cornerRadius = 0.dp)
                             .border(
                                 2.dp,
-                                Colors.currentYukiTheme.thinBorder,
+                                Colors.theme.thinBorder,
                                 RectangleShape
                             )
                 }

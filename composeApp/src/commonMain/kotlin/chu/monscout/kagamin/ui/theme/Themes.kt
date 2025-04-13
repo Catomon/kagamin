@@ -1,42 +1,28 @@
 package chu.monscout.kagamin.ui.theme
 
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.Typography
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
-import chu.monscout.kagamin.LocalSnackbarHostState
-import chu.monscout.kagamin.loadSettings
-import kagamin.composeapp.generated.resources.BadComic_Regular
-import kagamin.composeapp.generated.resources.Res
-import org.jetbrains.compose.resources.Font
 
-@Composable
-fun YukiTheme(content: @Composable () -> Unit) {
-    val snackbarHostState = remember { SnackbarHostState() }
+sealed class KagaminTheme(
+    val name: String,
+    val background: Color,
+    val background2: Color,
+    val surface: Color,
+    val font: Color,
+    val fontSecondary: Color,
+    val bars: Color,
+) {
+    open val smallButtonIcon: Color = surface
+    open val playerButtonIcon: Color = surface
+    open val onBars: Color = surface
+    open val listItemA: Color = surface.copy(0.9f)
+    open val listItemB: Color = background2.copy(0.8f)
+    open val barsTransparent: Color = bars.copy(0.9f)
+    open val playerButtonIconTransparent get() = playerButtonIcon.copy(0.5f)
+    open val progressOverThumbnail: Color = bars.copy(0.5f)
+    open val thinBorder: Color = bars
+    open val selectedButton: Color = Color.White
 
-    CompositionLocalProvider(
-        LocalSnackbarHostState provides snackbarHostState,
-    ) {
-        MaterialTheme(
-            colors = Colors.yukiColors,
-            typography = Typography(FontFamily(Font(Res.font.BadComic_Regular))),
-            content = content
-        )
-    }
-}
-
-object Themes {
-    val list = listOf(Violet, Pink, Blue, KagaminDark, White)
-
-    fun forName(name: String) = list.find { it.name == name }
-
-    fun forNameOrFirst(name: String) = list.find { it.name == name } ?: list.first()
-
-    object White : IYukiTheme(
+    object White : KagaminTheme(
         name = "white",
         background = Color(0xffc9c9c9),
         background2 = Color(0xff626262),
@@ -52,7 +38,7 @@ object Themes {
         override val selectedButton: Color = fontSecondary
     }
 
-    object Grey : IYukiTheme(
+    object Grey : KagaminTheme(
         name = "grey",
         background = Color(0xffc9c9c9),
         background2 = Color(0xff626262),
@@ -67,7 +53,7 @@ object Themes {
         override val thinBorder: Color = Color(0xff5b5b5b)
     }
 
-    object Pink : IYukiTheme(
+    object Pink : KagaminTheme(
         name = "yuki",
         background = Color(0xffffbecf),
         background2 = Color(0xffff618f),
@@ -87,7 +73,7 @@ object Themes {
     }
 
     //more pink
-    //   object Pink : IYukiTheme(
+    //   object Pink : KagaminTheme(
     //        name = "yuki",
     //        background = Color(0xffffbecf),
     //        background2 = Color(0xffff618f),
@@ -100,7 +86,7 @@ object Themes {
     //    }
 
     //blue + pnk
-    //    object Pink : IYukiTheme(
+    //    object Pink : KagaminTheme(
     //        name = "yuki",
     //        background = Color(0xffffbecf),
     //        background2 = Color(0xffc94d63),
@@ -117,7 +103,7 @@ object Themes {
     //        override val barsTransparent: Color = bars.copy(0.8f)
     //    }
 
-    object Violet : IYukiTheme(
+    object Violet : KagaminTheme(
         name = "gami-kasa",
         background = Color(0xffc09dff),
         background2 = Color(0xff6232a9),
@@ -132,7 +118,7 @@ object Themes {
         override val thinBorder: Color = Color(0xff5522a2)
     }
 
-    object Blue : IYukiTheme(
+    object Blue : KagaminTheme(
         name = "nata",
         background = Color(0xffadcfff),
         background2 = Color(0xff0f2e93),
@@ -141,13 +127,13 @@ object Themes {
         fontSecondary = Color(0xffd2e6ff),
         bars = Color(0xff0f2e93),
     ) {
-//        override val playerButtonIcon: Color = Color(0xff9775d5)
+        //        override val playerButtonIcon: Color = Color(0xff9775d5)
         override val listItemA: Color = Color(0xcc1840c5)
         override val listItemB: Color = Color(0xcc1037b4)
         override val thinBorder: Color = Color(0xff042386)
     }
 
-    //    object YukiLight : IYukiTheme(
+    //    object YukiLight : KagaminTheme(
     //        name = "yuki-light",
     //        background = Color(0xffffffff),
     //        background2 = Color(0xff86c6ea),
@@ -164,7 +150,7 @@ object Themes {
     //        override val barsTransparent: Color = bars.copy(0.50f)
     //    }
 
-    object KagaminDark : IYukiTheme(
+    object KagaminDark : KagaminTheme(
         name = "kagamin-dark",
         background = Color(0xffffffff),
         background2 = Color(0xff8a8a8a),
@@ -181,58 +167,4 @@ object Themes {
         override val barsTransparent: Color = bars.copy(0.95f)
         override val progressOverThumbnail: Color = bars.copy(0.25f)
     }
-
-    open class IYukiTheme(
-        val name: String,
-        val background: Color,
-        val background2: Color,
-        val surface: Color,
-        val font: Color,
-        val fontSecondary: Color,
-        val bars: Color,
-    ) {
-        open val smallButtonIcon: Color = surface
-        open val playerButtonIcon: Color = surface
-        open val onBars: Color = surface
-        open val listItemA: Color = surface.copy(0.9f)
-        open val listItemB: Color = background2.copy(0.8f)
-        open val barsTransparent: Color = bars.copy(0.9f)
-        open val playerButtonIconTransparent get() = playerButtonIcon.copy(0.5f)
-        open val progressOverThumbnail: Color = bars.copy(0.5f)
-        open val thinBorder: Color = bars
-        open val selectedButton: Color = Color.White
-    }
-}
-
-object Colors {
-    var currentYukiTheme = Themes.list.first()
-
-    val surface get() = currentYukiTheme.surface
-    val text get() = currentYukiTheme.font
-    val text2 get() = currentYukiTheme.fontSecondary
-    val background get() = currentYukiTheme.background
-    val bars get() = currentYukiTheme.bars
-    val barsTransparent get() = currentYukiTheme.barsTransparent
-
-    init {
-        currentYukiTheme =
-            Themes.list.find { it.name == loadSettings().theme } ?: Themes.list.first()
-    }
-
-    private val lightRed = Color(245, 83, 95)
-    var yukiColors = androidx.compose.material.Colors(
-        primary = bars,
-        primaryVariant = Color(0xFF3700B3),
-        secondary = Color(0xFF03DAC6),
-        secondaryVariant = Color(0xFF018786),
-        background = background,
-        surface = bars,
-        error = lightRed,
-        onPrimary = Color.White,
-        onSecondary = Color.White,
-        onBackground = Color.White,
-        onSurface = Color.White,
-        onError = Color.White,
-        false
-    )
 }

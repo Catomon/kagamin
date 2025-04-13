@@ -14,29 +14,29 @@ import chu.monscout.kagamin.ui.theme.Colors
 fun VolumeSlider(volume: Float, volumeChanged: (Float) -> Unit, modifier: Modifier = Modifier) {
     val interactionSource = MutableInteractionSource()
     val colors = SliderDefaults.colors(
-        Colors.currentYukiTheme.playerButtonIcon,
-        Colors.currentYukiTheme.playerButtonIconTransparent,
-        Colors.currentYukiTheme.playerButtonIcon,
-        Colors.currentYukiTheme.playerButtonIconTransparent,
-        Colors.currentYukiTheme.playerButtonIconTransparent,
-        Colors.currentYukiTheme.playerButtonIconTransparent,
-        Colors.currentYukiTheme.playerButtonIconTransparent,
-        Colors.currentYukiTheme.playerButtonIconTransparent,
-        Colors.currentYukiTheme.playerButtonIconTransparent,
-        Colors.currentYukiTheme.playerButtonIconTransparent
+        Colors.theme.playerButtonIcon,
+        Colors.theme.playerButtonIconTransparent,
+        Colors.theme.playerButtonIcon,
+        Colors.theme.playerButtonIconTransparent,
+        Colors.theme.playerButtonIconTransparent,
+        Colors.theme.playerButtonIconTransparent,
+        Colors.theme.playerButtonIconTransparent,
+        Colors.theme.playerButtonIconTransparent,
+        Colors.theme.playerButtonIconTransparent,
+        Colors.theme.playerButtonIconTransparent
     )
 
     val shadowColors = SliderDefaults.colors(
-        Colors.currentYukiTheme.thinBorder,
-        Colors.currentYukiTheme.thinBorder,
-        Colors.currentYukiTheme.thinBorder,
-        Colors.currentYukiTheme.thinBorder,
-        Colors.currentYukiTheme.thinBorder,
-        Colors.currentYukiTheme.thinBorder,
-        Colors.currentYukiTheme.thinBorder,
-        Colors.currentYukiTheme.thinBorder,
-        Colors.currentYukiTheme.thinBorder,
-        Colors.currentYukiTheme.thinBorder,
+        Colors.theme.thinBorder,
+        Colors.theme.thinBorder,
+        Colors.theme.thinBorder,
+        Colors.theme.thinBorder,
+        Colors.theme.thinBorder,
+        Colors.theme.thinBorder,
+        Colors.theme.thinBorder,
+        Colors.theme.thinBorder,
+        Colors.theme.thinBorder,
+        Colors.theme.thinBorder,
     )
 
 

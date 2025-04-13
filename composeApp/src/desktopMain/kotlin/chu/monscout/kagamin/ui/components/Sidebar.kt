@@ -39,7 +39,7 @@ fun MinimizeButton(modifier: Modifier) {
             painterResource(Res.drawable.minimize_window),
             "Minimize",
             modifier = Modifier.size(32.dp),
-            colorFilter = ColorFilter.tint(Colors.currentYukiTheme.smallButtonIcon)
+            colorFilter = ColorFilter.tint(Colors.theme.smallButtonIcon)
         )
     }
 }
@@ -69,7 +69,7 @@ fun Sidebar(
                             state.currentTab = Tabs.PLAYBACK
                         }
                     },
-                    color = if (state.currentTab == Tabs.PLAYBACK) Colors.currentYukiTheme.selectedButton else Colors.currentYukiTheme.smallButtonIcon,
+                    color = if (state.currentTab == Tabs.PLAYBACK) Colors.theme.selectedButton else Colors.theme.smallButtonIcon,
                     Modifier.weight(0.333f)
                 )
             }
@@ -80,7 +80,7 @@ fun Sidebar(
                         state.currentTab = Tabs.TRACKLIST
                     }
                 },
-                color = if (state.currentTab == Tabs.TRACKLIST) Colors.currentYukiTheme.selectedButton else Colors.currentYukiTheme.smallButtonIcon,
+                color = if (state.currentTab == Tabs.TRACKLIST) Colors.theme.selectedButton else Colors.theme.smallButtonIcon,
                 Modifier.weight(0.333f)
             )
 
@@ -90,7 +90,7 @@ fun Sidebar(
                         state.currentTab = Tabs.PLAYLISTS
                     }
                 },
-                color = if (state.currentTab == Tabs.PLAYLISTS) Colors.currentYukiTheme.selectedButton else Colors.currentYukiTheme.smallButtonIcon,
+                color = if (state.currentTab == Tabs.PLAYLISTS) Colors.theme.selectedButton else Colors.theme.smallButtonIcon,
                 Modifier.weight(0.333f)
             )
 
@@ -111,7 +111,7 @@ fun Sidebar(
                 }
             },
                 modifier = Modifier.weight(0.333f),
-                color = if (state.currentTab == Tabs.ADD_TRACKS || state.currentTab == Tabs.CREATE_PLAYLIST) Colors.currentYukiTheme.selectedButton else Colors.currentYukiTheme.smallButtonIcon
+                color = if (state.currentTab == Tabs.ADD_TRACKS || state.currentTab == Tabs.CREATE_PLAYLIST) Colors.theme.selectedButton else Colors.theme.smallButtonIcon
             )
         }
 
@@ -142,7 +142,7 @@ private fun SwapLayoutButton(layoutManager: LayoutManager) {
             painterResource(Res.drawable.drag),
             "drag window",
             modifier = Modifier.size(20.dp),
-            colorFilter = ColorFilter.tint(Colors.currentYukiTheme.smallButtonIcon)
+            colorFilter = ColorFilter.tint(Colors.theme.smallButtonIcon)
         )
     }
 }
@@ -156,7 +156,7 @@ private fun MenuButton(navController: NavHostController, modifier: Modifier) {
             painterResource(Res.drawable.menu),
             "Menu",
             modifier = Modifier.size(32.dp),
-            colorFilter = ColorFilter.tint(Colors.currentYukiTheme.smallButtonIcon)
+            colorFilter = ColorFilter.tint(Colors.theme.smallButtonIcon)
         )
     }
 }

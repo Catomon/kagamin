@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import chu.monscout.kagamin.audio.AudioPlayer
 import chu.monscout.kagamin.audio.AudioTrack
@@ -22,14 +23,14 @@ import kagamin.composeapp.generated.resources.prev
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun PlaybackButtons(player: AudioPlayer<AudioTrack>, modifier: Modifier = Modifier) {
+fun PlaybackButtons(player: AudioPlayer<AudioTrack>, modifier: Modifier = Modifier, buttonsSize: Dp = 32.dp) {
     Row(
-        modifier = modifier.height(48.dp),//.background(Colors.noteBackground.copy(alpha = 0.75f)),
+        modifier = modifier.height(buttonsSize * 1.5f),//.background(Colors.noteBackground.copy(alpha = 0.75f)),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(
-            modifier = Modifier.size(32.dp),
+            modifier = Modifier.size(buttonsSize),
             onClick = {
                 player.prevTrack()
             }
@@ -37,13 +38,13 @@ fun PlaybackButtons(player: AudioPlayer<AudioTrack>, modifier: Modifier = Modifi
             ImageWithShadow(
                 painterResource(Res.drawable.prev),
                 "Previous",
-                modifier = Modifier.size(32.dp),
-                colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon)
+                modifier = Modifier.size(buttonsSize),
+                colorFilter = ColorFilter.tint(Colors.theme.playerButtonIcon)
             )
         }
 
         IconButton(
-            modifier = Modifier.size(40.dp),
+            modifier = Modifier.size(buttonsSize * 1.25f),
             onClick = {
                 when (player.playState.value) {
                     AudioPlayer.PlayState.PLAYING -> player.pause()
@@ -57,22 +58,22 @@ fun PlaybackButtons(player: AudioPlayer<AudioTrack>, modifier: Modifier = Modifi
                     ImageWithShadow(
                         painterResource(Res.drawable.play),
                         "Play",
-                        modifier = Modifier.size(40.dp),
-                        colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon)
+                        modifier = Modifier.size(buttonsSize * 1.25f),
+                        colorFilter = ColorFilter.tint(Colors.theme.playerButtonIcon)
                     )
                 } else {
                     ImageWithShadow(
                         painterResource(Res.drawable.pause),
                         "Pause",
-                        modifier = Modifier.size(40.dp),
-                        colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon)
+                        modifier = Modifier.size(buttonsSize * 1.25f),
+                        colorFilter = ColorFilter.tint(Colors.theme.playerButtonIcon)
                     )
                 }
             }
         }
 
         IconButton(
-            modifier = Modifier.size(32.dp),
+            modifier = Modifier.size(buttonsSize),
             onClick = {
                 player.nextTrack()
             }
@@ -80,8 +81,8 @@ fun PlaybackButtons(player: AudioPlayer<AudioTrack>, modifier: Modifier = Modifi
             ImageWithShadow(
                 painterResource(Res.drawable.next),
                 "Next",
-                modifier = Modifier.size(32.dp),
-                colorFilter = ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon)
+                modifier = Modifier.size(buttonsSize),
+                colorFilter = ColorFilter.tint(Colors.theme.playerButtonIcon)
             )
         }
     }

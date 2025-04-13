@@ -52,7 +52,7 @@ actual fun TrackItem(
     val snackbar = LocalSnackbarHostState.current
     val isHeader = index == -1
     val backColor = if (isHeader) Colors.barsTransparent else
-        if (index % 2 == 0) Colors.currentYukiTheme.listItemA else Colors.currentYukiTheme.listItemB
+        if (index % 2 == 0) Colors.theme.listItemA else Colors.theme.listItemB
     ContextMenuArea(items = {
         listOf(
             ContextMenuItem("Select") {
@@ -151,7 +151,7 @@ actual fun TrackItem(
                 Text(
                     track.name,
                     fontSize = 10.sp,
-                    color = if (isHeader) Colors.currentYukiTheme.playerButtonIcon else Colors.text,
+                    color = if (isHeader) Colors.theme.playerButtonIcon else Colors.text,
                     maxLines = 1,
                     modifier = Modifier.align(Alignment.CenterStart),
                     overflow = TextOverflow.Ellipsis,

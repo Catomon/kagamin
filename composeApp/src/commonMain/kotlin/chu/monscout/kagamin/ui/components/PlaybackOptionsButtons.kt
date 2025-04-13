@@ -21,6 +21,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import chu.monscout.kagamin.audio.AudioPlayer
 import chu.monscout.kagamin.audio.AudioTrack
@@ -35,7 +36,8 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun PlaybackOptionsButtons(
     player: AudioPlayer<AudioTrack>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    buttonsSize: Dp = 32.dp
 ) {
     var playMode by player.playMode
     var volume by player.volume
@@ -59,11 +61,11 @@ fun PlaybackOptionsButtons(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = modifier.height(32.dp)
+            modifier = modifier.height(buttonsSize)
         ) {
             IconButton({
                 showVolumeSlider = !showVolumeSlider
-            }, modifier = Modifier.size(32.dp).onFocusChanged { focusState ->
+            }, modifier = Modifier.size(buttonsSize).onFocusChanged { focusState ->
                 showVolumeSlider = focusState.isFocused
             }.focusable().pointerInput(Unit) {
                 awaitPointerEventScope {
@@ -85,8 +87,8 @@ fun PlaybackOptionsButtons(
                 ImageWithShadow(
                     painterResource(Res.drawable.volume),
                     "volume",
-                    colorFilter = if (showVolumeSlider) ColorFilter.tint(Colors.currentYukiTheme.playerButtonIcon)
-                    else ColorFilter.tint(Colors.currentYukiTheme.playerButtonIconTransparent)
+                    colorFilter = if (showVolumeSlider) ColorFilter.tint(Colors.theme.playerButtonIcon)
+                    else ColorFilter.tint(Colors.theme.playerButtonIconTransparent)
                 )
             }
 
@@ -103,14 +105,14 @@ fun PlaybackOptionsButtons(
                     playMode =
                         if (playMode != AudioPlayer.PlayMode.REPEAT_TRACK) AudioPlayer.PlayMode.REPEAT_TRACK
                         else AudioPlayer.PlayMode.REPEAT_PLAYLIST
-                }, modifier = Modifier.size(32.dp)) {
+                }, modifier = Modifier.size(buttonsSize)) {
                     ImageWithShadow(
                         painterResource(Res.drawable.repeat_single),
                         "repeat track",
                         colorFilter = if (playMode == AudioPlayer.PlayMode.REPEAT_TRACK) ColorFilter.tint(
-                            Colors.currentYukiTheme.playerButtonIcon
+                            Colors.theme.playerButtonIcon
                         )
-                        else ColorFilter.tint(Colors.currentYukiTheme.playerButtonIconTransparent)
+                        else ColorFilter.tint(Colors.theme.playerButtonIconTransparent)
                     )
                 }
 
@@ -121,14 +123,14 @@ fun PlaybackOptionsButtons(
                     player.playMode.value =
                         if (playMode != AudioPlayer.PlayMode.RANDOM) AudioPlayer.PlayMode.RANDOM
                         else AudioPlayer.PlayMode.REPEAT_PLAYLIST
-                }, modifier = Modifier.size(32.dp)) {
+                }, modifier = Modifier.size(buttonsSize)) {
                     ImageWithShadow(
                         painterResource(Res.drawable.random),
                         "random mode",
                         colorFilter = if (playMode == AudioPlayer.PlayMode.RANDOM) ColorFilter.tint(
-                            Colors.currentYukiTheme.playerButtonIcon
+                            Colors.theme.playerButtonIcon
                         )
-                        else ColorFilter.tint(Colors.currentYukiTheme.playerButtonIconTransparent)
+                        else ColorFilter.tint(Colors.theme.playerButtonIconTransparent)
                     )
                 }
             }

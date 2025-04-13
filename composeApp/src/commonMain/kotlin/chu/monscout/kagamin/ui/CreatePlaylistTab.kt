@@ -28,7 +28,7 @@ fun CreatePlaylistTab(state: KagaminViewModel, modifier: Modifier) {
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.background(Colors.currentYukiTheme.listItemB),
+        modifier = modifier.background(Colors.theme.listItemB),
         verticalArrangement = Arrangement.Center
     ) {
         TextField(name, onValueChange = {

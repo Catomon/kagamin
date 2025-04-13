@@ -26,13 +26,13 @@ import androidx.navigation.NavHostController
 import chu.monscout.kagamin.ui.theme.Colors
 import chu.monscout.kagamin.LayoutManager
 import chu.monscout.kagamin.LocalLayoutManager
-import chu.monscout.kagamin.ui.theme.Themes
 import chu.monscout.kagamin.data.AppSettings
 import chu.monscout.kagamin.audio.AudioPlayer
 import chu.monscout.kagamin.loadSettings
 import chu.monscout.kagamin.openInBrowser
 import chu.monscout.kagamin.saveSettings
 import chu.monscout.kagamin.ui.components.AppName
+import chu.monscout.kagamin.ui.theme.KagaminTheme
 import chu.monscout.kagamin.ui.viewmodel.KagaminViewModel
 import kotlin.system.exitProcess
 
@@ -138,17 +138,17 @@ private fun ThemeRadioButtons(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
     ) {
-        Text("Themes:", color = Colors.text)
+        Text("KagaminTheme:", color = Colors.text)
         Row(verticalAlignment = Alignment.CenterVertically) {
             RadioButton(
-                theme == Themes.Violet.name,
+                theme == KagaminTheme.Violet.name,
                 colors = RadioButtonDefaults.colors(
-                    Themes.Violet.bars,
-                    Themes.Violet.surface
+                    KagaminTheme.Violet.bars,
+                    KagaminTheme.Violet.surface
                 ),
                 onClick = {
-                    Colors.currentYukiTheme = Themes.Violet
-                    settings.theme = Themes.Violet.name
+                    Colors.theme = KagaminTheme.Violet
+                    settings.theme = KagaminTheme.Violet.name
                     saveSettings(settings)
                     state.settings = loadSettings()
                 },
@@ -159,11 +159,11 @@ private fun ThemeRadioButtons(
                     )
                 })
             RadioButton(
-                theme == Themes.Pink.name,
-                colors = RadioButtonDefaults.colors(Themes.Pink.bars, Themes.Pink.surface),
+                theme == KagaminTheme.Pink.name,
+                colors = RadioButtonDefaults.colors(KagaminTheme.Pink.bars, KagaminTheme.Pink.surface),
                 onClick = {
-                    Colors.currentYukiTheme = Themes.Pink
-                    settings.theme = Themes.Pink.name
+                    Colors.theme = KagaminTheme.Pink
+                    settings.theme = KagaminTheme.Pink.name
                     saveSettings(settings)
                     state.settings = loadSettings()
                 },
@@ -174,11 +174,11 @@ private fun ThemeRadioButtons(
                     )
                 })
             RadioButton(
-                theme == Themes.Blue.name,
-                colors = RadioButtonDefaults.colors(Themes.Blue.bars, Themes.Blue.surface),
+                theme == KagaminTheme.Blue.name,
+                colors = RadioButtonDefaults.colors(KagaminTheme.Blue.bars, KagaminTheme.Blue.surface),
                 onClick = {
-                    Colors.currentYukiTheme = Themes.Blue
-                    settings.theme = Themes.Blue.name
+                    Colors.theme = KagaminTheme.Blue
+                    settings.theme = KagaminTheme.Blue.name
                     saveSettings(settings)
                     state.settings = loadSettings()
                 },
@@ -190,14 +190,14 @@ private fun ThemeRadioButtons(
                 })
             Row(verticalAlignment = Alignment.CenterVertically) {
                 RadioButton(
-                    theme == Themes.KagaminDark.name,
+                    theme == KagaminTheme.KagaminDark.name,
                     colors = RadioButtonDefaults.colors(
-                        Themes.KagaminDark.bars,
-                        Themes.KagaminDark.barsTransparent
+                        KagaminTheme.KagaminDark.bars,
+                        KagaminTheme.KagaminDark.barsTransparent
                     ),
                     onClick = {
-                        Colors.currentYukiTheme = Themes.KagaminDark
-                        settings.theme = Themes.KagaminDark.name
+                        Colors.theme = KagaminTheme.KagaminDark
+                        settings.theme = KagaminTheme.KagaminDark.name
                         saveSettings(settings)
                         state.settings = loadSettings()
                     },
@@ -209,14 +209,14 @@ private fun ThemeRadioButtons(
                     })
 
 //                RadioButton(
-//                    theme == Themes.White.name,
+//                    theme == KagaminTheme.White.name,
 //                    colors = RadioButtonDefaults.colors(
-//                        Themes.White.bars,
-//                        Themes.White.barsTransparent
+//                        KagaminTheme.White.bars,
+//                        KagaminTheme.White.barsTransparent
 //                    ),
 //                    onClick = {
-//                        Colors.currentYukiTheme = Themes.White
-//                        settings.theme = Themes.White.name
+//                        Colors.currentYukiTheme = KagaminTheme.White
+//                        settings.theme = KagaminTheme.White.name
 //                        saveSettings(settings)
 //                        state.settings = loadSettings()
 //                    },

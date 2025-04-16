@@ -16,7 +16,7 @@ object PlayerScreenDestination {
 
 @Composable
 expect fun PlayerScreen(
-    state: KagaminViewModel = viewModel { KagaminViewModel() },
+    viewModel: KagaminViewModel = viewModel { KagaminViewModel() },
     navController: NavHostController,
     modifier: Modifier = Modifier,
 )

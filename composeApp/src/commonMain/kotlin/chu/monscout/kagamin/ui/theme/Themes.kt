@@ -4,50 +4,54 @@ import androidx.compose.ui.graphics.Color
 
 sealed class KagaminTheme(
     val name: String,
-    val background: Color,
-    val background2: Color,
-    val surface: Color,
-    val font: Color,
-    val fontSecondary: Color,
-    val bars: Color,
+    open val behindBackground: Color,
+    open val text: Color,
+    open val textSecondary: Color,
+    open val background: Color,
+    open val listItemA: Color,
+    open val listItemB: Color,
+    open val buttonIconSmall: Color = listItemA,
+    open val buttonIcon: Color = listItemA,
+    open val onBars: Color = listItemA,
+    open val backgroundTransparent: Color = background.copy(0.9f),
+    open val buttonIconTransparent: Color = buttonIcon.copy(0.5f),
+    open val thumbnailProgressIndicator: Color = background.copy(0.5f),
+    open val thinBorder: Color = background,
+    open val buttonIconSmallSelected: Color = Color.White,
 ) {
-    open val smallButtonIcon: Color = surface
-    open val playerButtonIcon: Color = surface
-    open val onBars: Color = surface
-    open val listItemA: Color = surface.copy(0.9f)
-    open val listItemB: Color = background2.copy(0.8f)
-    open val barsTransparent: Color = bars.copy(0.9f)
-    open val playerButtonIconTransparent get() = playerButtonIcon.copy(0.5f)
-    open val progressOverThumbnail: Color = bars.copy(0.5f)
-    open val thinBorder: Color = bars
-    open val selectedButton: Color = Color.White
+
+    //    open val listItemA: Color = surface.copy(0.9f)
+    //    open val listItemB: Color = background2.copy(0.8f)
+    //    open val barsTransparent: Color = bars
+    //    open val playerButtonIconTransparent get() = playerButtonIcon
+    //    open val progressOverThumbnail: Color = bars
 
     object White : KagaminTheme(
         name = "white",
-        background = Color(0xffc9c9c9),
-        background2 = Color(0xff626262),
-        surface = Color(0xffd9d9d9),
-        font = Color(0xff111111),
-        fontSecondary = Color(0xff464646),
-        bars = Color(0xffffffff),
+        behindBackground = Color(0xffc9c9c9),
+        listItemB = Color(0xff626262),
+        listItemA = Color(0xffd9d9d9),
+        text = Color(0xff111111),
+        textSecondary = Color(0xff464646),
+        background = Color(0xffffffff),
     ) {
-        override val playerButtonIcon: Color = Color(0xffb6b6b6)
+        override val buttonIcon: Color = Color(0xffb6b6b6)
         override val listItemA: Color = Color(0xcbeaeaea)
         override val listItemB: Color = Color(0xcbcccccc)
         override val thinBorder: Color = Color(0xff5b5b5b)
-        override val selectedButton: Color = fontSecondary
+        override val buttonIconSmallSelected: Color = textSecondary
     }
 
     object Grey : KagaminTheme(
         name = "grey",
-        background = Color(0xffc9c9c9),
-        background2 = Color(0xff626262),
-        surface = Color(0xffd9d9d9),
-        font = Color(0xff111111),
-        fontSecondary = Color(0xff464646),
-        bars = Color(0xff3d3d3d),
+        behindBackground = Color(0xffc9c9c9),
+        listItemB = Color(0xff626262),
+        listItemA = Color(0xffd9d9d9),
+        text = Color(0xff111111),
+        textSecondary = Color(0xff464646),
+        background = Color(0xff3d3d3d),
     ) {
-        override val playerButtonIcon: Color = Color(0xffb6b6b6)
+        override val buttonIcon: Color = Color(0xffb6b6b6)
         override val listItemA: Color = Color(0xcbcecece)
         override val listItemB: Color = Color(0xcbb6b6b6)
         override val thinBorder: Color = Color(0xff5b5b5b)
@@ -55,21 +59,21 @@ sealed class KagaminTheme(
 
     object Pink : KagaminTheme(
         name = "yuki",
-        background = Color(0xffffbecf),
-        background2 = Color(0xffff618f),
-        surface = Color(0xfff799b4),
-        font = Color(0xFFFFFFFF),
-        fontSecondary = Color(0xFFFFE1EA),
-        bars = Color(0xffec588c),
+        behindBackground = Color(0xffffbecf),
+        listItemB = Color(0xffff618f),
+        listItemA = Color(0xfff799b4),
+        text = Color(0xFFFFFFFF),
+        textSecondary = Color(0xFFFFE1EA),
+        background = Color(0xffec588c),
     ) {
-        override val smallButtonIcon: Color = Color(0xffffffff)
-        override val playerButtonIcon: Color = Color(0xffffc3d2)
+        override val buttonIconSmall: Color = Color(0xffffffff)
+        override val buttonIcon: Color = Color(0xffffc3d2)
         override val onBars: Color = Color(0xfff58a9e)
         override val listItemA: Color = Color(0xcdff84a6)
         override val listItemB: Color = Color(0xcdff618f)
-        override val barsTransparent: Color = bars.copy(0.8f)
+        override val backgroundTransparent: Color = background.copy(0.8f)
         override val thinBorder: Color = Color(0xffea417c)
-        override val selectedButton: Color = background2
+        override val buttonIconSmallSelected: Color = listItemB
     }
 
     //more pink
@@ -105,27 +109,26 @@ sealed class KagaminTheme(
 
     object Violet : KagaminTheme(
         name = "gami-kasa",
-        background = Color(0xffc09dff),
-        background2 = Color(0xff6232a9),
-        surface = Color(0xff916dd6),
-        font = Color(0xFFFFFFFF),
-        fontSecondary = Color(0xFFDECCFF),
-        bars = Color(0xff6232a9),
+        behindBackground = Color(0xffc09dff),
+        listItemB = Color(0xcb6632b2),
+        listItemA = Color(0xcb753cc9),
+        text = Color(0xFFFFFFFF),
+        textSecondary = Color(0xFFDECCFF),
+        background = Color(0xff6232a9),
     ) {
-        override val playerButtonIcon: Color = Color(0xff9775d5)
-        override val listItemA: Color = Color(0xcb753cc9)
-        override val listItemB: Color = Color(0xcb6632b2)
+        override val buttonIconSmall: Color = Color(0xff916dd6)
+        override val buttonIcon: Color = Color(0xff9775d5)
         override val thinBorder: Color = Color(0xff5522a2)
     }
 
-    object Blue : KagaminTheme(
+    data object Blue : KagaminTheme(
         name = "nata",
-        background = Color(0xffadcfff),
-        background2 = Color(0xff0f2e93),
-        surface = Color(0xff6197de),
-        font = Color(0xFFFFFFFF),
-        fontSecondary = Color(0xffd2e6ff),
-        bars = Color(0xff0f2e93),
+        behindBackground = Color(0xffadcfff),
+        listItemB = Color(0xff0f2e93),
+        listItemA = Color(0xff6197de),
+        text = Color(0xFFFFFFFF),
+        textSecondary = Color(0xffd2e6ff),
+        background = Color(0xff0f2e93),
     ) {
         //        override val playerButtonIcon: Color = Color(0xff9775d5)
         override val listItemA: Color = Color(0xcc1840c5)
@@ -152,19 +155,19 @@ sealed class KagaminTheme(
 
     object KagaminDark : KagaminTheme(
         name = "kagamin-dark",
-        background = Color(0xffffffff),
-        background2 = Color(0xff8a8a8a),
-        surface = Color(0xffb2b2b2),
-        font = Color(0xffffffff), //Color(0xffff4d7c)
-        fontSecondary = Color(0xffab0460),
-        bars = Color(0xff000000),
+        behindBackground = Color(0xffffffff),
+        listItemB = Color(0xff8a8a8a),
+        listItemA = Color(0xffb2b2b2),
+        text = Color(0xffffffff), //Color(0xffff4d7c)
+        textSecondary = Color(0xffab0460),
+        background = Color(0xff000000),
     ) {
-        override val smallButtonIcon: Color = Color(0xffd51e82)
-        override val playerButtonIcon: Color = Color(0xffd51e82)
+        override val buttonIconSmall: Color = Color(0xffd51e82)
+        override val buttonIcon: Color = Color(0xffd51e82)
         override val onBars: Color = Color(0xfffd72bb)
         override val listItemA: Color = Color(0xe6de2d8d)
         override val listItemB: Color = Color(0xe6d51e82)
-        override val barsTransparent: Color = bars.copy(0.95f)
-        override val progressOverThumbnail: Color = bars.copy(0.25f)
+        override val backgroundTransparent: Color = background.copy(0.95f)
+        override val thumbnailProgressIndicator: Color = background.copy(0.25f)
     }
 }

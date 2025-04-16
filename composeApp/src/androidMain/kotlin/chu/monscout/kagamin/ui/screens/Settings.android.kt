@@ -14,12 +14,14 @@ import androidx.compose.material.RadioButton
 import androidx.compose.material.RadioButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import chu.monscout.kagamin.ui.theme.Colors
 import chu.monscout.kagamin.data.AppSettings
@@ -27,45 +29,42 @@ import chu.monscout.kagamin.audio.AudioPlayer
 import chu.monscout.kagamin.loadSettings
 import chu.monscout.kagamin.openInBrowser
 import chu.monscout.kagamin.saveSettings
+import chu.monscout.kagamin.ui.components.AppName
 import chu.monscout.kagamin.ui.theme.KagaminTheme
 import chu.monscout.kagamin.ui.viewmodel.KagaminViewModel
 import kotlin.system.exitProcess
 
 @Composable
 actual fun SettingsScreen(
-    state: KagaminViewModel,
+    viewModel: KagaminViewModel,
     navController: NavHostController,
     modifier: Modifier
 ) {
-    val settings = state.settings
-    val theme = state.settings.theme
+    val settings = viewModel.settings
+    val theme = viewModel.settings.theme
 
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Colors.bars),
+            .background(Colors.background),
         contentAlignment = Alignment.Center
     ) {
-        Column(
-            Modifier
-                .align(Alignment.BottomEnd)
-                .padding(end = 6.dp),
-            horizontalAlignment = Alignment.End
-        ) {
-            Text(
-                "ver. 1.0.4",
-                color = Colors.text2
-            )
+        AppName(Modifier
+            .align(Alignment.TopCenter)
+            .padding(top = 10.dp))
 
-            Text(
-                "github.com/Catomon",
-                Modifier.clickable {
+        Text(
+            "ver. 1.0.7 github.com/Catomon",
+            Modifier
+                .clickable {
                     openInBrowser("https://github.com/Catomon")
-                },
-                fontStyle = FontStyle.Italic,
-                color = Colors.text2
-            )
-        }
+                }
+                .padding(start = 3.dp)
+                .align(Alignment.BottomCenter),
+            fontStyle = FontStyle.Italic,
+            color = Colors.textSecondary,
+            fontSize = 12.sp
+        )
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -73,44 +72,53 @@ actual fun SettingsScreen(
             modifier = modifier.fillMaxSize()
         ) {
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
+                horizontalAlignment = Alignment.Start,
             ) {
-                ThemeRadioButtons(theme, settings, state)
+                ThemeRadioButtons(theme, settings, viewModel)
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("Always on top")
 
                     Checkbox(settings.alwaysOnTop, {
-                        settings.alwaysOnTop = it
-                        saveSettings(settings)
-                        state.settings = loadSettings()
+                        viewModel.settings = settings.copy(alwaysOnTop = it)
+                    })
+                }
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Crossfade")
+
+                    Checkbox(settings.crossfade, {
+                        viewModel.settings = settings.copy(crossfade = it)
                     })
                 }
             }
         }
 
-        Column(Modifier.align(Alignment.BottomStart)) {
-            Button({
-                if (navController.currentDestination?.route == SettingsDestination.toString())
-                    navController.popBackStack()
-            }) {
-                Text("Return", color = Colors.text)
-            }
+        Button({
+            if (navController.currentDestination?.route == SettingsDestination.toString())
+                navController.popBackStack()
+        }, modifier = Modifier
+            .align(Alignment.BottomStart)
+            .padding(start = 10.dp)) {
+            Text("Return", color = Colors.text)
+        }
 
-            Button(
-                {
-                    val player = state.audioPlayer
-                    settings.crossfade = player.crossfade.value
-                    settings.repeat = player.playMode.value == AudioPlayer.PlayMode.REPEAT_TRACK
-                    settings.volume = player.volume.value
-                    settings.random = player.playMode.value == AudioPlayer.PlayMode.RANDOM
-                    saveSettings(settings)
-                    exitProcess(1)
-                },
-                modifier = Modifier.padding(top = 12.dp)
-            ) {
-                Text("Exit App", color = Colors.text)
-            }
+        Button(
+            {
+                val player = viewModel.audioPlayer
+                viewModel.settings = settings.copy(
+                    repeat = player.playMode.value == AudioPlayer.PlayMode.REPEAT_TRACK,
+                    volume = player.volume.value,
+                    random = player.playMode.value == AudioPlayer.PlayMode.RANDOM,
+                )
+                saveSettings(settings)
+                exitProcess(1)
+            },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(end = 10.dp)
+        ) {
+            Text("Exit App", color = Colors.text)
         }
     }
 }
@@ -120,77 +128,73 @@ private fun ThemeRadioButtons(
     theme: String,
     settings: AppSettings,
     state: KagaminViewModel,
+    modifier: Modifier = Modifier
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Text("Theme", color = Colors.text)
-
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                RadioButton(
-                    theme == KagaminTheme.Violet.name,
-                    colors = RadioButtonDefaults.colors(
-                        KagaminTheme.Violet.bars,
-                        KagaminTheme.Violet.surface
-                    ),
-                    onClick = {
-                        Colors.theme = KagaminTheme.Violet
-                        settings.theme = KagaminTheme.Violet.name
-                        saveSettings(settings)
-                        state.settings = loadSettings()
-                    },
-                    modifier = Modifier.drawBehind {
-                        drawCircle(
-                            color = Color.White,
-                            size.minDimension / 2.5f
-                        )
-                    })
-                RadioButton(
-                    theme == KagaminTheme.Pink.name,
-                    colors = RadioButtonDefaults.colors(KagaminTheme.Pink.bars, KagaminTheme.Pink.surface),
-                    onClick = {
-                        Colors.theme = KagaminTheme.Pink
-                        settings.theme = KagaminTheme.Pink.name
-                        saveSettings(settings)
-                        state.settings = loadSettings()
-                    },
-                    modifier = Modifier.drawBehind {
-                        drawCircle(
-                            color = Color.White,
-                            size.minDimension / 2.5f
-                        )
-                    })
-                RadioButton(
-                    theme == KagaminTheme.Blue.name,
-                    colors = RadioButtonDefaults.colors(KagaminTheme.Blue.bars, KagaminTheme.Blue.surface),
-                    onClick = {
-                        Colors.theme = KagaminTheme.Blue
-                        settings.theme = KagaminTheme.Blue.name
-                        saveSettings(settings)
-                        state.settings = loadSettings()
-                    },
-                    modifier = Modifier.drawBehind {
-                        drawCircle(
-                            color = Color.White,
-                            size.minDimension / 2.5f
-                        )
-                    })
-            }
-
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+    ) {
+        Text("KagaminTheme:", color = Colors.text)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            RadioButton(
+                theme == KagaminTheme.Violet.name,
+                colors = RadioButtonDefaults.colors(
+                    KagaminTheme.Violet.background,
+                    KagaminTheme.Violet.listItemA
+                ),
+                onClick = {
+                    Colors.theme = KagaminTheme.Violet
+                    state.settings = settings.copy(theme = KagaminTheme.Violet.name)
+                },
+                modifier = Modifier.drawBehind {
+                    drawCircle(
+                        color = Color.White,
+                        size.minDimension / 2.5f
+                    )
+                })
+            RadioButton(
+                theme == KagaminTheme.Pink.name,
+                colors = RadioButtonDefaults.colors(
+                    KagaminTheme.Pink.background,
+                    KagaminTheme.Pink.listItemA
+                ),
+                onClick = {
+                    Colors.theme = KagaminTheme.Pink
+                    state.settings = settings.copy(theme = KagaminTheme.Pink.name)
+                },
+                modifier = Modifier.drawBehind {
+                    drawCircle(
+                        color = Color.White,
+                        size.minDimension / 2.5f
+                    )
+                })
+            RadioButton(
+                theme == KagaminTheme.Blue.name,
+                colors = RadioButtonDefaults.colors(
+                    KagaminTheme.Blue.background,
+                    KagaminTheme.Blue.listItemA
+                ),
+                onClick = {
+                    Colors.theme = KagaminTheme.Blue
+                    state.settings = settings.copy(theme = KagaminTheme.Blue.name)
+                },
+                modifier = Modifier.drawBehind {
+                    drawCircle(
+                        color = Color.White,
+                        size.minDimension / 2.5f
+                    )
+                })
             Row(verticalAlignment = Alignment.CenterVertically) {
                 RadioButton(
                     theme == KagaminTheme.KagaminDark.name,
                     colors = RadioButtonDefaults.colors(
-                        KagaminTheme.KagaminDark.bars,
-                        KagaminTheme.KagaminDark.barsTransparent
+                        KagaminTheme.KagaminDark.background,
+                        KagaminTheme.KagaminDark.backgroundTransparent
                     ),
                     onClick = {
                         Colors.theme = KagaminTheme.KagaminDark
-                        settings.theme = KagaminTheme.KagaminDark.name
-                        saveSettings(settings)
-                        state.settings = loadSettings()
+                        state.settings = settings.copy(theme = KagaminTheme.KagaminDark.name)
                     },
                     modifier = Modifier.drawBehind {
                         drawCircle(

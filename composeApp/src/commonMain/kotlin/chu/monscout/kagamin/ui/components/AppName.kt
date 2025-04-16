@@ -38,19 +38,19 @@ private fun AppNameNormal(modifier: Modifier = Modifier, height: Dp = 32.dp, fon
     ) {
         Text(
             text = "Kag",
-            color = Colors.theme.playerButtonIcon,
+            color = Colors.theme.buttonIcon,
             fontSize = fontSize,
             modifier = Modifier.height(height),
         )
         Image(
             painterResource(Res.drawable.star64),
             "App icon",
-            colorFilter = ColorFilter.tint(Colors.theme.playerButtonIcon),
+            colorFilter = ColorFilter.tint(Colors.theme.buttonIcon),
             modifier = Modifier.size(height).offset(y = (-3).dp)
         )
         Text(
             text = "min",
-            color = Colors.theme.playerButtonIcon,
+            color = Colors.theme.buttonIcon,
             fontSize = 18.sp,
             modifier = Modifier.height(height),
         )
@@ -90,18 +90,18 @@ private fun AppNameWShadowJap(modifier: Modifier = Modifier, height: Dp = 32.dp,
         ) {
             Text(
                 text = "かが",
-                color = Colors.theme.playerButtonIcon,
+                color = Colors.theme.buttonIcon,
                 fontSize = fontSize,
             )
             Image(
                 painterResource(Res.drawable.star64),
                 "App icon",
-                colorFilter = ColorFilter.tint(Colors.theme.playerButtonIcon),
+                colorFilter = ColorFilter.tint(Colors.theme.buttonIcon),
                 modifier = Modifier.size(height)
             )
             Text(
                 text = "みん",
-                color = Colors.theme.playerButtonIcon,
+                color = Colors.theme.buttonIcon,
                 fontSize = fontSize,
             )
         }
@@ -141,18 +141,18 @@ private fun AppNameWShadow(modifier: Modifier = Modifier) {
         ) {
             Text(
                 text = "Kag",
-                color = Colors.theme.playerButtonIcon,
+                color = Colors.theme.buttonIcon,
                 fontSize = 18.sp,
             )
             Image(
                 painterResource(Res.drawable.star64),
                 "App icon",
-                colorFilter = ColorFilter.tint(Colors.theme.playerButtonIcon),
+                colorFilter = ColorFilter.tint(Colors.theme.buttonIcon),
                 modifier = Modifier.size(25.dp)
             )
             Text(
                 text = "min",
-                color = Colors.theme.playerButtonIcon,
+                color = Colors.theme.buttonIcon,
                 fontSize = 18.sp,
             )
         }
@@ -164,7 +164,7 @@ private fun AppNameOutlined(modifier: Modifier = Modifier) {
     Row(modifier) {
         OutlinedText(
             text = "Kag",
-            fillColor = Colors.theme.playerButtonIcon,
+            fillColor = Colors.theme.buttonIcon,
             outlineColor = Colors.theme.thinBorder,
             fontSize = 18.sp,
             modifier = Modifier.height(32.dp),
@@ -182,13 +182,13 @@ private fun AppNameOutlined(modifier: Modifier = Modifier) {
             Image(
                 painterResource(Res.drawable.star64),
                 "App icon",
-                colorFilter = ColorFilter.tint(Colors.theme.playerButtonIcon),
+                colorFilter = ColorFilter.tint(Colors.theme.buttonIcon),
                 modifier = Modifier.size(30.dp).offset(y = (-3).dp)
             )
         }
         OutlinedText(
             text = "min",
-            fillColor = Colors.theme.playerButtonIcon,
+            fillColor = Colors.theme.buttonIcon,
             outlineColor = Colors.theme.thinBorder,
             fontSize = 18.sp,
             modifier = Modifier.height(32.dp),

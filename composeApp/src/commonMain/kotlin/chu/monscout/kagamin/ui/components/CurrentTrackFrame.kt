@@ -40,7 +40,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope.Companion.DefaultFilterQuality
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -99,18 +98,7 @@ fun CurrentTrackFrame(
 
             PlaybackOptionsButtons(player, Modifier.width(133.dp))
 
-            Box {
-                TrackProgressIndicator(
-                    currentTrack,
-                    player,
-                    updateProgress,
-                    progress,
-                    color = Colors.theme.thinBorder,
-                    textColor = Colors.theme.thinBorder,
-                    Modifier.graphicsLayer(translationY = 2f).padding(horizontal = 20.dp)
-                )
-                TrackProgressIndicator(currentTrack, player, updateProgress, progress, modifier = Modifier.padding(horizontal = 20.dp))
-            }
+            TrackProgressIndicator(currentTrack, player, updateProgress, progress, modifier = Modifier.padding(horizontal = 20.dp))
         }
     }
 }
@@ -148,7 +136,7 @@ fun CompactCurrentTrackFrame(
         val floatAnimation by animateFloatAsState(targetValue)
 
         val targetProgressColor: Color =
-            remember(isHovered) { if (isHovered) Colors.barsTransparent else Colors.theme.progressOverThumbnail }
+            remember(isHovered) { if (isHovered) Colors.backgroundTransparent else Colors.theme.thumbnailProgressIndicator }
         val aniColor = animateColorAsState(targetProgressColor)
 
         TrackThumbnail(
@@ -181,18 +169,7 @@ fun CompactCurrentTrackFrame(
                     player = player, Modifier.width(133.dp)
                 )
 
-                Box {
-                    TrackProgressIndicator(
-                        currentTrack,
-                        player,
-                        updateProgress,
-                        progress,
-                        color = Colors.theme.thinBorder,
-                        textColor = Colors.theme.thinBorder,
-                        Modifier.graphicsLayer(translationY = 2f).padding(horizontal = 20.dp)
-                    )
-                    TrackProgressIndicator(currentTrack, player, updateProgress, progress, modifier = Modifier.padding(horizontal = 20.dp))
-                }
+                TrackProgressIndicator(currentTrack, player, updateProgress, progress, modifier = Modifier.padding(horizontal = 20.dp))
             }
         }
     }
@@ -204,7 +181,7 @@ fun TrackThumbnail(
     player: AudioPlayer<AudioTrack>,
     updateProgress: () -> Unit,
     progress: Float,
-    progressColor: Color = Colors.theme.progressOverThumbnail,
+    progressColor: Color = Colors.theme.thumbnailProgressIndicator,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
     blur: Boolean = false,

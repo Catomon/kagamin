@@ -39,7 +39,7 @@ fun PlaybackButtons(player: AudioPlayer<AudioTrack>, modifier: Modifier = Modifi
                 painterResource(Res.drawable.prev),
                 "Previous",
                 modifier = Modifier.size(buttonsSize),
-                colorFilter = ColorFilter.tint(Colors.theme.playerButtonIcon)
+                colorFilter = ColorFilter.tint(Colors.theme.buttonIcon)
             )
         }
 
@@ -59,14 +59,14 @@ fun PlaybackButtons(player: AudioPlayer<AudioTrack>, modifier: Modifier = Modifi
                         painterResource(Res.drawable.play),
                         "Play",
                         modifier = Modifier.size(buttonsSize * 1.25f),
-                        colorFilter = ColorFilter.tint(Colors.theme.playerButtonIcon)
+                        colorFilter = ColorFilter.tint(Colors.theme.buttonIcon)
                     )
                 } else {
                     ImageWithShadow(
                         painterResource(Res.drawable.pause),
                         "Pause",
                         modifier = Modifier.size(buttonsSize * 1.25f),
-                        colorFilter = ColorFilter.tint(Colors.theme.playerButtonIcon)
+                        colorFilter = ColorFilter.tint(Colors.theme.buttonIcon)
                     )
                 }
             }
@@ -82,7 +82,7 @@ fun PlaybackButtons(player: AudioPlayer<AudioTrack>, modifier: Modifier = Modifi
                 painterResource(Res.drawable.next),
                 "Next",
                 modifier = Modifier.size(buttonsSize),
-                colorFilter = ColorFilter.tint(Colors.theme.playerButtonIcon)
+                colorFilter = ColorFilter.tint(Colors.theme.buttonIcon)
             )
         }
     }

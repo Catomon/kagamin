@@ -34,7 +34,7 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 actual fun PlaylistItem(
     playlist: Pair<String, PlaylistData>,
-    state: KagaminViewModel,
+    viewModel: KagaminViewModel,
     playlists: List<Pair<String, PlaylistData>>,
     i: Int,
     remove: () -> Unit,
@@ -42,24 +42,24 @@ actual fun PlaylistItem(
     shuffle: () -> Unit
 ) {
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(56.dp)) {
-        if (state.currentPlaylistName == playlist.first) {
+        if (viewModel.currentPlaylistName == playlist.first) {
             Box(Modifier
                 .fillMaxHeight()
                 .clip(
                     RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp)
                 )
-                .background(Colors.barsTransparent)
+                .background(Colors.backgroundTransparent)
                 .clickable {
-                    state.onPlayPause()
+                    viewModel.onPlayPause()
                 }, contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painterResource(if (state.playState == AudioPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
+                    painterResource(if (viewModel.playState == AudioPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
                     "current playlist playback state icon",
                     modifier = Modifier
                         .size(16.dp)
                         .fillMaxHeight(),
-                    colorFilter = ColorFilter.tint(Colors.surface)
+                    colorFilter = ColorFilter.tint(Colors.theme.buttonIcon)
                 )
             }
         }
@@ -69,8 +69,8 @@ actual fun PlaylistItem(
                 .fillMaxHeight()
                 .background(color = if (i % 2 == 0) Colors.theme.listItemA else Colors.theme.listItemB)
                 .clickable {
-                    state.currentPlaylistName = playlist.first
-                    state.currentTab = Tabs.TRACKLIST
+                    viewModel.currentPlaylistName = playlist.first
+                    viewModel.currentTab = Tabs.TRACKLIST
                 }
                 .padding(4.dp)
         ) {
@@ -89,7 +89,7 @@ actual fun PlaylistItem(
                     "Tracks: ${playlist.second.tracks.size}",
                     modifier = Modifier.weight(0.5f),
                     fontSize = 10.sp,
-                    color = Colors.text2
+                    color = Colors.textSecondary
                 )
 //                    Text(
 //                        "Duration: ???",

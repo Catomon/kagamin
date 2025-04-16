@@ -1,5 +1,6 @@
 package chu.monscout.kagamin.ui.components
 
+import android.graphics.BitmapFactory
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,17 +18,26 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chu.monscout.kagamin.audio.AudioPlayer
 import chu.monscout.kagamin.audio.AudioTrack
+import chu.monscout.kagamin.audio.AudioTrackAndy
 import chu.monscout.kagamin.ui.theme.Colors
 import kotlinx.coroutines.delay
 
 actual fun getThumbnail(audioTrack: AudioTrack): ImageBitmap? {
-    return null //todo
+    val artworkData = (audioTrack as AudioTrackAndy).mediaItem?.mediaMetadata?.artworkData ?: return null
+    if (artworkData != null) {
+        val bitmap = BitmapFactory.decodeByteArray(artworkData, 0, artworkData.size)
+        return bitmap?.asImageBitmap()
+    }
+
+    return null
 }
 
 @Composable
@@ -64,7 +74,9 @@ fun CurrentTrackFrame2(
                 player,
                 updateProgress,
                 progress,
-                modifier = Modifier.padding(8.dp).size(300.dp)
+                modifier = Modifier
+                    .padding(8.dp)
+                    .size(300.dp)
             )
 
             PlaybackButtons(
@@ -75,20 +87,10 @@ fun CurrentTrackFrame2(
 
             Spacer(Modifier.weight(0.50f))
 
-            Box {
-                TrackProgressIndicator(
-                    currentTrack,
-                    player,
-                    updateProgress,
-                    progress,
-                    color = Colors.theme.thinBorder,
-                    textColor = Colors.theme.thinBorder,
-                    Modifier.graphicsLayer(translationY = pad).padding(horizontal = 15.dp),
-                    fontSize = 20.sp
-                )
-                TrackProgressIndicator(currentTrack, player, updateProgress, progress,
-                    fontSize = 20.sp, modifier = Modifier.padding(horizontal = 15.dp))
-            }
+            TrackProgressIndicator(
+                currentTrack, player, updateProgress, progress,
+                fontSize = 20.sp, modifier = Modifier.padding(horizontal = 15.dp)
+            )
         }
     }
 }

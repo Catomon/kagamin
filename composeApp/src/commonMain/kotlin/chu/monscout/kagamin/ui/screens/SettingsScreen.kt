@@ -15,7 +15,7 @@ object SettingsDestination {
 
 @Composable
 expect fun SettingsScreen(
-    state: KagaminViewModel,
+    viewModel: KagaminViewModel,
     navController: NavHostController,
     modifier: Modifier = Modifier
 )

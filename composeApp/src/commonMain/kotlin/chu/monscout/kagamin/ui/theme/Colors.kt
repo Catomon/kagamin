@@ -10,12 +10,11 @@ object Colors {
 
     var theme = themes.first()
 
-    val surface get() = theme.surface
-    val text get() = theme.font
-    val text2 get() = theme.fontSecondary
+    val text get() = theme.text
+    val textSecondary get() = theme.textSecondary
+    val behindBackground get() = theme.behindBackground
     val background get() = theme.background
-    val bars get() = theme.bars
-    val barsTransparent get() = theme.barsTransparent
+    val backgroundTransparent get() = theme.backgroundTransparent
 
     init {
         theme =
@@ -24,12 +23,12 @@ object Colors {
 
     private val lightRed = Color(245, 83, 95)
     var materialColors = androidx.compose.material.Colors(
-        primary = bars,
-        primaryVariant = Color(0xFF3700B3),
-        secondary = Color(0xFF03DAC6),
-        secondaryVariant = Color(0xFF018786),
+        primary = theme.buttonIcon,
+        primaryVariant = theme.buttonIconTransparent,
+        secondary = theme.buttonIconSmall,
+        secondaryVariant = theme.buttonIconSmallSelected,
         background = background,
-        surface = bars,
+        surface = backgroundTransparent,
         error = lightRed,
         onPrimary = Color.White,
         onSecondary = Color.White,

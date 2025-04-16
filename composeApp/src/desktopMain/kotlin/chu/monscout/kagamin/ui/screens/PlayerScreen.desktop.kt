@@ -25,10 +25,10 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import chu.monscout.kagamin.ui.theme.Colors
 import chu.monscout.kagamin.audio.AudioPlayer
+import chu.monscout.kagamin.saveSettings
 import chu.monscout.kagamin.ui.AddTracksTab
 import chu.monscout.kagamin.ui.CreatePlaylistTab
 import chu.monscout.kagamin.ui.Playlists
@@ -39,29 +39,28 @@ import chu.monscout.kagamin.ui.components.CurrentTrackFrame
 import chu.monscout.kagamin.ui.components.TrackThumbnail
 import chu.monscout.kagamin.ui.util.Tabs
 import chu.monscout.kagamin.ui.viewmodel.KagaminViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 actual fun PlayerScreen(
-    state: KagaminViewModel,
+    viewModel: KagaminViewModel,
     navController: NavHostController,
     modifier: Modifier,
 ) {
-    val audioPlayer = state.audioPlayer
-    val playlist = state.playlist
-    val currentTrack = state.currentTrack
-    val playState = state.playState
-    val playMode = state.playMode
-    val currentPlaylistName = state.currentPlaylistName
-    val videoUrl = state.videoUrl
+    val audioPlayer = viewModel.audioPlayer
+    val playlist = viewModel.playlist
+    val currentTrack = viewModel.currentTrack
+    val playState = viewModel.playState
+    val playMode = viewModel.playMode
+    val currentPlaylistName = viewModel.currentPlaylistName
+    val videoUrl = viewModel.videoUrl
 
     LaunchedEffect(currentPlaylistName) {
-        state.viewModelScope.launch {
-            state.reloadPlaylist()
-        }
+        viewModel.reloadPlaylist()
+
+        saveSettings(viewModel.settings.copy(lastPlaylistName = currentPlaylistName))
     }
 
-    Box(modifier.background(color = Colors.background, shape = RoundedCornerShape(16.dp))) {
+    Box(modifier.background(color = Colors.behindBackground, shape = RoundedCornerShape(16.dp))) {
         TrackThumbnail(
             currentTrack,
             audioPlayer,
@@ -78,7 +77,7 @@ actual fun PlayerScreen(
         Row() {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxHeight().background(color = Colors.barsTransparent)
+                modifier = Modifier.fillMaxHeight().background(color = Colors.backgroundTransparent)
             ) {
                 AppName(Modifier.padding(horizontal = 12.dp).height(25.dp)
                     .graphicsLayer(translationY = 2f)
@@ -102,20 +101,20 @@ actual fun PlayerScreen(
             }
 
             Box(Modifier.weight(0.75f)) {
-                AnimatedContent(targetState = state.currentTab, transitionSpec = {
+                AnimatedContent(targetState = viewModel.currentTab, transitionSpec = {
                     slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
                 }) {
                     when (it) {
                         Tabs.PLAYLISTS -> {
                             Playlists(
-                                state,
+                                viewModel,
                                 Modifier.align(Alignment.Center)
                                     .fillMaxSize()//.padding(start = 4.dp, end = 4.dp)
                             )
                         }
 
                         Tabs.TRACKLIST -> {
-                            if (state.playlist.isEmpty()) {
+                            if (viewModel.playlist.isEmpty()) {
                                 Box(
                                     Modifier.fillMaxSize()
                                         .background(Colors.theme.listItemB),
@@ -124,14 +123,14 @@ actual fun PlayerScreen(
                                     Text(
                                         "Drop files or folders here",
                                         textAlign = TextAlign.Center,
-                                        color = Colors.text2
+                                        color = Colors.textSecondary
                                     )
                                 }
                             } else {
                                 //https://www.youtube.com/playlist?list=PLjw1aNT6Kz2m00RTIUwY6u_vZAwKm8RKn
                                 Tracklist(
-                                    state,
-                                    state.playlist,
+                                    viewModel,
+                                    viewModel.playlist,
                                     Modifier.align(Alignment.Center)
                                         .fillMaxSize()//.padding(start = 16.dp, end = 16.dp)
                                 )
@@ -141,11 +140,11 @@ actual fun PlayerScreen(
                         Tabs.OPTIONS -> TODO()
 
                         Tabs.ADD_TRACKS -> {
-                            AddTracksTab(state, Modifier.fillMaxSize().align(Alignment.Center))
+                            AddTracksTab(viewModel, Modifier.fillMaxSize().align(Alignment.Center))
                         }
 
                         Tabs.CREATE_PLAYLIST -> {
-                            CreatePlaylistTab(state, Modifier.fillMaxSize().align(Alignment.Center))
+                            CreatePlaylistTab(viewModel, Modifier.fillMaxSize().align(Alignment.Center))
                         }
 
                         Tabs.PLAYBACK -> {
@@ -155,7 +154,7 @@ actual fun PlayerScreen(
                 }
             }
 
-            Sidebar(state, navController)
+            Sidebar(viewModel, navController)
         }
     }
 }

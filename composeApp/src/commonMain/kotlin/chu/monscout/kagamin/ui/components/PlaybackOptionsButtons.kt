@@ -87,8 +87,8 @@ fun PlaybackOptionsButtons(
                 ImageWithShadow(
                     painterResource(Res.drawable.volume),
                     "volume",
-                    colorFilter = if (showVolumeSlider) ColorFilter.tint(Colors.theme.playerButtonIcon)
-                    else ColorFilter.tint(Colors.theme.playerButtonIconTransparent)
+                    colorFilter = if (showVolumeSlider) ColorFilter.tint(Colors.theme.buttonIcon)
+                    else ColorFilter.tint(Colors.theme.buttonIconTransparent)
                 )
             }
 
@@ -110,9 +110,9 @@ fun PlaybackOptionsButtons(
                         painterResource(Res.drawable.repeat_single),
                         "repeat track",
                         colorFilter = if (playMode == AudioPlayer.PlayMode.REPEAT_TRACK) ColorFilter.tint(
-                            Colors.theme.playerButtonIcon
+                            Colors.theme.buttonIcon
                         )
-                        else ColorFilter.tint(Colors.theme.playerButtonIconTransparent)
+                        else ColorFilter.tint(Colors.theme.buttonIconTransparent)
                     )
                 }
 
@@ -128,9 +128,9 @@ fun PlaybackOptionsButtons(
                         painterResource(Res.drawable.random),
                         "random mode",
                         colorFilter = if (playMode == AudioPlayer.PlayMode.RANDOM) ColorFilter.tint(
-                            Colors.theme.playerButtonIcon
+                            Colors.theme.buttonIcon
                         )
-                        else ColorFilter.tint(Colors.theme.playerButtonIconTransparent)
+                        else ColorFilter.tint(Colors.theme.buttonIconTransparent)
                     )
                 }
             }

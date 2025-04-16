@@ -1,24 +1,15 @@
 package chu.monscout.kagamin
 
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.core.net.toUri
-import androidx.media3.common.MediaItem
 import chu.monscout.kagamin.audio.AudioPlayer
 import chu.monscout.kagamin.audio.AudioTrack
-import chu.monscout.kagamin.audio.AudioTrackAndy
 import com.darkrockstudios.libraries.mpfilepicker.MultipleFilePicker
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.io.File
-import java.util.UUID
-
-actual fun <T : AudioTrack> createAudioTrack(uri: String, name: String): T {
-    val uri = File(uri).toUri()
-    return AudioTrackAndy(
-        MediaItem.Builder().setUri(uri).setMediaId(UUID.randomUUID().toString(),).build()
-    ).also { it.name = name } as T
-}
 
 @Composable
 actual fun MultiFilePicker(
@@ -32,7 +23,15 @@ actual fun MultiFilePicker(
         show.value = false
         if (files != null) {
             //it.platformFile desk - File, android - Uri
-            audioPlayer.load(files.map { it.platformFile.toString() })
+            audioPlayer.load(files.map {
+                val uri = it.platformFile as Uri
+                (playerContext?.invoke() as Activity).contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION// or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+
+                uri.toString()
+            })
 
             savePlaylist(currentPlaylistName, audioPlayer.playlist.value.toTypedArray())
         }

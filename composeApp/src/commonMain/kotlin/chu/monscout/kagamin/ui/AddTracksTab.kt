@@ -36,7 +36,7 @@ fun AddTracksTab(state: KagaminViewModel, modifier: Modifier = Modifier) {
             textAlign = TextAlign.Center,
             //color = Colors.noteText
             modifier = Modifier.padding(horizontal = 8.dp),
-            color = Colors.text2
+            color = Colors.textSecondary
         )
 
         IconButton(onClick = {

@@ -37,13 +37,13 @@ actual fun TrackItem(
     index: Int,
     track: AudioTrack,
     tracklistManager: TracklistManager,
-    state: KagaminViewModel,
+    viewModel: KagaminViewModel,
     onClick: () -> Unit,
     modifier: Modifier
 ) {
     val clipboard = LocalClipboardManager.current
     val isHeader = index == -1
-    val backColor = if (isHeader) Colors.barsTransparent else
+    val backColor = if (isHeader) Colors.backgroundTransparent else
         if (index % 2 == 0) Colors.theme.listItemA else Colors.theme.listItemB
 
     Row(
@@ -53,23 +53,23 @@ actual fun TrackItem(
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.Start
     ) {
-        if (index > -1 && state.currentTrack == track) {
+        if (index > -1 && viewModel.currentTrack == track) {
             Box(
                 Modifier
                     .height(32.dp)
                     .clip(
                         RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp)
                     )
-                    .background(Colors.barsTransparent)
+                    .background(Colors.backgroundTransparent)
                     .clickable {
-                        state.onPlayPause()
+                        viewModel.onPlayPause()
                     }, contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painterResource(if (state.playState == AudioPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
+                    painterResource(if (viewModel.playState == AudioPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
                     "track playback state icon",
                     modifier = Modifier.size(16.dp),
-                    colorFilter = ColorFilter.tint(Colors.surface)
+                    colorFilter = ColorFilter.tint(Colors.theme.buttonIcon)
                 )
             }
         }

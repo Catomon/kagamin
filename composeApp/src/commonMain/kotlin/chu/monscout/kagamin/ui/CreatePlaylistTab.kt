@@ -22,7 +22,7 @@ import chu.monscout.kagamin.ui.viewmodel.KagaminViewModel
 import chu.monscout.kagamin.ui.util.Tabs
 
 @Composable
-fun CreatePlaylistTab(state: KagaminViewModel, modifier: Modifier) {
+fun CreatePlaylistTab(viewModel: KagaminViewModel, modifier: Modifier) {
     var name by remember { mutableStateOf("") }
     var isError by remember { mutableStateOf(false) }
 
@@ -37,10 +37,10 @@ fun CreatePlaylistTab(state: KagaminViewModel, modifier: Modifier) {
 
         Button(onClick = {
             if (isValidFileName(name)) {
-                state.currentPlaylistName = name
+                viewModel.currentPlaylistName = name
                 savePlaylist(name, emptyArray())
 
-                state.currentTab = Tabs.TRACKLIST
+                viewModel.currentTab = Tabs.TRACKLIST
             } else
                 isError = true
         }) {

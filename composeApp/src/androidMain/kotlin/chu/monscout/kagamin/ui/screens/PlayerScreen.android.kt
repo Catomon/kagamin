@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -29,7 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import chu.monscout.kagamin.ui.theme.Colors
 import chu.monscout.kagamin.MultiFilePicker
-import chu.monscout.kagamin.createAudioTrack
+import chu.monscout.kagamin.audio.createAudioTrack
 import chu.monscout.kagamin.loadPlaylist
 import chu.monscout.kagamin.ui.components.AddButton
 import chu.monscout.kagamin.ui.AddTracksTab
@@ -37,7 +36,6 @@ import chu.monscout.kagamin.ui.components.AppName
 import chu.monscout.kagamin.ui.components.BackgroundImage
 import chu.monscout.kagamin.ui.BottomBar
 import chu.monscout.kagamin.ui.CreatePlaylistTab
-import chu.monscout.kagamin.ui.components.CurrentTrackFrame
 import chu.monscout.kagamin.ui.Playlists
 import chu.monscout.kagamin.ui.Tracklist
 import chu.monscout.kagamin.ui.components.CurrentTrackFrame2
@@ -53,23 +51,23 @@ import org.jetbrains.compose.resources.painterResource
 
 @Composable
 actual fun PlayerScreen(
-    state: KagaminViewModel,
+    viewModel: KagaminViewModel,
     navController: NavHostController,
     modifier: Modifier,
 ) {
-    val audioPlayer = state.audioPlayer
-    val playlist = state.playlist
-    val currentTrack = state.currentTrack
-    val playState = state.playState
-    val playMode = state.playMode
-    val currentPlaylistName = state.currentPlaylistName
+    val audioPlayer = viewModel.audioPlayer
+    val playlist = viewModel.playlist
+    val currentTrack = viewModel.currentTrack
+    val playState = viewModel.playState
+    val playMode = viewModel.playMode
+    val currentPlaylistName = viewModel.currentPlaylistName
     val showFilePicker = remember { mutableStateOf(false) }
 
-    MultiFilePicker(showFilePicker, state.audioPlayer, state.currentPlaylistName)
+    MultiFilePicker(showFilePicker, viewModel.audioPlayer, viewModel.currentPlaylistName)
 
     LaunchedEffect(currentPlaylistName) {
         CoroutineScope(Dispatchers.Default).launch {
-            state.isLoadingPlaylistFile = true
+            viewModel.isLoadingPlaylistFile = true
             try {
                 val trackUris = loadPlaylist(currentPlaylistName)?.tracks
                 if (trackUris != null) {
@@ -81,11 +79,11 @@ actual fun PlayerScreen(
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-            state.isLoadingPlaylistFile = false
+            viewModel.isLoadingPlaylistFile = false
         }
     }
 
-    Box(modifier.background(color = Colors.background, shape = RoundedCornerShape(16.dp))) {
+    Box(modifier.background(color = Colors.behindBackground, shape = RoundedCornerShape(16.dp))) {
         BackgroundImage()
 
         Column(Modifier.fillMaxSize()) {
@@ -97,7 +95,7 @@ actual fun PlayerScreen(
                     .fillMaxWidth()
             ) {
                 AppName(Modifier
-                    .background(color = Colors.barsTransparent)
+                    .background(color = Colors.backgroundTransparent)
                     .padding(horizontal = 12.dp)
                     .padding(top = 8.dp)
                     .height(50.dp)
@@ -112,7 +110,7 @@ actual fun PlayerScreen(
                         .fillMaxWidth()
                         .weight(0.99f)
                 ) {
-                    AnimatedContent(targetState = state.currentTab, transitionSpec = {
+                    AnimatedContent(targetState = viewModel.currentTab, transitionSpec = {
                         slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
                     }) {
                         when (it) {
@@ -121,13 +119,13 @@ actual fun PlayerScreen(
                                     currentTrack,
                                     audioPlayer,
                                     Modifier
-                                        .fillMaxSize().background(color = Colors.barsTransparent).padding(horizontal = 48.dp)
+                                        .fillMaxSize().background(color = Colors.backgroundTransparent).padding(horizontal = 48.dp)
                                 )
                             }
 
                             Tabs.PLAYLISTS -> {
                                 Playlists(
-                                    state,
+                                    viewModel,
                                     Modifier
                                         .align(Alignment.Center)
                                         .fillMaxSize()
@@ -135,7 +133,7 @@ actual fun PlayerScreen(
                             }
 
                             Tabs.TRACKLIST -> {
-                                if (state.playlist.isEmpty()) {
+                                if (viewModel.playlist.isEmpty()) {
                                     Box(
                                         Modifier
                                             .fillMaxSize()
@@ -145,13 +143,13 @@ actual fun PlayerScreen(
                                         Text(
                                             "Drop files or folders here",
                                             textAlign = TextAlign.Center,
-                                            color = Colors.text2
+                                            color = Colors.textSecondary
                                         )
                                     }
                                 } else {
                                     Tracklist(
-                                        state,
-                                        state.playlist,
+                                        viewModel,
+                                        viewModel.playlist,
                                         Modifier
                                             .align(Alignment.Center)
                                             .fillMaxSize()
@@ -163,7 +161,7 @@ actual fun PlayerScreen(
 
                             Tabs.ADD_TRACKS -> {
                                 AddTracksTab(
-                                    state, Modifier
+                                    viewModel, Modifier
                                         .fillMaxHeight()
                                         .align(Alignment.Center)
                                 )
@@ -171,7 +169,7 @@ actual fun PlayerScreen(
 
                             Tabs.CREATE_PLAYLIST -> {
                                 CreatePlaylistTab(
-                                    state, Modifier
+                                    viewModel, Modifier
                                         .fillMaxHeight()
                                         .fillMaxWidth()
                                         .align(Alignment.Center)
@@ -180,16 +178,16 @@ actual fun PlayerScreen(
                         }
                     }
 
-                    if (state.currentTab != Tabs.PLAYBACK)
+                    if (viewModel.currentTab != Tabs.PLAYBACK)
                         AddButton(
                             painterResource(
-                                if (state.currentTab == Tabs.ADD_TRACKS || state.currentTab == Tabs.CREATE_PLAYLIST) Res.drawable.arrow_left
+                                if (viewModel.currentTab == Tabs.ADD_TRACKS || viewModel.currentTab == Tabs.CREATE_PLAYLIST) Res.drawable.arrow_left
                                 else Res.drawable.add
                             ),
                             onClick = {
-                                when (state.currentTab) {
+                                when (viewModel.currentTab) {
                                     Tabs.PLAYLISTS -> {
-                                        state.currentTab = Tabs.CREATE_PLAYLIST
+                                        viewModel.currentTab = Tabs.CREATE_PLAYLIST
                                     }
 
                                     Tabs.TRACKLIST, Tabs.PLAYBACK -> {
@@ -197,17 +195,17 @@ actual fun PlayerScreen(
                                     }
 
                                     else -> {
-                                        state.currentTab =
-                                            if (state.currentTab == Tabs.ADD_TRACKS) Tabs.TRACKLIST else Tabs.PLAYLISTS
+                                        viewModel.currentTab =
+                                            if (viewModel.currentTab == Tabs.ADD_TRACKS) Tabs.TRACKLIST else Tabs.PLAYLISTS
                                     }
                                 }
 
-                            }, modifier = Modifier.align(Alignment.BottomEnd), if (state.currentTab == Tabs.ADD_TRACKS || state.currentTab == Tabs.CREATE_PLAYLIST) Color.White else Colors.theme.smallButtonIcon
+                            }, modifier = Modifier.align(Alignment.BottomEnd), if (viewModel.currentTab == Tabs.ADD_TRACKS || viewModel.currentTab == Tabs.CREATE_PLAYLIST) Color.White else Colors.theme.buttonIconSmall
                         )
                 }
             }
 
-            BottomBar(state, navController)
+            BottomBar(viewModel, navController)
         }
     }
 }

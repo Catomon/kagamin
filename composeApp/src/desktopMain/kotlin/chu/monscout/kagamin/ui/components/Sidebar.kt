@@ -39,19 +39,19 @@ fun MinimizeButton(modifier: Modifier) {
             painterResource(Res.drawable.minimize_window),
             "Minimize",
             modifier = Modifier.size(32.dp),
-            colorFilter = ColorFilter.tint(Colors.theme.smallButtonIcon)
+            colorFilter = ColorFilter.tint(Colors.theme.buttonIconSmall)
         )
     }
 }
 
 @Composable
 fun Sidebar(
-    state: KagaminViewModel, navController: NavHostController, modifier: Modifier = Modifier
+    viewModel: KagaminViewModel, navController: NavHostController, modifier: Modifier = Modifier
 ) {
     val layoutManager = LocalLayoutManager.current
 
     Column(
-        modifier.fillMaxHeight().width(32.dp).background(color = Colors.barsTransparent),
+        modifier.fillMaxHeight().width(32.dp).background(color = Colors.backgroundTransparent),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -65,53 +65,53 @@ fun Sidebar(
             if (layoutManager.currentLayout.value != LayoutManager.Layout.Default) {
                 PlaybackTabButton(
                     {
-                        if (state.currentTab != Tabs.PLAYBACK) {
-                            state.currentTab = Tabs.PLAYBACK
+                        if (viewModel.currentTab != Tabs.PLAYBACK) {
+                            viewModel.currentTab = Tabs.PLAYBACK
                         }
                     },
-                    color = if (state.currentTab == Tabs.PLAYBACK) Colors.theme.selectedButton else Colors.theme.smallButtonIcon,
+                    color = if (viewModel.currentTab == Tabs.PLAYBACK) Colors.theme.buttonIconSmallSelected else Colors.theme.buttonIconSmall,
                     Modifier.weight(0.333f)
                 )
             }
 
             TracklistTabButton(
                 {
-                    if (state.currentTab != Tabs.TRACKLIST) {
-                        state.currentTab = Tabs.TRACKLIST
+                    if (viewModel.currentTab != Tabs.TRACKLIST) {
+                        viewModel.currentTab = Tabs.TRACKLIST
                     }
                 },
-                color = if (state.currentTab == Tabs.TRACKLIST) Colors.theme.selectedButton else Colors.theme.smallButtonIcon,
+                color = if (viewModel.currentTab == Tabs.TRACKLIST) Colors.theme.buttonIconSmallSelected else Colors.theme.buttonIconSmall,
                 Modifier.weight(0.333f)
             )
 
             PlaylistsTabButton(
                 {
-                    if (state.currentTab != Tabs.PLAYLISTS) {
-                        state.currentTab = Tabs.PLAYLISTS
+                    if (viewModel.currentTab != Tabs.PLAYLISTS) {
+                        viewModel.currentTab = Tabs.PLAYLISTS
                     }
                 },
-                color = if (state.currentTab == Tabs.PLAYLISTS) Colors.theme.selectedButton else Colors.theme.smallButtonIcon,
+                color = if (viewModel.currentTab == Tabs.PLAYLISTS) Colors.theme.buttonIconSmallSelected else Colors.theme.buttonIconSmall,
                 Modifier.weight(0.333f)
             )
 
             AddButton(onClick = {
-                when (state.currentTab) {
+                when (viewModel.currentTab) {
                     Tabs.PLAYLISTS -> {
-                        state.currentTab = Tabs.CREATE_PLAYLIST
+                        viewModel.currentTab = Tabs.CREATE_PLAYLIST
                     }
 
                     Tabs.TRACKLIST, Tabs.PLAYBACK -> {
-                        state.currentTab = Tabs.ADD_TRACKS
+                        viewModel.currentTab = Tabs.ADD_TRACKS
                     }
 
                     else -> {
-                        state.currentTab =
-                            if (state.currentTab == Tabs.ADD_TRACKS) Tabs.TRACKLIST else Tabs.PLAYLISTS
+                        viewModel.currentTab =
+                            if (viewModel.currentTab == Tabs.ADD_TRACKS) Tabs.TRACKLIST else Tabs.PLAYLISTS
                     }
                 }
             },
                 modifier = Modifier.weight(0.333f),
-                color = if (state.currentTab == Tabs.ADD_TRACKS || state.currentTab == Tabs.CREATE_PLAYLIST) Colors.theme.selectedButton else Colors.theme.smallButtonIcon
+                color = if (viewModel.currentTab == Tabs.ADD_TRACKS || viewModel.currentTab == Tabs.CREATE_PLAYLIST) Colors.theme.buttonIconSmallSelected else Colors.theme.buttonIconSmall
             )
         }
 
@@ -142,7 +142,7 @@ private fun SwapLayoutButton(layoutManager: LayoutManager) {
             painterResource(Res.drawable.drag),
             "drag window",
             modifier = Modifier.size(20.dp),
-            colorFilter = ColorFilter.tint(Colors.theme.smallButtonIcon)
+            colorFilter = ColorFilter.tint(Colors.theme.buttonIconSmall)
         )
     }
 }
@@ -156,7 +156,7 @@ private fun MenuButton(navController: NavHostController, modifier: Modifier) {
             painterResource(Res.drawable.menu),
             "Menu",
             modifier = Modifier.size(32.dp),
-            colorFilter = ColorFilter.tint(Colors.theme.smallButtonIcon)
+            colorFilter = ColorFilter.tint(Colors.theme.buttonIconSmall)
         )
     }
 }

@@ -26,7 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import chu.monscout.kagamin.ui.theme.Colors
-import chu.monscout.kagamin.createAudioTrack
+import chu.monscout.kagamin.audio.createAudioTrack
 import chu.monscout.kagamin.loadPlaylist
 import chu.monscout.kagamin.ui.AddTracksTab
 import chu.monscout.kagamin.ui.components.AppName
@@ -73,7 +73,7 @@ fun CompactPlayerScreen(
         }
     }
 
-    Box(modifier.background(color = Colors.background, shape = RoundedCornerShape(16.dp))) {
+    Box(modifier.background(color = Colors.behindBackground, shape = RoundedCornerShape(16.dp))) {
         TrackThumbnail(
             currentTrack,
             audioPlayer,
@@ -94,7 +94,7 @@ fun CompactPlayerScreen(
             ) {
                 Box(
                     contentAlignment = Alignment.Center,
-                    modifier = Modifier.fillMaxWidth().background(color = Colors.barsTransparent)
+                    modifier = Modifier.fillMaxWidth().background(color = Colors.backgroundTransparent)
                 ) {
                     AppName(Modifier
                         .height(25.dp).graphicsLayer(translationY = 2f)
@@ -113,7 +113,7 @@ fun CompactPlayerScreen(
                                     currentTrack,
                                     audioPlayer,
                                     Modifier.width(160.dp).fillMaxHeight()
-                                        .background(color = Colors.barsTransparent)
+                                        .background(color = Colors.backgroundTransparent)
                                 )
                             }
 
@@ -135,7 +135,7 @@ fun CompactPlayerScreen(
                                         Text(
                                             "Drop files or folders here",
                                             textAlign = TextAlign.Center,
-                                            color = Colors.text2
+                                            color = Colors.textSecondary
                                         )
                                     }
                                 } else {

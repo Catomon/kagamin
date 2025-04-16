@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -25,31 +26,35 @@ import kotlinx.coroutines.launch
 import java.io.File
 
 @Composable
-fun Tracklist(state: KagaminViewModel, tracks: List<AudioTrack>, modifier: Modifier = Modifier) {
+fun Tracklist(viewModel: KagaminViewModel, tracks: List<AudioTrack>, modifier: Modifier = Modifier) {
     val coroutineScope = rememberCoroutineScope()
     val tracklistManager = remember { TracklistManager(coroutineScope) }
-    val tracksIndex =
+    val index =
         remember(tracks) { tracks.mapIndexed { i, track -> (track.uri to i) }.toMap() }
-    val currentTrack = state.currentTrack
+    val currentTrack = viewModel.currentTrack
 
     val listState = rememberLazyListState()
+
+    LaunchedEffect(Unit) {
+        listState.scrollToItem(index[currentTrack?.uri] ?: 0)
+    }
 
     Column(modifier) {
         if (currentTrack != null) {
             TrackItem(
                 -1,
-                state.currentTrack!!,
+                viewModel.currentTrack!!,
                 tracklistManager,
-                state = state,
+                viewModel = viewModel,
                 onClick = onClick@{
-                    val curTrackIndex = tracksIndex[currentTrack.uri] ?: return@onClick
+                    val curTrackIndex = index[currentTrack.uri] ?: return@onClick
                     coroutineScope.launch {
                         listState.animateScrollToItem(curTrackIndex)
                     }
                 }
             )
         } else {
-            Box(modifier = Modifier.background(Colors.barsTransparent).height(32.dp).fillMaxWidth())
+            Box(modifier = Modifier.background(Colors.backgroundTransparent).height(32.dp).fillMaxWidth())
         }
 
         LazyColumn(Modifier.fillMaxWidth(), state = listState) {
@@ -61,7 +66,7 @@ fun Tracklist(state: KagaminViewModel, tracks: List<AudioTrack>, modifier: Modif
                     index,
                     track,
                     tracklistManager,
-                    state = state,
+                    viewModel = viewModel,
                     onClick = onClick@{
                         if (tracklistManager.isAnySelected) {
                             if (tracklistManager.isSelected(index, track))
@@ -69,16 +74,16 @@ fun Tracklist(state: KagaminViewModel, tracks: List<AudioTrack>, modifier: Modif
                             else tracklistManager.select(index, track)
                             return@onClick
                         }
-                        if (state.isLoadingSong != null) return@onClick
+                        if (viewModel.isLoadingSong != null) return@onClick
 
                         if (track.uri.startsWith("http")) {
-                             state.videoUrl = track.uri
+                             viewModel.videoUrl = track.uri
                         } else {
-                            state.videoUrl = ""
-                            state.viewModelScope.launch {
-                                state.isLoadingSong = track
-                                state.audioPlayer.play(track) //todo state.playSong()
-                                state.isLoadingSong = null
+                            viewModel.videoUrl = ""
+                            viewModel.viewModelScope.launch {
+                                viewModel.isLoadingSong = track
+                                viewModel.audioPlayer.play(track)
+                                viewModel.isLoadingSong = null
                             }
                         }
                     },
@@ -140,36 +145,36 @@ class TracklistManager(
     }
 
     fun contextMenuRemovePressed(
-        state: KagaminViewModel,
+        viewModel: KagaminViewModel,
         track: AudioTrack
     ) {
         coroutineScope.launch {
             if (isAnySelected) {
                 selected.values.forEach { track ->
-                    state.isLoadingSong = track
-                    state.audioPlayer.removeFromPlaylist(track)
-                    state.audioPlayer.playlist.value =
-                        state.audioPlayer.playlist.value
+                    viewModel.isLoadingSong = track
+                    viewModel.audioPlayer.removeFromPlaylist(track)
+                    viewModel.audioPlayer.playlist.value =
+                        viewModel.audioPlayer.playlist.value
                     savePlaylist(
-                        state.currentPlaylistName,
-                        state.audioPlayer.playlist.value.toTypedArray()
+                        viewModel.currentPlaylistName,
+                        viewModel.audioPlayer.playlist.value.toTypedArray()
                     )
                     //listState.scrollToItem(i, -60)
-                    state.isLoadingSong = null
+                    viewModel.isLoadingSong = null
                 }
 
                 deselectAll()
             } else {
-                state.isLoadingSong = track
-                state.audioPlayer.removeFromPlaylist(track)
-                state.audioPlayer.playlist.value =
-                    state.audioPlayer.playlist.value
+                viewModel.isLoadingSong = track
+                viewModel.audioPlayer.removeFromPlaylist(track)
+                viewModel.audioPlayer.playlist.value =
+                    viewModel.audioPlayer.playlist.value
                 savePlaylist(
-                    state.currentPlaylistName,
-                    state.audioPlayer.playlist.value.toTypedArray()
+                    viewModel.currentPlaylistName,
+                    viewModel.audioPlayer.playlist.value.toTypedArray()
                 )
                 //listState.scrollToItem(i, -60)
-                state.isLoadingSong = null
+                viewModel.isLoadingSong = null
             }
         }
     }
@@ -180,7 +185,7 @@ expect fun TrackItem(
     index: Int,
     track: AudioTrack,
     tracklistManager: TracklistManager,
-    state: KagaminViewModel,
+    viewModel: KagaminViewModel,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 )

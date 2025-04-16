@@ -17,14 +17,14 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val context = this
+        playerContext = { context }
+
         startKoin {
             modules(appModule)
         }
 
         setContent {
-            val context = this
-            playerContext = { context }
-
             KagaminTheme {
                 App()
             }

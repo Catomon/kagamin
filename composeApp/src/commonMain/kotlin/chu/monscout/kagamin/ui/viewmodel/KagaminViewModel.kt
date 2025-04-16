@@ -6,8 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import chu.monscout.kagamin.audio.AudioPlayer
 import chu.monscout.kagamin.audio.AudioTrack
-import chu.monscout.kagamin.createAudioPlayer
-import chu.monscout.kagamin.createAudioTrack
+import chu.monscout.kagamin.audio.createAudioPlayer
+import chu.monscout.kagamin.audio.createAudioTrack
 import chu.monscout.kagamin.loadPlaylist
 import chu.monscout.kagamin.loadSettings
 import chu.monscout.kagamin.ui.util.Tabs
@@ -18,7 +18,9 @@ class KagaminViewModel : ViewModel() {
     val currentTrack by audioPlayer.currentTrack
     val playState by audioPlayer.playState
     val playMode by audioPlayer.playMode
+    
     var currentPlaylistName by mutableStateOf("default")
+
     var isLoadingPlaylistFile by mutableStateOf(false)
     var isLoadingSong by mutableStateOf<AudioTrack?>(null)
     var currentTab by mutableStateOf(Tabs.TRACKLIST)
@@ -26,8 +28,10 @@ class KagaminViewModel : ViewModel() {
 
     var settings by mutableStateOf(loadSettings())
 
-    var height by mutableStateOf(0)
-    var width by mutableStateOf(0)
+    init {
+        val lastPlaylistName = settings.lastPlaylistName.ifBlank { "default" }
+        currentPlaylistName = lastPlaylistName
+    }
 
     fun onPlayPause() {
         when (audioPlayer.playState.value) {
@@ -35,6 +39,10 @@ class KagaminViewModel : ViewModel() {
             AudioPlayer.PlayState.PAUSED -> audioPlayer.resume()
             AudioPlayer.PlayState.IDLE -> audioPlayer.resume()
         }
+    }
+
+    fun playTrack(track: AudioTrack) {
+        TODO()
     }
 
     fun reloadPlaylist() {
@@ -46,6 +54,8 @@ class KagaminViewModel : ViewModel() {
                 trackUris.forEach {
                     audioPlayer.addToPlaylist(createAudioTrack(it.uri, it.name))
                 }
+            } else {
+                currentPlaylistName = "default"
             }
         } catch (e: Exception) {
             e.printStackTrace()

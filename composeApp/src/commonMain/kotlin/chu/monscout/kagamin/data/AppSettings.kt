@@ -4,15 +4,16 @@ import chu.monscout.kagamin.ui.theme.Colors
 import kotlinx.serialization.Serializable
 
 @Serializable
-class AppSettings(
-    var showTrackProgressBar: Boolean = true,
-    var discordIntegration: Boolean = true,
-    var japaneseTitle: Boolean = false,
-    var theme: String = Colors.themes.first().name,
-    var alwaysOnTop: Boolean = false,
-    var showSingerIcons: Boolean = false,
-    var volume: Float = 0.3f,
-    var random: Boolean = false,
-    var crossfade: Boolean = true,
-    var repeat: Boolean = false,
+data class AppSettings(
+    val showTrackProgressBar: Boolean = true,
+    val discordIntegration: Boolean = true,
+    val japaneseTitle: Boolean = false,
+    val theme: String = Colors.themes.first().name,
+    val alwaysOnTop: Boolean = false,
+    val showSingerIcons: Boolean = false,
+    val volume: Float = 0.3f,
+    val random: Boolean = false,
+    val crossfade: Boolean = true,
+    val repeat: Boolean = false,
+    val lastPlaylistName: String = "default",
 )

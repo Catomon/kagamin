@@ -1,6 +1,7 @@
 package chu.monscout.kagamin.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,9 +13,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,10 +29,20 @@ import chu.monscout.kagamin.loadPlaylists
 import chu.monscout.kagamin.removePlaylist
 import chu.monscout.kagamin.savePlaylist
 import chu.monscout.kagamin.ui.viewmodel.KagaminViewModel
+import kotlinx.coroutines.launch
 
 @Composable
-fun Playlists(state: KagaminViewModel, modifier: Modifier = Modifier) {
+fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
     var playlists by remember { mutableStateOf(loadPlaylists()) }
+    val index =
+        remember(playlists) { playlists.mapIndexed { i, pl -> (pl.first to i) }.toMap() }
+
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        listState.scrollToItem(index[viewModel.currentPlaylistName] ?: 0)
+    }
 
     if (playlists.isEmpty()) {
         Box(
@@ -40,24 +53,31 @@ fun Playlists(state: KagaminViewModel, modifier: Modifier = Modifier) {
             Text(
                 "No playlists.",
                 textAlign = TextAlign.Center,
-                color = Colors.text2
+                color = Colors.textSecondary
             )
         }
     } else {
         Column(modifier) {
             Box(
-                modifier = Modifier.background(Colors.barsTransparent).height(32.dp).fillMaxWidth()
-                    .padding(horizontal = 4.dp), contentAlignment = Alignment.CenterStart
+                modifier = Modifier.background(Colors.backgroundTransparent).height(32.dp)
+                    .fillMaxWidth()
+                    .clickable {
+                        val curTrackIndex =
+                            index[viewModel.currentPlaylistName] ?: return@clickable
+                        coroutineScope.launch {
+                            listState.animateScrollToItem(curTrackIndex)
+                        }
+                    }.padding(horizontal = 4.dp), contentAlignment = Alignment.CenterStart
             ) {
                 Text(
-                    state.currentPlaylistName,
+                    viewModel.currentPlaylistName,
                     fontSize = 10.sp,
-                    color = Colors.theme.playerButtonIcon
+                    color = Colors.theme.buttonIcon
                 )
             }
 
             LazyColumn(
-                state = rememberLazyListState(),
+                state = listState,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 items(playlists.size, key = {
@@ -66,13 +86,13 @@ fun Playlists(state: KagaminViewModel, modifier: Modifier = Modifier) {
                     val playlist = playlists[i]
                     PlaylistItem(
                         playlist,
-                        state,
+                        viewModel,
                         playlists,
                         i,
                         remove = {
                             removePlaylist(playlist.first)
-                            if (state.currentPlaylistName == playlist.first)
-                                state.currentPlaylistName = "default"
+                            if (viewModel.currentPlaylistName == playlist.first)
+                                viewModel.currentPlaylistName = "default"
                             playlists = loadPlaylists()
                         },
                         clear = {
@@ -81,8 +101,8 @@ fun Playlists(state: KagaminViewModel, modifier: Modifier = Modifier) {
                                 arrayOf()
                             )
 
-                            if (state.currentPlaylistName == playlist.first)
-                                state.audioPlayer.playlist.value = mutableListOf()
+                            if (viewModel.currentPlaylistName == playlist.first)
+                                viewModel.audioPlayer.playlist.value = mutableListOf()
 
                             playlists = loadPlaylists()
                         },
@@ -91,7 +111,7 @@ fun Playlists(state: KagaminViewModel, modifier: Modifier = Modifier) {
 
                             playlists = loadPlaylists()
 
-                            state.reloadPlaylist()
+                            viewModel.reloadPlaylist()
                         }
                     )
                 }
@@ -105,7 +125,7 @@ fun Playlists(state: KagaminViewModel, modifier: Modifier = Modifier) {
 @Composable
 expect fun PlaylistItem(
     playlist: Pair<String, PlaylistData>,
-    state: KagaminViewModel,
+    viewModel: KagaminViewModel,
     playlists: List<Pair<String, PlaylistData>>,
     i: Int,
     remove: () -> Unit,

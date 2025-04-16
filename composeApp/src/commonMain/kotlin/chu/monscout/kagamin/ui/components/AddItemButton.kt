@@ -15,7 +15,7 @@ import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun AddItemButton(onClick: () -> Unit, modifier: Modifier) {
-    IconButton(onClick = onClick, modifier.background(Colors.bars, CircleShape).size(32.dp)) {
+    IconButton(onClick = onClick, modifier.background(Colors.background, CircleShape).size(32.dp)) {
         Icon(painterResource(Res.drawable.add), "Add button", modifier = Modifier.size(16.dp))
     }
 }

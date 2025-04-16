@@ -14,16 +14,16 @@ import chu.monscout.kagamin.ui.theme.Colors
 fun VolumeSlider(volume: Float, volumeChanged: (Float) -> Unit, modifier: Modifier = Modifier) {
     val interactionSource = MutableInteractionSource()
     val colors = SliderDefaults.colors(
-        Colors.theme.playerButtonIcon,
-        Colors.theme.playerButtonIconTransparent,
-        Colors.theme.playerButtonIcon,
-        Colors.theme.playerButtonIconTransparent,
-        Colors.theme.playerButtonIconTransparent,
-        Colors.theme.playerButtonIconTransparent,
-        Colors.theme.playerButtonIconTransparent,
-        Colors.theme.playerButtonIconTransparent,
-        Colors.theme.playerButtonIconTransparent,
-        Colors.theme.playerButtonIconTransparent
+        Colors.theme.buttonIcon,
+        Colors.theme.buttonIconTransparent,
+        Colors.theme.buttonIcon,
+        Colors.theme.buttonIconTransparent,
+        Colors.theme.buttonIconTransparent,
+        Colors.theme.buttonIconTransparent,
+        Colors.theme.buttonIconTransparent,
+        Colors.theme.buttonIconTransparent,
+        Colors.theme.buttonIconTransparent,
+        Colors.theme.buttonIconTransparent
     )
 
     val shadowColors = SliderDefaults.colors(

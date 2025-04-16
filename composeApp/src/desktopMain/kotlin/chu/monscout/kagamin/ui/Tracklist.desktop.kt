@@ -43,7 +43,7 @@ actual fun TrackItem(
     index: Int,
     track: AudioTrack,
     tracklistManager: TracklistManager,
-    state: KagaminViewModel,
+    viewModel: KagaminViewModel,
     onClick: () -> Unit,
     modifier: Modifier
 ) {
@@ -51,7 +51,7 @@ actual fun TrackItem(
     val confirmationWindow = LocalConfirmWindow.current
     val snackbar = LocalSnackbarHostState.current
     val isHeader = index == -1
-    val backColor = if (isHeader) Colors.barsTransparent else
+    val backColor = if (isHeader) Colors.backgroundTransparent else
         if (index % 2 == 0) Colors.theme.listItemA else Colors.theme.listItemB
     ContextMenuArea(items = {
         listOf(
@@ -69,21 +69,21 @@ actual fun TrackItem(
                 }
             },
             ContextMenuItem(if (tracklistManager.isAnySelected) "Remove selected" else "Remove") {
-                tracklistManager.contextMenuRemovePressed(state, track)
+                tracklistManager.contextMenuRemovePressed(viewModel, track)
             },
             ContextMenuItem(if (tracklistManager.selected.size <= 1) "Delete file" else "Delete files") {
                 if (tracklistManager.selected.size < 1) {
                     confirmationWindow.value = ConfirmWindowState(
                         true,
                         onConfirm = {
-                            if (state.currentTrack == track)
-                                state.audioPlayer.stop()
+                            if (viewModel.currentTrack == track)
+                                viewModel.audioPlayer.stop()
 
-                            state.viewModelScope.launch {
+                            viewModel.viewModelScope.launch {
                                 tracklistManager.deleteFile(track)
                                 snackbar.showSnackbar("Deleting the file..")
                             }
-                            tracklistManager.contextMenuRemovePressed(state, track)
+                            tracklistManager.contextMenuRemovePressed(viewModel, track)
                         },
                         onCancel = {
 
@@ -97,12 +97,12 @@ actual fun TrackItem(
                         true,
                         onConfirm = {
                             if (tracklistManager.selected.any { it.value == track })
-                                state.audioPlayer.stop()
+                                viewModel.audioPlayer.stop()
 
                             tracklistManager.deleteSelectedFiles()
-                            tracklistManager.contextMenuRemovePressed(state, track)
+                            tracklistManager.contextMenuRemovePressed(viewModel, track)
 
-                            state.viewModelScope.launch {
+                            viewModel.viewModelScope.launch {
                                 snackbar.showSnackbar("Deleting files..")
                             }
                         },
@@ -122,19 +122,19 @@ actual fun TrackItem(
             modifier = Modifier.height(32.dp).fillMaxWidth(),
             horizontalArrangement = Arrangement.Start
         ) {
-            if (index > -1 && state.currentTrack == track) {
+            if (index > -1 && viewModel.currentTrack == track) {
                 Box(
                     Modifier.height(32.dp)//.clip(
-                 //           RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp)
-                        .background(Colors.barsTransparent).clickable {
-                        state.onPlayPause()
-                    }, contentAlignment = Alignment.Center
+                        //           RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp)
+                        .background(Colors.backgroundTransparent).clickable {
+                            viewModel.onPlayPause()
+                        }, contentAlignment = Alignment.Center
                 ) {
                     Image(
-                        painterResource(if (state.playState == AudioPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
+                        painterResource(if (viewModel.playState == AudioPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
                         "track playback state icon",
                         modifier = Modifier.size(16.dp),
-                        colorFilter = ColorFilter.tint(Colors.surface)
+                        colorFilter = ColorFilter.tint(Colors.theme.buttonIcon)
                     )
                 }
             }
@@ -151,7 +151,7 @@ actual fun TrackItem(
                 Text(
                     track.name,
                     fontSize = 10.sp,
-                    color = if (isHeader) Colors.theme.playerButtonIcon else Colors.text,
+                    color = if (isHeader) Colors.theme.buttonIcon else Colors.text,
                     maxLines = 1,
                     modifier = Modifier.align(Alignment.CenterStart),
                     overflow = TextOverflow.Ellipsis,

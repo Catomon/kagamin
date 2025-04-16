@@ -18,7 +18,7 @@ fun AddButton(
     painterResource: Painter = painterResource(Res.drawable.add),
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    color: Color = Colors.theme.smallButtonIcon
+    color: Color = Colors.theme.buttonIconSmall
 ) {
     TextButton(
         onClick = onClick,

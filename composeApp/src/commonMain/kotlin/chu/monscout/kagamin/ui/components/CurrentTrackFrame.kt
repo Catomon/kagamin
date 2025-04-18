@@ -52,7 +52,9 @@ import chu.monscout.kagamin.ui.theme.Colors
 import chu.monscout.kagamin.ui.util.getCropParameters
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.def_thumb
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.painterResource
 
 expect fun getThumbnail(audioTrack: AudioTrack): ImageBitmap?
@@ -199,12 +201,14 @@ fun TrackThumbnail(
     LaunchedEffect(currentTrack) {
         loadingThumb = true
         image = if (currentTrack != null) {
-            getThumbnail(currentTrack)?.let { thumbnail ->
-                val crop = getCropParameters(thumbnail)
-                size = crop.second
-                offset = crop.first
+            withContext(Dispatchers.IO) {
+                getThumbnail(currentTrack)?.let { thumbnail ->
+                    val crop = getCropParameters(thumbnail)
+                    size = crop.second
+                    offset = crop.first
 
-                thumbnail
+                    thumbnail
+                }
             }
         } else {
             null

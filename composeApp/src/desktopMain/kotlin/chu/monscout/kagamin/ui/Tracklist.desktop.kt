@@ -1,20 +1,36 @@
 package chu.monscout.kagamin.ui
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuItem
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -37,6 +53,105 @@ import kagamin.composeapp.generated.resources.play
 import kagamin.composeapp.generated.resources.selected
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
+
+@Composable
+fun Tracklist(
+    viewModel: KagaminViewModel,
+    tracks: List<AudioTrack>,
+    modifier: Modifier = Modifier
+) {
+    val coroutineScope = rememberCoroutineScope()
+    val tracklistManager = remember { TracklistManager(coroutineScope) }
+    val index =
+        remember(tracks) { tracks.mapIndexed { i, track -> (track.uri to i) }.toMap() }
+    val currentTrack = viewModel.currentTrack
+
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(Unit) {
+        listState.scrollToItem(index[currentTrack?.uri] ?: 0)
+    }
+
+    Column(modifier) {
+        if (currentTrack != null) {
+            TrackItem(
+                -1,
+                viewModel.currentTrack!!,
+                tracklistManager,
+                viewModel = viewModel,
+                onClick = onClick@{
+                    val curTrackIndex = index[currentTrack.uri] ?: return@onClick
+                    coroutineScope.launch {
+                        listState.animateScrollToItem(curTrackIndex)
+                    }
+                }
+            )
+        } else {
+            Box(
+                modifier = Modifier.background(Colors.backgroundTransparent).height(32.dp)
+                    .fillMaxWidth()
+            )
+        }
+
+        val interactionSource = remember { MutableInteractionSource() }
+        val isHovered by interactionSource.collectIsHoveredAsState()
+
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxSize().weight(2f).hoverable(interactionSource)
+        ) {
+            Column(Modifier.fillMaxSize()) {
+                LazyColumn(Modifier.fillMaxWidth(), state = listState) {
+                    items(tracks.size, key = {
+                        tracks[it].uri
+                    }) { index ->
+                        val track = tracks[index]
+                        TrackItem(
+                            index,
+                            track,
+                            tracklistManager,
+                            viewModel = viewModel,
+                            onClick = onClick@{
+                                if (tracklistManager.isAnySelected) {
+                                    if (tracklistManager.isSelected(index, track))
+                                        tracklistManager.deselect(index, track)
+                                    else tracklistManager.select(index, track)
+                                    return@onClick
+                                }
+                                if (viewModel.isLoadingSong != null) return@onClick
+
+                                if (track.uri.startsWith("http")) {
+                                    viewModel.videoUrl = track.uri
+                                } else {
+                                    viewModel.videoUrl = ""
+                                    viewModel.viewModelScope.launch {
+                                        viewModel.isLoadingSong = track
+                                        viewModel.audioPlayer.play(track)
+                                        viewModel.isLoadingSong = null
+                                    }
+                                }
+                            },
+                            modifier = Modifier
+                        )
+                    }
+                }
+
+                Spacer(Modifier.fillMaxSize().weight(2f).background(Colors.theme.listItemB))
+            }
+
+            androidx.compose.animation.AnimatedVisibility(
+                isHovered, modifier = Modifier.align(Alignment.CenterEnd)
+                    .fillMaxHeight()
+            ) {
+                VerticalScrollbar(
+                    modifier = Modifier
+                        .fillMaxHeight(),
+                    adapter = rememberScrollbarAdapter(listState)
+                )
+            }
+        }
+    }
+}
 
 @Composable
 actual fun TrackItem(

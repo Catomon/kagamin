@@ -76,7 +76,7 @@ fun CurrentTrackFrame2(
                 progress,
                 modifier = Modifier
                     .padding(8.dp)
-                    .size(300.dp)
+                    .size(200.dp)
             )
 
             PlaybackButtons(

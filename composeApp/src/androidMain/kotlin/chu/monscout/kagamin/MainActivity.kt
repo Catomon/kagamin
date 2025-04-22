@@ -20,10 +20,6 @@ class MainActivity : ComponentActivity() {
         val context = this
         playerContext = { context }
 
-        startKoin {
-            modules(appModule)
-        }
-
         setContent {
             KagaminTheme {
                 App()

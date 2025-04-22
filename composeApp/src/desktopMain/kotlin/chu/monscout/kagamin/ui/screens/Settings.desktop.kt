@@ -134,7 +134,7 @@ private fun ThemeRadioButtons(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
     ) {
-        Text("KagaminTheme:", color = Colors.text)
+        Text("Theme:", color = Colors.text)
         Row(verticalAlignment = Alignment.CenterVertically) {
             RadioButton(
                 theme == KagaminTheme.Violet.name,

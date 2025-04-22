@@ -4,8 +4,12 @@ import chu.monscout.kagamin.data.PlaylistData
 import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuItem
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -71,6 +76,9 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
             )
         }
     } else {
+        val interactionSource = remember { MutableInteractionSource() }
+        val isHovered by interactionSource.collectIsHoveredAsState()
+
         Column(modifier) {
             Box(
                 modifier = Modifier.background(Colors.backgroundTransparent).height(32.dp)
@@ -90,48 +98,66 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                 )
             }
 
-            LazyColumn(
-                state = listState,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                items(playlists.size, key = {
-                    playlists[it]
-                }) { i ->
-                    val playlist = playlists[i]
-                    PlaylistItem(
-                        playlist,
-                        viewModel,
-                        playlists,
-                        i,
-                        remove = {
-                            removePlaylist(playlist.first)
-                            if (viewModel.currentPlaylistName == playlist.first)
-                                viewModel.currentPlaylistName = "default"
-                            playlists = loadPlaylists()
-                        },
-                        clear = {
-                            savePlaylist(
-                                playlist.first,
-                                arrayOf()
+            Box(Modifier.fillMaxSize().hoverable(interactionSource)) {
+                Column {
+                    LazyColumn(
+                        state = listState,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        items(playlists.size, key = {
+                            playlists[it]
+                        }) { i ->
+                            val playlist = playlists[i]
+                            PlaylistItem(
+                                playlist,
+                                viewModel,
+                                playlists,
+                                i,
+                                remove = {
+                                    removePlaylist(playlist.first)
+                                    if (viewModel.currentPlaylistName == playlist.first)
+                                        viewModel.currentPlaylistName = "default"
+                                    playlists = loadPlaylists()
+                                },
+                                clear = {
+                                    savePlaylist(
+                                        playlist.first,
+                                        arrayOf()
+                                    )
+
+                                    if (viewModel.currentPlaylistName == playlist.first)
+                                        viewModel.audioPlayer.playlist.value = mutableListOf()
+
+                                    playlists = loadPlaylists()
+                                },
+                                shuffle = {
+                                    savePlaylist(
+                                        playlist.first,
+                                        playlist.second.tracks.toList().shuffled()
+                                    )
+
+                                    playlists = loadPlaylists()
+
+                                    viewModel.reloadPlaylist()
+                                }
                             )
-
-                            if (viewModel.currentPlaylistName == playlist.first)
-                                viewModel.audioPlayer.playlist.value = mutableListOf()
-
-                            playlists = loadPlaylists()
-                        },
-                        shuffle = {
-                            savePlaylist(playlist.first, playlist.second.tracks.toList().shuffled())
-
-                            playlists = loadPlaylists()
-
-                            viewModel.reloadPlaylist()
                         }
+                    }
+
+                    Box(Modifier.fillMaxSize().background(Colors.theme.listItemB))
+                }
+
+                androidx.compose.animation.AnimatedVisibility(
+                    isHovered, modifier = Modifier.align(Alignment.CenterEnd)
+                        .fillMaxHeight()
+                ) {
+                    VerticalScrollbar(
+                        modifier = Modifier
+                            .fillMaxHeight(),
+                        adapter = rememberScrollbarAdapter(listState)
                     )
                 }
             }
-
-            Box(Modifier.fillMaxSize().background(Colors.theme.listItemB))
         }
     }
 }

@@ -56,8 +56,9 @@ fun TrackThumbnail(
 
     var isUpdatingOffsets by remember(image) { mutableStateOf(true) }
 
-        //todo fix flickering
+    var croppedImage by remember { mutableStateOf<ImageBitmap?>(null) }
 
+    //crop black bars
     LaunchedEffect(image) {
         if (isUpdatingOffsets) {
             if (image != null) {
@@ -66,6 +67,10 @@ fun TrackThumbnail(
                 }
                 size = crop.second
                 offset = crop.first
+
+                croppedImage = image
+            } else {
+                croppedImage = null
             }
 
             isUpdatingOffsets = false
@@ -82,7 +87,6 @@ fun TrackThumbnail(
                 cornerRadius = CornerRadius(12f)
             )
         }
-//            .border(2.dp, Colors.currentYukiTheme.thinBorder, RoundedCornerShape(12.dp))
             .clip(RoundedCornerShape(12.dp))
             .let {
                 if (controlProgress) {
@@ -98,7 +102,7 @@ fun TrackThumbnail(
             }
     ) {
         AnimatedContent(image, modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp))) {
-            if (image == null || isUpdatingOffsets) {
+            if (croppedImage == null) {
                 Box(
                     Modifier.fillMaxSize()
                 ) {
@@ -114,7 +118,7 @@ fun TrackThumbnail(
                 Image(
                     remember {
                         BitmapPainter(
-                            image,
+                            croppedImage!!,
                             filterQuality = DrawScope.DefaultFilterQuality,
                             srcOffset = offset,
                             srcSize = size

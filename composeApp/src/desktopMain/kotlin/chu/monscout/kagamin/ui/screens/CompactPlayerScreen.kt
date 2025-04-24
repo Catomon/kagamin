@@ -25,17 +25,17 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import chu.monscout.kagamin.ui.theme.Colors
 import chu.monscout.kagamin.audio.createAudioTrack
 import chu.monscout.kagamin.loadPlaylist
 import chu.monscout.kagamin.ui.AddTracksTab
-import chu.monscout.kagamin.ui.components.AppName
 import chu.monscout.kagamin.ui.CreatePlaylistTab
-import chu.monscout.kagamin.ui.components.CurrentTrackFrame
 import chu.monscout.kagamin.ui.Playlists
-import chu.monscout.kagamin.ui.components.Sidebar
 import chu.monscout.kagamin.ui.Tracklist
+import chu.monscout.kagamin.ui.components.AppName
+import chu.monscout.kagamin.ui.components.CurrentTrackFrame
+import chu.monscout.kagamin.ui.components.Sidebar
 import chu.monscout.kagamin.ui.components.TrackThumbnail
+import chu.monscout.kagamin.ui.theme.Colors
 import chu.monscout.kagamin.ui.util.Tabs
 import chu.monscout.kagamin.ui.viewmodel.KagaminViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -44,20 +44,20 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun CompactPlayerScreen(
-    state: KagaminViewModel,
+    viewModel: KagaminViewModel,
     navController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
-    val audioPlayer = state.audioPlayer
-    val playlist = state.playlist
-    val currentTrack = state.currentTrack
-    val playState = state.playState
-    val playMode = state.playMode
-    val currentPlaylistName = state.currentPlaylistName
+    val audioPlayer = viewModel.audioPlayer
+    val playlist = viewModel.playlist
+    val currentTrack = viewModel.currentTrack
+    val playState = viewModel.playState
+    val playMode = viewModel.playMode
+    val currentPlaylistName = viewModel.currentPlaylistName
 
     LaunchedEffect(currentPlaylistName) {
         CoroutineScope(Dispatchers.Default).launch {
-            state.isLoadingPlaylistFile = true
+            viewModel.isLoadingPlaylistFile = true
             try {
                 val trackUris = loadPlaylist(currentPlaylistName)?.tracks
                 if (trackUris != null) {
@@ -69,16 +69,19 @@ fun CompactPlayerScreen(
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-            state.isLoadingPlaylistFile = false
+            viewModel.isLoadingPlaylistFile = false
         }
     }
 
     Box(modifier.background(color = Colors.behindBackground, shape = RoundedCornerShape(16.dp))) {
         TrackThumbnail(
-            currentTrack,
-            audioPlayer,
-            {},
-            0f,
+            image = viewModel.trackThumbnail,
+            onSetProgress = {
+                if (currentTrack != null) {
+                    audioPlayer.seek((currentTrack.duration * it).toLong())
+                }
+            },
+            progress = 0f,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
             blur = true,
@@ -94,22 +97,25 @@ fun CompactPlayerScreen(
             ) {
                 Box(
                     contentAlignment = Alignment.Center,
-                    modifier = Modifier.fillMaxWidth().background(color = Colors.backgroundTransparent)
+                    modifier = Modifier.fillMaxWidth()
+                        .background(color = Colors.backgroundTransparent)
                 ) {
-                    AppName(Modifier
-                        .height(25.dp).graphicsLayer(translationY = 2f)
-                        .clickable(onClickLabel = "Open options") {
-                            navController.navigate(SettingsDestination.toString())
-                        })
+                    AppName(
+                        Modifier
+                            .height(25.dp).graphicsLayer(translationY = 2f)
+                            .clickable(onClickLabel = "Open options") {
+                                navController.navigate(SettingsDestination.toString())
+                            })
                 }
 
                 Box(Modifier.weight(0.99f).fillMaxHeight()) {
-                    AnimatedContent(targetState = state.currentTab, transitionSpec = {
+                    AnimatedContent(targetState = viewModel.currentTab, transitionSpec = {
                         slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
                     }) {
                         when (it) {
                             Tabs.PLAYBACK -> {
                                 CurrentTrackFrame(
+                                    viewModel.trackThumbnail,
                                     currentTrack,
                                     audioPlayer,
                                     Modifier.width(160.dp).fillMaxHeight()
@@ -119,14 +125,14 @@ fun CompactPlayerScreen(
 
                             Tabs.PLAYLISTS -> {
                                 Playlists(
-                                    state,
+                                    viewModel,
                                     Modifier.align(Alignment.Center)
                                         .fillMaxHeight()//.padding(start = 4.dp, end = 4.dp)
                                 )
                             }
 
                             Tabs.TRACKLIST -> {
-                                if (state.playlist.isEmpty()) {
+                                if (viewModel.playlist.isEmpty()) {
                                     Box(
                                         Modifier.fillMaxHeight()
                                             .background(Colors.theme.listItemB),
@@ -140,8 +146,8 @@ fun CompactPlayerScreen(
                                     }
                                 } else {
                                     Tracklist(
-                                        state,
-                                        state.playlist,
+                                        viewModel,
+                                        viewModel.playlist,
                                         Modifier.align(Alignment.Center)
                                             .fillMaxHeight()//.padding(start = 16.dp, end = 16.dp)
                                     )
@@ -152,13 +158,13 @@ fun CompactPlayerScreen(
 
                             Tabs.ADD_TRACKS -> {
                                 AddTracksTab(
-                                    state, Modifier.fillMaxHeight().align(Alignment.Center)
+                                    viewModel, Modifier.fillMaxHeight().align(Alignment.Center)
                                 )
                             }
 
                             Tabs.CREATE_PLAYLIST -> {
                                 CreatePlaylistTab(
-                                    state, Modifier.fillMaxHeight().align(Alignment.Center)
+                                    viewModel, Modifier.fillMaxHeight().align(Alignment.Center)
                                 )
                             }
                         }
@@ -166,7 +172,7 @@ fun CompactPlayerScreen(
                 }
             }
 
-            Sidebar(state, navController)
+            Sidebar(viewModel, navController)
         }
     }
 }

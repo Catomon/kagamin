@@ -1,6 +1,5 @@
 package chu.monscout.kagamin.ui.screens
 
-import VideoPlayer
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
@@ -26,19 +25,19 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import chu.monscout.kagamin.ui.theme.Colors
-import chu.monscout.kagamin.audio.AudioPlayer
 import chu.monscout.kagamin.saveSettings
 import chu.monscout.kagamin.ui.AddTracksTab
 import chu.monscout.kagamin.ui.CreatePlaylistTab
 import chu.monscout.kagamin.ui.Playlists
-import chu.monscout.kagamin.ui.components.Sidebar
 import chu.monscout.kagamin.ui.Tracklist
 import chu.monscout.kagamin.ui.components.AppName
 import chu.monscout.kagamin.ui.components.CurrentTrackFrame
+import chu.monscout.kagamin.ui.components.Sidebar
 import chu.monscout.kagamin.ui.components.TrackThumbnail
+import chu.monscout.kagamin.ui.theme.Colors
 import chu.monscout.kagamin.ui.util.Tabs
 import chu.monscout.kagamin.ui.viewmodel.KagaminViewModel
+import chu.monscout.kagamin.util.echoMsg
 
 @Composable
 actual fun PlayerScreen(
@@ -52,7 +51,6 @@ actual fun PlayerScreen(
     val playState = viewModel.playState
     val playMode = viewModel.playMode
     val currentPlaylistName = viewModel.currentPlaylistName
-    val videoUrl = viewModel.videoUrl
 
     LaunchedEffect(currentPlaylistName) {
         viewModel.reloadPlaylist()
@@ -60,11 +58,17 @@ actual fun PlayerScreen(
         saveSettings(viewModel.settings.copy(lastPlaylistName = currentPlaylistName))
     }
 
+    LaunchedEffect(currentTrack) {
+        viewModel.updateThumbnail()
+    }
+
     Box(modifier.background(color = Colors.behindBackground, shape = RoundedCornerShape(16.dp))) {
         TrackThumbnail(
-            currentTrack,
-            audioPlayer,
-            {},
+            viewModel.trackThumbnail,
+            onSetProgress = {
+                if (currentTrack != null)
+                    audioPlayer.seek((currentTrack.duration * it).toLong())
+            },
             0f,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
@@ -79,25 +83,17 @@ actual fun PlayerScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxHeight().background(color = Colors.backgroundTransparent)
             ) {
-                AppName(Modifier.padding(horizontal = 12.dp).height(25.dp)
-                    .graphicsLayer(translationY = 2f)
-                    .clickable {
-                        if (navController.currentDestination?.route != SettingsDestination.toString())
-                            navController.navigate(SettingsDestination.toString())
-                    })
+                AppName(
+                    Modifier.padding(horizontal = 12.dp).height(25.dp)
+                        .graphicsLayer(translationY = 2f)
+                        .clickable {
+                            if (navController.currentDestination?.route != SettingsDestination.toString())
+                                navController.navigate(SettingsDestination.toString())
+                        })
 
-                if (videoUrl.isEmpty()) {
-                    CurrentTrackFrame(
-                        currentTrack, audioPlayer, Modifier.width(160.dp).fillMaxHeight()
-                    )
-                } else {
-                    VideoPlayer(
-                        Modifier.width(160.dp).fillMaxHeight(),
-                        videoUrl,
-                        playState == AudioPlayer.PlayState.PLAYING,
-                        false
-                    )
-                }
+                CurrentTrackFrame(viewModel.trackThumbnail,
+                    currentTrack, audioPlayer, Modifier.width(160.dp).fillMaxHeight()
+                )
             }
 
             Box(Modifier.weight(0.75f)) {
@@ -144,7 +140,10 @@ actual fun PlayerScreen(
                         }
 
                         Tabs.CREATE_PLAYLIST -> {
-                            CreatePlaylistTab(viewModel, Modifier.fillMaxSize().align(Alignment.Center))
+                            CreatePlaylistTab(
+                                viewModel,
+                                Modifier.fillMaxSize().align(Alignment.Center)
+                            )
                         }
 
                         Tabs.PLAYBACK -> {

@@ -12,9 +12,9 @@ fun echoWarn(msg: String) {
 }
 
 fun Any.logMsg(msg: String) {
-    println(INFO + " [${this::class.simpleName}]$msg")
+    println(INFO + "[${this::class.simpleName}] $msg")
 }
 
 fun Any.logWarn(msg: String) {
-    println(WARN + " [${this::class.simpleName}]$msg")
+    println(WARN + "[${this::class.simpleName}] $msg")
 }

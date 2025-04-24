@@ -120,15 +120,10 @@ fun Tracklist(
                                 }
                                 if (viewModel.isLoadingSong != null) return@onClick
 
-                                if (track.uri.startsWith("http")) {
-                                    viewModel.videoUrl = track.uri
-                                } else {
-                                    viewModel.videoUrl = ""
-                                    viewModel.viewModelScope.launch {
-                                        viewModel.isLoadingSong = track
-                                        viewModel.audioPlayer.play(track)
-                                        viewModel.isLoadingSong = null
-                                    }
+                                viewModel.viewModelScope.launch {
+                                    viewModel.isLoadingSong = track
+                                    viewModel.audioPlayer.play(track)
+                                    viewModel.isLoadingSong = null
                                 }
                             },
                             modifier = Modifier

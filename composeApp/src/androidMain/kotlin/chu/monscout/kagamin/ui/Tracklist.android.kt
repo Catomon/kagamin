@@ -42,7 +42,11 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun Tracklist(viewModel: KagaminViewModel, tracks: List<AudioTrack>, modifier: Modifier = Modifier) {
+fun Tracklist(
+    viewModel: KagaminViewModel,
+    tracks: List<AudioTrack>,
+    modifier: Modifier = Modifier
+) {
     val coroutineScope = rememberCoroutineScope()
     val tracklistManager = remember { TracklistManager(coroutineScope) }
     val index =
@@ -70,7 +74,12 @@ fun Tracklist(viewModel: KagaminViewModel, tracks: List<AudioTrack>, modifier: M
                 }
             )
         } else {
-            Box(modifier = Modifier.background(Colors.backgroundTransparent).height(32.dp).fillMaxWidth())
+            Box(
+                modifier = Modifier
+                    .background(Colors.backgroundTransparent)
+                    .height(32.dp)
+                    .fillMaxWidth()
+            )
         }
 
         LazyColumn(Modifier.fillMaxWidth(), state = listState) {
@@ -92,15 +101,10 @@ fun Tracklist(viewModel: KagaminViewModel, tracks: List<AudioTrack>, modifier: M
                         }
                         if (viewModel.isLoadingSong != null) return@onClick
 
-                        if (track.uri.startsWith("http")) {
-                            viewModel.videoUrl = track.uri
-                        } else {
-                            viewModel.videoUrl = ""
-                            viewModel.viewModelScope.launch {
-                                viewModel.isLoadingSong = track
-                                viewModel.audioPlayer.play(track)
-                                viewModel.isLoadingSong = null
-                            }
+                        viewModel.viewModelScope.launch {
+                            viewModel.isLoadingSong = track
+                            viewModel.audioPlayer.play(track)
+                            viewModel.isLoadingSong = null
                         }
                     },
                     modifier = Modifier
@@ -108,7 +112,9 @@ fun Tracklist(viewModel: KagaminViewModel, tracks: List<AudioTrack>, modifier: M
             }
         }
 
-        Box(Modifier.fillMaxSize().background(Colors.theme.listItemB))
+        Box(Modifier
+            .fillMaxSize()
+            .background(Colors.theme.listItemB))
     }
 }
 

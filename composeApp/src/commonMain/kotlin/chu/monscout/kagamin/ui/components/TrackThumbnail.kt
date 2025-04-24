@@ -32,8 +32,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import chu.monscout.kagamin.audio.AudioPlayer
-import chu.monscout.kagamin.audio.AudioTrack
 import chu.monscout.kagamin.ui.theme.Colors
 import chu.monscout.kagamin.ui.util.getCropParameters
 import kagamin.composeapp.generated.resources.Res
@@ -44,9 +42,8 @@ import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun TrackThumbnail(
-    currentTrack: AudioTrack?,
-    player: AudioPlayer<AudioTrack>,
-    updateProgress: () -> Unit,
+    image: ImageBitmap?,
+    onSetProgress: (Float) -> Unit,
     progress: Float,
     progressColor: Color = Colors.theme.thumbnailProgressIndicator,
     modifier: Modifier = Modifier,
@@ -54,34 +51,29 @@ fun TrackThumbnail(
     blur: Boolean = false,
     controlProgress: Boolean = true
 ) {
-    //val progressColor = remember { Colors.bars.copy(0.5f) }
-
-    var image by remember {
-        mutableStateOf<ImageBitmap?>(null)
-    }
-    var loadingThumb by remember { mutableStateOf(true) }
     var offset by remember { mutableStateOf(IntOffset(0, 0)) }
     var size by remember { mutableStateOf(IntSize(0, 0)) }
 
-    LaunchedEffect(currentTrack) {
-        loadingThumb = true
-        image = if (currentTrack != null) {
-            withContext(Dispatchers.IO) {
-                getThumbnail(currentTrack)?.let { thumbnail ->
-                    val crop = getCropParameters(thumbnail)
-                    size = crop.second
-                    offset = crop.first
+    var isUpdatingOffsets by remember(image) { mutableStateOf(true) }
 
-                    thumbnail
+        //todo fix flickering
+
+    LaunchedEffect(image) {
+        if (isUpdatingOffsets) {
+            if (image != null) {
+                val crop = withContext(Dispatchers.IO) {
+                    getCropParameters(image)
                 }
+                size = crop.second
+                offset = crop.first
             }
-        } else {
-            null
+
+            isUpdatingOffsets = false
         }
-        loadingThumb = false
     }
 
-    Box(contentAlignment = Alignment.Center,
+    Box(
+        contentAlignment = Alignment.Center,
         modifier = modifier.drawBehind {
             drawRoundRect(
                 color = Colors.theme.backgroundTransparent,
@@ -91,22 +83,22 @@ fun TrackThumbnail(
             )
         }
 //            .border(2.dp, Colors.currentYukiTheme.thinBorder, RoundedCornerShape(12.dp))
-            .clip(RoundedCornerShape(12.dp)).let {
+            .clip(RoundedCornerShape(12.dp))
+            .let {
                 if (controlProgress) {
-                    it.pointerInput(currentTrack) {
-                        if (currentTrack == null) return@pointerInput
+                    it.pointerInput(Unit) {
                         val width = this.size.width
-                        detectTapGestures {
-                            player.seek((currentTrack.duration * (it.x / width)).toLong())
-                            updateProgress()
+                        detectTapGestures { offset ->
+                            onSetProgress(offset.x / width)
                         }
                     }
                 } else {
                     it
                 }
-            }) {
+            }
+    ) {
         AnimatedContent(image, modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp))) {
-            if (!loadingThumb && image == null) { //this still executes idc
+            if (image == null || isUpdatingOffsets) {
                 Box(
                     Modifier.fillMaxSize()
                 ) {
@@ -114,29 +106,24 @@ fun TrackThumbnail(
                         painterResource(Res.drawable.def_thumb),
                         "Default track thumbnail",
                         contentScale = contentScale,
-                        modifier = Modifier.fillMaxSize().let { if (blur) it.blur(5.dp) else it }.alpha(0.25f)
+                        modifier = Modifier.fillMaxSize().let { if (blur) it.blur(5.dp) else it }
+                            .alpha(0.25f)
                     )
                 }
             } else {
-                if (image == null) {
-                    Box(
-                        Modifier.fillMaxSize()
-                    ) {}
-                } else {
-                    Image(
-                        remember {
-                            BitmapPainter(
-                                image!!,
-                                filterQuality = DrawScope.DefaultFilterQuality,
-                                srcOffset = offset,
-                                srcSize = size
-                            )
-                        },
-                        "Track thumbnail",
-                        contentScale = contentScale,
-                        modifier = Modifier.fillMaxSize().let { if (blur) it.blur(5.dp) else it }
-                    )
-                }
+                Image(
+                    remember {
+                        BitmapPainter(
+                            image,
+                            filterQuality = DrawScope.DefaultFilterQuality,
+                            srcOffset = offset,
+                            srcSize = size
+                        )
+                    },
+                    "Track thumbnail",
+                    contentScale = contentScale,
+                    modifier = Modifier.fillMaxSize().let { if (blur) it.blur(5.dp) else it }
+                )
             }
         }
 

@@ -1,5 +1,8 @@
 package chu.monscout.kagamin.audio
 
+import chu.monscout.kagamin.loadSettings
+import chu.monscout.kagamin.util.logMsg
+import chu.monscout.kagamin.util.logWarn
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEvent
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventListener
@@ -13,7 +16,6 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason
-import chu.monscout.kagamin.loadSettings
 import java.io.File
 
 class AudioPlayerJVM : BaseAudioPlayer<AudioTrackJVM>() {
@@ -21,6 +23,8 @@ class AudioPlayerJVM : BaseAudioPlayer<AudioTrackJVM>() {
     private val stream = AudioStream(loader.createAudioInputStream())
     private val audioEventListener = AudioEventListenerImpl()
     override val position: Long get() = loader.player.playingTrack?.position ?: 0L
+
+    private var loadingTrack: AudioTrackJVM? = null
 
     init {
         startDiscordRich()
@@ -51,16 +55,36 @@ class AudioPlayerJVM : BaseAudioPlayer<AudioTrackJVM>() {
     }
 
     override fun play(track: AudioTrackJVM): Boolean {
+        logMsg("Play track: ${track.uri}")
+
         if (track.audioTrack == null) {
-            super.play(track)
+            logMsg("audioTrack == null, loading audio track: ${track.uri}")
+//            super.play(track)
+            loadingTrack = track
             load(listOf(track.uri))
             return true
         }
 
-        return if (!loader.player.startTrack(track.audioTrack!!.makeClone(), false) and super.play(track)) nextTrack() != null else true
+        val isStarted = loader.player.startTrack(track.audioTrack!!.makeClone(), false)
+        return if (isStarted) {
+            logMsg("Playback started.")
+            super.play(track)
+        } else {
+            val nextTrackAvailable = nextTrack() != null
+
+            if (nextTrackAvailable) {
+                logMsg("Could not start playback, will try playing next track.")
+            } else {
+                logMsg("Could not start playback and no next track available.")
+            }
+
+            nextTrackAvailable
+        }
     }
 
     override fun prevTrack(): AudioTrackJVM? {
+        logMsg("Prev track.")
+
         val nextAudioTrack = super.prevTrack()
 
         loader.player.stopTrack()
@@ -72,6 +96,8 @@ class AudioPlayerJVM : BaseAudioPlayer<AudioTrackJVM>() {
     private var filePlayTried = 0
 
     override fun nextTrack(): AudioTrackJVM? {
+        logMsg("Next track.")
+
         val nextAudioTrack = super.nextTrack()
 
         nextAudioTrack ?: let {
@@ -83,13 +109,13 @@ class AudioPlayerJVM : BaseAudioPlayer<AudioTrackJVM>() {
 
         if (!nextAudioTrack.uri.startsWith("http")) {
             if (filePlayTried >= playlist.value.size) {
-                println("playlist has no files to play")
+                logWarn("Playlist has no files to play.")
                 return null
             }
             filePlayTried++
 
             if (!File(nextAudioTrack.uri).exists()) {
-                println("track file does not exist: ${nextAudioTrack.uri}")
+                logWarn("Track file does not exist: ${nextAudioTrack.uri}")
 
                 return nextTrack()
             }
@@ -103,6 +129,8 @@ class AudioPlayerJVM : BaseAudioPlayer<AudioTrackJVM>() {
     }
 
     override fun queue(track: AudioTrackJVM) {
+        logMsg("Queue track.")
+
         super.queue(track)
 
         //scheduler.queue(track.uri)
@@ -121,12 +149,16 @@ class AudioPlayerJVM : BaseAudioPlayer<AudioTrackJVM>() {
     }
 
     override fun pause() {
+        logMsg("Pause.")
+
         loader.player.isPaused = true
 
         super.pause()
     }
 
     override fun resume() {
+        logMsg("Resume.")
+
         loader.player.isPaused = false
 
         if (currentTrack.value == null)
@@ -136,6 +168,8 @@ class AudioPlayerJVM : BaseAudioPlayer<AudioTrackJVM>() {
     }
 
     override fun stop() {
+        logMsg("Stop.")
+
         super.stop()
 
         loader.player.stopTrack()
@@ -154,6 +188,8 @@ class AudioPlayerJVM : BaseAudioPlayer<AudioTrackJVM>() {
     }
 
     override fun shutdown() {
+        logMsg("Shutdown..")
+
         super.shutdown()
 
         stopDiscordRich()
@@ -164,10 +200,14 @@ class AudioPlayerJVM : BaseAudioPlayer<AudioTrackJVM>() {
 
     inner class AudioLoadResulHandlerImpl : AudioLoadResultHandler {
         override fun trackLoaded(track: AudioTrack) {
-            if (currentTrack.value != null && currentTrack.value?.uri == track.info.uri) {
-                currentTrack.value?.audioTrack = track
-                play(currentTrack.value!!)
+            logMsg("Track loaded: ${track.info.uri}")
 
+            val loadingTrack = this@AudioPlayerJVM.loadingTrack
+            if (loadingTrack != null && loadingTrack.uri == track.info.uri) {
+                loadingTrack.audioTrack = track
+                play(loadingTrack)
+
+                this@AudioPlayerJVM.loadingTrack = null
                 return
             }
 
@@ -175,7 +215,10 @@ class AudioPlayerJVM : BaseAudioPlayer<AudioTrackJVM>() {
         }
 
         override fun playlistLoaded(playlist: AudioPlaylist) {
+            logMsg("Playlist loaded: ${playlist.name}")
+
             playlist.tracks.forEach {
+                logMsg("Track added: remote playlist: ${playlist.name}, track: ${it.info.uri}")
                 addToPlaylist(AudioTrackJVM(it))
             }
         }
@@ -185,6 +228,8 @@ class AudioPlayerJVM : BaseAudioPlayer<AudioTrackJVM>() {
         }
 
         override fun loadFailed(throwable: FriendlyException) {
+            logMsg("Loading is failed.")
+
             throwable.printStackTrace()
         }
     }
@@ -228,6 +273,7 @@ class AudioPlayerJVM : BaseAudioPlayer<AudioTrackJVM>() {
                             if (playMode.value != AudioPlayer.PlayMode.ONCE)
                                 nextTrack()
                         }
+
                         AudioTrackEndReason.LOAD_FAILED -> {
                             nextTrack()
                         }

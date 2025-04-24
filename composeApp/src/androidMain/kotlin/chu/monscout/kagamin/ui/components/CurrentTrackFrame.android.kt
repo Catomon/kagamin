@@ -30,16 +30,6 @@ import chu.monscout.kagamin.audio.AudioTrackAndy
 import chu.monscout.kagamin.ui.theme.Colors
 import kotlinx.coroutines.delay
 
-actual fun getThumbnail(audioTrack: AudioTrack): ImageBitmap? {
-    val artworkData = (audioTrack as AudioTrackAndy).mediaItem?.mediaMetadata?.artworkData ?: return null
-    if (artworkData != null) {
-        val bitmap = BitmapFactory.decodeByteArray(artworkData, 0, artworkData.size)
-        return bitmap?.asImageBitmap()
-    }
-
-    return null
-}
-
 @Composable
 fun CurrentTrackFrame2(
     currentTrack: AudioTrack?, player: AudioPlayer<AudioTrack>, modifier: Modifier = Modifier

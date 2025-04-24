@@ -34,15 +34,11 @@ import chu.monscout.kagamin.audio.AudioTrack
 import chu.monscout.kagamin.ui.theme.Colors
 import kotlinx.coroutines.delay
 
-expect fun getThumbnail(audioTrack: AudioTrack): ImageBitmap?
-
 @Composable
 fun CurrentTrackFrame(
+    thumbnail: ImageBitmap?,
     currentTrack: AudioTrack?, player: AudioPlayer<AudioTrack>, modifier: Modifier = Modifier
 ) {
-    val playMode by player.playMode
-    val crossfade by player.crossfade
-
     var progress by remember { mutableStateOf(-1f) }
     val updateProgress = {
         progress = when (currentTrack) {
@@ -64,9 +60,13 @@ fun CurrentTrackFrame(
             verticalArrangement = Arrangement.Center
         ) {
             TrackThumbnail(
-                currentTrack,
-                player,
-                updateProgress,
+                thumbnail,
+                onSetProgress = {
+                    if (currentTrack != null) {
+                        player.seek((currentTrack.duration * it).toLong())
+                        updateProgress()
+                    }
+                },
                 progress,
                 modifier = Modifier.padding(8.dp).size(145.dp)
             )
@@ -77,18 +77,24 @@ fun CurrentTrackFrame(
 
             PlaybackOptionsButtons(player, Modifier.width(133.dp))
 
-            TrackProgressIndicator(currentTrack, player, updateProgress, progress, modifier = Modifier.padding(horizontal = 20.dp))
+            TrackProgressIndicator(
+                currentTrack,
+                player,
+                updateProgress,
+                progress,
+                modifier = Modifier.padding(horizontal = 20.dp)
+            )
         }
     }
 }
 
 @Composable
 fun CompactCurrentTrackFrame(
-    currentTrack: AudioTrack?, player: AudioPlayer<AudioTrack>, modifier: Modifier = Modifier
+    thumbnail: ImageBitmap?,
+    currentTrack: AudioTrack?,
+    player: AudioPlayer<AudioTrack>,
+    modifier: Modifier = Modifier
 ) {
-    val playMode by player.playMode
-    val crossfade by player.crossfade
-
     var progress by remember { mutableStateOf(-1f) }
     val updateProgress = {
         progress = when (currentTrack) {
@@ -119,9 +125,13 @@ fun CompactCurrentTrackFrame(
         val aniColor = animateColorAsState(targetProgressColor)
 
         TrackThumbnail(
-            currentTrack,
-            player,
-            updateProgress,
+            thumbnail,
+          onSetProgress = {
+              if (currentTrack != null) {
+                  player.seek((currentTrack.duration * it).toLong())
+                  updateProgress()
+              }
+          },
             floatAnimation,
             progressColor = aniColor.value,
             modifier = Modifier.padding(8.dp).size(145.dp)
@@ -148,7 +158,13 @@ fun CompactCurrentTrackFrame(
                     player = player, Modifier.width(133.dp)
                 )
 
-                TrackProgressIndicator(currentTrack, player, updateProgress, progress, modifier = Modifier.padding(horizontal = 20.dp))
+                TrackProgressIndicator(
+                    currentTrack,
+                    player,
+                    updateProgress,
+                    progress,
+                    modifier = Modifier.padding(horizontal = 20.dp)
+                )
             }
         }
     }

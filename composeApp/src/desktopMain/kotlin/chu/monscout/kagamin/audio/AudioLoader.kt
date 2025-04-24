@@ -6,6 +6,7 @@ import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventListener
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
+import dev.lavalink.youtube.YoutubeAudioSourceManager
 import javax.sound.sampled.AudioInputStream
 
 class AudioLoader(
@@ -16,7 +17,7 @@ class AudioLoader(
     val playerManager = DefaultAudioPlayerManager()
     val player = playerManager.createPlayer()
 
-    //val ytManager = YoutubeAudioSourceManager()
+    val ytManager = YoutubeAudioSourceManager()
 
     var remoteSourcesRegistered = false
 
@@ -24,8 +25,8 @@ class AudioLoader(
         playerManager.configuration.outputFormat = outputFormat
 
         //100 tracks per page
-        //ytManager.setPlaylistPageCount(20)
-        //playerManager.registerSourceManager(ytManager)
+        ytManager.setPlaylistPageCount(20)
+        playerManager.registerSourceManager(ytManager)
         AudioSourceManagers.registerLocalSource(playerManager)
         registerRemoteSources()
     }

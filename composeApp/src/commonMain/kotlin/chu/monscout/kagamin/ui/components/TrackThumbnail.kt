@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import chu.monscout.kagamin.ui.theme.Colors
 import chu.monscout.kagamin.ui.util.getCropParameters
+import chu.monscout.kagamin.util.echoMsg
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.def_thumb
 import kotlinx.coroutines.Dispatchers
@@ -54,27 +55,23 @@ fun TrackThumbnail(
     var offset by remember { mutableStateOf(IntOffset(0, 0)) }
     var size by remember { mutableStateOf(IntSize(0, 0)) }
 
-    var isUpdatingOffsets by remember(image) { mutableStateOf(true) }
+    var isUpdatingOffsets by remember { mutableStateOf(false) }
 
     var croppedImage by remember { mutableStateOf<ImageBitmap?>(null) }
 
     //crop black bars
     LaunchedEffect(image) {
-        if (isUpdatingOffsets) {
-            if (image != null) {
-                val crop = withContext(Dispatchers.IO) {
-                    getCropParameters(image)
-                }
-                size = crop.second
-                offset = crop.first
-
-                croppedImage = image
-            } else {
-                croppedImage = null
+        isUpdatingOffsets = true
+        if (image != null) {
+            val crop = withContext(Dispatchers.IO) {
+                getCropParameters(image)
             }
-
-            isUpdatingOffsets = false
+            size = crop.second
+            offset = crop.first
         }
+        echoMsg("set cropped $image lol")
+        croppedImage = image
+        isUpdatingOffsets = false
     }
 
     Box(
@@ -90,7 +87,7 @@ fun TrackThumbnail(
             .clip(RoundedCornerShape(12.dp))
             .let {
                 if (controlProgress) {
-                    it.pointerInput(Unit) {
+                    it.pointerInput(croppedImage) {
                         val width = this.size.width
                         detectTapGestures { offset ->
                             onSetProgress(offset.x / width)
@@ -101,7 +98,7 @@ fun TrackThumbnail(
                 }
             }
     ) {
-        AnimatedContent(image, modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp))) {
+        AnimatedContent(croppedImage, modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp))) { croppedImage ->
             if (croppedImage == null) {
                 Box(
                     Modifier.fillMaxSize()
@@ -111,14 +108,14 @@ fun TrackThumbnail(
                         "Default track thumbnail",
                         contentScale = contentScale,
                         modifier = Modifier.fillMaxSize().let { if (blur) it.blur(5.dp) else it }
-                            .alpha(0.25f)
+                            .alpha(0.25f).clip(RoundedCornerShape(14.dp))
                     )
                 }
             } else {
                 Image(
-                    remember {
+                    remember(croppedImage) {
                         BitmapPainter(
-                            croppedImage!!,
+                            croppedImage,
                             filterQuality = DrawScope.DefaultFilterQuality,
                             srcOffset = offset,
                             srcSize = size
@@ -126,7 +123,7 @@ fun TrackThumbnail(
                     },
                     "Track thumbnail",
                     contentScale = contentScale,
-                    modifier = Modifier.fillMaxSize().let { if (blur) it.blur(5.dp) else it }
+                    modifier = Modifier.fillMaxSize().let { if (blur) it.blur(5.dp) else it }.clip(RoundedCornerShape(14.dp))
                 )
             }
         }

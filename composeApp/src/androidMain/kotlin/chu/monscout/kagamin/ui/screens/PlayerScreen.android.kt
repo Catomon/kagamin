@@ -116,6 +116,7 @@ actual fun PlayerScreen(
                         when (it) {
                             Tabs.PLAYBACK -> {
                                 CurrentTrackFrame2(
+                                    viewModel.trackThumbnail,
                                     currentTrack,
                                     audioPlayer,
                                     Modifier

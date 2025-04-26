@@ -32,7 +32,10 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun CurrentTrackFrame2(
-    currentTrack: AudioTrack?, player: AudioPlayer<AudioTrack>, modifier: Modifier = Modifier
+    thumbnail: ImageBitmap?,
+    currentTrack: AudioTrack?,
+    player: AudioPlayer<AudioTrack>,
+    modifier: Modifier = Modifier
 ) {
     val playMode by player.playMode
     val crossfade by player.crossfade
@@ -60,13 +63,17 @@ fun CurrentTrackFrame2(
             verticalArrangement = Arrangement.Center
         ) {
             TrackThumbnail(
-                currentTrack,
-                player,
-                updateProgress,
+                thumbnail,
+                onSetProgress = {
+                    if (currentTrack != null) {
+                        player.seek((currentTrack.duration * it).toLong())
+                        updateProgress()
+                    }
+                },
                 progress,
                 modifier = Modifier
                     .padding(8.dp)
-                    .size(200.dp)
+                    .size(250.dp)
             )
 
             PlaybackButtons(

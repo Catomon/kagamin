@@ -69,7 +69,6 @@ fun TrackThumbnail(
             size = crop.second
             offset = crop.first
         }
-        echoMsg("set cropped $image lol")
         croppedImage = image
         isUpdatingOffsets = false
     }

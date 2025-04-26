@@ -21,7 +21,7 @@ import java.io.File
 class AudioPlayerJVM : BaseAudioPlayer<AudioTrackJVM>() {
     private val loader = AudioLoader(AudioLoadResulHandlerImpl())
     private val stream = AudioStream(loader.createAudioInputStream())
-    private val audioEventListener = AudioEventListenerImpl()
+    private val eventListener = AudioEventListenerImpl()
     override val position: Long get() = loader.player.playingTrack?.position ?: 0L
 
     private var loadingTrack: AudioTrackJVM? = null
@@ -29,7 +29,7 @@ class AudioPlayerJVM : BaseAudioPlayer<AudioTrackJVM>() {
     init {
         startDiscordRich()
         discordRich(Rich.IDLE, null)
-        loader.addAudioEventListener(audioEventListener)
+        loader.addAudioEventListener(eventListener)
 
 //        val nipah = ClassLoader.getSystemClassLoader().getResource("nipah.mp3")?.toURI().toString()
 //        loader.playerManager.loadItem(nipah, EmptyAudioResultHandler())
@@ -159,12 +159,21 @@ class AudioPlayerJVM : BaseAudioPlayer<AudioTrackJVM>() {
     override fun resume() {
         logMsg("Resume.")
 
+        val currentTrack = currentTrack.value
+
         loader.player.isPaused = false
 
-        if (currentTrack.value == null)
-            nextTrack()
+        logMsg(loader.player.playingTrack.toString())
 
-        super.resume()
+        if (currentTrack == null) {
+            nextTrack()
+            super.resume()
+        } else {
+            if (loader.player.playingTrack == null)
+                play(currentTrack)
+            else
+                super.resume()
+        }
     }
 
     override fun stop() {
@@ -195,7 +204,7 @@ class AudioPlayerJVM : BaseAudioPlayer<AudioTrackJVM>() {
         stopDiscordRich()
         loader.player.stopTrack()
         loader.playerManager.shutdown()
-        stream.stop = true
+        stream.stop()
     }
 
     inner class AudioLoadResulHandlerImpl : AudioLoadResultHandler {

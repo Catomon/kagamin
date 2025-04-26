@@ -12,7 +12,6 @@ import javax.sound.sampled.AudioInputStream
 class AudioLoader(
     var resultHandler: AudioLoadResultHandler
 ) {
-
     var outputFormat = StandardAudioDataFormats.COMMON_PCM_S16_BE
     val playerManager = DefaultAudioPlayerManager()
     val player = playerManager.createPlayer()

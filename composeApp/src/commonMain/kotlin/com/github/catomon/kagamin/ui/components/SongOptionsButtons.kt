@@ -1,0 +1,119 @@
+package com.github.catomon.kagamin.ui.components
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.IconButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
+import com.github.catomon.kagamin.savePlaylist
+import com.github.catomon.kagamin.toTrackData
+import com.github.catomon.kagamin.ui.theme.Colors
+import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
+import kagamin.composeapp.generated.resources.Res
+import kagamin.composeapp.generated.resources.like_song
+import kagamin.composeapp.generated.resources.rate_song
+import kagamin.composeapp.generated.resources.song_info
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.jetbrains.compose.resources.painterResource
+
+@Composable
+fun SongOptionsButtons(
+    viewModel: KagaminViewModel,
+    modifier: Modifier = Modifier,
+    buttonsSize: Dp = 32.dp
+) {
+    val curTrack = viewModel.currentTrack
+    var updatingLike by remember { mutableStateOf(false) }
+    var loved by remember(updatingLike, curTrack) { //idk why that var not recalculated when updatingLike changes
+        mutableStateOf(curTrack?.let {
+            viewModel.lovedSongs.containsKey(
+                it.uri
+            )
+        } ?: false)
+    }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = modifier.height(buttonsSize)
+    ) {
+        IconButton({
+            //todo
+        }, modifier = Modifier.size(buttonsSize)) {
+            ImageWithShadow(
+                painterResource(Res.drawable.song_info),
+                "info",
+                colorFilter = if (false) ColorFilter.tint( //
+                    Colors.theme.buttonIcon
+                )
+                else ColorFilter.tint(Colors.theme.buttonIconTransparent)
+            )
+        }
+
+        IconButton({
+            //todo
+        }, modifier = Modifier.size(buttonsSize)) {
+            ImageWithShadow(
+                painterResource(Res.drawable.rate_song),
+                "rate song",
+                colorFilter = if (false) ColorFilter.tint( //if rated
+                    Colors.theme.buttonIcon
+                )
+                else ColorFilter.tint(Colors.theme.buttonIconTransparent)
+            )
+        }
+
+        IconButton(onClick = {
+            if (updatingLike) return@IconButton
+            viewModel.viewModelScope.launch {
+                updatingLike = true
+                if (!loved) {
+                    viewModel.currentTrack?.toTrackData()?.let { curTrackData ->
+                        viewModel.lovedSongs[curTrackData.uri] = curTrackData
+                        withContext(Dispatchers.IO) {
+                            savePlaylist(
+                                "loved",
+                                viewModel.lovedSongs.values.toList() + curTrackData
+                            )
+                        }
+                    }
+                } else {
+                    viewModel.currentTrack?.toTrackData()?.let { curTrackData ->
+                        viewModel.lovedSongs.remove(curTrackData.uri)
+                        withContext(Dispatchers.IO) {
+                            savePlaylist(
+                                "loved",
+                                viewModel.lovedSongs.values.toList() + curTrackData
+                            )
+                        }
+                    }
+                }
+                loved = curTrack?.let { viewModel.lovedSongs.containsKey(it.uri) } ?: false
+                updatingLike = false
+            }
+        }, modifier = Modifier.size(buttonsSize)) {
+            ImageWithShadow(
+                painterResource(Res.drawable.like_song),
+                "like song",
+                colorFilter = if (loved) ColorFilter.tint(
+                    Colors.theme.buttonIcon
+                )
+                else ColorFilter.tint(Colors.theme.buttonIconTransparent)
+            )
+        }
+    }
+}

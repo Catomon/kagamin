@@ -66,11 +66,11 @@ kotlin {
 }
 
 android {
-    namespace = "chu.monscout.kagamin"
+    namespace = "com.github.catomon.kagamin"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "chu.monscout.kagamin"
+        applicationId = "com.github.catomon.kagamin"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 7
@@ -100,7 +100,7 @@ compose.desktop {
     application {
         javaHome = System.getenv("JDK_21")
 
-        mainClass = "chu.monscout.kagamin.MainKt"
+        mainClass = "com.github.catomon.kagamin.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Msi, TargetFormat.Rpm)//, TargetFormat.Dmg, )

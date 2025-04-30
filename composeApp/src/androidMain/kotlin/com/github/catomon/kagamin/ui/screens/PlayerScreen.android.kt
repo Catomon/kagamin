@@ -1,6 +1,7 @@
 package com.github.catomon.kagamin.ui.screens
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
@@ -21,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
@@ -62,6 +64,16 @@ actual fun PlayerScreen(
     val playMode = viewModel.playMode
     val currentPlaylistName = viewModel.currentPlaylistName
     val showFilePicker = remember { mutableStateOf(false) }
+    val tabTransition: (Tabs) -> ContentTransform = { tab ->
+        when (tab) {
+            Tabs.ADD_TRACKS -> slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
+            Tabs.CREATE_PLAYLIST -> slideInHorizontally { -it } togetherWith slideOutHorizontally { it }
+            Tabs.TRACKLIST -> slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
+            Tabs.PLAYLISTS -> slideInHorizontally { -it } togetherWith slideOutHorizontally { it }
+
+            else -> slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.currentTab = Tabs.PLAYBACK
@@ -87,7 +99,12 @@ actual fun PlayerScreen(
         }
     }
 
-    Box(modifier.background(color = KagaminTheme.behindBackground, shape = RoundedCornerShape(16.dp))) {
+    Box(
+        modifier.background(
+            color = KagaminTheme.behindBackground,
+            shape = RoundedCornerShape(16.dp)
+        )
+    ) {
 //        BackgroundImage()
 
         TrackThumbnail(
@@ -111,15 +128,18 @@ actual fun PlayerScreen(
                     .weight(0.99f)
                     .fillMaxWidth()
             ) {
-                AppName(Modifier
-                    .background(color = KagaminTheme.backgroundTransparent)
-                    .padding(horizontal = 12.dp)
-                    .padding(top = 8.dp)
-                    .height(50.dp)
-                    .fillMaxWidth()
-                    .clickable(onClickLabel = "Open options") {
-                        navController.navigate(SettingsDestination.toString())
-                    }, height = 50.dp, 36.sp)
+                AppName(
+                    Modifier
+                        .background(color = KagaminTheme.backgroundTransparent)
+                        .padding(horizontal = 12.dp)
+                        .padding(top = 8.dp)
+                        .height(50.dp)
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable(onClickLabel = "Open options") {
+                            navController.navigate(SettingsDestination.toString())
+                        }, height = 50.dp, 36.sp
+                )
 
                 Box(
                     Modifier
@@ -128,7 +148,7 @@ actual fun PlayerScreen(
                         .weight(0.99f)
                 ) {
                     AnimatedContent(targetState = viewModel.currentTab, transitionSpec = {
-                        slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
+                        tabTransition(viewModel.currentTab)
                     }) { tab ->
                         when (tab) {
                             Tabs.PLAYBACK -> {
@@ -137,7 +157,8 @@ actual fun PlayerScreen(
                                     currentTrack,
                                     audioPlayer,
                                     Modifier
-                                        .fillMaxSize().background(color = KagaminTheme.backgroundTransparent)
+                                        .fillMaxSize()
+                                        .background(color = KagaminTheme.backgroundTransparent)
                                 )
                             }
 
@@ -218,7 +239,9 @@ actual fun PlayerScreen(
                                     }
                                 }
 
-                            }, modifier = Modifier.align(Alignment.BottomEnd), if (viewModel.currentTab == Tabs.ADD_TRACKS || viewModel.currentTab == Tabs.CREATE_PLAYLIST) Color.White else KagaminTheme.theme.buttonIconSmall
+                            },
+                            modifier = Modifier.align(Alignment.BottomEnd),
+                            if (viewModel.currentTab == Tabs.ADD_TRACKS || viewModel.currentTab == Tabs.CREATE_PLAYLIST) Color.White else KagaminTheme.theme.buttonIconSmall
                         )
                 }
             }

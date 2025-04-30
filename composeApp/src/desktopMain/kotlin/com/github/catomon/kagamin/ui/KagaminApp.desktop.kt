@@ -11,6 +11,7 @@ import com.github.catomon.kagamin.LayoutManager
 import com.github.catomon.kagamin.LocalLayoutManager
 import com.github.catomon.kagamin.LocalSnackbarHostState
 import com.github.catomon.kagamin.ui.screens.CompactPlayerScreen
+import com.github.catomon.kagamin.ui.screens.PlayerScreen
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.ui.screens.PlayerScreenDestination
 import com.github.catomon.kagamin.ui.screens.SettingsDestination
@@ -27,12 +28,12 @@ actual fun KagaminApp(
     Scaffold(snackbarHost = { SnackbarHost(LocalSnackbarHostState.current) }, modifier = modifier) {
         NavHost(
             navController,
-            startDestination = PlayerScreenDestination.toString()
+            startDestination = PlayerScreenDestination.toString(),
         ) {
-            composable(PlayerScreenDestination.toString()) {
+            composable(PlayerScreenDestination.toString(),) {
                 when (LocalLayoutManager.current.currentLayout.value) {
                     LayoutManager.Layout.Default -> {
-                        com.github.catomon.kagamin.ui.screens.PlayerScreen(kagaminViewModel.also {
+                        PlayerScreen(kagaminViewModel.also {
                             it.currentTab = Tabs.TRACKLIST
                         }, navController)
                     }

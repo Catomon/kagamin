@@ -159,7 +159,7 @@ sealed class KagaminColors(
         listItemB = Color(0xff8a8a8a),
         listItemA = Color(0xffb2b2b2),
         text = Color(0xffffffff), //Color(0xffff4d7c)
-        textSecondary = Color(0xffab0460),
+        textSecondary = Color(0xffffabda),
         background = Color(0xff000000),
     ) {
         override val buttonIconSmall: Color = Color(0xffd51e82)

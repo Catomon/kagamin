@@ -1,20 +1,20 @@
 package com.github.catomon.kagamin.ui
 
 import androidx.compose.foundation.background
-import com.github.catomon.kagamin.MultiFilePicker
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import com.github.catomon.kagamin.LocalSnackbarHostState
 import com.github.catomon.kagamin.savePlaylist
@@ -27,7 +27,6 @@ import io.github.vinceglb.filekit.path
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.folder
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.painterResource
@@ -43,7 +42,10 @@ fun AddTracksTab(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
     val snackbar = LocalSnackbarHostState.current
     val extensions = listOf("mp3", "wav")
 
-    val filePicker = rememberFilePickerLauncher(mode = FileKitMode.Multiple(), type = FileKitType.File(extensions)) { files ->
+    val filePicker = rememberFilePickerLauncher(
+        mode = FileKitMode.Multiple(),
+        type = FileKitType.File(extensions)
+    ) { files ->
         viewModel.viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 if (files != null) {
@@ -59,21 +61,26 @@ fun AddTracksTab(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.background(KagaminTheme.theme.listItemB),
+        modifier = modifier,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            "Drop files or folders here,\nor select from folder:",
-            textAlign = TextAlign.Center,
-            //color = Colors.noteText
-            modifier = Modifier.padding(horizontal = 8.dp),
-            color = KagaminTheme.textSecondary
-        )
+        AddTrackCreatePlaylistTabButtons(viewModel, modifier = Modifier.fillMaxWidth())
 
-        IconButton(onClick = {
-            filePicker.launch()
-        }) {
-            Icon(painterResource(Res.drawable.folder), "Select files from folder")
+        Column(Modifier.fillMaxSize().background(KagaminTheme.theme.listItemB), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+            Text(
+                "Playlist: ${viewModel.currentPlaylistName}\nDrop files or folders here,\nor select from folder:",
+                textAlign = TextAlign.Center,
+                //color = Colors.noteText
+                fontSize = 12.sp,
+                modifier = Modifier.padding(horizontal = 8.dp),
+                color = KagaminTheme.textSecondary
+            )
+
+            IconButton(onClick = {
+                filePicker.launch()
+            }) {
+                Icon(painterResource(Res.drawable.folder), "Select files from folder")
+            }
         }
     }
 }

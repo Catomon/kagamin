@@ -1,6 +1,9 @@
 package com.github.catomon.kagamin.ui.screens
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
@@ -18,8 +21,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
@@ -50,6 +55,17 @@ actual fun PlayerScreen(
     val playState = viewModel.playState
     val playMode = viewModel.playMode
     val currentPlaylistName = viewModel.currentPlaylistName
+
+    val tabTransition: (Tabs) -> ContentTransform = { tab ->
+        when (tab) {
+            Tabs.ADD_TRACKS -> slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
+            Tabs.CREATE_PLAYLIST -> slideInHorizontally { -it } togetherWith slideOutHorizontally { it }
+            Tabs.TRACKLIST -> slideInHorizontally { -it } togetherWith slideOutHorizontally { it }
+            Tabs.PLAYLISTS -> slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
+
+            else -> slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
+        }
+    }
 
     LaunchedEffect(currentPlaylistName) {
         viewModel.reloadPlaylist()
@@ -85,6 +101,7 @@ actual fun PlayerScreen(
                 AppName(
                     Modifier.padding(horizontal = 12.dp).height(25.dp)
                         .graphicsLayer(translationY = 2f)
+                        .clip(RoundedCornerShape(8.dp))
                         .clickable {
                             if (navController.currentDestination?.route != SettingsDestination.toString())
                                 navController.navigate(SettingsDestination.toString())
@@ -97,7 +114,7 @@ actual fun PlayerScreen(
 
             Box(Modifier.weight(0.75f)) {
                 AnimatedContent(targetState = viewModel.currentTab, transitionSpec = {
-                    slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
+                    tabTransition(viewModel.currentTab)
                 }) {
                     when (it) {
                         Tabs.PLAYLISTS -> {

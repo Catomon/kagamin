@@ -1,16 +1,20 @@
 package com.github.catomon.kagamin.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -33,9 +37,10 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun MinimizeButton(modifier: Modifier = Modifier) {
     val window = LocalWindow.current
-    IconButton({
-        window.isMinimized = true
-    }, modifier = modifier) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier.clip(RoundedCornerShape(12.dp)).clickable { window.isMinimized = true }
+    ) {
         ImageWithShadow(
             painterResource(Res.drawable.minimize_window),
             "Minimize",
@@ -52,7 +57,8 @@ fun Sidebar(
     val layoutManager = LocalLayoutManager.current
 
     Column(
-        modifier.fillMaxHeight().width(32.dp).background(color = KagaminTheme.backgroundTransparent),
+        modifier.fillMaxHeight().width(32.dp)
+            .background(color = KagaminTheme.backgroundTransparent),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -95,22 +101,23 @@ fun Sidebar(
                 Modifier.weight(0.333f)
             )
 
-            AddButton(onClick = {
-                when (viewModel.currentTab) {
-                    Tabs.PLAYLISTS -> {
-                        viewModel.currentTab = Tabs.CREATE_PLAYLIST
-                    }
+            AddButton(
+                onClick = {
+                    when (viewModel.currentTab) {
+                        Tabs.PLAYLISTS -> {
+                            viewModel.currentTab = Tabs.CREATE_PLAYLIST
+                        }
 
-                    Tabs.TRACKLIST, Tabs.PLAYBACK -> {
-                        viewModel.currentTab = Tabs.ADD_TRACKS
-                    }
+                        Tabs.TRACKLIST, Tabs.PLAYBACK -> {
+                            viewModel.currentTab = Tabs.ADD_TRACKS
+                        }
 
-                    else -> {
-                        viewModel.currentTab =
-                            if (viewModel.currentTab == Tabs.ADD_TRACKS) Tabs.TRACKLIST else Tabs.PLAYLISTS
+                        else -> {
+                            viewModel.currentTab =
+                                if (viewModel.currentTab == Tabs.ADD_TRACKS) Tabs.TRACKLIST else Tabs.PLAYLISTS
+                        }
                     }
-                }
-            },
+                },
                 modifier = Modifier.weight(0.333f),
                 color = if (viewModel.currentTab == Tabs.ADD_TRACKS || viewModel.currentTab == Tabs.CREATE_PLAYLIST) KagaminTheme.theme.buttonIconSmallSelected else KagaminTheme.theme.buttonIconSmall
             )

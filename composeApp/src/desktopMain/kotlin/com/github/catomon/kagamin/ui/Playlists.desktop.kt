@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,7 +33,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -151,6 +157,9 @@ actual fun PlaylistItem(
     clear: () -> Unit,
     shuffle: () -> Unit
 ) {
+
+    val backColor = if (i % 2 == 0) KagaminTheme.theme.listItemA else KagaminTheme.theme.listItemB
+
     ContextMenuArea(items = {
         listOf(
             ContextMenuItem("Shuffle") {
@@ -166,23 +175,33 @@ actual fun PlaylistItem(
     }) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(56.dp)) {
             if (viewModel.currentPlaylistName == playlist.first) {
-                Box(Modifier.fillMaxHeight()//.clip(
-                    //RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp)
-                //)
-                    .background(KagaminTheme.backgroundTransparent).clickable {
+                Box(Modifier.fillMaxHeight().graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+                    .drawWithContent {
+                        drawContent()
+                        drawRect(color = backColor, size = size, blendMode = BlendMode.SrcOut)
+                        drawContent()
+                    }.clickable {
                     viewModel.onPlayPause()
                 }, contentAlignment = Alignment.Center) {
-                    Image(
-                        painterResource(if (viewModel.playState == AudioPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
-                        "Play/Pause",
-                        modifier = Modifier.size(16.dp).fillMaxHeight(),
-                        colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIcon)
-                    )
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxHeight().background(
+                            KagaminTheme.backgroundTransparent,
+                            RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp)
+                        )
+                    ) {
+                        Image(
+                            painterResource(if (viewModel.playState == AudioPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
+                            "Play/Pause",
+                            modifier = Modifier.size(16.dp).fillMaxHeight(),
+                            colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIcon)
+                        )
+                    }
                 }
             }
 
             Column(
-                Modifier.fillMaxHeight().background(color = if (i % 2 == 0) KagaminTheme.theme.listItemA else KagaminTheme.theme.listItemB)
+                Modifier.fillMaxHeight().background(color = backColor)
                     .clickable {
                         viewModel.currentPlaylistName = playlist.first
                         viewModel.currentTab = Tabs.TRACKLIST

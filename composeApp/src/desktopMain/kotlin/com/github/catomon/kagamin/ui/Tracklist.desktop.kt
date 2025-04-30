@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,7 +36,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.toRect
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
@@ -143,7 +153,7 @@ fun Tracklist(
             ) {
                 VerticalScrollbar(
                     modifier = Modifier
-                        .fillMaxHeight().clickable {  },
+                        .fillMaxHeight().clickable { },
                     adapter = rememberScrollbarAdapter(listState)
                 )
             }
@@ -237,18 +247,31 @@ actual fun TrackItem(
         ) {
             if (index > -1 && viewModel.currentTrack == track) {
                 Box(
-                    Modifier.height(32.dp)//.clip(
-                        //           RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp)
-                        .background(KagaminTheme.backgroundTransparent).clickable {
-                            viewModel.onPlayPause()
-                        }, contentAlignment = Alignment.Center
+                    Modifier
+                        .height(32.dp)
+                        .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+                        .drawWithContent {
+                            drawContent()
+                            drawRect(color = backColor, size = size, blendMode = BlendMode.SrcOut)
+                            drawContent()
+                        }
+                        .clickable { viewModel.onPlayPause() },
+                    contentAlignment = Alignment.Center
                 ) {
-                    Image(
-                        painterResource(if (viewModel.playState == AudioPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
-                        "track playback state icon",
-                        modifier = Modifier.size(16.dp),
-                        colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIcon)
-                    )
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.height(32.dp).background(
+                            KagaminTheme.backgroundTransparent,
+                            RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp)
+                        )
+                    ) {
+                        Image(
+                            painterResource(if (viewModel.playState == AudioPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
+                            "track playback state icon",
+                            modifier = Modifier.size(16.dp),
+                            colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIcon)
+                        )
+                    }
                 }
             }
 

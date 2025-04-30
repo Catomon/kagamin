@@ -108,6 +108,7 @@ actual fun SettingsScreen(
                     repeat = player.playMode.value == AudioPlayer.PlayMode.REPEAT_TRACK,
                     volume = player.volume.value,
                     random = player.playMode.value == AudioPlayer.PlayMode.RANDOM,
+                    repeatPlaylist = player.playMode.value == AudioPlayer.PlayMode.REPEAT_PLAYLIST
                 )
                 saveSettings(settings)
                 exitProcess(1)

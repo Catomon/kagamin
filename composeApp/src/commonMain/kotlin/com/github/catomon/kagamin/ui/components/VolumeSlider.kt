@@ -2,62 +2,53 @@ package com.github.catomon.kagamin.ui.components
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.material.Slider
-import androidx.compose.material.SliderDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
-import com.github.catomon.kagamin.ui.theme.Colors
+import com.github.catomon.kagamin.ui.theme.KagaminTheme
 
 @Composable
-fun VolumeSlider(volume: Float, volumeChanged: (Float) -> Unit, modifier: Modifier = Modifier) {
-    val interactionSource = MutableInteractionSource()
+fun VolumeSlider(volume: Float, onVolumeChange: (Float) -> Unit, modifier: Modifier = Modifier) {
+    val interactionSource = remember { MutableInteractionSource() }
     val colors = SliderDefaults.colors(
-        Colors.theme.buttonIcon,
-        Colors.theme.buttonIconTransparent,
-        Colors.theme.buttonIcon,
-        Colors.theme.buttonIconTransparent,
-        Colors.theme.buttonIconTransparent,
-        Colors.theme.buttonIconTransparent,
-        Colors.theme.buttonIconTransparent,
-        Colors.theme.buttonIconTransparent,
-        Colors.theme.buttonIconTransparent,
-        Colors.theme.buttonIconTransparent
+        thumbColor = KagaminTheme.theme.buttonIcon,
+        activeTrackColor =   KagaminTheme.theme.buttonIcon,
+        activeTickColor = KagaminTheme.theme.buttonIcon,
+        inactiveTrackColor = KagaminTheme.theme.buttonIconTransparent,
+        inactiveTickColor = KagaminTheme.theme.buttonIconTransparent,
+        disabledThumbColor = KagaminTheme.theme.buttonIconTransparent,
+        disabledActiveTrackColor = KagaminTheme.theme.buttonIconTransparent,
+        disabledActiveTickColor = KagaminTheme.theme.buttonIconTransparent,
+        disabledInactiveTrackColor = KagaminTheme.theme.buttonIconTransparent,
+        disabledInactiveTickColor = KagaminTheme.theme.buttonIconTransparent
     )
 
     val shadowColors = SliderDefaults.colors(
-        Colors.theme.thinBorder,
-        Colors.theme.thinBorder,
-        Colors.theme.thinBorder,
-        Colors.theme.thinBorder,
-        Colors.theme.thinBorder,
-        Colors.theme.thinBorder,
-        Colors.theme.thinBorder,
-        Colors.theme.thinBorder,
-        Colors.theme.thinBorder,
-        Colors.theme.thinBorder,
+        KagaminTheme.theme.thinBorder,
+        KagaminTheme.theme.thinBorder,
+        KagaminTheme.theme.thinBorder,
+        KagaminTheme.theme.thinBorder,
+        KagaminTheme.theme.thinBorder,
+        KagaminTheme.theme.thinBorder,
+        KagaminTheme.theme.thinBorder,
+        KagaminTheme.theme.thinBorder,
+        KagaminTheme.theme.thinBorder,
+        KagaminTheme.theme.thinBorder,
     )
 
-
     Box(contentAlignment = Alignment.Center, modifier = modifier) {
-        Slider(
-            value = volume,
-            onValueChange = {
+        NormalSlider(volume, onVolumeChange, shadowColors, interactionSource, modifier = Modifier.graphicsLayer(translationY = 1.5f))
 
-            },
-            colors = shadowColors,
-            interactionSource = interactionSource,
-            modifier = Modifier.graphicsLayer(translationY = 1.5f)
-        )
-
-        Slider(
-            value = volume,
-            onValueChange = {
-                volumeChanged(it)
-            },
-            colors = colors,
-            interactionSource = interactionSource,
+        NormalSlider(
+            volume,
+            onVolumeChange,
+            colors,
+            interactionSource
         )
     }
 }
+

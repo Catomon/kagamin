@@ -15,7 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -25,7 +25,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.github.catomon.kagamin.ui.theme.Colors
+import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.audio.createAudioTrack
 import com.github.catomon.kagamin.loadPlaylist
 import com.github.catomon.kagamin.ui.AddTracksTab
@@ -77,7 +77,7 @@ fun TinyPlayerScreen(
         viewModel.updateThumbnail()
     }
 
-    Box(modifier.background(color = Colors.behindBackground, shape = RoundedCornerShape(16.dp))) {
+    Box(modifier.background(color = KagaminTheme.behindBackground, shape = RoundedCornerShape(16.dp))) {
         TrackThumbnail(
             image = viewModel.trackThumbnail,
             onSetProgress = {
@@ -101,7 +101,7 @@ fun TinyPlayerScreen(
             ) {
                 Box(
                     contentAlignment = Alignment.Center,
-                    modifier = Modifier.fillMaxWidth().background(color = Colors.backgroundTransparent)
+                    modifier = Modifier.fillMaxWidth().background(color = KagaminTheme.backgroundTransparent)
                 ) {
                     AppName(Modifier
                         .height(25.dp).graphicsLayer(translationY = 2f)
@@ -121,7 +121,7 @@ fun TinyPlayerScreen(
                                     currentTrack,
                                     audioPlayer,
                                     Modifier.width(160.dp).fillMaxHeight()
-                                        .background(color = Colors.backgroundTransparent)
+                                        .background(color = KagaminTheme.backgroundTransparent)
                                 )
                             }
 
@@ -137,13 +137,13 @@ fun TinyPlayerScreen(
                                 if (viewModel.playlist.isEmpty()) {
                                     Box(
                                         Modifier.fillMaxHeight()
-                                            .background(Colors.theme.listItemB),
+                                            .background(KagaminTheme.theme.listItemB),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text(
                                             "Drop files or folders here",
                                             textAlign = TextAlign.Center,
-                                            color = Colors.textSecondary
+                                            color = KagaminTheme.textSecondary
                                         )
                                     }
                                 } else {

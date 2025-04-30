@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.IconButton
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import com.github.catomon.kagamin.savePlaylist
 import com.github.catomon.kagamin.toTrackData
-import com.github.catomon.kagamin.ui.theme.Colors
+import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.like_song
@@ -60,9 +60,9 @@ fun SongOptionsButtons(
                 painterResource(Res.drawable.song_info),
                 "info",
                 colorFilter = if (false) ColorFilter.tint( //
-                    Colors.theme.buttonIcon
+                    KagaminTheme.theme.buttonIcon
                 )
-                else ColorFilter.tint(Colors.theme.buttonIconTransparent)
+                else ColorFilter.tint(KagaminTheme.theme.buttonIconTransparent)
             )
         }
 
@@ -73,9 +73,9 @@ fun SongOptionsButtons(
                 painterResource(Res.drawable.rate_song),
                 "rate song",
                 colorFilter = if (false) ColorFilter.tint( //if rated
-                    Colors.theme.buttonIcon
+                    KagaminTheme.theme.buttonIcon
                 )
-                else ColorFilter.tint(Colors.theme.buttonIconTransparent)
+                else ColorFilter.tint(KagaminTheme.theme.buttonIconTransparent)
             )
         }
 
@@ -112,9 +112,9 @@ fun SongOptionsButtons(
                 painterResource(Res.drawable.like_song),
                 "like song",
                 colorFilter = if (loved) ColorFilter.tint(
-                    Colors.theme.buttonIcon
+                    KagaminTheme.theme.buttonIcon
                 )
-                else ColorFilter.tint(Colors.theme.buttonIconTransparent)
+                else ColorFilter.tint(KagaminTheme.theme.buttonIconTransparent)
             )
         }
     }

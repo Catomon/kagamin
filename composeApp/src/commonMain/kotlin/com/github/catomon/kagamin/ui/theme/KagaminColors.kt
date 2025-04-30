@@ -2,7 +2,7 @@ package com.github.catomon.kagamin.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-sealed class KagaminTheme(
+sealed class KagaminColors(
     val name: String,
     open val behindBackground: Color,
     open val text: Color,
@@ -26,7 +26,7 @@ sealed class KagaminTheme(
     //    open val playerButtonIconTransparent get() = playerButtonIcon
     //    open val progressOverThumbnail: Color = bars
 
-    object White : KagaminTheme(
+    object White : KagaminColors(
         name = "white",
         behindBackground = Color(0xffc9c9c9),
         listItemB = Color(0xff626262),
@@ -42,7 +42,7 @@ sealed class KagaminTheme(
         override val buttonIconSmallSelected: Color = textSecondary
     }
 
-    object Grey : KagaminTheme(
+    object Grey : KagaminColors(
         name = "grey",
         behindBackground = Color(0xffc9c9c9),
         listItemB = Color(0xff626262),
@@ -57,7 +57,7 @@ sealed class KagaminTheme(
         override val thinBorder: Color = Color(0xff5b5b5b)
     }
 
-    object Pink : KagaminTheme(
+    object Pink : KagaminColors(
         name = "yuki",
         behindBackground = Color(0xffffbecf),
         listItemB = Color(0xffff618f),
@@ -77,7 +77,7 @@ sealed class KagaminTheme(
     }
 
     //more pink
-    //   object Pink : KagaminTheme(
+    //   object Pink : KagaminColors(
     //        name = "yuki",
     //        background = Color(0xffffbecf),
     //        background2 = Color(0xffff618f),
@@ -90,7 +90,7 @@ sealed class KagaminTheme(
     //    }
 
     //blue + pnk
-    //    object Pink : KagaminTheme(
+    //    object Pink : KagaminColors(
     //        name = "yuki",
     //        background = Color(0xffffbecf),
     //        background2 = Color(0xffc94d63),
@@ -107,7 +107,7 @@ sealed class KagaminTheme(
     //        override val barsTransparent: Color = bars.copy(0.8f)
     //    }
 
-    object Violet : KagaminTheme(
+    object Violet : KagaminColors(
         name = "gami-kasa",
         behindBackground = Color(0xffc09dff),
         listItemB = Color(0xcb6632b2),
@@ -121,7 +121,7 @@ sealed class KagaminTheme(
         override val thinBorder: Color = Color(0xff5522a2)
     }
 
-    data object Blue : KagaminTheme(
+    data object Blue : KagaminColors(
         name = "nata",
         behindBackground = Color(0xffadcfff),
         listItemB = Color(0xff0f2e93),
@@ -136,7 +136,7 @@ sealed class KagaminTheme(
         override val thinBorder: Color = Color(0xff042386)
     }
 
-    //    object YukiLight : KagaminTheme(
+    //    object YukiLight : KagaminColors(
     //        name = "yuki-light",
     //        background = Color(0xffffffff),
     //        background2 = Color(0xff86c6ea),
@@ -153,7 +153,7 @@ sealed class KagaminTheme(
     //        override val barsTransparent: Color = bars.copy(0.50f)
     //    }
 
-    object KagaminDark : KagaminTheme(
+    object KagaminDark : KagaminColors(
         name = "kagamin-dark",
         behindBackground = Color(0xffffffff),
         listItemB = Color(0xff8a8a8a),

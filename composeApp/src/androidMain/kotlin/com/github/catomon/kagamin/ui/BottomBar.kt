@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.github.catomon.kagamin.ui.theme.Colors
+import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.ui.util.Tabs
 
@@ -25,7 +25,7 @@ fun BottomBar(
         modifier
             .fillMaxWidth()
             .width(32.dp)
-            .background(color = Colors.backgroundTransparent),
+            .background(color = KagaminTheme.backgroundTransparent),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
@@ -42,7 +42,7 @@ fun BottomBar(
                         state.currentTab = Tabs.PLAYBACK
                     }
                 },
-                color = if (state.currentTab == Tabs.PLAYBACK) Color.White else Colors.theme.buttonIconSmall,
+                color = if (state.currentTab == Tabs.PLAYBACK) Color.White else KagaminTheme.theme.buttonIconSmall,
                 Modifier.weight(0.333f)
             )
 
@@ -52,7 +52,7 @@ fun BottomBar(
                         state.currentTab = Tabs.TRACKLIST
                     }
                 },
-                color = if (state.currentTab == Tabs.TRACKLIST) Color.White else Colors.theme.buttonIconSmall,
+                color = if (state.currentTab == Tabs.TRACKLIST) Color.White else KagaminTheme.theme.buttonIconSmall,
                 Modifier.weight(0.333f)
             )
 
@@ -62,7 +62,7 @@ fun BottomBar(
                         state.currentTab = Tabs.PLAYLISTS
                     }
                 },
-                color = if (state.currentTab == Tabs.PLAYLISTS) Color.White else Colors.theme.buttonIconSmall,
+                color = if (state.currentTab == Tabs.PLAYLISTS) Color.White else KagaminTheme.theme.buttonIconSmall,
                 Modifier.weight(0.333f)
             )
         }

@@ -32,7 +32,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import com.github.catomon.kagamin.ui.theme.Colors
+import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.getCropParameters
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.def_thumb
@@ -45,7 +45,7 @@ fun TrackThumbnail(
     image: ImageBitmap?,
     onSetProgress: (Float) -> Unit,
     progress: Float,
-    progressColor: Color = Colors.theme.thumbnailProgressIndicator,
+    progressColor: Color = KagaminTheme.theme.thumbnailProgressIndicator,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
     blur: Boolean = false,
@@ -78,7 +78,7 @@ fun TrackThumbnail(
         contentAlignment = Alignment.Center,
         modifier = modifier.drawBehind {
             drawRoundRect(
-                color = Colors.theme.backgroundTransparent,
+                color = KagaminTheme.theme.backgroundTransparent,
                 topLeft = Offset(0f, with(density) { 2.dp.toPx() }),
                 size = this.size.copy(),
                 cornerRadius = CornerRadius(12f)

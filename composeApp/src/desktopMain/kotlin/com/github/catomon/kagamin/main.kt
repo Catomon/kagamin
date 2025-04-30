@@ -4,11 +4,14 @@ import androidx.compose.ui.window.application
 import com.github.catomon.kagamin.util.echoMsg
 import com.github.catomon.kagamin.util.echoWarn
 import com.github.catomon.kagamin.di.appModule
+import io.github.vinceglb.filekit.FileKit
 import org.koin.core.context.GlobalContext.startKoin
 import javax.swing.JOptionPane
 
 fun main() {
     setDefaultExceptionHandler()
+
+    FileKit.init(appId = "Kagamin")
 
     application {
         setComposeExceptionHandler()

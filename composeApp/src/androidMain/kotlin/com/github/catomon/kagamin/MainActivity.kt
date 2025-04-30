@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.Preview
 import com.github.catomon.kagamin.ui.KagaminApp
-import com.github.catomon.kagamin.ui.theme.Colors
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 
 var playerContext: (() -> Context)? = null
@@ -20,7 +19,7 @@ class MainActivity : ComponentActivity() {
 
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
 
-        window.statusBarColor = Colors.theme.background.toArgb()
+        window.statusBarColor = KagaminTheme.theme.background.toArgb()
 
         val context = this
         playerContext = { context }

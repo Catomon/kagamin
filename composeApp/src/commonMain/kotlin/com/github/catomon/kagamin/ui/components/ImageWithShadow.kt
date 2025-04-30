@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import com.github.catomon.kagamin.ui.theme.Colors
+import com.github.catomon.kagamin.ui.theme.KagaminTheme
 
 @Composable
 fun ImageWithShadow(
@@ -27,7 +27,7 @@ fun ImageWithShadow(
         Image(
             painterResource,
             contentDescription = s,
-            colorFilter = ColorFilter.tint(Colors.theme.thinBorder),
+            colorFilter = ColorFilter.tint(KagaminTheme.theme.thinBorder),
             modifier = Modifier.graphicsLayer(translationY = pad).fillMaxSize()
         )
 

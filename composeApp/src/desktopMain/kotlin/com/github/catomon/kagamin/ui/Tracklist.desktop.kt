@@ -1,6 +1,5 @@
 package com.github.catomon.kagamin.ui
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuItem
 import androidx.compose.foundation.Image
@@ -25,8 +24,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,15 +36,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
-import com.github.catomon.kagamin.ui.theme.Colors
+import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.LocalSnackbarHostState
 import com.github.catomon.kagamin.audio.AudioPlayer
 import com.github.catomon.kagamin.audio.AudioTrack
@@ -95,7 +91,7 @@ fun Tracklist(
             )
         } else {
             Box(
-                modifier = Modifier.background(Colors.backgroundTransparent).height(32.dp)
+                modifier = Modifier.background(KagaminTheme.backgroundTransparent).height(32.dp)
                     .fillMaxWidth()
             )
         }
@@ -138,7 +134,7 @@ fun Tracklist(
                     }
                 }
 
-                Spacer(Modifier.fillMaxSize().weight(2f).background(Colors.theme.listItemB))
+                Spacer(Modifier.fillMaxSize().weight(2f).background(KagaminTheme.theme.listItemB))
             }
 
             androidx.compose.animation.AnimatedVisibility(
@@ -147,7 +143,7 @@ fun Tracklist(
             ) {
                 VerticalScrollbar(
                     modifier = Modifier
-                        .fillMaxHeight(),
+                        .fillMaxHeight().clickable {  },
                     adapter = rememberScrollbarAdapter(listState)
                 )
             }
@@ -168,8 +164,8 @@ actual fun TrackItem(
     val confirmationWindow = LocalConfirmWindow.current
     val snackbar = LocalSnackbarHostState.current
     val isHeader = index == -1
-    val backColor = if (isHeader) Colors.backgroundTransparent else
-        if (index % 2 == 0) Colors.theme.listItemA else Colors.theme.listItemB
+    val backColor = if (isHeader) KagaminTheme.backgroundTransparent else
+        if (index % 2 == 0) KagaminTheme.theme.listItemA else KagaminTheme.theme.listItemB
     ContextMenuArea(items = {
         listOf(
             ContextMenuItem("Select") {
@@ -243,7 +239,7 @@ actual fun TrackItem(
                 Box(
                     Modifier.height(32.dp)//.clip(
                         //           RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp)
-                        .background(Colors.backgroundTransparent).clickable {
+                        .background(KagaminTheme.backgroundTransparent).clickable {
                             viewModel.onPlayPause()
                         }, contentAlignment = Alignment.Center
                 ) {
@@ -251,7 +247,7 @@ actual fun TrackItem(
                         painterResource(if (viewModel.playState == AudioPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
                         "track playback state icon",
                         modifier = Modifier.size(16.dp),
-                        colorFilter = ColorFilter.tint(Colors.theme.buttonIcon)
+                        colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIcon)
                     )
                 }
             }
@@ -272,7 +268,7 @@ actual fun TrackItem(
                     Text(
                         track.name,
                         fontSize = 10.sp,
-                        color = if (isHeader) Colors.theme.buttonIcon else Colors.text,
+                        color = if (isHeader) KagaminTheme.theme.buttonIcon else KagaminTheme.text,
                         maxLines = 1,
                         // overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(0.99f).let {
@@ -291,6 +287,8 @@ actual fun TrackItem(
                             var trackDurationText by remember { mutableStateOf("-:-") }
 
                             LaunchedEffect(track) {
+                                trackDurationText = formatTime(track.duration)
+
                                 while (true) {
                                     if (viewModel.audioPlayer.playState.value == AudioPlayer.PlayState.PLAYING) {
                                         timePastText =
@@ -306,7 +304,7 @@ actual fun TrackItem(
                             Text(
                                 "$timePastText/$trackDurationText",
                                 fontSize = 10.sp,
-                                color = Colors.theme.buttonIcon
+                                color = KagaminTheme.theme.buttonIcon
                             )
                         }
                 }

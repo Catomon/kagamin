@@ -31,7 +31,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.dp
 import com.github.catomon.kagamin.audio.AudioPlayer
 import com.github.catomon.kagamin.audio.AudioTrack
-import com.github.catomon.kagamin.ui.theme.Colors
+import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import kotlinx.coroutines.delay
 
@@ -79,6 +79,8 @@ fun CurrentTrackFrame(
 
             PlaybackOptionsButtons(player, Modifier.width(133.dp))
 
+            VolumeOptions(volume = player.volume.value, onVolumeChange =  { newVolume -> player.volume.value = newVolume; player.setVolume(newVolume) }, modifier = Modifier.width(133.dp))
+
 //            TrackProgressIndicator(
 //                currentTrack,
 //                player,
@@ -87,10 +89,11 @@ fun CurrentTrackFrame(
 //                modifier = Modifier.padding(horizontal = 20.dp)
 //            )
 
-            SongOptionsButtons(
-                modifier = Modifier.width(133.dp),
-                viewModel = viewModel,
-            )
+            //todo
+//            SongOptionsButtons(
+//                modifier = Modifier.width(133.dp),
+//                viewModel = viewModel,
+//            )
         }
     }
 }
@@ -128,7 +131,7 @@ fun CompactCurrentTrackFrame(
         val floatAnimation by animateFloatAsState(targetValue)
 
         val targetProgressColor: Color =
-            remember(isHovered) { if (isHovered) Colors.backgroundTransparent else Colors.theme.thumbnailProgressIndicator }
+            remember(isHovered) { if (isHovered) KagaminTheme.backgroundTransparent else KagaminTheme.theme.thumbnailProgressIndicator }
         val aniColor = animateColorAsState(targetProgressColor)
 
         TrackThumbnail(
@@ -165,13 +168,19 @@ fun CompactCurrentTrackFrame(
                     player = player, Modifier.width(133.dp)
                 )
 
-                TrackProgressIndicator(
-                    currentTrack,
-                    player,
-                    updateProgress,
-                    progress,
-                    modifier = Modifier.padding(horizontal = 20.dp)
+                VolumeOptions(
+                    volume = player.volume.value,
+                    onVolumeChange =  { newVolume -> player.volume.value = newVolume; player.setVolume(newVolume) },
+                    modifier = Modifier.width(133.dp)
                 )
+
+//                TrackProgressIndicator(
+//                    currentTrack,
+//                    player,
+//                    updateProgress,
+//                    progress,
+//                    modifier = Modifier.padding(horizontal = 20.dp)
+//                )
             }
         }
     }

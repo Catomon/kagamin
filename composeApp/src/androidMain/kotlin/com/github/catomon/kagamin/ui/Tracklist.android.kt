@@ -15,8 +15,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -30,7 +30,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
-import com.github.catomon.kagamin.ui.theme.Colors
+import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.audio.AudioPlayer
 import com.github.catomon.kagamin.audio.AudioTrack
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
@@ -76,7 +76,7 @@ fun Tracklist(
         } else {
             Box(
                 modifier = Modifier
-                    .background(Colors.backgroundTransparent)
+                    .background(KagaminTheme.backgroundTransparent)
                     .height(32.dp)
                     .fillMaxWidth()
             )
@@ -114,7 +114,7 @@ fun Tracklist(
 
         Box(Modifier
             .fillMaxSize()
-            .background(Colors.theme.listItemB))
+            .background(KagaminTheme.theme.listItemB))
     }
 }
 
@@ -129,8 +129,8 @@ actual fun TrackItem(
 ) {
     val clipboard = LocalClipboardManager.current
     val isHeader = index == -1
-    val backColor = if (isHeader) Colors.backgroundTransparent else
-        if (index % 2 == 0) Colors.theme.listItemA else Colors.theme.listItemB
+    val backColor = if (isHeader) KagaminTheme.backgroundTransparent else
+        if (index % 2 == 0) KagaminTheme.theme.listItemA else KagaminTheme.theme.listItemB
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -146,7 +146,7 @@ actual fun TrackItem(
                     .clip(
                         RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp)
                     )
-                    .background(Colors.backgroundTransparent)
+                    .background(KagaminTheme.backgroundTransparent)
                     .clickable {
                         viewModel.onPlayPause()
                     }, contentAlignment = Alignment.Center
@@ -155,7 +155,7 @@ actual fun TrackItem(
                     painterResource(if (viewModel.playState == AudioPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
                     "track playback state icon",
                     modifier = Modifier.size(16.dp),
-                    colorFilter = ColorFilter.tint(Colors.theme.buttonIcon)
+                    colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIcon)
                 )
             }
         }
@@ -174,7 +174,7 @@ actual fun TrackItem(
             Text(
                 track.name,
                 fontSize = 12.sp,
-                color = Colors.text,
+                color = KagaminTheme.text,
                 maxLines = 1,
                 modifier = Modifier.align(Alignment.CenterStart),
                 overflow = TextOverflow.Ellipsis,

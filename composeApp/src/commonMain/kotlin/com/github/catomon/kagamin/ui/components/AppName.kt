@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.catomon.kagamin.ui.theme.Colors
+import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.star64
 import org.jetbrains.compose.resources.painterResource
@@ -38,19 +38,19 @@ private fun AppNameNormal(modifier: Modifier = Modifier, height: Dp = 32.dp, fon
     ) {
         Text(
             text = "Kag",
-            color = Colors.theme.buttonIcon,
+            color = KagaminTheme.theme.buttonIcon,
             fontSize = fontSize,
             modifier = Modifier.height(height),
         )
         Image(
             painterResource(Res.drawable.star64),
             "App icon",
-            colorFilter = ColorFilter.tint(Colors.theme.buttonIcon),
+            colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIcon),
             modifier = Modifier.size(height).offset(y = (-3).dp)
         )
         Text(
             text = "min",
-            color = Colors.theme.buttonIcon,
+            color = KagaminTheme.theme.buttonIcon,
             fontSize = 18.sp,
             modifier = Modifier.height(height),
         )
@@ -67,18 +67,18 @@ private fun AppNameWShadowJap(modifier: Modifier = Modifier, height: Dp = 32.dp,
         ) {
             Text(
                 text = "かが",
-                color = Colors.theme.thinBorder,
+                color = KagaminTheme.theme.thinBorder,
                 fontSize = fontSize,
             )
             Image(
                 painterResource(Res.drawable.star64),
                 "App icon",
-                colorFilter = ColorFilter.tint(Colors.theme.thinBorder),
+                colorFilter = ColorFilter.tint(KagaminTheme.theme.thinBorder),
                 modifier = Modifier.size(height)
             )
             Text(
                 text = "みん",
-                color = Colors.theme.thinBorder,
+                color = KagaminTheme.theme.thinBorder,
                 fontSize = fontSize,
             )
         }
@@ -90,18 +90,18 @@ private fun AppNameWShadowJap(modifier: Modifier = Modifier, height: Dp = 32.dp,
         ) {
             Text(
                 text = "かが",
-                color = Colors.theme.buttonIcon,
+                color = KagaminTheme.theme.buttonIcon,
                 fontSize = fontSize,
             )
             Image(
                 painterResource(Res.drawable.star64),
                 "App icon",
-                colorFilter = ColorFilter.tint(Colors.theme.buttonIcon),
+                colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIcon),
                 modifier = Modifier.size(height)
             )
             Text(
                 text = "みん",
-                color = Colors.theme.buttonIcon,
+                color = KagaminTheme.theme.buttonIcon,
                 fontSize = fontSize,
             )
         }
@@ -118,18 +118,18 @@ private fun AppNameWShadow(modifier: Modifier = Modifier) {
         ) {
             Text(
                 text = "Kag",
-                color = Colors.theme.thinBorder,
+                color = KagaminTheme.theme.thinBorder,
                 fontSize = 18.sp,
             )
             Image(
                 painterResource(Res.drawable.star64),
                 "App icon",
-                colorFilter = ColorFilter.tint(Colors.theme.thinBorder),
+                colorFilter = ColorFilter.tint(KagaminTheme.theme.thinBorder),
                 modifier = Modifier.size(25.dp)
             )
             Text(
                 text = "min",
-                color = Colors.theme.thinBorder,
+                color = KagaminTheme.theme.thinBorder,
                 fontSize = 18.sp,
             )
         }
@@ -141,18 +141,18 @@ private fun AppNameWShadow(modifier: Modifier = Modifier) {
         ) {
             Text(
                 text = "Kag",
-                color = Colors.theme.buttonIcon,
+                color = KagaminTheme.theme.buttonIcon,
                 fontSize = 18.sp,
             )
             Image(
                 painterResource(Res.drawable.star64),
                 "App icon",
-                colorFilter = ColorFilter.tint(Colors.theme.buttonIcon),
+                colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIcon),
                 modifier = Modifier.size(25.dp)
             )
             Text(
                 text = "min",
-                color = Colors.theme.buttonIcon,
+                color = KagaminTheme.theme.buttonIcon,
                 fontSize = 18.sp,
             )
         }
@@ -164,8 +164,8 @@ private fun AppNameOutlined(modifier: Modifier = Modifier) {
     Row(modifier) {
         OutlinedText(
             text = "Kag",
-            fillColor = Colors.theme.buttonIcon,
-            outlineColor = Colors.theme.thinBorder,
+            fillColor = KagaminTheme.theme.buttonIcon,
+            outlineColor = KagaminTheme.theme.thinBorder,
             fontSize = 18.sp,
             modifier = Modifier.height(32.dp),
             outlineDrawStyle = Stroke(4f)
@@ -174,7 +174,7 @@ private fun AppNameOutlined(modifier: Modifier = Modifier) {
             Image(
                 painterResource(Res.drawable.star64),
                 "App icon",
-                colorFilter = ColorFilter.tint(Colors.theme.thinBorder),
+                colorFilter = ColorFilter.tint(KagaminTheme.theme.thinBorder),
                 modifier = Modifier.size(32.dp).offset(y = (-3).dp).graphicsLayer(
                     scaleX = 1.25f, scaleY = 1.25f
                 )
@@ -182,14 +182,14 @@ private fun AppNameOutlined(modifier: Modifier = Modifier) {
             Image(
                 painterResource(Res.drawable.star64),
                 "App icon",
-                colorFilter = ColorFilter.tint(Colors.theme.buttonIcon),
+                colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIcon),
                 modifier = Modifier.size(30.dp).offset(y = (-3).dp)
             )
         }
         OutlinedText(
             text = "min",
-            fillColor = Colors.theme.buttonIcon,
-            outlineColor = Colors.theme.thinBorder,
+            fillColor = KagaminTheme.theme.buttonIcon,
+            outlineColor = KagaminTheme.theme.thinBorder,
             fontSize = 18.sp,
             modifier = Modifier.height(32.dp),
             outlineDrawStyle = Stroke(4f)

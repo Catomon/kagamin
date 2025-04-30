@@ -6,14 +6,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.TextButton
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.github.catomon.kagamin.ui.theme.Colors
+import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.LayoutManager
 import com.github.catomon.kagamin.LocalLayoutManager
 import com.github.catomon.kagamin.LocalWindow
@@ -30,16 +31,16 @@ import kagamin.composeapp.generated.resources.minimize_window
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun MinimizeButton(modifier: Modifier) {
+fun MinimizeButton(modifier: Modifier = Modifier) {
     val window = LocalWindow.current
-    TextButton({
+    IconButton({
         window.isMinimized = true
     }, modifier = modifier) {
         ImageWithShadow(
             painterResource(Res.drawable.minimize_window),
             "Minimize",
-            modifier = Modifier.size(32.dp),
-            colorFilter = ColorFilter.tint(Colors.theme.buttonIconSmall)
+            modifier = Modifier.size(20.dp),
+            colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIconSmall)
         )
     }
 }
@@ -51,7 +52,7 @@ fun Sidebar(
     val layoutManager = LocalLayoutManager.current
 
     Column(
-        modifier.fillMaxHeight().width(32.dp).background(color = Colors.backgroundTransparent),
+        modifier.fillMaxHeight().width(32.dp).background(color = KagaminTheme.backgroundTransparent),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -69,7 +70,7 @@ fun Sidebar(
                             viewModel.currentTab = Tabs.PLAYBACK
                         }
                     },
-                    color = if (viewModel.currentTab == Tabs.PLAYBACK) Colors.theme.buttonIconSmallSelected else Colors.theme.buttonIconSmall,
+                    color = if (viewModel.currentTab == Tabs.PLAYBACK) KagaminTheme.theme.buttonIconSmallSelected else KagaminTheme.theme.buttonIconSmall,
                     Modifier.weight(0.333f)
                 )
             }
@@ -80,7 +81,7 @@ fun Sidebar(
                         viewModel.currentTab = Tabs.TRACKLIST
                     }
                 },
-                color = if (viewModel.currentTab == Tabs.TRACKLIST) Colors.theme.buttonIconSmallSelected else Colors.theme.buttonIconSmall,
+                color = if (viewModel.currentTab == Tabs.TRACKLIST) KagaminTheme.theme.buttonIconSmallSelected else KagaminTheme.theme.buttonIconSmall,
                 Modifier.weight(0.333f)
             )
 
@@ -90,7 +91,7 @@ fun Sidebar(
                         viewModel.currentTab = Tabs.PLAYLISTS
                     }
                 },
-                color = if (viewModel.currentTab == Tabs.PLAYLISTS) Colors.theme.buttonIconSmallSelected else Colors.theme.buttonIconSmall,
+                color = if (viewModel.currentTab == Tabs.PLAYLISTS) KagaminTheme.theme.buttonIconSmallSelected else KagaminTheme.theme.buttonIconSmall,
                 Modifier.weight(0.333f)
             )
 
@@ -111,7 +112,7 @@ fun Sidebar(
                 }
             },
                 modifier = Modifier.weight(0.333f),
-                color = if (viewModel.currentTab == Tabs.ADD_TRACKS || viewModel.currentTab == Tabs.CREATE_PLAYLIST) Colors.theme.buttonIconSmallSelected else Colors.theme.buttonIconSmall
+                color = if (viewModel.currentTab == Tabs.ADD_TRACKS || viewModel.currentTab == Tabs.CREATE_PLAYLIST) KagaminTheme.theme.buttonIconSmallSelected else KagaminTheme.theme.buttonIconSmall
             )
         }
 
@@ -121,7 +122,7 @@ fun Sidebar(
 
 @Composable
 private fun SwapLayoutButton(layoutManager: LayoutManager) {
-    TextButton(
+    IconButton(
         onClick = {
             when (layoutManager.currentLayout.value) {
                 LayoutManager.Layout.Default -> {
@@ -141,8 +142,8 @@ private fun SwapLayoutButton(layoutManager: LayoutManager) {
         ImageWithShadow(
             painterResource(Res.drawable.drag),
             "drag window",
-            modifier = Modifier.size(20.dp),
-            colorFilter = ColorFilter.tint(Colors.theme.buttonIconSmall)
+            modifier = Modifier.size(16.dp),
+            colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIconSmall)
         )
     }
 }
@@ -156,7 +157,7 @@ private fun MenuButton(navController: NavHostController, modifier: Modifier) {
             painterResource(Res.drawable.menu),
             "Menu",
             modifier = Modifier.size(32.dp),
-            colorFilter = ColorFilter.tint(Colors.theme.buttonIconSmall)
+            colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIconSmall)
         )
     }
 }

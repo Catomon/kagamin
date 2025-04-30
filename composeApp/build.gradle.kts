@@ -31,7 +31,7 @@ kotlin {
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
-            implementation(compose.material)
+            implementation(compose.material3)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
@@ -48,8 +48,15 @@ kotlin {
 //            implementation(libs.androidx.ui.tooling)
 
             implementation(libs.kotlinx.serialization.json)
-            implementation(libs.mpfilepicker)
+//            implementation(libs.mpfilepicker)
             implementation(libs.mp3agic)
+//            implementation(libs.filekit.core)
+//            implementation(libs.filekit.dialogs)
+
+            implementation(libs.filekit.dialogs.compose)
+            implementation(libs.filekit.coil)
+
+            implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

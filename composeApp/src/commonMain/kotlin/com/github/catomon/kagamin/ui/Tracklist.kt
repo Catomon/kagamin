@@ -1,23 +1,9 @@
 package com.github.catomon.kagamin.ui
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewModelScope
-import com.github.catomon.kagamin.ui.theme.Colors
 import com.github.catomon.kagamin.audio.AudioTrack
 import com.github.catomon.kagamin.savePlaylist
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
@@ -26,7 +12,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 
 class TracklistManager(
-    val coroutineScope: CoroutineScope,
+    private val coroutineScope: CoroutineScope,
 ) {
     val selected: SnapshotStateMap<Int, AudioTrack> = mutableStateMapOf()
     val isAnySelected get() = selected.isNotEmpty()

@@ -7,8 +7,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.Text
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.catomon.kagamin.audio.AudioPlayer
 import com.github.catomon.kagamin.audio.AudioTrack
-import com.github.catomon.kagamin.ui.theme.Colors
+import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.formatTime
 
 @Composable
@@ -33,8 +33,8 @@ fun TrackProgressIndicator(
     player: AudioPlayer<AudioTrack>,
     updateProgress: () -> Unit,
     progress: Float,
-    color: Color = Colors.theme.buttonIcon,
-    textColor: Color = Colors.theme.buttonIconTransparent,
+    color: Color = KagaminTheme.theme.buttonIcon,
+    textColor: Color = KagaminTheme.theme.buttonIconTransparent,
     modifier: Modifier = Modifier,
     fontSize: TextUnit = 10.sp,
 ) {
@@ -59,7 +59,7 @@ fun TrackProgressIndicator(
         Box {
             LinearProgressIndicator(
                 progress = progress,
-                color = Colors.theme.thinBorder,
+                color = KagaminTheme.theme.thinBorder,
                 strokeCap = StrokeCap.Round,
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
                     .graphicsLayer(translationY = 2f)
@@ -79,11 +79,11 @@ fun TrackProgressIndicator(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                timePastText, fontSize = fontSize, color = Colors.theme.buttonIcon
+                timePastText, fontSize = fontSize, color = KagaminTheme.theme.buttonIcon
             )
 
             Text(
-                trackDurationText, fontSize = fontSize, color = Colors.theme.buttonIcon
+                trackDurationText, fontSize = fontSize, color = KagaminTheme.theme.buttonIcon
             )
         }
     }

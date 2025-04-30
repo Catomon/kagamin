@@ -5,7 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.draganddrop.dragAndDropTarget
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.SnackbarHostState
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -39,7 +39,6 @@ import com.github.catomon.kagamin.WindowConfig.isTraySupported
 import com.github.catomon.kagamin.audio.AudioPlayer
 import com.github.catomon.kagamin.ui.KagaminApp
 import com.github.catomon.kagamin.ui.customShadow
-import com.github.catomon.kagamin.ui.theme.Colors
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.ui.windows.ConfirmWindow
@@ -203,7 +202,7 @@ private fun Modifier.kagaminWindowDecoration() =
             .customShadow()
             .drawBehind {
                 drawRoundRect(
-                    color = Colors.theme.thinBorder,
+                    color = KagaminTheme.theme.thinBorder,
                     topLeft = Offset(0f, 2f),
                     size = this.size.copy(),
                     cornerRadius = CornerRadius(12f)
@@ -214,7 +213,7 @@ private fun Modifier.kagaminWindowDecoration() =
         this.customShadow(cornerRadius = 0.dp)
             .border(
                 2.dp,
-                Colors.theme.thinBorder,
+                KagaminTheme.theme.thinBorder,
                 RectangleShape
             )
 

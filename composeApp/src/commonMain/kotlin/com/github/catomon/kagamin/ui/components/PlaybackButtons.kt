@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.IconButton
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.github.catomon.kagamin.audio.AudioPlayer
 import com.github.catomon.kagamin.audio.AudioTrack
-import com.github.catomon.kagamin.ui.theme.Colors
+import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.next
 import kagamin.composeapp.generated.resources.pause
@@ -39,7 +39,7 @@ fun PlaybackButtons(player: AudioPlayer<AudioTrack>, modifier: Modifier = Modifi
                 painterResource(Res.drawable.prev),
                 "Previous",
                 modifier = Modifier.size(buttonsSize),
-                colorFilter = ColorFilter.tint(Colors.theme.buttonIcon)
+                colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIcon)
             )
         }
 
@@ -59,14 +59,14 @@ fun PlaybackButtons(player: AudioPlayer<AudioTrack>, modifier: Modifier = Modifi
                         painterResource(Res.drawable.play),
                         "Play",
                         modifier = Modifier.size(buttonsSize * 1.25f),
-                        colorFilter = ColorFilter.tint(Colors.theme.buttonIcon)
+                        colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIcon)
                     )
                 } else {
                     ImageWithShadow(
                         painterResource(Res.drawable.pause),
                         "Pause",
                         modifier = Modifier.size(buttonsSize * 1.25f),
-                        colorFilter = ColorFilter.tint(Colors.theme.buttonIcon)
+                        colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIcon)
                     )
                 }
             }
@@ -82,7 +82,7 @@ fun PlaybackButtons(player: AudioPlayer<AudioTrack>, modifier: Modifier = Modifi
                 painterResource(Res.drawable.next),
                 "Next",
                 modifier = Modifier.size(buttonsSize),
-                colorFilter = ColorFilter.tint(Colors.theme.buttonIcon)
+                colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIcon)
             )
         }
     }

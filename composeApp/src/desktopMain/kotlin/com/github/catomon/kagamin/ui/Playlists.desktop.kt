@@ -23,32 +23,26 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.catomon.kagamin.ui.theme.Colors
+import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.audio.AudioPlayer
-import com.github.catomon.kagamin.loadPlaylists
-import com.github.catomon.kagamin.removePlaylist
-import com.github.catomon.kagamin.savePlaylist
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.ui.util.Tabs
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.pause
 import kagamin.composeapp.generated.resources.play
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 
@@ -69,13 +63,13 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
     if (playlists.isEmpty()) {
         Box(
             modifier
-                .background(Colors.theme.listItemB),
+                .background(KagaminTheme.theme.listItemB),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 "No playlists.",
                 textAlign = TextAlign.Center,
-                color = Colors.textSecondary
+                color = KagaminTheme.textSecondary
             )
         }
     } else {
@@ -84,7 +78,7 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
 
         Column(modifier) {
             Box(
-                modifier = Modifier.background(Colors.backgroundTransparent).height(32.dp)
+                modifier = Modifier.background(KagaminTheme.backgroundTransparent).height(32.dp)
                     .fillMaxWidth()
                     .clickable {
                         val curTrackIndex =
@@ -97,7 +91,7 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                 Text(
                     viewModel.currentPlaylistName,
                     fontSize = 10.sp,
-                    color = Colors.theme.buttonIcon
+                    color = KagaminTheme.theme.buttonIcon
                 )
             }
 
@@ -129,7 +123,7 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                         }
                     }
 
-                    Box(Modifier.fillMaxSize().background(Colors.theme.listItemB))
+                    Box(Modifier.fillMaxSize().background(KagaminTheme.theme.listItemB))
                 }
 
                 androidx.compose.animation.AnimatedVisibility(
@@ -138,7 +132,7 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                 ) {
                     VerticalScrollbar(
                         modifier = Modifier
-                            .fillMaxHeight(),
+                            .fillMaxHeight().clickable {  },
                         adapter = rememberScrollbarAdapter(listState)
                     )
                 }
@@ -175,20 +169,20 @@ actual fun PlaylistItem(
                 Box(Modifier.fillMaxHeight()//.clip(
                     //RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp)
                 //)
-                    .background(Colors.backgroundTransparent).clickable {
+                    .background(KagaminTheme.backgroundTransparent).clickable {
                     viewModel.onPlayPause()
                 }, contentAlignment = Alignment.Center) {
                     Image(
                         painterResource(if (viewModel.playState == AudioPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
                         "Play/Pause",
                         modifier = Modifier.size(16.dp).fillMaxHeight(),
-                        colorFilter = ColorFilter.tint(Colors.theme.buttonIcon)
+                        colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIcon)
                     )
                 }
             }
 
             Column(
-                Modifier.fillMaxHeight().background(color = if (i % 2 == 0) Colors.theme.listItemA else Colors.theme.listItemB)
+                Modifier.fillMaxHeight().background(color = if (i % 2 == 0) KagaminTheme.theme.listItemA else KagaminTheme.theme.listItemB)
                     .clickable {
                         viewModel.currentPlaylistName = playlist.first
                         viewModel.currentTab = Tabs.TRACKLIST
@@ -199,7 +193,7 @@ actual fun PlaylistItem(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        playlist.first, fontSize = 10.sp, color = Colors.text,
+                        playlist.first, fontSize = 10.sp, color = KagaminTheme.text,
                         maxLines = 1
                     )
                 }
@@ -209,7 +203,7 @@ actual fun PlaylistItem(
                         "Tracks: ${playlist.second.tracks.size}",
                         modifier = Modifier.weight(0.5f),
                         fontSize = 10.sp,
-                        color = Colors.textSecondary
+                        color = KagaminTheme.textSecondary
                     )
 //                    Text(
 //                        "Duration: ???",

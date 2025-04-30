@@ -36,11 +36,12 @@ class AudioPlayerJVM : BaseAudioPlayer<AudioTrackJVM>() {
 
         val settings = loadSettings()
         crossfade.value = settings.crossfade
-        if (settings.random)
-            playMode.value = AudioPlayer.PlayMode.RANDOM
-        else
-            if (settings.repeat)
-                playMode.value = AudioPlayer.PlayMode.REPEAT_TRACK
+        when {
+            settings.random -> playMode.value = AudioPlayer.PlayMode.RANDOM
+            settings.repeat -> playMode.value = AudioPlayer.PlayMode.REPEAT_TRACK
+            settings.repeatPlaylist -> playMode.value = AudioPlayer.PlayMode.REPEAT_PLAYLIST
+        }
+
         setVolume(settings.volume)
     }
 

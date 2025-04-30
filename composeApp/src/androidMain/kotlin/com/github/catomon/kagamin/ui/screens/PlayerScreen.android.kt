@@ -13,9 +13,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -28,15 +27,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.github.catomon.kagamin.ui.theme.Colors
+import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.MultiFilePicker
 import com.github.catomon.kagamin.audio.createAudioTrack
 import com.github.catomon.kagamin.loadPlaylist
 import com.github.catomon.kagamin.ui.components.AddButton
 import com.github.catomon.kagamin.ui.AddTracksTab
 import com.github.catomon.kagamin.ui.components.AppName
-import com.github.catomon.kagamin.ui.components.BackgroundImage
-import com.github.catomon.kagamin.ui.BottomBar
 import com.github.catomon.kagamin.ui.CreatePlaylistTab
 import com.github.catomon.kagamin.ui.Playlists
 import com.github.catomon.kagamin.ui.Tracklist
@@ -90,7 +87,7 @@ actual fun PlayerScreen(
         }
     }
 
-    Box(modifier.background(color = Colors.behindBackground, shape = RoundedCornerShape(16.dp))) {
+    Box(modifier.background(color = KagaminTheme.behindBackground, shape = RoundedCornerShape(16.dp))) {
 //        BackgroundImage()
 
         TrackThumbnail(
@@ -115,7 +112,7 @@ actual fun PlayerScreen(
                     .fillMaxWidth()
             ) {
                 AppName(Modifier
-                    .background(color = Colors.backgroundTransparent)
+                    .background(color = KagaminTheme.backgroundTransparent)
                     .padding(horizontal = 12.dp)
                     .padding(top = 8.dp)
                     .height(50.dp)
@@ -140,7 +137,7 @@ actual fun PlayerScreen(
                                     currentTrack,
                                     audioPlayer,
                                     Modifier
-                                        .fillMaxSize().background(color = Colors.backgroundTransparent)
+                                        .fillMaxSize().background(color = KagaminTheme.backgroundTransparent)
                                 )
                             }
 
@@ -158,13 +155,13 @@ actual fun PlayerScreen(
                                     Box(
                                         Modifier
                                             .fillMaxSize()
-                                            .background(Colors.theme.listItemB),
+                                            .background(KagaminTheme.theme.listItemB),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text(
                                             "Drop files or folders here",
                                             textAlign = TextAlign.Center,
-                                            color = Colors.textSecondary
+                                            color = KagaminTheme.textSecondary
                                         )
                                     }
                                 } else {
@@ -221,7 +218,7 @@ actual fun PlayerScreen(
                                     }
                                 }
 
-                            }, modifier = Modifier.align(Alignment.BottomEnd), if (viewModel.currentTab == Tabs.ADD_TRACKS || viewModel.currentTab == Tabs.CREATE_PLAYLIST) Color.White else Colors.theme.buttonIconSmall
+                            }, modifier = Modifier.align(Alignment.BottomEnd), if (viewModel.currentTab == Tabs.ADD_TRACKS || viewModel.currentTab == Tabs.CREATE_PLAYLIST) Color.White else KagaminTheme.theme.buttonIconSmall
                         )
                 }
             }

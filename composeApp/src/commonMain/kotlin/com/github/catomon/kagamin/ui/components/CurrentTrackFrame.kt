@@ -113,7 +113,7 @@ fun CompactCurrentTrackFrame(
     LaunchedEffect(currentTrack) {
         while (true) {
             if (player.playState.value == AudioPlayer.PlayState.PLAYING) updateProgress()
-            delay(1000)
+            delay(250)
         }
     }
 

@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,7 +37,10 @@ fun SongOptionsButtons(
 ) {
     val curTrack = viewModel.currentTrack
     var updatingLike by remember { mutableStateOf(false) }
-    var loved by remember(updatingLike, curTrack) { //idk why that var not recalculated when updatingLike changes
+    var loved by remember(
+        updatingLike,
+        curTrack
+    ) {
         mutableStateOf(curTrack?.let {
             viewModel.lovedSongs.containsKey(
                 it.uri
@@ -78,8 +80,8 @@ fun SongOptionsButtons(
         }
 
         IconButton(onClick = {
-            if (updatingLike) return@IconButton
             viewModel.viewModelScope.launch {
+                if (updatingLike) return@launch
                 updatingLike = true
                 if (!loved) {
                     viewModel.currentTrack?.toTrackData()?.let { curTrackData ->

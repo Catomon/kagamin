@@ -6,6 +6,7 @@ import androidx.compose.foundation.ContextMenuItem
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -29,12 +30,16 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -44,6 +49,7 @@ import com.github.catomon.kagamin.ui.theme.Colors
 import com.github.catomon.kagamin.LocalSnackbarHostState
 import com.github.catomon.kagamin.audio.AudioPlayer
 import com.github.catomon.kagamin.audio.AudioTrack
+import com.github.catomon.kagamin.ui.util.formatTime
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.ui.windows.ConfirmWindowState
 import com.github.catomon.kagamin.ui.windows.LocalConfirmWindow
@@ -51,6 +57,7 @@ import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.pause
 import kagamin.composeapp.generated.resources.play
 import kagamin.composeapp.generated.resources.selected
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 
@@ -258,15 +265,53 @@ actual fun TrackItem(
                     .padding(4.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    track.name,
-                    fontSize = 10.sp,
-                    color = if (isHeader) Colors.theme.buttonIcon else Colors.text,
-                    maxLines = 1,
-                    modifier = Modifier.align(Alignment.CenterStart),
-                    overflow = TextOverflow.Ellipsis,
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        track.name,
+                        fontSize = 10.sp,
+                        color = if (isHeader) Colors.theme.buttonIcon else Colors.text,
+                        maxLines = 1,
+                        // overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(0.99f).let {
+                            if (isHeader) it.basicMarquee(iterations = Int.MAX_VALUE)
+                            else it
+                        }
+                    )
 
+                    // duration text
+                    if (isHeader)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            var timePastText by remember { mutableStateOf("-:-") }
+                            var trackDurationText by remember { mutableStateOf("-:-") }
+
+                            LaunchedEffect(track) {
+                                while (true) {
+                                    if (viewModel.audioPlayer.playState.value == AudioPlayer.PlayState.PLAYING) {
+                                        timePastText =
+                                            formatTime(track.let { viewModel.audioPlayer.position })
+
+                                        if (viewModel.audioPlayer.position < 1000)
+                                            trackDurationText = formatTime(track.duration)
+                                    }
+                                    delay(250)
+                                }
+                            }
+
+                            Text(
+                                "$timePastText/$trackDurationText",
+                                fontSize = 10.sp,
+                                color = Colors.theme.buttonIcon
+                            )
+                        }
+                }
+
+                //selected icon
                 Row(
                     Modifier.align(Alignment.CenterEnd),
                     verticalAlignment = Alignment.CenterVertically

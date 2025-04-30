@@ -1,7 +1,6 @@
 package com.github.catomon.kagamin.ui.viewmodel
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -17,6 +16,7 @@ import com.github.catomon.kagamin.data.TrackData
 import com.github.catomon.kagamin.loadPlaylist
 import com.github.catomon.kagamin.loadPlaylists
 import com.github.catomon.kagamin.loadSettings
+import com.github.catomon.kagamin.savePlaylist
 import com.github.catomon.kagamin.ui.components.getThumbnail
 import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.util.echoMsg
@@ -64,6 +64,7 @@ class KagaminViewModel(private val ioDispatcher: CoroutineDispatcher = Dispatche
             val lovedPl = playlists.value["loved"] ?: return@launch
             val lovedMap = lovedPl.tracks.associateBy { it.uri }
             withContext(Dispatchers.Main) {
+                lovedSongs.clear()
                 lovedSongs.putAll(lovedMap)
             }
         }
@@ -122,5 +123,35 @@ class KagaminViewModel(private val ioDispatcher: CoroutineDispatcher = Dispatche
         } finally {
             isLoadingPlaylistFile = false
         }
+    }
+
+    fun removePlaylist(playlistName: String) {
+        com.github.catomon.kagamin.removePlaylist(playlistName)
+        if (currentPlaylistName == playlistName)
+            currentPlaylistName = "default"
+
+        reloadPlaylists()
+    }
+
+    fun clearPlaylist(playlistName: String) {
+        savePlaylist(
+            playlistName,
+            arrayOf()
+        )
+        if (currentPlaylistName == playlistName)
+            audioPlayer.playlist.value = mutableListOf()
+
+        reloadPlaylists()
+    }
+
+    fun shufflePlaylist(playlistName: String) {
+        val playlist = playlists.value[playlistName] ?: return
+        savePlaylist(
+            playlistName,
+            playlist.tracks.toList().shuffled()
+        )
+
+        reloadPlaylists()
+        reloadPlaylist()
     }
 }

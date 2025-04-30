@@ -38,10 +38,10 @@ import androidx.compose.ui.window.rememberWindowState
 import com.github.catomon.kagamin.WindowConfig.isTraySupported
 import com.github.catomon.kagamin.audio.AudioPlayer
 import com.github.catomon.kagamin.ui.KagaminApp
-import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.ui.customShadow
 import com.github.catomon.kagamin.ui.theme.Colors
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
+import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.ui.windows.ConfirmWindow
 import com.github.catomon.kagamin.ui.windows.ConfirmWindowState
 import com.github.catomon.kagamin.ui.windows.LocalConfirmWindow
@@ -189,39 +189,35 @@ private fun WindowScope.AppFrame(kagaminViewModel: KagaminViewModel = get(Kagami
         KagaminApp(
             kagaminViewModel,
             modifier = Modifier
-                .let {
-                    if (WindowConfig.isTransparent)
-                        it
-                            .padding(8.dp)
-                            .customShadow()
-                            .drawBehind {
-                                drawRoundRect(
-                                    color = Colors.theme.thinBorder,
-                                    topLeft = Offset(0f, 2f),
-                                    size = this.size.copy(),
-                                    cornerRadius = CornerRadius(12f)
-                                )
-                            }
-                            .clip(RoundedCornerShape(12.dp))
-//                            .border(
-//                                2.dp,
-//                                Colors.currentYukiTheme.thinBorder,
-//                                RoundedCornerShape(12.dp)
-//                            )
-                    else
-                        it.customShadow(cornerRadius = 0.dp)
-                            .border(
-                                2.dp,
-                                Colors.theme.thinBorder,
-                                RectangleShape
-                            )
-                }
+                .kagaminWindowDecoration()
                 .dragAndDropTarget({ true }, remember {
                     createTrackDragAndDropTarget(kagaminViewModel, snackbar)
                 })
         )
     }
 }
+
+private fun Modifier.kagaminWindowDecoration() =
+    if (WindowConfig.isTransparent)
+        this.padding(8.dp)
+            .customShadow()
+            .drawBehind {
+                drawRoundRect(
+                    color = Colors.theme.thinBorder,
+                    topLeft = Offset(0f, 2f),
+                    size = this.size.copy(),
+                    cornerRadius = CornerRadius(12f)
+                )
+            }
+            .clip(RoundedCornerShape(12.dp))
+    else
+        this.customShadow(cornerRadius = 0.dp)
+            .border(
+                2.dp,
+                Colors.theme.thinBorder,
+                RectangleShape
+            )
+
 
 @OptIn(ExperimentalComposeUiApi::class)
 private fun createTrackDragAndDropTarget(

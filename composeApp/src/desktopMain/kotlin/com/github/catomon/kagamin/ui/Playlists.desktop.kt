@@ -117,30 +117,13 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                                 playlists,
                                 i,
                                 remove = {
-                                    removePlaylist(playlist.first)
-                                    if (viewModel.currentPlaylistName == playlist.first)
-                                        viewModel.currentPlaylistName = "default"
-                                    viewModel.reloadPlaylists()
+                                   viewModel.removePlaylist(playlist.first)
                                 },
                                 clear = {
-                                    savePlaylist(
-                                        playlist.first,
-                                        arrayOf()
-                                    )
-
-                                    if (viewModel.currentPlaylistName == playlist.first)
-                                        viewModel.audioPlayer.playlist.value = mutableListOf()
-
-                                    viewModel.reloadPlaylists()
+                                    viewModel.clearPlaylist(playlist.first)
                                 },
                                 shuffle = {
-                                    savePlaylist(
-                                        playlist.first,
-                                        playlist.second.tracks.toList().shuffled()
-                                    )
-
-                                    viewModel.reloadPlaylists()
-                                    viewModel.reloadPlaylist()
+                                    viewModel.shufflePlaylist(playlist.first)
                                 }
                             )
                         }
@@ -197,7 +180,7 @@ actual fun PlaylistItem(
                 }, contentAlignment = Alignment.Center) {
                     Image(
                         painterResource(if (viewModel.playState == AudioPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
-                        "current playlist playback state icon",
+                        "Play/Pause",
                         modifier = Modifier.size(16.dp).fillMaxHeight(),
                         colorFilter = ColorFilter.tint(Colors.theme.buttonIcon)
                     )

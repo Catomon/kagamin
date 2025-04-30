@@ -73,6 +73,10 @@ fun TinyPlayerScreen(
         }
     }
 
+    LaunchedEffect(currentTrack) {
+        viewModel.updateThumbnail()
+    }
+
     Box(modifier.background(color = Colors.behindBackground, shape = RoundedCornerShape(16.dp))) {
         TrackThumbnail(
             image = viewModel.trackThumbnail,

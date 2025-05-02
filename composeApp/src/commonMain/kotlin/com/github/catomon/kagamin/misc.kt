@@ -14,13 +14,6 @@ val LocalSnackbarHostState = compositionLocalOf<SnackbarHostState> {
     error("No Snackbar Host State provided")
 }
 
-@Composable
-expect fun MultiFilePicker(
-    show: MutableState<Boolean>,
-    audioPlayer: AudioPlayer<AudioTrack>,
-    currentPlaylistName: String
-)
-
 fun formatMilliseconds(ms: Long): String {
     val minutes = (ms / 1000) / 60
     val seconds = (ms / 1000) % 60

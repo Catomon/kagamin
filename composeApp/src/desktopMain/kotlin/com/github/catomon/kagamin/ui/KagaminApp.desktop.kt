@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.github.catomon.kagamin.LayoutManager
+import com.github.catomon.kagamin.ui.util.LayoutManager
 import com.github.catomon.kagamin.LocalLayoutManager
 import com.github.catomon.kagamin.LocalSnackbarHostState
 import com.github.catomon.kagamin.ui.screens.CompactPlayerScreen

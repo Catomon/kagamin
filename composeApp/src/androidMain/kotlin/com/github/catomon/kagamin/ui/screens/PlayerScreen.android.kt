@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
-import com.github.catomon.kagamin.MultiFilePicker
 import com.github.catomon.kagamin.audio.createAudioTrack
 import com.github.catomon.kagamin.loadPlaylist
 import com.github.catomon.kagamin.ui.components.AddButton
@@ -79,7 +78,7 @@ actual fun PlayerScreen(
         viewModel.currentTab = Tabs.PLAYBACK
     }
 
-    MultiFilePicker(showFilePicker, viewModel.audioPlayer, viewModel.currentPlaylistName)
+    //todo file picker
 
     LaunchedEffect(currentPlaylistName) {
         CoroutineScope(Dispatchers.Default).launch {

@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
-import com.github.catomon.kagamin.LayoutManager
+import com.github.catomon.kagamin.ui.util.LayoutManager
 import com.github.catomon.kagamin.LocalLayoutManager
 import com.github.catomon.kagamin.data.AppSettings
 import com.github.catomon.kagamin.audio.AudioPlayer

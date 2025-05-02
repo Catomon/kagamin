@@ -19,7 +19,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
-import com.github.catomon.kagamin.LayoutManager
+import com.github.catomon.kagamin.ui.util.LayoutManager
 import com.github.catomon.kagamin.LocalLayoutManager
 import com.github.catomon.kagamin.LocalWindow
 import com.github.catomon.kagamin.ui.PlaybackTabButton

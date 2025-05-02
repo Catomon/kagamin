@@ -7,9 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,19 +22,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowScope
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import com.github.catomon.kagamin.audio.AudioPlayer
-import com.github.catomon.kagamin.audio.AudioTrack
-import io.github.vinceglb.filekit.FileKit
-import io.github.vinceglb.filekit.dialogs.FileKitMode
-import io.github.vinceglb.filekit.dialogs.FileKitType
-import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
-import io.github.vinceglb.filekit.dialogs.openFilePicker
-import io.github.vinceglb.filekit.path
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.github.catomon.kagamin.ui.util.LayoutManager
 import java.awt.MouseInfo
 import java.awt.Point
 import java.awt.Window
@@ -74,16 +60,6 @@ fun ApplicationScope.setComposeExceptionHandler() {
             }
         }
     }
-}
-
-@OptIn(DelicateCoroutinesApi::class)
-@Composable
-actual fun MultiFilePicker(
-    show: MutableState<Boolean>,
-    audioPlayer: AudioPlayer<AudioTrack>,
-    currentPlaylistName: String
-) {
-
 }
 
 @Composable
@@ -141,14 +117,4 @@ val LocalLayoutManager = compositionLocalOf<LayoutManager> {
 
 val LocalWindow = compositionLocalOf<ComposeWindow> {
     error("No window")
-}
-
-class LayoutManager(
-    val currentLayout: MutableState<Layout> = mutableStateOf(Layout.Default)
-) {
-    enum class Layout {
-        Default,
-        Compact,
-        Tiny,
-    }
 }

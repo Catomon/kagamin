@@ -40,6 +40,7 @@ import com.github.catomon.kagamin.audio.AudioPlayer
 import com.github.catomon.kagamin.ui.KagaminApp
 import com.github.catomon.kagamin.ui.customShadow
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
+import com.github.catomon.kagamin.ui.util.LayoutManager
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.ui.windows.ConfirmWindow
 import com.github.catomon.kagamin.ui.windows.ConfirmWindowState

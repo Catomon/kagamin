@@ -29,27 +29,36 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.audio.AudioPlayer
+import com.github.catomon.kagamin.ui.components.TrackThumbnail
+import com.github.catomon.kagamin.ui.components.getThumbnail
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.ui.util.Tabs
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.pause
 import kagamin.composeapp.generated.resources.play
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -160,6 +169,23 @@ actual fun PlaylistItem(
 
     val backColor = if (i % 2 == 0) KagaminTheme.theme.listItemA else KagaminTheme.theme.listItemB
 
+    var trackThumbnailUpdated by remember { mutableStateOf<ImageBitmap?>(null) }
+
+    val height = 64.dp
+
+    LaunchedEffect(Unit) {
+        playlist.second.tracks.randomOrNull()?.uri?.let { uri ->
+            trackThumbnailUpdated = try {
+                withContext(Dispatchers.IO) {
+                    getThumbnail(uri)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+    }
+
     ContextMenuArea(items = {
         listOf(
             ContextMenuItem("Shuffle") {
@@ -173,64 +199,80 @@ actual fun PlaylistItem(
             },
         )
     }) {
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(56.dp)) {
-            if (viewModel.currentPlaylistName == playlist.first) {
-                Box(Modifier.fillMaxHeight().graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+        Box(Modifier.height(64.dp)) {
+            TrackThumbnail(trackThumbnailUpdated, modifier = Modifier.fillMaxWidth().height(height), shape = RectangleShape)
+
+            PlaylistItemContent(viewModel, playlist, backColor)
+        }
+    }
+}
+
+@Composable
+private fun PlaylistItemContent(
+    viewModel: KagaminViewModel,
+    playlist: Pair<String, PlaylistData>,
+    backColor: Color
+) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+        if (viewModel.currentPlaylistName == playlist.first) {
+            Box(
+                Modifier.fillMaxHeight()
+                    .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
                     .drawWithContent {
                         drawContent()
                         drawRect(color = backColor, size = size, blendMode = BlendMode.SrcOut)
                         drawContent()
                     }.clickable {
-                    viewModel.onPlayPause()
-                }, contentAlignment = Alignment.Center) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier.fillMaxHeight().background(
-                            KagaminTheme.backgroundTransparent,
-                            RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp)
-                        )
-                    ) {
-                        Image(
-                            painterResource(if (viewModel.playState == AudioPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
-                            "Play/Pause",
-                            modifier = Modifier.size(16.dp).fillMaxHeight(),
-                            colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIcon)
-                        )
-                    }
+                        viewModel.onPlayPause()
+                    }, contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.fillMaxHeight().background(
+                        KagaminTheme.backgroundTransparent,
+                        RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp)
+                    )
+                ) {
+                    Image(
+                        painterResource(if (viewModel.playState == AudioPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
+                        "Play/Pause",
+                        modifier = Modifier.size(16.dp).fillMaxHeight(),
+                        colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIcon)
+                    )
                 }
             }
+        }
 
-            Column(
-                Modifier.fillMaxHeight().background(color = backColor)
-                    .clickable {
-                        viewModel.currentPlaylistName = playlist.first
-                        viewModel.currentTab = Tabs.TRACKLIST
-                    }.padding(4.dp)
+        Column(
+            Modifier.fillMaxHeight().background(color = backColor)
+                .clickable {
+                    viewModel.currentPlaylistName = playlist.first
+                    viewModel.currentTab = Tabs.TRACKLIST
+                }.padding(4.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        playlist.first, fontSize = 10.sp, color = KagaminTheme.text,
-                        maxLines = 1
-                    )
-                }
+                Text(
+                    playlist.first, fontSize = 10.sp, color = KagaminTheme.text,
+                    maxLines = 1
+                )
+            }
 
-                Row(Modifier.fillMaxWidth()) {
-                    Text(
-                        "Tracks: ${playlist.second.tracks.size}",
-                        modifier = Modifier.weight(0.5f),
-                        fontSize = 10.sp,
-                        color = KagaminTheme.textSecondary
-                    )
+            Row(Modifier.fillMaxWidth()) {
+                Text(
+                    "Tracks: ${playlist.second.tracks.size}",
+                    modifier = Modifier.weight(0.5f),
+                    fontSize = 10.sp,
+                    color = KagaminTheme.textSecondary
+                )
 //                    Text(
 //                        "Duration: ???",
 //                        modifier = Modifier.weight(0.5f),
 //                        fontSize = 10.sp,
 //                        color = Colors.text2
 //                    )
-                }
             }
         }
     }

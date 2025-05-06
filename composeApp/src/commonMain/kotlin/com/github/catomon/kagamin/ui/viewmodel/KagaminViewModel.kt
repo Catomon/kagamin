@@ -88,10 +88,10 @@ class KagaminViewModel(private val ioDispatcher: CoroutineDispatcher = Dispatche
         loadingThumbnail = true
 
         val currentTrack = currentTrack
-        val trackThumbnailT = if (currentTrack != null) {
+        val trackThumbnailUpdated = if (currentTrack != null) {
             try {
                 withContext(ioDispatcher) {
-                    getThumbnail(currentTrack)
+                    getThumbnail(currentTrack.uri)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -101,7 +101,7 @@ class KagaminViewModel(private val ioDispatcher: CoroutineDispatcher = Dispatche
             null
         }
 
-        trackThumbnail = trackThumbnailT
+        trackThumbnail = trackThumbnailUpdated
 
         loadingThumbnail = false
     }

@@ -7,3 +7,5 @@ actual val userDataFolder: File =
         System.getProperty("user.home"),
         if (osName.contains("win")) "AppData/Roaming/Kagamin" else ".local/share/Kagamin"
     )
+
+val cacheFolder = File(System.getenv("LOCALAPPDATA"), "Kagamin/thumbnails/")

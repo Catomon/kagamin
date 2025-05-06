@@ -35,9 +35,11 @@ import androidx.compose.ui.window.WindowScope
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.rememberTrayState
 import androidx.compose.ui.window.rememberWindowState
+import androidx.lifecycle.viewModelScope
 import com.github.catomon.kagamin.WindowConfig.isTraySupported
 import com.github.catomon.kagamin.audio.AudioPlayer
 import com.github.catomon.kagamin.ui.KagaminApp
+import com.github.catomon.kagamin.ui.components.getThumbnail
 import com.github.catomon.kagamin.ui.customShadow
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.LayoutManager
@@ -49,8 +51,9 @@ import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.kagamin_icon64
 import kagamin.composeapp.generated.resources.pause_icon
 import kagamin.composeapp.generated.resources.play_icon
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.painterResource
 import org.koin.java.KoinJavaComponent.get
 import java.awt.datatransfer.DataFlavor
@@ -235,48 +238,69 @@ private fun createTrackDragAndDropTarget(
     override fun onDrop(event: DragAndDropEvent): Boolean {
         event.awtTransferable.let {
             if (it.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-                try {
-                    val droppedFiles =
-                        it.getTransferData(DataFlavor.javaFileListFlavor) as List<File>
-                    val musicFiles = ArrayList<File>(1000)
-                    fun filterMusicFiles(files: List<File>) {
-                        for (file in files) {
-                            if (file.isDirectory) {
-                                file.listFiles()
-                                    ?.let { filterMusicFiles(it.toList()) }
-                            } else {
-                                if (file.extension == "mp3" || file.extension == "wav") {
-                                    musicFiles.add(file)
-                                }
-                            }
-                        }
-                    }
+                val droppedFiles =
+                    it.getTransferData(DataFlavor.javaFileListFlavor) as List<File>
 
-                    filterMusicFiles(droppedFiles)
-
-                    kagaminViewModel.audioPlayer.load(musicFiles.map { it.path })
-                    savePlaylist(
-                        kagaminViewModel.currentPlaylistName,
-                        kagaminViewModel.audioPlayer.playlist.value.toTypedArray()
-                    )
-
-                    //fixme
-                    GlobalScope.launch {
-                        snackbar.showSnackbar("${musicFiles.size} files were added.")
-                    }
-                    return true
-                } catch (ex: Exception) {
-                    ex.printStackTrace()
-
-                    //fixme
-                    GlobalScope.launch {
-                        snackbar.showSnackbar(ex.message ?: "null")
-                    }
-                    return false
+                kagaminViewModel.viewModelScope.launch {
+                    loadTrackFiles(droppedFiles)
                 }
+
+                return true
             } else {
                 return false
             }
+        }
+    }
+
+    private suspend fun loadTrackFiles(droppedFiles: List<File>): Boolean {
+        try {
+            val trackFiles = ArrayList<File>(1000)
+
+            snackbar.showSnackbar("Filtering files...")
+
+            withContext(Dispatchers.IO) {
+                fun filterMusicFiles(files: List<File>) {
+                    for (file in files) {
+                        if (file.isDirectory) {
+                            file.listFiles()
+                                ?.let { filterMusicFiles(it.toList()) }
+                        } else {
+                            if (file.extension == "mp3" || file.extension == "wav") {
+                                trackFiles.add(file)
+                            }
+                        }
+                    }
+                }
+
+                filterMusicFiles(droppedFiles)
+            }
+
+            snackbar.showSnackbar("Caching thumbnails...")
+
+            withContext(Dispatchers.IO) {
+                trackFiles.forEach {
+                    getThumbnail(it.path)
+                }
+            }
+
+            snackbar.showSnackbar("Adding tracks...")
+
+            kagaminViewModel.audioPlayer.load(trackFiles.map { it.path })
+
+            withContext(Dispatchers.IO) {
+                savePlaylist(
+                    kagaminViewModel.currentPlaylistName,
+                    kagaminViewModel.audioPlayer.playlist.value.toTypedArray()
+                )
+            }
+
+            snackbar.showSnackbar("${trackFiles.size} tracks were added.")
+            return true
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+
+            snackbar.showSnackbar(ex.message ?: "null")
+            return false
         }
     }
 }

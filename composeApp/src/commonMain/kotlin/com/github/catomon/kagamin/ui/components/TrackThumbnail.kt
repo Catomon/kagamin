@@ -24,6 +24,7 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.input.pointer.pointerInput
@@ -43,13 +44,14 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun TrackThumbnail(
     image: ImageBitmap?,
-    onSetProgress: (Float) -> Unit,
-    progress: Float,
+    onSetProgress: (Float) -> Unit = { },
+    progress: Float = 0f,
     progressColor: Color = KagaminTheme.theme.thumbnailProgressIndicator,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
     blur: Boolean = false,
-    controlProgress: Boolean = true
+    controlProgress: Boolean = true,
+    shape: Shape = RoundedCornerShape(12.dp)
 ) {
     var offset by remember { mutableStateOf(IntOffset(0, 0)) }
     var size by remember { mutableStateOf(IntSize(0, 0)) }
@@ -81,10 +83,10 @@ fun TrackThumbnail(
                 color = KagaminTheme.theme.backgroundTransparent,
                 topLeft = Offset(0f, with(density) { 2.dp.toPx() }),
                 size = this.size.copy(),
-                cornerRadius = CornerRadius(12f)
+                cornerRadius = CornerRadius(if (shape is RoundedCornerShape) 12f else 0f)
             )
         }
-            .clip(RoundedCornerShape(12.dp))
+            .clip(shape)
             .let {
                 if (controlProgress) {
                     it.pointerInput(croppedImage) {
@@ -98,7 +100,7 @@ fun TrackThumbnail(
                 }
             }
     ) {
-        AnimatedContent(croppedImage, modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp))) { croppedImage ->
+        AnimatedContent(croppedImage, modifier = Modifier.fillMaxSize().clip(shape)) { croppedImage ->
             if (croppedImage == null) {
                 Box(
                     Modifier.fillMaxSize()
@@ -107,7 +109,7 @@ fun TrackThumbnail(
                         painterResource(Res.drawable.def_thumb),
                         "Default track thumbnail",
                         contentScale = contentScale,
-                        modifier = Modifier.fillMaxSize().let { if (blur) it.blur(5.dp) else it }.clip(RoundedCornerShape(14.dp))
+                        modifier = Modifier.fillMaxSize().let { if (blur) it.blur(5.dp) else it }.clip(shape)
                     )
                 }
             } else {
@@ -122,7 +124,7 @@ fun TrackThumbnail(
                     },
                     "Track thumbnail",
                     contentScale = contentScale,
-                    modifier = Modifier.fillMaxSize().let { if (blur) it.blur(5.dp) else it }.clip(RoundedCornerShape(14.dp))
+                    modifier = Modifier.fillMaxSize().let { if (blur) it.blur(5.dp) else it }.clip(shape)
                 )
             }
         }

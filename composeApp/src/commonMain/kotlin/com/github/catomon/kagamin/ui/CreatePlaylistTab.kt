@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.github.catomon.kagamin.isValidFileName
+import com.github.catomon.kagamin.loadPlaylists
 import com.github.catomon.kagamin.savePlaylist
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.Tabs
@@ -77,12 +78,12 @@ fun CreatePlaylistTab(viewModel: KagaminViewModel, modifier: Modifier) {
                 Button(onClick = {
                     if (isValidFileName(name)) {
                         viewModel.currentPlaylistName = name
-                        if (isLink) {
-                            viewModel.audioPlayer.load(listOf(link))
-                        }
+//                        if (isLink) { don't.
+//                            viewModel.audioPlayer.load(listOf(link))
+//                        }
                         savePlaylist(
                             viewModel.currentPlaylistName,
-                            viewModel.audioPlayer.playlist.value.toTypedArray()
+                            emptyList()
                         )
                         viewModel.currentTab = Tabs.TRACKLIST
                     } else

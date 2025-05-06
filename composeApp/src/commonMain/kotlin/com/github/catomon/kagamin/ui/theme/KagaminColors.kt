@@ -165,8 +165,8 @@ sealed class KagaminColors(
         override val buttonIconSmall: Color = Color(0xffd51e82)
         override val buttonIcon: Color = Color(0xffd51e82)
         override val onBars: Color = Color(0xfffd72bb)
-        override val listItemA: Color = Color(0xe6de2d8d)
-        override val listItemB: Color = Color(0xe6d51e82)
+        override val listItemA: Color = Color(0xcdde2d8d)
+        override val listItemB: Color = Color(0xcbd51e82)
         override val backgroundTransparent: Color = background.copy(0.95f)
         override val thumbnailProgressIndicator: Color = background.copy(0.25f)
     }

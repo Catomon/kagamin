@@ -73,7 +73,7 @@ fun Tracklist(
     val window = LocalWindow.current
 
     LaunchedEffect(allowAutoScroll) {
-        delay(3)
+        delay(3000)
         allowAutoScroll = true
     }
 

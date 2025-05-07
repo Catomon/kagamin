@@ -59,7 +59,7 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
     if (playlists.isEmpty()) {
         Box(
             modifier
-                .background(KagaminTheme.theme.listItemB),
+                .background(KagaminTheme.theme.listItem),
             contentAlignment = Alignment.Center
         ) {
             Text(
@@ -129,7 +129,7 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                 }
             }
 
-            Box(Modifier.fillMaxSize().background(KagaminTheme.theme.listItemB))
+            Box(Modifier.fillMaxSize().background(KagaminTheme.theme.listItem))
         }
     }
 }
@@ -170,7 +170,7 @@ actual fun PlaylistItem(
         Column(
             Modifier
                 .fillMaxHeight()
-                .background(color = if (i % 2 == 0) KagaminTheme.theme.listItemA else KagaminTheme.theme.listItemB)
+                .background(color = if (i % 2 == 0) KagaminTheme.theme.forDisabledMostlyIdk else KagaminTheme.theme.listItem)
                 .clickable {
                     viewModel.currentPlaylistName = playlist.first
                     viewModel.currentTab = Tabs.TRACKLIST

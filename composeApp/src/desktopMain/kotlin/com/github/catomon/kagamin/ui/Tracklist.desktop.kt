@@ -1,7 +1,5 @@
 package com.github.catomon.kagamin.ui
 
-import androidx.compose.foundation.ContextMenuArea
-import androidx.compose.foundation.ContextMenuItem
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
@@ -41,19 +39,16 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
-import com.github.catomon.kagamin.ui.theme.KagaminTheme
-import com.github.catomon.kagamin.LocalSnackbarHostState
+import com.github.catomon.kagamin.LocalWindow
 import com.github.catomon.kagamin.audio.AudioPlayer
 import com.github.catomon.kagamin.audio.AudioTrack
+import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.formatTime
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
-import com.github.catomon.kagamin.ui.windows.ConfirmWindowState
-import com.github.catomon.kagamin.ui.windows.LocalConfirmWindow
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.pause
 import kagamin.composeapp.generated.resources.play
@@ -73,16 +68,33 @@ fun Tracklist(
     val index =
         remember(tracks) { tracks.mapIndexed { i, track -> (track.uri to i) }.toMap() }
     val currentTrack = viewModel.currentTrack
-
     val listState = rememberLazyListState()
+    var allowAutoScroll by remember { mutableStateOf(true) }
+    val window = LocalWindow.current
+
+    LaunchedEffect(allowAutoScroll) {
+        delay(3)
+        allowAutoScroll = true
+    }
 
     LaunchedEffect(Unit) {
         listState.scrollToItem(index[currentTrack?.uri] ?: 0)
     }
 
+    LaunchedEffect(currentTrack) {
+        if (!window.isMinimized && viewModel.settings.autoScrollNextTrack && allowAutoScroll) {
+            val nextIndex =
+                index[currentTrack?.uri ?: return@LaunchedEffect] ?: return@LaunchedEffect
+            if (viewModel.playMode == AudioPlayer.PlayMode.RANDOM)
+                listState.scrollToItem(nextIndex)
+            else
+                listState.animateScrollToItem(nextIndex)
+        }
+    }
+
     Column(modifier) {
         if (currentTrack != null) {
-            TrackItem(
+            TrackItemHeader(
                 -1,
                 viewModel.currentTrack!!,
                 tracklistManager,
@@ -109,7 +121,14 @@ fun Tracklist(
             modifier = Modifier.fillMaxSize().weight(2f).hoverable(interactionSource)
         ) {
             Column(Modifier.fillMaxSize()) {
-                LazyColumn(Modifier.fillMaxWidth(), state = listState) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth()
+                        .background(KagaminTheme.backgroundTransparent)
+                        .pointerInput(allowAutoScroll) {
+                            allowAutoScroll = false
+                        },
+                    state = listState
+                ) {
                     items(tracks.size, key = {
                         tracks[it].uri
                     }) { index ->
@@ -134,12 +153,12 @@ fun Tracklist(
                                     viewModel.isLoadingSong = null
                                 }
                             },
-                            modifier = Modifier
+                            modifier = Modifier.padding(2.dp)
                         )
                     }
                 }
 
-                Spacer(Modifier.fillMaxSize().weight(2f).background(KagaminTheme.theme.listItemB))
+                Spacer(Modifier.fillMaxSize().weight(2f).background(KagaminTheme.theme.listItem))
             }
 
             androidx.compose.animation.AnimatedVisibility(
@@ -157,7 +176,7 @@ fun Tracklist(
 }
 
 @Composable
-actual fun TrackItem(
+actual fun TrackItemHeader(
     index: Int,
     track: AudioTrack,
     tracklistManager: TracklistManager,
@@ -165,176 +184,108 @@ actual fun TrackItem(
     onClick: () -> Unit,
     modifier: Modifier
 ) {
-    val clipboard = LocalClipboardManager.current
-    val confirmationWindow = LocalConfirmWindow.current
-    val snackbar = LocalSnackbarHostState.current
-    val isHeader = index == -1
-    val backColor = if (isHeader) KagaminTheme.backgroundTransparent else
-        if (index % 2 == 0) KagaminTheme.theme.listItemA else KagaminTheme.theme.listItemB
-    ContextMenuArea(items = {
-        listOf(
-            ContextMenuItem("Select") {
-                if (!isHeader)
-                    tracklistManager.select(index, track)
-            },
-            if (tracklistManager.isAnySelected) {
-                ContextMenuItem("Deselect All") {
-                    tracklistManager.deselectAll()
-                }
-            } else {
-                ContextMenuItem("Copy URI") {
-                    clipboard.setText(AnnotatedString(track.uri))
-                }
-            },
-            ContextMenuItem(if (tracklistManager.isAnySelected) "Remove selected" else "Remove") {
-                tracklistManager.contextMenuRemovePressed(viewModel, track)
-            },
-            ContextMenuItem(if (tracklistManager.selected.size <= 1) "Delete file" else "Delete files") {
-                if (tracklistManager.selected.size < 1) {
-                    confirmationWindow.value = ConfirmWindowState(
-                        true,
-                        onConfirm = {
-                            if (viewModel.currentTrack == track)
-                                viewModel.audioPlayer.stop()
+    val isHeader = true
+    val backColor = KagaminTheme.backgroundTransparent
 
-                            viewModel.viewModelScope.launch {
-                                tracklistManager.deleteFile(track)
-                                snackbar.showSnackbar("Deleting the file..")
-                            }
-                            tracklistManager.contextMenuRemovePressed(viewModel, track)
-                        },
-                        onCancel = {
-
-                        },
-                        onClose = {
-                            confirmationWindow.value = ConfirmWindowState()
-                        }
-                    )
-                } else {
-                    confirmationWindow.value = ConfirmWindowState(
-                        true,
-                        onConfirm = {
-                            if (tracklistManager.selected.any { it.value == track })
-                                viewModel.audioPlayer.stop()
-
-                            tracklistManager.deleteSelectedFiles()
-                            tracklistManager.contextMenuRemovePressed(viewModel, track)
-
-                            viewModel.viewModelScope.launch {
-                                snackbar.showSnackbar("Deleting files..")
-                            }
-                        },
-                        onCancel = {
-
-                        },
-                        onClose = {
-                            confirmationWindow.value = ConfirmWindowState()
-                        }
-                    )
-                }
-            },
-        )
-    }) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.height(32.dp).fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start
-        ) {
-            if (index > -1 && viewModel.currentTrack == track) {
-                Box(
-                    Modifier
-                        .height(32.dp)
-                        .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
-                        .drawWithContent {
-                            drawContent()
-                            drawRect(color = backColor, size = size, blendMode = BlendMode.SrcOut)
-                            drawContent()
-                        }
-                        .clickable { viewModel.onPlayPause() },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier.height(32.dp).background(
-                            KagaminTheme.backgroundTransparent,
-                            RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp)
-                        )
-                    ) {
-                        Image(
-                            painterResource(if (viewModel.playState == AudioPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
-                            "track playback state icon",
-                            modifier = Modifier.size(16.dp),
-                            colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIcon)
-                        )
-                    }
-                }
-            }
-
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.height(32.dp).fillMaxWidth(),
+        horizontalArrangement = Arrangement.Start
+    ) {
+        if (index > -1 && viewModel.currentTrack == track) {
             Box(
-                modifier = modifier.fillMaxWidth().height(32.dp)
-                    .background(color = backColor)
-                    .clickable {
-                        onClick()
+                Modifier
+                    .height(32.dp)
+                    .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+                    .drawWithContent {
+                        drawContent()
+                        drawRect(color = backColor, size = size, blendMode = BlendMode.SrcOut)
+                        drawContent()
                     }
-                    .padding(4.dp),
+                    .clickable { viewModel.onPlayPause() },
                 contentAlignment = Alignment.Center
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        track.name,
-                        fontSize = 10.sp,
-                        color = if (isHeader) KagaminTheme.theme.buttonIcon else KagaminTheme.text,
-                        maxLines = 1,
-                        // overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(0.99f).let {
-                            if (isHeader) it.basicMarquee(iterations = Int.MAX_VALUE)
-                            else it
-                        }
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.height(32.dp).background(
+                        KagaminTheme.backgroundTransparent,
+                        RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp)
                     )
-
-                    // duration text
-                    if (isHeader)
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            var timePastText by remember { mutableStateOf("-:-") }
-                            var trackDurationText by remember { mutableStateOf("-:-") }
-
-                            LaunchedEffect(track) {
-                                trackDurationText = formatTime(track.duration)
-
-                                while (true) {
-                                    if (viewModel.audioPlayer.playState.value == AudioPlayer.PlayState.PLAYING) {
-                                        timePastText =
-                                            formatTime(track.let { viewModel.audioPlayer.position })
-
-                                        if (viewModel.audioPlayer.position < 1000)
-                                            trackDurationText = formatTime(track.duration)
-                                    }
-                                    delay(250)
-                                }
-                            }
-
-                            Text(
-                                "$timePastText/$trackDurationText",
-                                fontSize = 10.sp,
-                                color = KagaminTheme.theme.buttonIcon
-                            )
-                        }
-                }
-
-                //selected icon
-                Row(
-                    Modifier.align(Alignment.CenterEnd),
-                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (tracklistManager.selected.contains(index))
-                        Icon(painterResource(Res.drawable.selected), null)
+                    Image(
+                        painterResource(if (viewModel.playState == AudioPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
+                        "track playback state icon",
+                        modifier = Modifier.size(16.dp),
+                        colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIcon)
+                    )
                 }
+            }
+        }
+
+        Box(
+            modifier = modifier.fillMaxWidth().height(32.dp)
+                .background(color = backColor)
+                .clickable {
+                    onClick()
+                }
+                .padding(4.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    track.name,
+                    fontSize = 10.sp,
+                    color = if (isHeader) KagaminTheme.theme.buttonIcon else KagaminTheme.text,
+                    maxLines = 1,
+                    // overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(0.99f).let {
+                        if (isHeader) it.basicMarquee(iterations = Int.MAX_VALUE)
+                        else it
+                    }
+                )
+
+                // duration text
+                if (isHeader)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        var timePastText by remember { mutableStateOf("-:-") }
+                        var trackDurationText by remember { mutableStateOf("-:-") }
+
+                        LaunchedEffect(track) {
+                            trackDurationText = formatTime(track.duration)
+
+                            while (true) {
+                                if (viewModel.audioPlayer.playState.value == AudioPlayer.PlayState.PLAYING) {
+                                    timePastText =
+                                        formatTime(track.let { viewModel.audioPlayer.position })
+
+                                    if (viewModel.audioPlayer.position < 1000)
+                                        trackDurationText = formatTime(track.duration)
+                                }
+                                delay(250)
+                            }
+                        }
+
+                        Text(
+                            "$timePastText/$trackDurationText",
+                            fontSize = 10.sp,
+                            color = KagaminTheme.theme.buttonIcon
+                        )
+                    }
+            }
+
+            //selected icon
+            Row(
+                Modifier.align(Alignment.CenterEnd),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (tracklistManager.selected.contains(index))
+                    Icon(painterResource(Res.drawable.selected), null)
             }
         }
     }

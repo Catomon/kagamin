@@ -2,8 +2,6 @@ package com.github.catomon.kagamin.ui.screens
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ContentTransform
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
@@ -21,7 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -77,7 +74,12 @@ actual fun PlayerScreen(
         viewModel.updateThumbnail()
     }
 
-    Box(modifier.background(color = KagaminTheme.behindBackground, shape = RoundedCornerShape(16.dp))) {
+    Box(
+        modifier.background(
+            color = KagaminTheme.behindBackground,
+            shape = RoundedCornerShape(16.dp)
+        )
+    ) {
         TrackThumbnail(
             viewModel.trackThumbnail,
             onSetProgress = {
@@ -96,7 +98,8 @@ actual fun PlayerScreen(
         Row() {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxHeight().background(color = KagaminTheme.backgroundTransparent)
+                modifier = Modifier.fillMaxHeight()
+                    .background(color = KagaminTheme.backgroundTransparent)
             ) {
                 AppName(
                     Modifier.padding(horizontal = 12.dp).height(25.dp)
@@ -107,7 +110,8 @@ actual fun PlayerScreen(
                                 navController.navigate(SettingsDestination.toString())
                         })
 
-                CurrentTrackFrame(viewModel, viewModel.trackThumbnail,
+                CurrentTrackFrame(
+                    viewModel, viewModel.trackThumbnail,
                     currentTrack, audioPlayer, Modifier.width(160.dp).fillMaxHeight()
                 )
             }
@@ -129,7 +133,7 @@ actual fun PlayerScreen(
                             if (viewModel.playlist.isEmpty()) {
                                 Box(
                                     Modifier.fillMaxSize()
-                                        .background(KagaminTheme.theme.listItemB),
+                                        .background(KagaminTheme.theme.listItem),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(

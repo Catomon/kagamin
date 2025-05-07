@@ -17,4 +17,5 @@ data class AppSettings(
     val repeat: Boolean = false,
     val repeatPlaylist: Boolean = false,
     val lastPlaylistName: String = "default",
+    val autoScrollNextTrack: Boolean = false
 )

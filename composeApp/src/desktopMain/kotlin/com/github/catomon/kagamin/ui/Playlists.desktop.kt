@@ -35,7 +35,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
@@ -78,7 +77,7 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
     if (playlists.isEmpty()) {
         Box(
             modifier
-                .background(KagaminTheme.theme.listItemB),
+                .background(KagaminTheme.theme.listItem),
             contentAlignment = Alignment.Center
         ) {
             Text(
@@ -138,7 +137,7 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                         }
                     }
 
-                    Box(Modifier.fillMaxSize().background(KagaminTheme.theme.listItemB))
+                    Box(Modifier.fillMaxSize().background(KagaminTheme.theme.listItem))
                 }
 
                 androidx.compose.animation.AnimatedVisibility(
@@ -167,7 +166,7 @@ actual fun PlaylistItem(
     shuffle: () -> Unit
 ) {
 
-    val backColor = if (i % 2 == 0) KagaminTheme.theme.listItemA else KagaminTheme.theme.listItemB
+    val backColor = KagaminTheme.theme.listItem
 
     var trackThumbnailUpdated by remember { mutableStateOf<ImageBitmap?>(null) }
 

@@ -96,7 +96,7 @@ class TracklistManager(
 }
 
 @Composable
-expect fun TrackItem(
+expect fun TrackItemHeader(
     index: Int,
     track: AudioTrack,
     tracklistManager: TracklistManager,

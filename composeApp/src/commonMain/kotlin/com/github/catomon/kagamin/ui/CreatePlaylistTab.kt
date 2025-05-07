@@ -21,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.github.catomon.kagamin.isValidFileName
-import com.github.catomon.kagamin.loadPlaylists
 import com.github.catomon.kagamin.savePlaylist
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.Tabs
@@ -44,7 +43,11 @@ fun CreatePlaylistTab(viewModel: KagaminViewModel, modifier: Modifier) {
     ) {
         AddTrackCreatePlaylistTabButtons(viewModel, modifier = Modifier.fillMaxWidth())
 
-        Column(Modifier.fillMaxSize().background(KagaminTheme.theme.listItemB), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+        Column(
+            Modifier.fillMaxSize().background(KagaminTheme.theme.listItem),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
             TextField(
                 name,
                 onValueChange = {

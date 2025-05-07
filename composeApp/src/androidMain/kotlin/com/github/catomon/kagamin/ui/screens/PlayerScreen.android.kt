@@ -29,17 +29,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.audio.createAudioTrack
 import com.github.catomon.kagamin.loadPlaylist
-import com.github.catomon.kagamin.ui.components.AddButton
 import com.github.catomon.kagamin.ui.AddTracksTab
-import com.github.catomon.kagamin.ui.components.AppName
 import com.github.catomon.kagamin.ui.CreatePlaylistTab
 import com.github.catomon.kagamin.ui.Playlists
 import com.github.catomon.kagamin.ui.Tracklist
+import com.github.catomon.kagamin.ui.components.AddButton
+import com.github.catomon.kagamin.ui.components.AppName
 import com.github.catomon.kagamin.ui.components.CurrentTrackFrame2
 import com.github.catomon.kagamin.ui.components.TrackThumbnail
+import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import kagamin.composeapp.generated.resources.Res
@@ -175,7 +175,7 @@ actual fun PlayerScreen(
                                     Box(
                                         Modifier
                                             .fillMaxSize()
-                                            .background(KagaminTheme.theme.listItemB),
+                                            .background(KagaminTheme.theme.listItem),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text(

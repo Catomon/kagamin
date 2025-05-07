@@ -61,7 +61,7 @@ fun Tracklist(
 
     Column(modifier) {
         if (currentTrack != null) {
-            TrackItem(
+            TrackItemHeader(
                 -1,
                 viewModel.currentTrack!!,
                 tracklistManager,
@@ -87,7 +87,7 @@ fun Tracklist(
                 tracks[it].uri
             }) { index ->
                 val track = tracks[index]
-                TrackItem(
+                TrackItemHeader(
                     index,
                     track,
                     tracklistManager,
@@ -114,12 +114,12 @@ fun Tracklist(
 
         Box(Modifier
             .fillMaxSize()
-            .background(KagaminTheme.theme.listItemB))
+            .background(KagaminTheme.theme.listItem))
     }
 }
 
 @Composable
-actual fun TrackItem(
+actual fun TrackItemHeader(
     index: Int,
     track: AudioTrack,
     tracklistManager: TracklistManager,
@@ -130,7 +130,7 @@ actual fun TrackItem(
     val clipboard = LocalClipboardManager.current
     val isHeader = index == -1
     val backColor = if (isHeader) KagaminTheme.backgroundTransparent else
-        if (index % 2 == 0) KagaminTheme.theme.listItemA else KagaminTheme.theme.listItemB
+        if (index % 2 == 0) KagaminTheme.theme.forDisabledMostlyIdk else KagaminTheme.theme.listItem
 
     Row(
         verticalAlignment = Alignment.CenterVertically,

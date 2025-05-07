@@ -91,6 +91,14 @@ actual fun SettingsScreen(
                         viewModel.settings = settings.copy(crossfade = it)
                     })
                 }
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Scroll to next track")
+
+                    Checkbox(settings.autoScrollNextTrack, {
+                        viewModel.settings = settings.copy(autoScrollNextTrack = it)
+                    })
+                }
             }
         }
 
@@ -140,7 +148,7 @@ private fun ThemeRadioButtons(
                 theme == KagaminColors.Violet.name,
                 colors = RadioButtonDefaults.colors(
                     KagaminColors.Violet.background,
-                    KagaminColors.Violet.listItemA
+                    KagaminColors.Violet.forDisabledMostlyIdk
                 ),
                 onClick = {
                     KagaminTheme.theme = KagaminColors.Violet
@@ -156,7 +164,7 @@ private fun ThemeRadioButtons(
                 theme == KagaminColors.Pink.name,
                 colors = RadioButtonDefaults.colors(
                     KagaminColors.Pink.background,
-                    KagaminColors.Pink.listItemA
+                    KagaminColors.Pink.forDisabledMostlyIdk
                 ),
                 onClick = {
                     KagaminTheme.theme = KagaminColors.Pink
@@ -172,7 +180,7 @@ private fun ThemeRadioButtons(
                 theme == KagaminColors.Blue.name,
                 colors = RadioButtonDefaults.colors(
                     KagaminColors.Blue.background,
-                    KagaminColors.Blue.listItemA
+                    KagaminColors.Blue.forDisabledMostlyIdk
                 ),
                 onClick = {
                     KagaminTheme.theme = KagaminColors.Blue

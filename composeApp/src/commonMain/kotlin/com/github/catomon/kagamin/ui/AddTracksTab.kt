@@ -66,7 +66,7 @@ fun AddTracksTab(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
     ) {
         AddTrackCreatePlaylistTabButtons(viewModel, modifier = Modifier.fillMaxWidth())
 
-        Column(Modifier.fillMaxSize().background(KagaminTheme.theme.listItemB), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+        Column(Modifier.fillMaxSize().background(KagaminTheme.theme.listItem), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
             Text(
                 "Playlist: ${viewModel.currentPlaylistName}\nDrop files or folders here,\nor select from folder:",
                 textAlign = TextAlign.Center,

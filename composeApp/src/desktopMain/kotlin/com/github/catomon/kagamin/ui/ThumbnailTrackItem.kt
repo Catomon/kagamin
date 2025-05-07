@@ -1,5 +1,6 @@
 package com.github.catomon.kagamin.ui
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuItem
 import androidx.compose.foundation.Image
@@ -9,6 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -26,14 +28,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
@@ -47,7 +46,6 @@ import com.github.catomon.kagamin.audio.AudioTrack
 import com.github.catomon.kagamin.ui.components.TrackThumbnail
 import com.github.catomon.kagamin.ui.components.getThumbnail
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
-import com.github.catomon.kagamin.ui.util.formatTime
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.ui.windows.ConfirmWindowState
 import com.github.catomon.kagamin.ui.windows.LocalConfirmWindow
@@ -56,7 +54,6 @@ import kagamin.composeapp.generated.resources.pause
 import kagamin.composeapp.generated.resources.play
 import kagamin.composeapp.generated.resources.selected
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.painterResource
@@ -73,9 +70,8 @@ fun ThumbnailTrackItem(
     val clipboard = LocalClipboardManager.current
     val confirmationWindow = LocalConfirmWindow.current
     val snackbar = LocalSnackbarHostState.current
-    val isHeader = index == -1
-    val backColor = if (isHeader) KagaminTheme.backgroundTransparent else
-        if (index % 2 == 0) KagaminTheme.theme.listItemA else KagaminTheme.theme.listItemB
+    val isCurrentTrack = index == -1
+    val backColor = if (isCurrentTrack) KagaminTheme.backgroundTransparent else KagaminTheme.theme.listItem
 
     var trackThumbnailUpdated by remember { mutableStateOf<ImageBitmap?>(null) }
 
@@ -94,7 +90,7 @@ fun ThumbnailTrackItem(
 
     ContextMenuArea(items = {
         ThumbnailTrackItemDefaults.contextMenuItems(
-            isHeader,
+            isCurrentTrack,
             tracklistManager,
             index,
             track,
@@ -104,29 +100,37 @@ fun ThumbnailTrackItem(
             snackbar
         )
     }) {
-        Box(modifier.height(height)) {
-            if (!isHeader) {
-                TrackThumbnail(trackThumbnailUpdated, modifier = Modifier.fillMaxWidth().height(height), shape = RectangleShape)
+        Row(modifier.height(height)) {
+            AnimatedVisibility(index > -1 && viewModel.currentTrack == track) {
+                PlaybackStateButton(height, backColor, viewModel)
             }
 
-            ThumbnailTrackItemContent(
-                height,
-                index,
-                viewModel,
-                track,
-                backColor,
-                modifier = Modifier,
-                onClick,
-                isHeader,
-                tracklistManager
-            )
+            Box(Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp))) {
+                TrackThumbnail(
+                    trackThumbnailUpdated,
+                    modifier = Modifier.fillMaxWidth().height(height),//.alpha(0.75f),
+                    shape = RectangleShape
+                )
+
+                TrackItemContent(
+                    height,
+                    index,
+                    viewModel,
+                    track,
+                    backColor,
+                    modifier = Modifier,
+                    onClick,
+                    isCurrentTrack,
+                    tracklistManager
+                )
+            }
         }
     }
 }
 
 
 @Composable
-private fun ThumbnailTrackItemContent(
+private fun TrackItemContent(
     height: Dp,
     index: Int,
     viewModel: KagaminViewModel,
@@ -142,69 +146,35 @@ private fun ThumbnailTrackItemContent(
         modifier = Modifier.height(height).fillMaxWidth(),
         horizontalArrangement = Arrangement.Start
     ) {
-        if (index > -1 && viewModel.currentTrack == track) {
-            PlaybackStateButton(height, backColor, viewModel)
-        }
+//        if (index > -1 && viewModel.currentTrack == track) {
+//            PlaybackStateButton(height, backColor, viewModel)
+//        }
 
         Box(
             modifier = modifier.fillMaxWidth().height(height)
-                .background(color = backColor)
+                //.background(color = backColor)
                 .clickable {
                     onClick()
-                }
-                .padding(4.dp),
+                },
             contentAlignment = Alignment.Center
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth().background(backColor)
+                    .align(Alignment.BottomCenter).padding(start = 4.dp)
             ) {
-//                    if (!isHeader) {
-//                        TrackThumbnail(trackThumbnailUpdated, modifier = Modifier.size(32.dp), shape = RectangleShape)
-//                    }
-
                 Text(
                     track.name,
                     fontSize = 10.sp,
                     color = if (isHeader) KagaminTheme.theme.buttonIcon else KagaminTheme.text,
                     maxLines = 1,
                     // overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(0.99f).let {
+                    modifier = Modifier.fillMaxWidth().let {
                         if (isHeader) it.basicMarquee(iterations = Int.MAX_VALUE)
                         else it
-                    }
+                    }.align(Alignment.Bottom)
                 )
-
-                // duration text
-                if (isHeader)
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        var timePastText by remember { mutableStateOf("-:-") }
-                        var trackDurationText by remember { mutableStateOf("-:-") }
-
-                        LaunchedEffect(track) {
-                            trackDurationText = formatTime(track.duration)
-
-                            while (true) {
-                                if (viewModel.audioPlayer.playState.value == AudioPlayer.PlayState.PLAYING) {
-                                    timePastText =
-                                        formatTime(track.let { viewModel.audioPlayer.position })
-
-                                    if (viewModel.audioPlayer.position < 1000)
-                                        trackDurationText = formatTime(track.duration)
-                                }
-                                delay(250)
-                            }
-                        }
-
-                        Text(
-                            "$timePastText/$trackDurationText",
-                            fontSize = 10.sp,
-                            color = KagaminTheme.theme.buttonIcon
-                        )
-                    }
             }
 
             //selected icon
@@ -228,21 +198,23 @@ private fun PlaybackStateButton(
     Box(
         Modifier
             .height(height)
-            .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
-            .drawWithContent {
-                drawContent()
-                drawRect(color = backColor, size = size, blendMode = BlendMode.SrcOut)
-                drawContent()
-            }
+//            .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+//            .drawWithContent {
+//                drawContent()
+//                drawRect(color = backColor, size = size, blendMode = BlendMode.SrcOut)
+//                drawContent()
+//            }
+            .clip(RoundedCornerShape(6.dp))
             .clickable { viewModel.onPlayPause() },
         contentAlignment = Alignment.Center
     ) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.height(height).background(
-                KagaminTheme.backgroundTransparent,
-                RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp)
-            )
+            modifier = Modifier.height(height)
+//                .background(
+//                KagaminTheme.backgroundTransparent,
+//                RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp)
+//            )
         ) {
             Image(
                 painterResource(if (viewModel.playState == AudioPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),

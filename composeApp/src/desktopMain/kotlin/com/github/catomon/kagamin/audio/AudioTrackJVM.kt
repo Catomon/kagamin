@@ -5,26 +5,22 @@ import java.util.UUID
 
 class AudioTrackJVM(
     override val uri: String,
+    var overrideName: String = "",
     override val id: String = UUID.randomUUID().toString(),
-    override var author: String = "",
-    override var name: String = "",
-    override var duration: Long = Long.MAX_VALUE
 ) : com.github.catomon.kagamin.audio.AudioTrack {
 
     var audioTrack: AudioTrack? = null
-        set(value) {
-            field = value
-            author = audioTrack?.info?.author ?: ""
-            name = audioTrack?.trackName ?: ""
-            duration = audioTrack?.duration ?: Long.MAX_VALUE
-        }
+
+    override val author: String get() = audioTrack?.info?.author ?: ""
+    override val name: String get() = overrideName.ifBlank { audioTrack?.trackName?.let { if (it == "Unknown artist") "" else it } ?: "" }
+    override val duration: Long get() = audioTrack?.duration ?: Long.MAX_VALUE
 
     constructor(audioTrack: AudioTrack) : this(
         audioTrack.info.uri,
         audioTrack.info.identifier,
-        audioTrack.info.author,
-        audioTrack.trackName
-    )
+    ) {
+        this.audioTrack = audioTrack
+    }
 
     override fun equals(other: Any?): Boolean {
         return other is com.github.catomon.kagamin.audio.AudioTrack && uri == other.uri

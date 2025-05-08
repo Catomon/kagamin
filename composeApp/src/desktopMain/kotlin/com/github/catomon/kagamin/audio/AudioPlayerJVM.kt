@@ -66,7 +66,9 @@ class AudioPlayerJVM : BaseAudioPlayer<AudioTrackJVM>() {
             return true
         }
 
-        val isStarted = loader.player.startTrack(track.audioTrack!!.makeClone(), false)
+        track.audioTrack = track.audioTrack!!.makeClone()
+
+        val isStarted = loader.player.startTrack(track.audioTrack!!, false)
         return if (isStarted) {
             logMsg("Playback started.")
             super.play(track)

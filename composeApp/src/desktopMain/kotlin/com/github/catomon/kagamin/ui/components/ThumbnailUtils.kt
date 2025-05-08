@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import com.github.catomon.kagamin.cacheFolder
 import com.mpatric.mp3agic.Mp3File
+import kotlinx.io.IOException
 import org.jetbrains.skia.Image
 
 actual fun getThumbnail(trackUri: String): ImageBitmap? = try {
@@ -36,7 +37,7 @@ actual fun getThumbnail(trackUri: String): ImageBitmap? = try {
 //            println("success.")
         }
     }
-} catch (e: Exception) {
+} catch (e: IOException) {
 //        println("fail.")
     e.printStackTrace()
     null

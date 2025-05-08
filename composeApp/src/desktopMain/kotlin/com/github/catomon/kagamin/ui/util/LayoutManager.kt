@@ -10,5 +10,8 @@ class LayoutManager(
         Default,
         Compact,
         Tiny,
+        BottomControls,
     }
+
+    constructor(layout: Layout): this(mutableStateOf(layout))
 }

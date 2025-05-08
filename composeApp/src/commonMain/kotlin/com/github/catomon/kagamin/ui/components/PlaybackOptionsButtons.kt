@@ -59,60 +59,90 @@ fun PlaybackOptionsButtons(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.height(buttonsSize).fillMaxWidth()
         ) {
-            IconButton({
-                playMode =
-                    if (playMode != AudioPlayer.PlayMode.REPEAT_TRACK) AudioPlayer.PlayMode.REPEAT_TRACK
-                    else AudioPlayer.PlayMode.PLAYLIST
-            }, modifier = Modifier.size(buttonsSize)) {
-                ImageWithShadow(
-                    painterResource(Res.drawable.repeat_single),
-                    "Toggle repeat track",
-                    colorFilter = if (playMode == AudioPlayer.PlayMode.REPEAT_TRACK) ColorFilter.tint(
-                        KagaminTheme.theme.buttonIcon
-                    )
-                    else ColorFilter.tint(KagaminTheme.theme.buttonIconTransparent)
-                )
-            }
+            RepeatTrackPlaybackButton(buttonsSize = buttonsSize, player = player)
 
-            IconButton({
-                playMode =
-                    if (playMode != AudioPlayer.PlayMode.REPEAT_PLAYLIST) AudioPlayer.PlayMode.REPEAT_PLAYLIST
-                    else AudioPlayer.PlayMode.PLAYLIST
-            }, modifier = Modifier.size(buttonsSize)) {
-                ImageWithShadow(
-                    painterResource(Res.drawable.repeat_playlist),
-                    "Toggle repeat playlist",
-                    colorFilter = if (playMode == AudioPlayer.PlayMode.REPEAT_PLAYLIST) ColorFilter.tint(
-                        KagaminTheme.theme.buttonIcon
-                    )
-                    else ColorFilter.tint(KagaminTheme.theme.buttonIconTransparent)
-                )
-            }
+            RepeatPlaylistPlaybackButton(buttonsSize = buttonsSize, player = player)
 
-            IconButton({
-                player.playMode.value =
-                    if (playMode != AudioPlayer.PlayMode.RANDOM) AudioPlayer.PlayMode.RANDOM
-                    else AudioPlayer.PlayMode.PLAYLIST
-            }, modifier = Modifier.size(buttonsSize)) {
-                ImageWithShadow(
-                    painterResource(Res.drawable.random),
-                    "Toggle random mode",
-                    colorFilter = if (playMode == AudioPlayer.PlayMode.RANDOM) ColorFilter.tint(
-                        KagaminTheme.theme.buttonIcon
-                    )
-                    else ColorFilter.tint(KagaminTheme.theme.buttonIconTransparent)
-                )
-            }
+            RandomPlaybackButton(player, buttonsSize)
         }
     }
 }
 
 @Composable
-fun VolumeOptions(
+fun RepeatTrackPlaybackButton(
+    player: AudioPlayer<AudioTrack>,
     buttonsSize: Dp = 32.dp,
+) {
+    val playMode: AudioPlayer.PlayMode = player.playMode.value
+
+    IconButton({
+        player.playMode.value =
+            if (playMode != AudioPlayer.PlayMode.REPEAT_TRACK) AudioPlayer.PlayMode.REPEAT_TRACK
+            else AudioPlayer.PlayMode.PLAYLIST
+    }, modifier = Modifier.size(buttonsSize)) {
+        ImageWithShadow(
+            painterResource(Res.drawable.repeat_single),
+            "Toggle repeat track",
+            colorFilter = if (playMode == AudioPlayer.PlayMode.REPEAT_TRACK) ColorFilter.tint(
+                KagaminTheme.theme.buttonIcon
+            )
+            else ColorFilter.tint(KagaminTheme.theme.buttonIconTransparent)
+        )
+    }
+}
+
+@Composable
+fun RepeatPlaylistPlaybackButton(
+    player: AudioPlayer<AudioTrack>,
+    buttonsSize: Dp = 32.dp,
+) {
+    val playMode: AudioPlayer.PlayMode = player.playMode.value
+
+    IconButton({
+        player.playMode.value =
+            if (playMode != AudioPlayer.PlayMode.REPEAT_PLAYLIST) AudioPlayer.PlayMode.REPEAT_PLAYLIST
+            else AudioPlayer.PlayMode.PLAYLIST
+    }, modifier = Modifier.size(buttonsSize)) {
+        ImageWithShadow(
+            painterResource(Res.drawable.repeat_playlist),
+            "Toggle repeat playlist",
+            colorFilter = if (playMode == AudioPlayer.PlayMode.REPEAT_PLAYLIST) ColorFilter.tint(
+                KagaminTheme.theme.buttonIcon
+            )
+            else ColorFilter.tint(KagaminTheme.theme.buttonIconTransparent)
+        )
+    }
+}
+
+@Composable
+fun RandomPlaybackButton(
+    player: AudioPlayer<AudioTrack>,
+    buttonsSize: Dp = 32.dp
+) {
+    val playMode: AudioPlayer.PlayMode = player.playMode.value
+
+    IconButton({
+        player.playMode.value =
+            if (playMode != AudioPlayer.PlayMode.RANDOM) AudioPlayer.PlayMode.RANDOM
+            else AudioPlayer.PlayMode.PLAYLIST
+    }, modifier = Modifier.size(buttonsSize)) {
+        ImageWithShadow(
+            painterResource(Res.drawable.random),
+            "Toggle random mode",
+            colorFilter = if (playMode == AudioPlayer.PlayMode.RANDOM) ColorFilter.tint(
+                KagaminTheme.theme.buttonIcon
+            )
+            else ColorFilter.tint(KagaminTheme.theme.buttonIconTransparent)
+        )
+    }
+}
+
+@Composable
+fun VolumeOptions(
     volume: Float,
     onVolumeChange: (Float) -> Unit,
     modifier: Modifier = Modifier,
+    buttonsSize: Dp = 32.dp,
 ) {
     var oldVolume by remember { mutableStateOf(volume) }
     Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {

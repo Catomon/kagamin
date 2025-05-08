@@ -61,40 +61,49 @@ import java.io.File
 
 @Composable
 fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
-    val windowState =
-        rememberWindowState(width = WindowConfig.WIDTH.dp, height = WindowConfig.HEIGHT.dp)
-
     val kagaminViewModel: KagaminViewModel = remember { get(KagaminViewModel::class.java) }
 
-    val layoutManager = remember { LayoutManager() }
+    val layoutManager = remember {
+        LayoutManager(
+            LayoutManager.Layout.valueOf(
+                kagaminViewModel.settings.extra["layout"] ?: "Default"
+            )
+        )
+    }
     val currentLayout by layoutManager.currentLayout
 
     val confirmWindowState = remember { mutableStateOf(ConfirmWindowState()) }
 
-    LaunchedEffect(currentLayout) {
+    val windowSize = remember(currentLayout) {
         when (currentLayout) {
-            LayoutManager.Layout.Default -> {
-                windowState.size =
-                    DpSize(width = WindowConfig.WIDTH.dp, height = WindowConfig.HEIGHT.dp)
-            }
+            LayoutManager.Layout.Default -> DpSize(
+                width = WindowConfig.WIDTH.dp, height = WindowConfig.HEIGHT.dp
+            )
 
-            LayoutManager.Layout.Compact -> {
-                windowState.size = DpSize(
-                    width = WindowConfig.COMPACT_WIDTH.dp,
-                    height = WindowConfig.COMPACT_HEIGHT.dp
-                )
-            }
+            LayoutManager.Layout.Compact -> DpSize(
+                width = WindowConfig.COMPACT_WIDTH.dp, height = WindowConfig.COMPACT_HEIGHT.dp
+            )
 
-            LayoutManager.Layout.Tiny -> {
-                windowState.size =
-                    DpSize(width = WindowConfig.TINY_WIDTH.dp, height = WindowConfig.TINY_HEIGHT.dp)
-            }
+            LayoutManager.Layout.Tiny -> DpSize(
+                width = WindowConfig.TINY_WIDTH.dp, height = WindowConfig.TINY_HEIGHT.dp
+            )
+
+            LayoutManager.Layout.BottomControls -> DpSize(
+                width = WindowConfig.BOTTOM_CONTROLS_WIDTH.dp,
+                height = WindowConfig.BOTTOM_CONTROLS_HEIGHT.dp
+            )
         }
     }
 
+    val windowState =
+        rememberWindowState(size = windowSize)
+
+    LaunchedEffect(windowSize) {
+        windowState.size = windowSize
+    }
+
     CompositionLocalProvider(
-        LocalLayoutManager provides layoutManager,
-        LocalConfirmWindow provides confirmWindowState
+        LocalLayoutManager provides layoutManager, LocalConfirmWindow provides confirmWindowState
     ) {
         AppWindow(windowState, kagaminViewModel, onCloseRequest)
     }
@@ -118,9 +127,7 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
 
 @Composable
 private fun AppWindow(
-    windowState: WindowState,
-    kagaminViewModel: KagaminViewModel,
-    onCloseRequest: () -> Unit
+    windowState: WindowState, kagaminViewModel: KagaminViewModel, onCloseRequest: () -> Unit
 ) {
     val layoutManager = LocalLayoutManager.current
 
@@ -166,13 +173,14 @@ private fun AppWindow(
                     LayoutManager.Layout.Tiny -> {
                         layoutManager.currentLayout.value = LayoutManager.Layout.Default
                     }
+
+                    LayoutManager.Layout.BottomControls -> LayoutManager.Layout.Default
                 }
                 false
             } else {
                 false
             }
-        }
-    ) {
+        }) {
         CompositionLocalProvider(
             LocalWindow provides this.window,
         ) {
@@ -187,45 +195,33 @@ private fun AppWindow(
 @Composable
 private fun WindowScope.AppFrame(kagaminViewModel: KagaminViewModel = get(KagaminViewModel::class.java)) {
     WindowDraggableArea {
-        val snackbar =
-            LocalSnackbarHostState.current
+        val snackbar = LocalSnackbarHostState.current
         KagaminApp(
             kagaminViewModel,
-            modifier = Modifier
-                .kagaminWindowDecoration()
-                .dragAndDropTarget({ true }, remember {
-                    createTrackDragAndDropTarget(kagaminViewModel, snackbar)
-                })
+            modifier = Modifier.kagaminWindowDecoration().dragAndDropTarget({ true }, remember {
+                createTrackDragAndDropTarget(kagaminViewModel, snackbar)
+            })
         )
     }
 }
 
 private fun Modifier.kagaminWindowDecoration() =
-    if (WindowConfig.isTransparent)
-        this.padding(8.dp)
-            .customShadow()
-            .drawBehind {
-                drawRoundRect(
-                    color = KagaminTheme.theme.thinBorder,
-                    topLeft = Offset(0f, 2f),
-                    size = this.size.copy(),
-                    cornerRadius = CornerRadius(12f)
-                )
-            }
-            .clip(RoundedCornerShape(12.dp))
-    else
-        this.customShadow(cornerRadius = 0.dp)
-            .border(
-                2.dp,
-                KagaminTheme.theme.thinBorder,
-                RectangleShape
-            )
+    if (WindowConfig.isTransparent) this.padding(8.dp).customShadow().drawBehind {
+        drawRoundRect(
+            color = KagaminTheme.theme.thinBorder,
+            topLeft = Offset(0f, 2f),
+            size = this.size.copy(),
+            cornerRadius = CornerRadius(12f)
+        )
+    }.clip(RoundedCornerShape(12.dp))
+    else this.customShadow(cornerRadius = 0.dp).border(
+        2.dp, KagaminTheme.theme.thinBorder, RectangleShape
+    )
 
 
 @OptIn(ExperimentalComposeUiApi::class)
 private fun createTrackDragAndDropTarget(
-    kagaminViewModel: KagaminViewModel,
-    snackbar: SnackbarHostState
+    kagaminViewModel: KagaminViewModel, snackbar: SnackbarHostState
 ) = object : DragAndDropTarget {
     override fun onStarted(event: DragAndDropEvent) {
 
@@ -238,8 +234,7 @@ private fun createTrackDragAndDropTarget(
     override fun onDrop(event: DragAndDropEvent): Boolean {
         event.awtTransferable.let {
             if (it.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-                val droppedFiles =
-                    it.getTransferData(DataFlavor.javaFileListFlavor) as List<File>
+                val droppedFiles = it.getTransferData(DataFlavor.javaFileListFlavor) as List<File>
 
                 kagaminViewModel.viewModelScope.launch {
                     loadTrackFiles(droppedFiles)
@@ -262,8 +257,7 @@ private fun createTrackDragAndDropTarget(
                 fun filterMusicFiles(files: List<File>) {
                     for (file in files) {
                         if (file.isDirectory) {
-                            file.listFiles()
-                                ?.let { filterMusicFiles(it.toList()) }
+                            file.listFiles()?.let { filterMusicFiles(it.toList()) }
                         } else {
                             if (file.extension == "mp3" || file.extension == "wav") {
                                 trackFiles.add(file)

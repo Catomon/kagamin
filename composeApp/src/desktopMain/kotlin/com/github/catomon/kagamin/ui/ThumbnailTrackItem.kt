@@ -4,17 +4,21 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuItem
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.MarqueeAnimationMode
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarHostState
@@ -29,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
@@ -56,6 +61,7 @@ import kagamin.composeapp.generated.resources.selected
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.io.IOException
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -71,7 +77,8 @@ fun ThumbnailTrackItem(
     val confirmationWindow = LocalConfirmWindow.current
     val snackbar = LocalSnackbarHostState.current
     val isCurrentTrack = index == -1
-    val backColor = if (isCurrentTrack) KagaminTheme.backgroundTransparent else KagaminTheme.theme.listItem
+    val backColor =
+        if (isCurrentTrack) KagaminTheme.backgroundTransparent else KagaminTheme.theme.listItem
 
     var trackThumbnailUpdated by remember { mutableStateOf<ImageBitmap?>(null) }
 
@@ -82,7 +89,7 @@ fun ThumbnailTrackItem(
             withContext(Dispatchers.IO) {
                 getThumbnail(track.uri)
             }
-        } catch (e: Exception) {
+        } catch (e: IOException) {
             e.printStackTrace()
             null
         }
@@ -105,24 +112,43 @@ fun ThumbnailTrackItem(
                 PlaybackStateButton(height, backColor, viewModel)
             }
 
-            Box(Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp))) {
-                TrackThumbnail(
-                    trackThumbnailUpdated,
-                    modifier = Modifier.fillMaxWidth().height(height),//.alpha(0.75f),
-                    shape = RectangleShape
-                )
+            Column(Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)).background(backColor)) {
+                Row(Modifier.weight(1f)) {
+                    TrackThumbnail(
+                        trackThumbnailUpdated,
+                        modifier = Modifier.width(64.dp),//.alpha(0.75f),
+                        shape = RoundedCornerShape(8.dp)
+                    )
 
-                TrackItemContent(
-                    height,
-                    index,
-                    viewModel,
-                    track,
-                    backColor,
-                    modifier = Modifier,
-                    onClick,
-                    isCurrentTrack,
-                    tracklistManager
-                )
+                    TrackItemContent(
+                        index = index,
+                        viewModel = viewModel,
+                        track = track,
+                        backColor = backColor,
+                        onClick = onClick,
+                        isHeader = isCurrentTrack,
+                        tracklistManager = tracklistManager,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
+
+//                Row(
+//                    verticalAlignment = Alignment.CenterVertically,
+//                    horizontalArrangement = Arrangement.SpaceBetween,
+//                    modifier = Modifier.fillMaxWidth().background(backColor).padding(start = 4.dp)
+//                ) {
+//                    Text(
+//                        track.name,
+//                        fontSize = 10.sp,
+//                        color = if (isCurrentTrack) KagaminTheme.theme.buttonIcon else KagaminTheme.text,
+//                        maxLines = 1,
+//                        // overflow = TextOverflow.Ellipsis,
+//                        modifier = Modifier.fillMaxWidth().let {
+//                            if (isCurrentTrack) it.basicMarquee(iterations = Int.MAX_VALUE)
+//                            else it
+//                        }.align(Alignment.Bottom)
+//                    )
+//                }
             }
         }
     }
@@ -131,53 +157,52 @@ fun ThumbnailTrackItem(
 
 @Composable
 private fun TrackItemContent(
-    height: Dp,
     index: Int,
     viewModel: KagaminViewModel,
     track: AudioTrack,
     backColor: Color,
-    modifier: Modifier,
     onClick: () -> Unit,
     isHeader: Boolean,
-    tracklistManager: TracklistManager
+    tracklistManager: TracklistManager,
+    modifier: Modifier,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.height(height).fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Start
     ) {
-//        if (index > -1 && viewModel.currentTrack == track) {
-//            PlaybackStateButton(height, backColor, viewModel)
-//        }
-
         Box(
-            modifier = modifier.fillMaxWidth().height(height)
-                //.background(color = backColor)
+            modifier = modifier.fillMaxSize()
                 .clickable {
                     onClick()
                 },
             contentAlignment = Alignment.Center
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth().background(backColor)
-                    .align(Alignment.BottomCenter).padding(start = 4.dp)
+            Column(
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier.clip(RoundedCornerShape(6.dp))
+                    .align(Alignment.TopStart).padding(start = 4.dp)
             ) {
                 Text(
                     track.name,
                     fontSize = 10.sp,
-                    color = if (isHeader) KagaminTheme.theme.buttonIcon else KagaminTheme.text,
+                    color = KagaminTheme.text,
                     maxLines = 1,
                     // overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.fillMaxWidth().let {
-                        if (isHeader) it.basicMarquee(iterations = Int.MAX_VALUE)
-                        else it
-                    }.align(Alignment.Bottom)
+                    modifier = Modifier.focusable().basicMarquee(iterations = Int.MAX_VALUE, animationMode = MarqueeAnimationMode.WhileFocused)
+                )
+
+                Text(
+                    track.author,
+                    fontSize = 8.sp,
+                    color = KagaminTheme.textSecondary,
+                    maxLines = 1,
+                    // overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE)
                 )
             }
 
-            //selected icon
             Row(
                 Modifier.align(Alignment.CenterEnd),
                 verticalAlignment = Alignment.CenterVertically
@@ -190,7 +215,7 @@ private fun TrackItemContent(
 }
 
 @Composable
-private fun PlaybackStateButton(
+fun PlaybackStateButton(
     height: Dp,
     backColor: Color,
     viewModel: KagaminViewModel

@@ -1,5 +1,7 @@
 package com.github.catomon.kagamin.ui
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
@@ -11,6 +13,7 @@ import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -77,7 +80,7 @@ fun Tracklist(
         allowAutoScroll = true
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(viewModel.currentPlaylistName) {
         listState.scrollToItem(index[currentTrack?.uri] ?: 0)
     }
 
@@ -92,7 +95,16 @@ fun Tracklist(
         }
     }
 
-    Column(modifier) {
+    Column(modifier.graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+        .drawWithContent {
+            drawContent()
+            drawRect(
+                color = KagaminTheme.backgroundTransparent,
+                size = size,
+                blendMode = BlendMode.SrcOut
+            )
+            drawContent()
+        }) {
         if (currentTrack != null) {
             TrackItemHeader(
                 -1,
@@ -123,16 +135,18 @@ fun Tracklist(
             Column(Modifier.fillMaxSize()) {
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth()
-                        .background(KagaminTheme.backgroundTransparent)
+//                        .background(KagaminTheme.backgroundTransparent)
                         .pointerInput(allowAutoScroll) {
                             allowAutoScroll = false
                         },
-                    state = listState
+                    state = listState,
+                    contentPadding = PaddingValues(2.dp)
                 ) {
                     items(tracks.size, key = {
-                        tracks[it].uri
+                        tracks[it].id
                     }) { index ->
                         val track = tracks[index]
+
                         ThumbnailTrackItem(
                             index,
                             track,
@@ -158,7 +172,9 @@ fun Tracklist(
                     }
                 }
 
-                Spacer(Modifier.fillMaxSize().weight(2f).background(KagaminTheme.theme.listItem))
+                Spacer(
+                    Modifier.fillMaxSize().weight(2f).background(KagaminTheme.backgroundTransparent)
+                )
             }
 
             androidx.compose.animation.AnimatedVisibility(

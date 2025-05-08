@@ -1,5 +1,6 @@
 package com.github.catomon.kagamin.ui
 
+import androidx.compose.animation.AnimatedVisibility
 import com.github.catomon.kagamin.data.PlaylistData
 import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuItem
@@ -13,6 +14,7 @@ import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,6 +37,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
@@ -58,14 +61,14 @@ import kagamin.composeapp.generated.resources.play
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.io.IOException
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
     val playlistsMap by viewModel.playlists.collectAsState()
     val playlists = remember(playlistsMap) { playlistsMap.map { it.key to it.value } }
-    val index =
-        remember(playlists) { playlists.mapIndexed { i, pl -> (pl.first to i) }.toMap() }
+    val index = remember(playlists) { playlists.mapIndexed { i, pl -> (pl.first to i) }.toMap() }
 
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
@@ -76,14 +79,13 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
 
     if (playlists.isEmpty()) {
         Box(
-            modifier
-                .background(KagaminTheme.theme.listItem),
+            modifier.background(KagaminTheme.backgroundTransparent),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 "No playlists.",
                 textAlign = TextAlign.Center,
-                color = KagaminTheme.textSecondary
+                color = KagaminTheme.backgroundTransparent
             )
         }
     } else {
@@ -93,10 +95,8 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
         Column(modifier) {
             Box(
                 modifier = Modifier.background(KagaminTheme.backgroundTransparent).height(32.dp)
-                    .fillMaxWidth()
-                    .clickable {
-                        val curTrackIndex =
-                            index[viewModel.currentPlaylistName] ?: return@clickable
+                    .fillMaxWidth().clickable {
+                        val curTrackIndex = index[viewModel.currentPlaylistName] ?: return@clickable
                         coroutineScope.launch {
                             listState.animateScrollToItem(curTrackIndex)
                         }
@@ -112,41 +112,32 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
             Box(Modifier.fillMaxSize().hoverable(interactionSource)) {
                 Column {
                     LazyColumn(
-                        state = listState,
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        state = listState, horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.background(KagaminTheme.backgroundTransparent),
+                        contentPadding = PaddingValues(2.dp)
                     ) {
                         items(playlists.size, key = {
                             playlists[it]
                         }) { i ->
                             val playlist = playlists[i]
-                            PlaylistItem(
-                                playlist,
-                                viewModel,
-                                playlists,
-                                i,
-                                remove = {
-                                   viewModel.removePlaylist(playlist.first)
-                                },
-                                clear = {
-                                    viewModel.clearPlaylist(playlist.first)
-                                },
-                                shuffle = {
-                                    viewModel.shufflePlaylist(playlist.first)
-                                }
-                            )
+                            PlaylistItem(playlist, viewModel, playlists, i, remove = {
+                                viewModel.removePlaylist(playlist.first)
+                            }, clear = {
+                                viewModel.clearPlaylist(playlist.first)
+                            }, shuffle = {
+                                viewModel.shufflePlaylist(playlist.first)
+                            })
                         }
                     }
 
-                    Box(Modifier.fillMaxSize().background(KagaminTheme.theme.listItem))
+                    Box(Modifier.fillMaxSize().background(KagaminTheme.backgroundTransparent))
                 }
 
                 androidx.compose.animation.AnimatedVisibility(
-                    isHovered, modifier = Modifier.align(Alignment.CenterEnd)
-                        .fillMaxHeight()
+                    isHovered, modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight()
                 ) {
                     VerticalScrollbar(
-                        modifier = Modifier
-                            .fillMaxHeight().clickable {  },
+                        modifier = Modifier.fillMaxHeight().clickable { },
                         adapter = rememberScrollbarAdapter(listState)
                     )
                 }
@@ -178,7 +169,7 @@ actual fun PlaylistItem(
                 withContext(Dispatchers.IO) {
                     getThumbnail(uri)
                 }
-            } catch (e: Exception) {
+            } catch (e: IOException) {
                 e.printStackTrace()
                 null
             }
@@ -198,64 +189,43 @@ actual fun PlaylistItem(
             },
         )
     }) {
-        Box(Modifier.height(64.dp)) {
-            TrackThumbnail(trackThumbnailUpdated, modifier = Modifier.fillMaxWidth().height(height), shape = RectangleShape)
 
-            PlaylistItemContent(viewModel, playlist, backColor)
+        Row(Modifier.height(height).padding(2.dp)) {
+            AnimatedVisibility(viewModel.currentPlaylistName == playlist.first) {
+                PlaybackStateButton(height, backColor, viewModel)
+            }
+
+            Box(Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp))) {
+                TrackThumbnail(
+                    trackThumbnailUpdated,
+                    modifier = Modifier.fillMaxWidth().height(height),
+                    shape = RectangleShape
+                )
+
+                PlaylistItemContent(viewModel, playlist, backColor)
+            }
         }
     }
 }
 
 @Composable
 private fun PlaylistItemContent(
-    viewModel: KagaminViewModel,
-    playlist: Pair<String, PlaylistData>,
-    backColor: Color
+    viewModel: KagaminViewModel, playlist: Pair<String, PlaylistData>, backColor: Color
 ) {
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-        if (viewModel.currentPlaylistName == playlist.first) {
-            Box(
-                Modifier.fillMaxHeight()
-                    .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
-                    .drawWithContent {
-                        drawContent()
-                        drawRect(color = backColor, size = size, blendMode = BlendMode.SrcOut)
-                        drawContent()
-                    }.clickable {
-                        viewModel.onPlayPause()
-                    }, contentAlignment = Alignment.Center
-            ) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier.fillMaxHeight().background(
-                        KagaminTheme.backgroundTransparent,
-                        RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp)
-                    )
-                ) {
-                    Image(
-                        painterResource(if (viewModel.playState == AudioPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
-                        "Play/Pause",
-                        modifier = Modifier.size(16.dp).fillMaxHeight(),
-                        colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIcon)
-                    )
-                }
-            }
-        }
-
         Column(
-            Modifier.fillMaxHeight().background(color = backColor)
+            Modifier.fillMaxHeight()
+                //.background(color = backColor)
                 .clickable {
                     viewModel.currentPlaylistName = playlist.first
                     viewModel.currentTab = Tabs.TRACKLIST
                 }.padding(4.dp)
         ) {
             Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
+                horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    playlist.first, fontSize = 10.sp, color = KagaminTheme.text,
-                    maxLines = 1
+                    playlist.first, fontSize = 10.sp, color = KagaminTheme.text, maxLines = 1
                 )
             }
 

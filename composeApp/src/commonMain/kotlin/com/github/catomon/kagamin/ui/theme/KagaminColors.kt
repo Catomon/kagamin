@@ -60,7 +60,8 @@ sealed class KagaminColors(
     object Pink : KagaminColors(
         name = "yuki",
         behindBackground = Color(0xffffbecf),
-        listItem = Color(0xcb753cc9),
+//        listItem = Color(0xcb753cc9),
+        listItem = Color(0xcdffc3d2),
         forDisabledMostlyIdk = Color(0xfff799b4),
         text = Color(0xFFFFFFFF),
         textSecondary = Color(0xFFFFE1EA),
@@ -109,7 +110,7 @@ sealed class KagaminColors(
     object Violet : KagaminColors(
         name = "gami-kasa",
         behindBackground = Color(0xffc09dff),
-        listItem = Color(0xcb6c4141),
+        listItem = Color(0xcd9775d5), // Color(0xcb6c4141)
         forDisabledMostlyIdk = Color(0xcb753cc9),
         text = Color(0xFFFFFFFF),
         textSecondary = Color(0xFFDECCFF),
@@ -137,7 +138,7 @@ sealed class KagaminColors(
     data object Blue : KagaminColors(
         name = "nata",
         behindBackground = Color(0xffadcfff),
-        listItem =  Color(0xcc0c3719),
+        listItem =  Color(0xcd6197de), //Color(0xcc0c3719)
         forDisabledMostlyIdk = Color(0xff6197de),
         text = Color(0xFFFFFFFF),
         textSecondary = Color(0xffd2e6ff),

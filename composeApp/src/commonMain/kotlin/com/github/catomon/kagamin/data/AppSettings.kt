@@ -2,6 +2,7 @@ package com.github.catomon.kagamin.data
 
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import kotlinx.serialization.Serializable
+import java.awt.LayoutManager
 
 @Serializable
 data class AppSettings(
@@ -17,5 +18,6 @@ data class AppSettings(
     val repeat: Boolean = false,
     val repeatPlaylist: Boolean = false,
     val lastPlaylistName: String = "default",
-    val autoScrollNextTrack: Boolean = false
+    val autoScrollNextTrack: Boolean = false,
+    val extra: Map<String, String> = emptyMap()
 )

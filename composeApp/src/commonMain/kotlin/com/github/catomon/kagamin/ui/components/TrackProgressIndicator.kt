@@ -43,7 +43,8 @@ fun TrackProgressIndicator(
     val timePastText = formatTime(currentTrack?.let { player.position })
     val trackDurationText = formatTime(currentTrack?.duration)
 
-    Column(verticalArrangement = Arrangement.Center,
+    Column(
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.pointerHoverIcon(
             PointerIcon.Hand
@@ -60,6 +61,7 @@ fun TrackProgressIndicator(
             LinearProgressIndicator(
                 progress = progress,
                 color = KagaminTheme.theme.thinBorder,
+                trackColor = KagaminTheme.theme.buttonIcon,
                 strokeCap = StrokeCap.Round,
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
                     .graphicsLayer(translationY = 2f)
@@ -69,6 +71,7 @@ fun TrackProgressIndicator(
                 progress = progress,
                 Modifier.fillMaxWidth().padding(top = 8.dp),
                 color = color,
+                trackColor = KagaminTheme.theme.buttonIcon,
                 strokeCap = StrokeCap.Round
             )
         }
@@ -86,5 +89,38 @@ fun TrackProgressIndicator(
                 trackDurationText, fontSize = fontSize, color = KagaminTheme.theme.buttonIcon
             )
         }
+    }
+}
+
+@Composable
+fun TrackProgressIndicator2(
+    currentTrack: AudioTrack?,
+    player: AudioPlayer<AudioTrack>,
+    updateProgress: () -> Unit,
+    progress: Float,
+    color: Color = KagaminTheme.theme.buttonIcon,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier.pointerHoverIcon(
+            PointerIcon.Hand
+        ).pointerInput(currentTrack) {
+            if (currentTrack == null) return@pointerInput
+            val width = this.size.width
+            detectTapGestures {
+                player.seek((currentTrack.duration * (it.x / width)).toLong())
+                updateProgress()
+            }
+        }) {
+
+        LinearProgressIndicator(
+            progress = progress,
+            Modifier.fillMaxWidth().padding(top = 8.dp),
+            color = color,
+            trackColor = KagaminTheme.theme.thinBorder,
+            strokeCap = StrokeCap.Round
+        )
     }
 }

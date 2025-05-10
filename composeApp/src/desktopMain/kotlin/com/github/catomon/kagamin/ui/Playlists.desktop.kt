@@ -40,17 +40,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.audio.AudioPlayer
+import com.github.catomon.kagamin.ui.components.OutlinedText
 import com.github.catomon.kagamin.ui.components.TrackThumbnail
 import com.github.catomon.kagamin.ui.components.getThumbnail
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
@@ -156,7 +161,6 @@ actual fun PlaylistItem(
     clear: () -> Unit,
     shuffle: () -> Unit
 ) {
-
     val backColor = KagaminTheme.theme.listItem
 
     var trackThumbnailUpdated by remember { mutableStateOf<ImageBitmap?>(null) }
@@ -189,7 +193,6 @@ actual fun PlaylistItem(
             },
         )
     }) {
-
         Row(Modifier.height(height).padding(2.dp)) {
             AnimatedVisibility(viewModel.currentPlaylistName == playlist.first) {
                 PlaybackStateButton(height, backColor, viewModel)
@@ -224,17 +227,26 @@ private fun PlaylistItemContent(
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
             ) {
-                Text(
-                    playlist.first, fontSize = 10.sp, color = KagaminTheme.text, maxLines = 1
+                OutlinedText(
+                    playlist.first, fontSize = 10.sp, fillColor = KagaminTheme.text, maxLines = 1,
+                 outlineColor = Color.Black.copy(alpha = 0.25f),
+                    outlineDrawStyle = Stroke(
+                        width = 3f,
+                        join = StrokeJoin.Round
+                    )
                 )
             }
 
             Row(Modifier.fillMaxWidth()) {
-                Text(
+                OutlinedText(
                     "Tracks: ${playlist.second.tracks.size}",
-                    modifier = Modifier.weight(0.5f),
                     fontSize = 10.sp,
-                    color = KagaminTheme.textSecondary
+                    fillColor = KagaminTheme.text,
+                    outlineColor = Color.Black.copy(alpha = 0.25f),
+                    outlineDrawStyle = Stroke(
+                        width = 3f,
+                        join = StrokeJoin.Round
+                    )
                 )
 //                    Text(
 //                        "Duration: ???",

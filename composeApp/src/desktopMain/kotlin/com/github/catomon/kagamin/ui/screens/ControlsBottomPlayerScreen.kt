@@ -1,6 +1,5 @@
 package com.github.catomon.kagamin.ui.screens
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
@@ -23,26 +22,21 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.github.catomon.kagamin.saveSettings
-import com.github.catomon.kagamin.ui.AddTracksTab
-import com.github.catomon.kagamin.ui.CreatePlaylistTab
 import com.github.catomon.kagamin.ui.Playlists
 import com.github.catomon.kagamin.ui.Tracklist
+import com.github.catomon.kagamin.ui.components.AddButton
 import com.github.catomon.kagamin.ui.components.AppName
-import com.github.catomon.kagamin.ui.components.CurrentTrackFrame
 import com.github.catomon.kagamin.ui.components.PlaybackButtons
 import com.github.catomon.kagamin.ui.components.RandomPlaybackButton
 import com.github.catomon.kagamin.ui.components.RepeatPlaylistPlaybackButton
 import com.github.catomon.kagamin.ui.components.RepeatTrackPlaybackButton
-import com.github.catomon.kagamin.ui.components.Sidebar
 import com.github.catomon.kagamin.ui.components.TrackThumbnail
 import com.github.catomon.kagamin.ui.components.VolumeOptions
-import com.github.catomon.kagamin.ui.components.VolumeSlider
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
@@ -201,7 +195,10 @@ fun ControlsBottomPlayerScreen(
                         }.align(Alignment.CenterStart)
                 )
 
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.align(Alignment.CenterEnd)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.align(Alignment.CenterEnd)
+                ) {
                     RepeatPlaylistPlaybackButton(audioPlayer)
 
                     RepeatTrackPlaybackButton(audioPlayer)
@@ -217,8 +214,23 @@ fun ControlsBottomPlayerScreen(
                         },
                         modifier = Modifier.width(133.dp)
                     )
+
+                    AddTrackOrPlaylistButton(viewModel)
                 }
             }
         }
     }
+}
+
+@Composable
+fun AddTrackOrPlaylistButton(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
+    AddButton(
+        onClick = {
+            viewModel.currentTab = Tabs.CREATE_PLAYLIST
+            viewModel.createPlaylistWindow = !viewModel.createPlaylistWindow
+        },
+        modifier = modifier,
+        color = if (viewModel.currentTab == Tabs.ADD_TRACKS || viewModel.currentTab == Tabs.CREATE_PLAYLIST) KagaminTheme.theme.buttonIconSmallSelected else KagaminTheme.theme.buttonIconSmall,
+        size = 32.dp
+    )
 }

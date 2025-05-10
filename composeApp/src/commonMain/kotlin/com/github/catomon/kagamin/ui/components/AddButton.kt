@@ -13,6 +13,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import kagamin.composeapp.generated.resources.Res
@@ -24,7 +25,8 @@ fun AddButton(
     painterResource: Painter = painterResource(Res.drawable.add),
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    color: Color = KagaminTheme.theme.buttonIconSmall
+    color: Color = KagaminTheme.theme.buttonIconSmall,
+    size: Dp = 20.dp
 ) {
     Box(
         contentAlignment = Alignment.Center,
@@ -33,7 +35,7 @@ fun AddButton(
         ImageWithShadow(
             painterResource,
             "Add button",
-            modifier = Modifier.size(20.dp),
+            modifier = Modifier.size(size),
             colorFilter = ColorFilter.tint(color)
         )
     }

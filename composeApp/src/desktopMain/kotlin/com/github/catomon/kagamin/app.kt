@@ -5,6 +5,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.draganddrop.dragAndDropTarget
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -44,6 +46,7 @@ import com.github.catomon.kagamin.ui.customShadow
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.LayoutManager
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
+import com.github.catomon.kagamin.ui.windows.AddTracksOrPlaylistsWindow
 import com.github.catomon.kagamin.ui.windows.ConfirmWindow
 import com.github.catomon.kagamin.ui.windows.ConfirmWindowState
 import com.github.catomon.kagamin.ui.windows.LocalConfirmWindow
@@ -108,6 +111,10 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
         AppWindow(windowState, kagaminViewModel, onCloseRequest)
     }
 
+    if (kagaminViewModel.createPlaylistWindow) {
+        AddTracksOrPlaylistsWindow(kagaminViewModel)
+    }
+
     if (isTraySupported) {
         val trayState = rememberTrayState()
         Tray(
@@ -117,7 +124,11 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
                 kagaminViewModel.onPlayPause()
             },
             state = trayState
-        )
+        ) {
+            Item("Exit", onClick = {
+                onCloseRequest()
+            })
+        }
     }
 
     if (confirmWindowState.value.isVisible) {
@@ -205,7 +216,7 @@ private fun WindowScope.AppFrame(kagaminViewModel: KagaminViewModel = get(Kagami
     }
 }
 
-private fun Modifier.kagaminWindowDecoration() =
+fun Modifier.kagaminWindowDecoration() =
     if (WindowConfig.isTransparent) this.padding(8.dp).customShadow().drawBehind {
         drawRoundRect(
             color = KagaminTheme.theme.thinBorder,

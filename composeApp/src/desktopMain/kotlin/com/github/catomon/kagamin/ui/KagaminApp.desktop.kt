@@ -20,6 +20,7 @@ import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.screens.TinyPlayerScreen
 
 @Composable
+//Todo: not app, main window
 actual fun KagaminApp(
     kagaminViewModel: KagaminViewModel,
     modifier: Modifier

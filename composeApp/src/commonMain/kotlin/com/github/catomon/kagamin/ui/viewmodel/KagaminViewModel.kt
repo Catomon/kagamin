@@ -40,6 +40,8 @@ class KagaminViewModel(private val ioDispatcher: CoroutineDispatcher = Dispatche
 
     var isLoadingPlaylistFile by mutableStateOf(false)
     var isLoadingSong by mutableStateOf<AudioTrack?>(null)
+
+    //todo move to player screen state
     var currentTab by mutableStateOf(Tabs.TRACKLIST)
 
     var settings by mutableStateOf(loadSettings())
@@ -49,6 +51,8 @@ class KagaminViewModel(private val ioDispatcher: CoroutineDispatcher = Dispatche
 
     var lovedSongs = mutableStateMapOf<String, TrackData>()
         private set
+
+    var createPlaylistWindow by mutableStateOf(false)
 
     init {
         val lastPlaylistName = settings.lastPlaylistName.ifBlank { "default" }

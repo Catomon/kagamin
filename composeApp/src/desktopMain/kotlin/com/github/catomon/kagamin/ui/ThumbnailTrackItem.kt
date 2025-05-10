@@ -27,17 +27,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.onPointerEvent
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
@@ -48,6 +51,7 @@ import androidx.lifecycle.viewModelScope
 import com.github.catomon.kagamin.LocalSnackbarHostState
 import com.github.catomon.kagamin.audio.AudioPlayer
 import com.github.catomon.kagamin.audio.AudioTrack
+import com.github.catomon.kagamin.ui.components.LikeSongButton
 import com.github.catomon.kagamin.ui.components.TrackThumbnail
 import com.github.catomon.kagamin.ui.components.getThumbnail
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
@@ -59,6 +63,7 @@ import kagamin.composeapp.generated.resources.pause
 import kagamin.composeapp.generated.resources.play
 import kagamin.composeapp.generated.resources.selected
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.io.IOException
@@ -71,18 +76,34 @@ fun ThumbnailTrackItem(
     tracklistManager: TracklistManager,
     viewModel: KagaminViewModel,
     onClick: () -> Unit,
-    modifier: Modifier
+    isCurrentTrack: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     val clipboard = LocalClipboardManager.current
     val confirmationWindow = LocalConfirmWindow.current
     val snackbar = LocalSnackbarHostState.current
-    val isCurrentTrack = index == -1
-    val backColor =
-        if (isCurrentTrack) KagaminTheme.backgroundTransparent else KagaminTheme.theme.listItem
+    val backgroundColor = KagaminTheme.theme.listItem
 
     var trackThumbnailUpdated by remember { mutableStateOf<ImageBitmap?>(null) }
 
     val height = 64.dp
+
+    var progress by remember { mutableFloatStateOf(-1f) }
+    val updateProgress = {
+        progress = when {
+            !isCurrentTrack -> 0f
+            else -> if (track.duration > 0 && track.duration < Long.MAX_VALUE) viewModel.audioPlayer.position.toFloat() / track.duration else -1f
+        }
+    }
+
+    LaunchedEffect(isCurrentTrack) {
+        if (!isCurrentTrack) return@LaunchedEffect
+
+        while (true) {
+            if (viewModel.audioPlayer.playState.value == AudioPlayer.PlayState.PLAYING) updateProgress()
+            delay(250)
+        }
+    }
 
     LaunchedEffect(track) {
         trackThumbnailUpdated = try {
@@ -109,107 +130,91 @@ fun ThumbnailTrackItem(
     }) {
         Row(modifier.height(height)) {
             AnimatedVisibility(index > -1 && viewModel.currentTrack == track) {
-                PlaybackStateButton(height, backColor, viewModel)
+                PlaybackStateButton(height, backgroundColor, viewModel)
             }
 
-            Column(Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)).background(backColor)) {
+            Column(Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)).background(backgroundColor).clickable {
+                onClick()
+            }) {
                 Row(Modifier.weight(1f)) {
                     TrackThumbnail(
                         trackThumbnailUpdated,
                         modifier = Modifier.width(64.dp),//.alpha(0.75f),
-                        shape = RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(8.dp),
+                        progress = progress,
+                        controlProgress = false
                     )
 
-                    TrackItemContent(
-                        index = index,
+                    TrackItemBody(
                         viewModel = viewModel,
                         track = track,
-                        backColor = backColor,
-                        onClick = onClick,
-                        isHeader = isCurrentTrack,
-                        tracklistManager = tracklistManager,
-                        modifier = Modifier.fillMaxSize(),
+                        isSelected = tracklistManager.selected.contains(index),
+                        modifier = Modifier.fillMaxSize()
                     )
                 }
-
-//                Row(
-//                    verticalAlignment = Alignment.CenterVertically,
-//                    horizontalArrangement = Arrangement.SpaceBetween,
-//                    modifier = Modifier.fillMaxWidth().background(backColor).padding(start = 4.dp)
-//                ) {
-//                    Text(
-//                        track.name,
-//                        fontSize = 10.sp,
-//                        color = if (isCurrentTrack) KagaminTheme.theme.buttonIcon else KagaminTheme.text,
-//                        maxLines = 1,
-//                        // overflow = TextOverflow.Ellipsis,
-//                        modifier = Modifier.fillMaxWidth().let {
-//                            if (isCurrentTrack) it.basicMarquee(iterations = Int.MAX_VALUE)
-//                            else it
-//                        }.align(Alignment.Bottom)
-//                    )
-//                }
             }
         }
     }
 }
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun TrackItemContent(
-    index: Int,
+private fun TrackItemBody(
     viewModel: KagaminViewModel,
     track: AudioTrack,
-    backColor: Color,
-    onClick: () -> Unit,
-    isHeader: Boolean,
-    tracklistManager: TracklistManager,
+    isSelected: Boolean,
     modifier: Modifier,
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Start
+
+    var isHovered by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = modifier.fillMaxWidth().onPointerEvent(PointerEventType.Exit) {
+            isHovered = false
+        }.onPointerEvent(PointerEventType.Enter) {
+            isHovered = true
+        },
+        contentAlignment = Alignment.Center
     ) {
-        Box(
-            modifier = modifier.fillMaxSize()
-                .clickable {
-                    onClick()
-                },
-            contentAlignment = Alignment.Center
+        Column(
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.SpaceEvenly,
+            modifier = Modifier.clip(RoundedCornerShape(6.dp))
+                .align(Alignment.TopStart).padding(start = 4.dp)
         ) {
-            Column(
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier.clip(RoundedCornerShape(6.dp))
-                    .align(Alignment.TopStart).padding(start = 4.dp)
-            ) {
-                Text(
-                    track.name,
-                    fontSize = 10.sp,
-                    color = KagaminTheme.text,
-                    maxLines = 1,
-                    // overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.focusable().basicMarquee(iterations = Int.MAX_VALUE, animationMode = MarqueeAnimationMode.WhileFocused)
+            Text(
+                track.name,
+                fontSize = 10.sp,
+                color = KagaminTheme.text,
+                maxLines = 1,
+                // overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.focusable().basicMarquee(
+                    iterations = Int.MAX_VALUE,
+                    animationMode = MarqueeAnimationMode.WhileFocused
                 )
+            )
 
-                Text(
-                    track.author,
-                    fontSize = 8.sp,
-                    color = KagaminTheme.textSecondary,
-                    maxLines = 1,
-                    // overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE)
-                )
-            }
+            Text(
+                track.author,
+                fontSize = 8.sp,
+                color = KagaminTheme.textSecondary,
+                maxLines = 1,
+                // overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE)
+            )
+        }
 
-            Row(
-                Modifier.align(Alignment.CenterEnd),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                if (tracklistManager.selected.contains(index))
-                    Icon(painterResource(Res.drawable.selected), null)
-            }
+        AnimatedVisibility(isHovered || viewModel.lovedSongs[track.uri] != null, modifier = Modifier.align(Alignment.CenterEnd)) {
+            LikeSongButton(viewModel, track, 48.dp)
+        }
+
+        Row(
+            Modifier.align(Alignment.CenterEnd),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (isSelected)
+                Icon(painterResource(Res.drawable.selected), null)
         }
     }
 }

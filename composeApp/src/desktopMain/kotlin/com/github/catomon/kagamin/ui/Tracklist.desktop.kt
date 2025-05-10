@@ -47,7 +47,6 @@ import androidx.lifecycle.viewModelScope
 import com.github.catomon.kagamin.LocalWindow
 import com.github.catomon.kagamin.audio.AudioPlayer
 import com.github.catomon.kagamin.audio.AudioTrack
-import com.github.catomon.kagamin.ui.components.TrackProgressIndicator
 import com.github.catomon.kagamin.ui.components.TrackProgressIndicator2
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.formatTime
@@ -65,7 +64,7 @@ fun Tracklist(
     val tracklistManager = remember { TracklistManager(coroutineScope) }
     val index =
         remember(tracks) { tracks.mapIndexed { i, track -> (track.uri to i) }.toMap() }
-    val track = viewModel.currentTrack
+    val currentTrack = viewModel.currentTrack
     val listState = rememberLazyListState()
     var allowAutoScroll by remember { mutableStateOf(true) }
     val window = LocalWindow.current
@@ -76,13 +75,13 @@ fun Tracklist(
     }
 
     LaunchedEffect(viewModel.currentPlaylistName) {
-        listState.scrollToItem(index[track?.uri] ?: 0)
+        listState.scrollToItem(index[currentTrack?.uri] ?: 0)
     }
 
-    LaunchedEffect(track) {
+    LaunchedEffect(currentTrack) {
         if (!window.isMinimized && viewModel.settings.autoScrollNextTrack && allowAutoScroll) {
             val nextIndex =
-                index[track?.uri ?: return@LaunchedEffect] ?: return@LaunchedEffect
+                index[currentTrack?.uri ?: return@LaunchedEffect] ?: return@LaunchedEffect
             if (viewModel.playMode == AudioPlayer.PlayMode.RANDOM)
                 listState.scrollToItem(nextIndex)
             else
@@ -100,14 +99,14 @@ fun Tracklist(
             )
             drawContent()
         }) {
-        if (track != null) {
+        if (currentTrack != null) {
             TrackItemHeader(
                 -1,
                 viewModel.currentTrack!!,
                 tracklistManager,
                 viewModel = viewModel,
                 onClick = onClick@{
-                    val curTrackIndex = index[track.uri] ?: return@onClick
+                    val curTrackIndex = index[currentTrack.uri] ?: return@onClick
                     coroutineScope.launch {
                         listState.animateScrollToItem(curTrackIndex)
                     }
@@ -146,6 +145,7 @@ fun Tracklist(
                             index,
                             track,
                             tracklistManager,
+                            isCurrentTrack = currentTrack == track,
                             viewModel = viewModel,
                             onClick = onClick@{
                                 if (tracklistManager.isAnySelected) {

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -16,6 +17,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
+import com.github.catomon.kagamin.audio.AudioTrack
 import com.github.catomon.kagamin.savePlaylist
 import com.github.catomon.kagamin.toTrackData
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
@@ -36,17 +38,6 @@ fun SongOptionsButtons(
     buttonsSize: Dp = 32.dp
 ) {
     val curTrack = viewModel.currentTrack
-    var updatingLike by remember { mutableStateOf(false) }
-    var loved by remember(
-        updatingLike,
-        curTrack
-    ) {
-        mutableStateOf(curTrack?.let {
-            viewModel.lovedSongs.containsKey(
-                it.uri
-            )
-        } ?: false)
-    }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -79,12 +70,36 @@ fun SongOptionsButtons(
             )
         }
 
-        IconButton(onClick = {
+        LikeSongButton(viewModel, curTrack, buttonsSize)
+    }
+}
+
+@Composable
+fun LikeSongButton(
+    viewModel: KagaminViewModel,
+    curTrack: AudioTrack?,
+    buttonsSize: Dp,
+    modifier: Modifier = Modifier
+) {
+    var updatingLike by remember { mutableStateOf(false) }
+    var loved by remember(
+        updatingLike,
+        curTrack
+    ) {
+        mutableStateOf(curTrack?.let {
+            viewModel.lovedSongs.containsKey(
+                it.uri
+            )
+        } ?: false)
+    }
+
+    IconButton(
+        onClick = {
             viewModel.viewModelScope.launch {
                 if (updatingLike) return@launch
                 updatingLike = true
                 if (!loved) {
-                    viewModel.currentTrack?.toTrackData()?.let { curTrackData ->
+                    curTrack?.toTrackData()?.let { curTrackData ->
                         viewModel.lovedSongs[curTrackData.uri] = curTrackData
                         withContext(Dispatchers.IO) {
                             savePlaylist(
@@ -94,12 +109,12 @@ fun SongOptionsButtons(
                         }
                     }
                 } else {
-                    viewModel.currentTrack?.toTrackData()?.let { curTrackData ->
+                    curTrack?.toTrackData()?.let { curTrackData ->
                         viewModel.lovedSongs.remove(curTrackData.uri)
                         withContext(Dispatchers.IO) {
                             savePlaylist(
                                 "loved",
-                                viewModel.lovedSongs.values.toList() + curTrackData
+                                viewModel.lovedSongs.values.toList()
                             )
                         }
                     }
@@ -107,15 +122,13 @@ fun SongOptionsButtons(
                 loved = curTrack?.let { viewModel.lovedSongs.containsKey(it.uri) } ?: false
                 updatingLike = false
             }
-        }, modifier = Modifier.size(buttonsSize)) {
-            ImageWithShadow(
-                painterResource(Res.drawable.like_song),
-                "like song",
-                colorFilter = if (loved) ColorFilter.tint(
-                    KagaminTheme.theme.buttonIcon
-                )
-                else ColorFilter.tint(KagaminTheme.theme.buttonIconTransparent)
-            )
-        }
+        },
+        modifier = modifier.size(buttonsSize)
+    ) {
+        Icon(
+            painter = painterResource(Res.drawable.like_song),
+            contentDescription = "like song",
+            tint = if (loved) KagaminTheme.theme.forDisabledMostlyIdk else KagaminTheme.theme.buttonIconTransparent
+        )
     }
 }

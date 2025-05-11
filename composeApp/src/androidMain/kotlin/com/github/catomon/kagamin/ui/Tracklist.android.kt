@@ -114,7 +114,7 @@ fun Tracklist(
 
         Box(Modifier
             .fillMaxSize()
-            .background(KagaminTheme.theme.listItem))
+            .background(KagaminTheme.colors.listItem))
     }
 }
 
@@ -130,7 +130,7 @@ actual fun TrackItemHeader(
     val clipboard = LocalClipboardManager.current
     val isHeader = index == -1
     val backColor = if (isHeader) KagaminTheme.backgroundTransparent else
-        if (index % 2 == 0) KagaminTheme.theme.forDisabledMostlyIdk else KagaminTheme.theme.listItem
+        if (index % 2 == 0) KagaminTheme.colors.forDisabledMostlyIdk else KagaminTheme.colors.listItem
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -155,7 +155,7 @@ actual fun TrackItemHeader(
                     painterResource(if (viewModel.playState == AudioPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
                     "track playback state icon",
                     modifier = Modifier.size(16.dp),
-                    colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIcon)
+                    colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon)
                 )
             }
         }

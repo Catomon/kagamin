@@ -133,7 +133,7 @@ actual fun PlayerScreen(
                             if (viewModel.playlist.isEmpty()) {
                                 Box(
                                     Modifier.fillMaxSize()
-                                        .background(KagaminTheme.theme.listItem),
+                                        .background(KagaminTheme.colors.listItem),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(

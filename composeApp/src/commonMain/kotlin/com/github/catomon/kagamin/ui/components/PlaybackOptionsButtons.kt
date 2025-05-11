@@ -84,9 +84,9 @@ fun RepeatTrackPlaybackButton(
             painterResource(Res.drawable.repeat_single),
             "Toggle repeat track",
             colorFilter = if (playMode == AudioPlayer.PlayMode.REPEAT_TRACK) ColorFilter.tint(
-                KagaminTheme.theme.buttonIcon
+                KagaminTheme.colors.buttonIcon
             )
-            else ColorFilter.tint(KagaminTheme.theme.buttonIconTransparent)
+            else ColorFilter.tint(KagaminTheme.colors.buttonIconTransparent)
         )
     }
 }
@@ -107,9 +107,9 @@ fun RepeatPlaylistPlaybackButton(
             painterResource(Res.drawable.repeat_playlist),
             "Toggle repeat playlist",
             colorFilter = if (playMode == AudioPlayer.PlayMode.REPEAT_PLAYLIST) ColorFilter.tint(
-                KagaminTheme.theme.buttonIcon
+                KagaminTheme.colors.buttonIcon
             )
-            else ColorFilter.tint(KagaminTheme.theme.buttonIconTransparent)
+            else ColorFilter.tint(KagaminTheme.colors.buttonIconTransparent)
         )
     }
 }
@@ -130,9 +130,9 @@ fun RandomPlaybackButton(
             painterResource(Res.drawable.random),
             "Toggle random mode",
             colorFilter = if (playMode == AudioPlayer.PlayMode.RANDOM) ColorFilter.tint(
-                KagaminTheme.theme.buttonIcon
+                KagaminTheme.colors.buttonIcon
             )
-            else ColorFilter.tint(KagaminTheme.theme.buttonIconTransparent)
+            else ColorFilter.tint(KagaminTheme.colors.buttonIconTransparent)
         )
     }
 }
@@ -152,8 +152,8 @@ fun VolumeOptions(
             ImageWithShadow(
                 painterResource(Res.drawable.volume),
                 "volume",
-                colorFilter = if (volume > 0f) ColorFilter.tint(KagaminTheme.theme.buttonIcon)
-                else ColorFilter.tint(KagaminTheme.theme.buttonIconTransparent)
+                colorFilter = if (volume > 0f) ColorFilter.tint(KagaminTheme.colors.buttonIcon)
+                else ColorFilter.tint(KagaminTheme.colors.buttonIconTransparent)
             )
         }
 

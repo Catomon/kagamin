@@ -51,9 +51,9 @@ fun SongOptionsButtons(
                 painterResource(Res.drawable.song_info),
                 "info",
                 colorFilter = if (false) ColorFilter.tint( //
-                    KagaminTheme.theme.buttonIcon
+                    KagaminTheme.colors.buttonIcon
                 )
-                else ColorFilter.tint(KagaminTheme.theme.buttonIconTransparent)
+                else ColorFilter.tint(KagaminTheme.colors.buttonIconTransparent)
             )
         }
 
@@ -64,9 +64,9 @@ fun SongOptionsButtons(
                 painterResource(Res.drawable.rate_song),
                 "rate song",
                 colorFilter = if (false) ColorFilter.tint( //if rated
-                    KagaminTheme.theme.buttonIcon
+                    KagaminTheme.colors.buttonIcon
                 )
-                else ColorFilter.tint(KagaminTheme.theme.buttonIconTransparent)
+                else ColorFilter.tint(KagaminTheme.colors.buttonIconTransparent)
             )
         }
 
@@ -128,7 +128,7 @@ fun LikeSongButton(
         Icon(
             painter = painterResource(Res.drawable.like_song),
             contentDescription = "like song",
-            tint = if (loved) KagaminTheme.theme.forDisabledMostlyIdk else KagaminTheme.theme.buttonIconTransparent
+            tint = if (loved) KagaminTheme.colors.forDisabledMostlyIdk else KagaminTheme.colors.buttonIconTransparent
         )
     }
 }

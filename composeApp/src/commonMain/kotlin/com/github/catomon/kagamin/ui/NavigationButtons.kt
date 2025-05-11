@@ -2,11 +2,8 @@ package com.github.catomon.kagamin.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,7 +22,7 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun TracklistTabButton(
     onClick: () -> Unit,
-    color: Color = KagaminTheme.theme.buttonIconSmall,
+    color: Color = KagaminTheme.colors.buttonIconSmall,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -44,7 +41,7 @@ fun TracklistTabButton(
 @Composable
 fun PlaylistsTabButton(
     onClick: () -> Unit,
-    color: Color = KagaminTheme.theme.buttonIconSmall,
+    color: Color = KagaminTheme.colors.buttonIconSmall,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -63,7 +60,7 @@ fun PlaylistsTabButton(
 @Composable
 fun PlaybackTabButton(
     onClick: () -> Unit,
-    color: Color = KagaminTheme.theme.buttonIconSmall,
+    color: Color = KagaminTheme.colors.buttonIconSmall,
     modifier: Modifier = Modifier
 ) {
     Box(

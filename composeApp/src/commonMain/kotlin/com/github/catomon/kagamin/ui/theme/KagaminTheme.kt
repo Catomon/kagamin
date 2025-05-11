@@ -1,5 +1,6 @@
 package com.github.catomon.kagamin.ui.theme
 
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -21,7 +22,7 @@ fun KagaminTheme(content: @Composable () -> Unit) {
         LocalSnackbarHostState provides snackbarHostState,
     ) {
         MaterialTheme(
-            colorScheme = KagaminTheme.materialColors,
+            colorScheme = KagaminTheme.colorScheme,
             typography = KagaminTheme.typography,
             content = content
         )
@@ -34,35 +35,61 @@ object KagaminTheme {
         KagaminColors.Blue, KagaminColors.KagaminDark, KagaminColors.White
     )
 
-    var theme = themes.first()
+    var colors = themes.first()
 
-    val text get() = theme.text
-    val textSecondary get() = theme.textSecondary
-    val behindBackground get() = theme.behindBackground
-    val background get() = theme.background
-    val backgroundTransparent get() = theme.backgroundTransparent
+    val text get() = colors.text
+    val textSecondary get() = colors.textSecondary
+    val behindBackground get() = colors.behindBackground
+    val background get() = colors.background
+    val backgroundTransparent get() = colors.backgroundTransparent
 
     init {
-        theme =
+        colors =
             themes.find { it.name == loadSettings().theme } ?: themes.first()
     }
 
     private val lightRed = Color(245, 83, 95)
-    val materialColors
-        @Composable get() = MaterialTheme.colorScheme.copy(
-            primary = theme.buttonIcon,
-            primaryContainer = theme.buttonIconTransparent,
-            secondary = theme.buttonIconSmall,
-            secondaryContainer = theme.buttonIconSmallSelected,
-            background = background,
-            surface = backgroundTransparent,
-            error = lightRed,
-            onPrimary = Color.White,
-            onSecondary = Color.White,
-            onBackground = Color.White,
-            onSurface = Color.White,
-            onError = Color.White,
-        )
+    val colorScheme: ColorScheme
+        @Composable get() = with(MaterialTheme.colorScheme) {
+            copy(
+                primary = colors.buttonIcon,
+                primaryContainer = colors.buttonIconTransparent,
+                secondary = colors.buttonIconSmall,
+                secondaryContainer = colors.buttonIconSmallSelected,
+                background = background,
+                surface = backgroundTransparent,
+                error = lightRed,
+                onPrimary = Color.White,
+                onSecondary = Color.White,
+                onBackground = Color.White,
+                onSurface = Color.White,
+                onError = Color.White,
+                onPrimaryContainer = this.onPrimaryContainer,
+                inversePrimary = this.inversePrimary,
+                onSecondaryContainer = this.onSecondaryContainer,
+                tertiary = this.tertiary,
+                onTertiary = this.onTertiary,
+                tertiaryContainer = this.tertiaryContainer,
+                onTertiaryContainer = this.onTertiaryContainer,
+                surfaceVariant = colors.backgroundTransparent,
+                onSurfaceVariant = colors.buttonIcon,
+                surfaceTint = this.surfaceTint,
+                inverseSurface = this.inverseSurface,
+                inverseOnSurface = this.inverseOnSurface,
+                errorContainer = this.errorContainer,
+                onErrorContainer = this.onErrorContainer,
+                outline = colors.buttonIcon,
+                outlineVariant = this.outlineVariant,
+                scrim = this.scrim,
+                surfaceBright = this.surfaceBright,
+                surfaceDim = this.surfaceDim,
+                surfaceContainer = this.surfaceContainer,
+                surfaceContainerHigh = this.surfaceContainerHigh,
+                surfaceContainerHighest = colors.behindBackground,
+                surfaceContainerLow = this.surfaceContainerLow,
+                surfaceContainerLowest = this.surfaceContainerLowest,
+            )
+        }
 
     val fontFamily @Composable get() = FontFamily(Font(Res.font.BadComic_Regular))
 
@@ -71,21 +98,24 @@ object KagaminTheme {
             val t = MaterialTheme.typography
             val fontFamily = fontFamily
             t.copy(
-                displayLarge = t.displayLarge.copy(fontFamily = fontFamily),
-                displayMedium = t.displayMedium.copy(fontFamily = fontFamily),
-                displaySmall = t.displaySmall.copy(fontFamily = fontFamily),
-                headlineLarge = t.headlineLarge.copy(fontFamily = fontFamily),
-                headlineMedium = t.headlineMedium.copy(fontFamily = fontFamily),
-                headlineSmall = t.headlineSmall.copy(fontFamily = fontFamily),
-                titleLarge = t.titleLarge.copy(fontFamily = fontFamily),
-                titleMedium = t.titleMedium.copy(fontFamily = fontFamily),
-                titleSmall = t.titleSmall.copy(fontFamily = fontFamily),
-                bodyLarge = t.bodyLarge.copy(fontFamily = fontFamily),
-                bodyMedium = t.bodyMedium.copy(fontFamily = fontFamily),
-                bodySmall = t.bodySmall.copy(fontFamily = fontFamily),
-                labelLarge = t.labelLarge.copy(fontFamily = fontFamily),
-                labelMedium = t.labelMedium.copy(fontFamily = fontFamily),
-                labelSmall = t.labelSmall.copy(fontFamily = fontFamily)
+                displayLarge = t.displayLarge.copy(fontFamily = fontFamily, color = colors.text),
+                displayMedium = t.displayMedium.copy(fontFamily = fontFamily, color = colors.text),
+                displaySmall = t.displaySmall.copy(fontFamily = fontFamily, color = colors.text),
+                headlineLarge = t.headlineLarge.copy(fontFamily = fontFamily, color = colors.text),
+                headlineMedium = t.headlineMedium.copy(
+                    fontFamily = fontFamily,
+                    color = colors.text
+                ),
+                headlineSmall = t.headlineSmall.copy(fontFamily = fontFamily, color = colors.text),
+                titleLarge = t.titleLarge.copy(fontFamily = fontFamily, color = colors.text),
+                titleMedium = t.titleMedium.copy(fontFamily = fontFamily, color = colors.text),
+                titleSmall = t.titleSmall.copy(fontFamily = fontFamily, color = colors.text),
+                bodyLarge = t.bodyLarge.copy(fontFamily = fontFamily, color = colors.text),
+                bodyMedium = t.bodyMedium.copy(fontFamily = fontFamily, color = colors.text),
+                bodySmall = t.bodySmall.copy(fontFamily = fontFamily, color = colors.text),
+                labelLarge = t.labelLarge.copy(fontFamily = fontFamily, color = colors.text),
+                labelMedium = t.labelMedium.copy(fontFamily = fontFamily, color = colors.text),
+                labelSmall = t.labelSmall.copy(fontFamily = fontFamily, color = colors.text)
             )
         }
 }

@@ -175,7 +175,7 @@ actual fun PlayerScreen(
                                     Box(
                                         Modifier
                                             .fillMaxSize()
-                                            .background(KagaminTheme.theme.listItem),
+                                            .background(KagaminTheme.colors.listItem),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text(
@@ -240,7 +240,7 @@ actual fun PlayerScreen(
 
                             },
                             modifier = Modifier.align(Alignment.BottomEnd),
-                            if (viewModel.currentTab == Tabs.ADD_TRACKS || viewModel.currentTab == Tabs.CREATE_PLAYLIST) Color.White else KagaminTheme.theme.buttonIconSmall
+                            if (viewModel.currentTab == Tabs.ADD_TRACKS || viewModel.currentTab == Tabs.CREATE_PLAYLIST) Color.White else KagaminTheme.colors.buttonIconSmall
                         )
                 }
             }

@@ -151,7 +151,7 @@ fun TinyPlayerScreen(
                                 if (viewModel.playlist.isEmpty()) {
                                     Box(
                                         Modifier.fillMaxHeight()
-                                            .background(KagaminTheme.theme.listItem),
+                                            .background(KagaminTheme.colors.listItem),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text(

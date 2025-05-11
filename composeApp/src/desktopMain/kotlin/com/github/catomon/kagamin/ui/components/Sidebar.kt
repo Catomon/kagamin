@@ -45,7 +45,7 @@ fun MinimizeButton(modifier: Modifier = Modifier) {
             painterResource(Res.drawable.minimize_window),
             "Minimize",
             modifier = Modifier.size(20.dp),
-            colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIconSmall)
+            colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIconSmall)
         )
     }
 }
@@ -76,7 +76,7 @@ fun Sidebar(
                             viewModel.currentTab = Tabs.PLAYBACK
                         }
                     },
-                    color = if (viewModel.currentTab == Tabs.PLAYBACK) KagaminTheme.theme.buttonIconSmallSelected else KagaminTheme.theme.buttonIconSmall,
+                    color = if (viewModel.currentTab == Tabs.PLAYBACK) KagaminTheme.colors.buttonIconSmallSelected else KagaminTheme.colors.buttonIconSmall,
                     Modifier.weight(0.333f)
                 )
             }
@@ -87,7 +87,7 @@ fun Sidebar(
                         viewModel.currentTab = Tabs.TRACKLIST
                     }
                 },
-                color = if (viewModel.currentTab == Tabs.TRACKLIST) KagaminTheme.theme.buttonIconSmallSelected else KagaminTheme.theme.buttonIconSmall,
+                color = if (viewModel.currentTab == Tabs.TRACKLIST) KagaminTheme.colors.buttonIconSmallSelected else KagaminTheme.colors.buttonIconSmall,
                 Modifier.weight(0.333f)
             )
 
@@ -97,7 +97,7 @@ fun Sidebar(
                         viewModel.currentTab = Tabs.PLAYLISTS
                     }
                 },
-                color = if (viewModel.currentTab == Tabs.PLAYLISTS) KagaminTheme.theme.buttonIconSmallSelected else KagaminTheme.theme.buttonIconSmall,
+                color = if (viewModel.currentTab == Tabs.PLAYLISTS) KagaminTheme.colors.buttonIconSmallSelected else KagaminTheme.colors.buttonIconSmall,
                 Modifier.weight(0.333f)
             )
 
@@ -119,7 +119,7 @@ fun Sidebar(
                     }
                 },
                 modifier = Modifier.weight(0.333f),
-                color = if (viewModel.currentTab == Tabs.ADD_TRACKS || viewModel.currentTab == Tabs.CREATE_PLAYLIST) KagaminTheme.theme.buttonIconSmallSelected else KagaminTheme.theme.buttonIconSmall
+                color = if (viewModel.currentTab == Tabs.ADD_TRACKS || viewModel.currentTab == Tabs.CREATE_PLAYLIST) KagaminTheme.colors.buttonIconSmallSelected else KagaminTheme.colors.buttonIconSmall
             )
         }
 
@@ -154,7 +154,7 @@ private fun SwapLayoutButton(layoutManager: LayoutManager) {
             painterResource(Res.drawable.drag),
             "drag window",
             modifier = Modifier.size(16.dp),
-            colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIconSmall)
+            colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIconSmall)
         )
     }
 }
@@ -168,7 +168,7 @@ private fun MenuButton(navController: NavHostController, modifier: Modifier) {
             painterResource(Res.drawable.menu),
             "Menu",
             modifier = Modifier.size(32.dp),
-            colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIconSmall)
+            colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIconSmall)
         )
     }
 }

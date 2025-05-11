@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import com.github.catomon.kagamin.data.PlaylistData
 import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuItem
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,7 +20,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
@@ -38,36 +36,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
-import com.github.catomon.kagamin.audio.AudioPlayer
 import com.github.catomon.kagamin.ui.components.OutlinedText
 import com.github.catomon.kagamin.ui.components.TrackThumbnail
 import com.github.catomon.kagamin.ui.components.getThumbnail
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.ui.util.Tabs
-import kagamin.composeapp.generated.resources.Res
-import kagamin.composeapp.generated.resources.pause
-import kagamin.composeapp.generated.resources.play
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.io.IOException
-import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
@@ -110,7 +96,7 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                 Text(
                     viewModel.currentPlaylistName,
                     fontSize = 10.sp,
-                    color = KagaminTheme.theme.buttonIcon
+                    color = KagaminTheme.colors.buttonIcon
                 )
             }
 
@@ -161,7 +147,7 @@ actual fun PlaylistItem(
     clear: () -> Unit,
     shuffle: () -> Unit
 ) {
-    val backColor = KagaminTheme.theme.listItem
+    val backColor = KagaminTheme.colors.listItem
 
     var trackThumbnailUpdated by remember { mutableStateOf<ImageBitmap?>(null) }
 

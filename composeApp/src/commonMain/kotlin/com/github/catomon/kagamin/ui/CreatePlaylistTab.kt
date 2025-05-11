@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -44,11 +45,11 @@ fun CreatePlaylistTab(viewModel: KagaminViewModel, modifier: Modifier) {
         AddTrackCreatePlaylistTabButtons(viewModel, modifier = Modifier.fillMaxWidth())
 
         Column(
-            Modifier.fillMaxSize().background(KagaminTheme.theme.listItem),
+            Modifier.fillMaxSize().background(KagaminTheme.colors.backgroundTransparent),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            TextField(
+            OutlinedTextField(
                 name,
                 onValueChange = {
                     name = it

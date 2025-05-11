@@ -143,7 +143,7 @@ private fun ThemeRadioButtons(
                     KagaminColors.Violet.forDisabledMostlyIdk
                 ),
                 onClick = {
-                    KagaminTheme.theme = KagaminColors.Violet
+                    KagaminTheme.colors = KagaminColors.Violet
                     state.settings = settings.copy(theme = KagaminColors.Violet.name)
                 },
                 modifier = Modifier.drawBehind {
@@ -159,7 +159,7 @@ private fun ThemeRadioButtons(
                     KagaminColors.Pink.forDisabledMostlyIdk
                 ),
                 onClick = {
-                    KagaminTheme.theme = KagaminColors.Pink
+                    KagaminTheme.colors = KagaminColors.Pink
                     state.settings = settings.copy(theme = KagaminColors.Pink.name)
                 },
                 modifier = Modifier.drawBehind {
@@ -175,7 +175,7 @@ private fun ThemeRadioButtons(
                     KagaminColors.Blue.forDisabledMostlyIdk
                 ),
                 onClick = {
-                    KagaminTheme.theme = KagaminColors.Blue
+                    KagaminTheme.colors = KagaminColors.Blue
                     state.settings = settings.copy(theme = KagaminColors.Blue.name)
                 },
                 modifier = Modifier.drawBehind {
@@ -192,7 +192,7 @@ private fun ThemeRadioButtons(
                         KagaminColors.KagaminDark.backgroundTransparent
                     ),
                     onClick = {
-                        KagaminTheme.theme = KagaminColors.KagaminDark
+                        KagaminTheme.colors = KagaminColors.KagaminDark
                         state.settings = settings.copy(theme = KagaminColors.KagaminDark.name)
                     },
                     modifier = Modifier.drawBehind {

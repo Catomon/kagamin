@@ -18,6 +18,7 @@ import com.github.catomon.kagamin.ui.screens.PlayerScreenDestination
 import com.github.catomon.kagamin.ui.screens.SettingsDestination
 import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.screens.TinyPlayerScreen
+import com.github.catomon.kagamin.ui.theme.KagaminTheme
 
 @Composable
 //Todo: not app, main window
@@ -28,7 +29,7 @@ actual fun KagaminApp(
     val navController = rememberNavController()
     val layoutManager = LocalLayoutManager.current.currentLayout
 
-    Scaffold(snackbarHost = { SnackbarHost(LocalSnackbarHostState.current) }, modifier = modifier) {
+    Scaffold(snackbarHost = { SnackbarHost(LocalSnackbarHostState.current) }, modifier = modifier, containerColor = KagaminTheme.colors.background) {
         NavHost(
             navController,
             startDestination = PlayerScreenDestination.toString(),

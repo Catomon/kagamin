@@ -46,7 +46,7 @@ fun TrackThumbnail(
     image: ImageBitmap?,
     onSetProgress: (Float) -> Unit = { },
     progress: Float = 0f,
-    progressColor: Color = KagaminTheme.theme.thumbnailProgressIndicator,
+    progressColor: Color = KagaminTheme.colors.thumbnailProgressIndicator,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
     blur: Boolean = false,
@@ -80,7 +80,7 @@ fun TrackThumbnail(
         contentAlignment = Alignment.Center,
         modifier = modifier.drawBehind {
             drawRoundRect(
-                color = KagaminTheme.theme.backgroundTransparent,
+                color = KagaminTheme.colors.backgroundTransparent,
                 topLeft = Offset(0f, with(density) { 2.dp.toPx() }),
                 size = this.size.copy(),
                 cornerRadius = CornerRadius(if (shape is RoundedCornerShape) 12f else 0f)

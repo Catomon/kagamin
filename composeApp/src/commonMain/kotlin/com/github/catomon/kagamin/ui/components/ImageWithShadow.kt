@@ -27,7 +27,7 @@ fun ImageWithShadow(
         Image(
             painterResource,
             contentDescription = s,
-            colorFilter = ColorFilter.tint(KagaminTheme.theme.thinBorder),
+            colorFilter = ColorFilter.tint(KagaminTheme.colors.thinBorder),
             modifier = Modifier.graphicsLayer(translationY = pad).fillMaxSize()
         )
 

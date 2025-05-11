@@ -33,8 +33,8 @@ fun TrackProgressIndicator(
     player: AudioPlayer<AudioTrack>,
     updateProgress: () -> Unit,
     progress: Float,
-    color: Color = KagaminTheme.theme.buttonIcon,
-    textColor: Color = KagaminTheme.theme.buttonIconTransparent,
+    color: Color = KagaminTheme.colors.buttonIcon,
+    textColor: Color = KagaminTheme.colors.buttonIconTransparent,
     modifier: Modifier = Modifier,
     fontSize: TextUnit = 10.sp,
 ) {
@@ -60,8 +60,8 @@ fun TrackProgressIndicator(
         Box {
             LinearProgressIndicator(
                 progress = progress,
-                color = KagaminTheme.theme.thinBorder,
-                trackColor = KagaminTheme.theme.buttonIcon,
+                color = KagaminTheme.colors.thinBorder,
+                trackColor = KagaminTheme.colors.buttonIcon,
                 strokeCap = StrokeCap.Round,
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
                     .graphicsLayer(translationY = 2f)
@@ -71,7 +71,7 @@ fun TrackProgressIndicator(
                 progress = progress,
                 Modifier.fillMaxWidth().padding(top = 8.dp),
                 color = color,
-                trackColor = KagaminTheme.theme.buttonIcon,
+                trackColor = KagaminTheme.colors.buttonIcon,
                 strokeCap = StrokeCap.Round
             )
         }
@@ -82,11 +82,11 @@ fun TrackProgressIndicator(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                timePastText, fontSize = fontSize, color = KagaminTheme.theme.buttonIcon
+                timePastText, fontSize = fontSize, color = KagaminTheme.colors.buttonIcon
             )
 
             Text(
-                trackDurationText, fontSize = fontSize, color = KagaminTheme.theme.buttonIcon
+                trackDurationText, fontSize = fontSize, color = KagaminTheme.colors.buttonIcon
             )
         }
     }
@@ -98,7 +98,7 @@ fun TrackProgressIndicator2(
     player: AudioPlayer<AudioTrack>,
     updateProgress: () -> Unit,
     progress: Float,
-    color: Color = KagaminTheme.theme.buttonIcon,
+    color: Color = KagaminTheme.colors.buttonIcon,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -119,7 +119,7 @@ fun TrackProgressIndicator2(
             progress = progress,
             Modifier.fillMaxWidth().padding(top = 8.dp),
             color = color,
-            trackColor = KagaminTheme.theme.thinBorder,
+            trackColor = KagaminTheme.colors.thinBorder,
             strokeCap = StrokeCap.Round
         )
     }

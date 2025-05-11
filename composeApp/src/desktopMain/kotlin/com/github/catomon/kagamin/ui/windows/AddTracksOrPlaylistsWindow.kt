@@ -8,7 +8,6 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
@@ -16,7 +15,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -79,7 +77,6 @@ fun ApplicationScope.AddTracksOrPlaylistsWindow(
 
                         Box(
                             Modifier.fillMaxSize()
-                                .background(color = KagaminTheme.backgroundTransparent)
                         ) {
                             AnimatedContent(targetState = viewModel.currentTab, transitionSpec = {
                                 tabTransition(viewModel.currentTab)
@@ -125,7 +122,7 @@ fun ApplicationScope.AddTracksOrPlaylistsWindow(
                                 viewModel.createPlaylistWindow = false
                                 viewModel.currentTab = Tabs.TRACKLIST
                             }, modifier = Modifier.align(Alignment.BottomCenter)) {
-                                Icon(Icons.Default.Close, contentDescription = null, tint = KagaminTheme.theme.thinBorder)
+                                Icon(Icons.Default.Close, contentDescription = null, tint = KagaminTheme.colors.thinBorder)
                             }
                         }
                     }

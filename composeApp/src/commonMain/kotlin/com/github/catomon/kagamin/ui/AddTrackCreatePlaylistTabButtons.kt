@@ -32,7 +32,7 @@ fun AddTrackCreatePlaylistTabButtons(viewModel: KagaminViewModel, modifier: Modi
         Text(
             "Add tracks",
             fontSize = 10.sp,
-            color = if(viewModel.currentTab == Tabs.ADD_TRACKS) Color.White else KagaminTheme.theme.buttonIcon,
+            color = if(viewModel.currentTab == Tabs.ADD_TRACKS) Color.White else KagaminTheme.colors.buttonIcon,
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
                 .clickable {
@@ -43,7 +43,7 @@ fun AddTrackCreatePlaylistTabButtons(viewModel: KagaminViewModel, modifier: Modi
         Text(
             "Create playlist",
             fontSize = 10.sp,
-            color = if(viewModel.currentTab == Tabs.CREATE_PLAYLIST) Color.White else KagaminTheme.theme.buttonIcon,
+            color = if(viewModel.currentTab == Tabs.CREATE_PLAYLIST) Color.White else KagaminTheme.colors.buttonIcon,
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
                 .clickable {

@@ -1,7 +1,6 @@
 package com.github.catomon.kagamin.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
@@ -24,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,6 +33,7 @@ import com.github.catomon.kagamin.data.AppSettings
 import com.github.catomon.kagamin.openInBrowser
 import com.github.catomon.kagamin.saveSettings
 import com.github.catomon.kagamin.ui.components.AppName
+import com.github.catomon.kagamin.ui.components.TrackThumbnail
 import com.github.catomon.kagamin.ui.theme.KagaminColors
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.LayoutManager
@@ -54,9 +54,24 @@ actual fun SettingsScreen(
     }
 
     Box(
-        modifier = modifier.fillMaxSize().background(KagaminTheme.background),
+        modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
+        TrackThumbnail(
+            viewModel.trackThumbnail,
+            onSetProgress = {
+                if (viewModel.currentTrack != null)
+                    viewModel.audioPlayer.seek((viewModel.currentTrack!!.duration * it).toLong())
+            },
+            0f,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
+            blur = true,
+            controlProgress = false
+        )
+
+        Box(Modifier.fillMaxSize().background(color = KagaminTheme.backgroundTransparent))
+
         Text(
             "ver. 1.1.0",
             Modifier.padding(10.dp).align(Alignment.TopEnd),
@@ -120,7 +135,7 @@ actual fun SettingsScreen(
                 currentLayout.value = LayoutManager.Layout.entries.first { it != prev }
                 currentLayout.value = prev
             }) {
-                Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, "Return")
+                Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, "Return", tint = KagaminTheme.colors.buttonIcon)
             }
 
             AppName()
@@ -201,7 +216,7 @@ private fun ThemeRadioButtons(
                     KagaminColors.Violet.background, KagaminColors.Violet.forDisabledMostlyIdk
                 ),
                 onClick = {
-                    KagaminTheme.theme = KagaminColors.Violet
+                    KagaminTheme.colors = KagaminColors.Violet
                     state.settings = settings.copy(theme = KagaminColors.Violet.name)
                 },
                 modifier = Modifier.drawBehind {
@@ -215,7 +230,7 @@ private fun ThemeRadioButtons(
                     KagaminColors.Pink.background, KagaminColors.Pink.forDisabledMostlyIdk
                 ),
                 onClick = {
-                    KagaminTheme.theme = KagaminColors.Pink
+                    KagaminTheme.colors = KagaminColors.Pink
                     state.settings = settings.copy(theme = KagaminColors.Pink.name)
                 },
                 modifier = Modifier.drawBehind {
@@ -229,7 +244,7 @@ private fun ThemeRadioButtons(
                     KagaminColors.Blue.background, KagaminColors.Blue.forDisabledMostlyIdk
                 ),
                 onClick = {
-                    KagaminTheme.theme = KagaminColors.Blue
+                    KagaminTheme.colors = KagaminColors.Blue
                     state.settings = settings.copy(theme = KagaminColors.Blue.name)
                 },
                 modifier = Modifier.drawBehind {
@@ -245,7 +260,7 @@ private fun ThemeRadioButtons(
                         KagaminColors.KagaminDark.backgroundTransparent
                     ),
                     onClick = {
-                        KagaminTheme.theme = KagaminColors.KagaminDark
+                        KagaminTheme.colors = KagaminColors.KagaminDark
                         state.settings = settings.copy(theme = KagaminColors.KagaminDark.name)
                     },
                     modifier = Modifier.drawBehind {

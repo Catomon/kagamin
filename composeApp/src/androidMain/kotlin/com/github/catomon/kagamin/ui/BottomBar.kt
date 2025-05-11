@@ -42,7 +42,7 @@ fun BottomBar(
                         state.currentTab = Tabs.PLAYBACK
                     }
                 },
-                color = if (state.currentTab == Tabs.PLAYBACK) Color.White else KagaminTheme.theme.buttonIconSmall,
+                color = if (state.currentTab == Tabs.PLAYBACK) Color.White else KagaminTheme.colors.buttonIconSmall,
                 Modifier.weight(0.333f)
             )
 
@@ -52,7 +52,7 @@ fun BottomBar(
                         state.currentTab = Tabs.TRACKLIST
                     }
                 },
-                color = if (state.currentTab == Tabs.TRACKLIST) Color.White else KagaminTheme.theme.buttonIconSmall,
+                color = if (state.currentTab == Tabs.TRACKLIST) Color.White else KagaminTheme.colors.buttonIconSmall,
                 Modifier.weight(0.333f)
             )
 
@@ -62,7 +62,7 @@ fun BottomBar(
                         state.currentTab = Tabs.PLAYLISTS
                     }
                 },
-                color = if (state.currentTab == Tabs.PLAYLISTS) Color.White else KagaminTheme.theme.buttonIconSmall,
+                color = if (state.currentTab == Tabs.PLAYLISTS) Color.White else KagaminTheme.colors.buttonIconSmall,
                 Modifier.weight(0.333f)
             )
         }

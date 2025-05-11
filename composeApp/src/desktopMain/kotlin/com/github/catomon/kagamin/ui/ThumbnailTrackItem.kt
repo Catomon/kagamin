@@ -40,7 +40,6 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
@@ -82,17 +81,17 @@ fun ThumbnailTrackItem(
     val clipboard = LocalClipboardManager.current
     val confirmationWindow = LocalConfirmWindow.current
     val snackbar = LocalSnackbarHostState.current
-    val backgroundColor = KagaminTheme.theme.listItem
+    val backgroundColor = KagaminTheme.colors.listItem
 
     var trackThumbnailUpdated by remember { mutableStateOf<ImageBitmap?>(null) }
 
     val height = 64.dp
 
-    var progress by remember { mutableFloatStateOf(-1f) }
+    var progress by remember(isCurrentTrack) { mutableFloatStateOf(0f) }
     val updateProgress = {
         progress = when {
             !isCurrentTrack -> 0f
-            else -> if (track.duration > 0 && track.duration < Long.MAX_VALUE) viewModel.audioPlayer.position.toFloat() / track.duration else -1f
+            else -> if (track.duration > 0 && track.duration < Long.MAX_VALUE) viewModel.audioPlayer.position.toFloat() / track.duration else 0f
         }
     }
 
@@ -250,7 +249,7 @@ fun PlaybackStateButton(
                 painterResource(if (viewModel.playState == AudioPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
                 if (viewModel.playState == AudioPlayer.PlayState.PAUSED) "play" else "pause",
                 modifier = Modifier.size(16.dp),
-                colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIcon)
+                colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon)
             )
         }
     }

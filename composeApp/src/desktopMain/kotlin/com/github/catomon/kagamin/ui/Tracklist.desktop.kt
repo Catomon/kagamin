@@ -253,7 +253,7 @@ actual fun TrackItemHeader(
                         Text(
                             track.name,
                             fontSize = 10.sp,
-                            color = KagaminTheme.theme.buttonIcon,
+                            color = KagaminTheme.colors.buttonIcon,
                             maxLines = 1,
                             modifier = Modifier.weight(1f)
                                 .basicMarquee(iterations = Int.MAX_VALUE)
@@ -286,7 +286,7 @@ actual fun TrackItemHeader(
                     Text(
                         "$timePastText/$trackDurationText",
                         fontSize = 10.sp,
-                        color = KagaminTheme.theme.buttonIcon
+                        color = KagaminTheme.colors.buttonIcon
                     )
                 }
             }

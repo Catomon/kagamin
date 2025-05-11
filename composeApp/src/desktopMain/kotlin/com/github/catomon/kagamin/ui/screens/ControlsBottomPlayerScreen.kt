@@ -77,8 +77,7 @@ fun ControlsBottomPlayerScreen(
 
     Box(
         modifier.background(
-            color = KagaminTheme.behindBackground,
-            shape = RoundedCornerShape(16.dp)
+            color = KagaminTheme.background
         )
     ) {
         TrackThumbnail(
@@ -88,47 +87,27 @@ fun ControlsBottomPlayerScreen(
                     audioPlayer.seek((currentTrack.duration * it).toLong())
             },
             0f,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp)),
             contentScale = ContentScale.Crop,
             blur = true,
             controlProgress = false
         )
-
-//        BackgroundImage()
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize()
         ) {
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
-//            Column(
-//                horizontalAlignment = Alignment.CenterHorizontally,
-//                modifier = Modifier.fillMaxHeight()
-//                    .background(color = KagaminTheme.backgroundTransparent)
-//            ) {
-//                AppName(
-//                    Modifier.padding(horizontal = 12.dp).height(25.dp)
-//                        .graphicsLayer(translationY = 2f)
-//                        .clip(RoundedCornerShape(8.dp))
-//                        .clickable {
-//                            if (navController.currentDestination?.route != SettingsDestination.toString())
-//                                navController.navigate(SettingsDestination.toString())
-//                        })
-//
-//                CurrentTrackFrame(
-//                    viewModel, viewModel.trackThumbnail,
-//                    currentTrack, audioPlayer, Modifier.width(160.dp).fillMaxHeight()
-//                )
-//            }
-
                 Playlists(
                     viewModel,
-                    Modifier.weight(0.35f) //.padding(start = 4.dp, end = 4.dp)
+                    Modifier.weight(0.35f)
                 )
 
                 if (viewModel.playlist.isEmpty()) {
                     Box(
-                        Modifier.weight(0.65f).fillMaxHeight()
+                        Modifier
+                            .weight(0.65f)
+                            .fillMaxHeight()
                             .background(KagaminTheme.backgroundTransparent),
                         contentAlignment = Alignment.Center
                     ) {
@@ -142,57 +121,28 @@ fun ControlsBottomPlayerScreen(
                     Tracklist(
                         viewModel,
                         viewModel.playlist,
-                        Modifier.weight(0.65f)//.padding(start = 16.dp, end = 16.dp)
+                        Modifier.weight(0.65f)
                     )
                 }
-
-//                AnimatedContent(targetState = viewModel.currentTab, transitionSpec = {
-//                    tabTransition(viewModel.currentTab)
-//                }) {
-//                    when (it) {
-//                        Tabs.PLAYLISTS -> {
-//
-//                        }
-//
-//                        Tabs.TRACKLIST -> {
-//
-//                        }
-//
-//                        Tabs.OPTIONS -> TODO()
-//
-//                        Tabs.ADD_TRACKS -> {
-//                            AddTracksTab(viewModel, Modifier.fillMaxSize().align(Alignment.Center))
-//                        }
-//
-//                        Tabs.CREATE_PLAYLIST -> {
-//                            CreatePlaylistTab(
-//                                viewModel,
-//                                Modifier.fillMaxSize().align(Alignment.Center)
-//                            )
-//                        }
-//
-//                        Tabs.PLAYBACK -> {
-//                            error("not supposed for default layout")
-//                        }
-//                    }
-//                }
-
-//            Sidebar(viewModel, navController)
             }
 
             Box(
-                modifier = Modifier.fillMaxWidth().height(40.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp)
                     .background(color = KagaminTheme.backgroundTransparent),
                 contentAlignment = Alignment.Center
             ) {
                 AppName(
-                    Modifier.padding(horizontal = 12.dp).height(25.dp)
-                        //.graphicsLayer(translationY = 2f)
+                    Modifier
+                        .padding(horizontal = 12.dp)
+                        .height(25.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .clickable {
                             if (navController.currentDestination?.route != SettingsDestination.toString())
                                 navController.navigate(SettingsDestination.toString())
-                        }.align(Alignment.CenterStart)
+                        }
+                        .align(Alignment.CenterStart)
                 )
 
                 Row(
@@ -215,7 +165,7 @@ fun ControlsBottomPlayerScreen(
                         modifier = Modifier.width(133.dp)
                     )
 
-                    AddTrackOrPlaylistButton(viewModel)
+                    AddTrackOrPlaylistButton(viewModel, Modifier.padding(end = 6.dp))
                 }
             }
         }
@@ -230,7 +180,7 @@ fun AddTrackOrPlaylistButton(viewModel: KagaminViewModel, modifier: Modifier = M
             viewModel.createPlaylistWindow = !viewModel.createPlaylistWindow
         },
         modifier = modifier,
-        color = if (viewModel.currentTab == Tabs.ADD_TRACKS || viewModel.currentTab == Tabs.CREATE_PLAYLIST) KagaminTheme.theme.buttonIconSmallSelected else KagaminTheme.theme.buttonIconSmall,
-        size = 32.dp
+        color = if (viewModel.currentTab == Tabs.ADD_TRACKS || viewModel.currentTab == Tabs.CREATE_PLAYLIST) KagaminTheme.colors.buttonIconSmallSelected else KagaminTheme.colors.buttonIconSmall,
+        size = 24.dp
     )
 }

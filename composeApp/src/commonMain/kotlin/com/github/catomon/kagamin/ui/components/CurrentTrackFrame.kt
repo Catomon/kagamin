@@ -131,7 +131,7 @@ fun CompactCurrentTrackFrame(
         val floatAnimation by animateFloatAsState(targetValue)
 
         val targetProgressColor: Color =
-            remember(isHovered) { if (isHovered) KagaminTheme.backgroundTransparent else KagaminTheme.theme.thumbnailProgressIndicator }
+            remember(isHovered) { if (isHovered) KagaminTheme.backgroundTransparent else KagaminTheme.colors.thumbnailProgressIndicator }
         val aniColor = animateColorAsState(targetProgressColor)
 
         TrackThumbnail(

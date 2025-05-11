@@ -38,19 +38,19 @@ private fun AppNameNormal(modifier: Modifier = Modifier, height: Dp = 32.dp, fon
     ) {
         Text(
             text = "Kag",
-            color = KagaminTheme.theme.buttonIcon,
+            color = KagaminTheme.colors.buttonIcon,
             fontSize = fontSize,
             modifier = Modifier.height(height),
         )
         Image(
             painterResource(Res.drawable.star64),
             "App icon",
-            colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIcon),
+            colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon),
             modifier = Modifier.size(height).offset(y = (-3).dp)
         )
         Text(
             text = "min",
-            color = KagaminTheme.theme.buttonIcon,
+            color = KagaminTheme.colors.buttonIcon,
             fontSize = 18.sp,
             modifier = Modifier.height(height),
         )
@@ -67,18 +67,18 @@ private fun AppNameWShadowJap(modifier: Modifier = Modifier, height: Dp = 32.dp,
         ) {
             Text(
                 text = "かが",
-                color = KagaminTheme.theme.thinBorder,
+                color = KagaminTheme.colors.thinBorder,
                 fontSize = fontSize,
             )
             Image(
                 painterResource(Res.drawable.star64),
                 "App icon",
-                colorFilter = ColorFilter.tint(KagaminTheme.theme.thinBorder),
+                colorFilter = ColorFilter.tint(KagaminTheme.colors.thinBorder),
                 modifier = Modifier.size(height)
             )
             Text(
                 text = "みん",
-                color = KagaminTheme.theme.thinBorder,
+                color = KagaminTheme.colors.thinBorder,
                 fontSize = fontSize,
             )
         }
@@ -90,18 +90,18 @@ private fun AppNameWShadowJap(modifier: Modifier = Modifier, height: Dp = 32.dp,
         ) {
             Text(
                 text = "かが",
-                color = KagaminTheme.theme.buttonIcon,
+                color = KagaminTheme.colors.buttonIcon,
                 fontSize = fontSize,
             )
             Image(
                 painterResource(Res.drawable.star64),
                 "App icon",
-                colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIcon),
+                colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon),
                 modifier = Modifier.size(height)
             )
             Text(
                 text = "みん",
-                color = KagaminTheme.theme.buttonIcon,
+                color = KagaminTheme.colors.buttonIcon,
                 fontSize = fontSize,
             )
         }
@@ -118,18 +118,18 @@ private fun AppNameWShadow(modifier: Modifier = Modifier) {
         ) {
             Text(
                 text = "Kag",
-                color = KagaminTheme.theme.thinBorder,
+                color = KagaminTheme.colors.thinBorder,
                 fontSize = 18.sp,
             )
             Image(
                 painterResource(Res.drawable.star64),
                 "App icon",
-                colorFilter = ColorFilter.tint(KagaminTheme.theme.thinBorder),
+                colorFilter = ColorFilter.tint(KagaminTheme.colors.thinBorder),
                 modifier = Modifier.size(25.dp)
             )
             Text(
                 text = "min",
-                color = KagaminTheme.theme.thinBorder,
+                color = KagaminTheme.colors.thinBorder,
                 fontSize = 18.sp,
             )
         }
@@ -141,18 +141,18 @@ private fun AppNameWShadow(modifier: Modifier = Modifier) {
         ) {
             Text(
                 text = "Kag",
-                color = KagaminTheme.theme.buttonIcon,
+                color = KagaminTheme.colors.buttonIcon,
                 fontSize = 18.sp,
             )
             Image(
                 painterResource(Res.drawable.star64),
                 "App icon",
-                colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIcon),
+                colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon),
                 modifier = Modifier.size(25.dp)
             )
             Text(
                 text = "min",
-                color = KagaminTheme.theme.buttonIcon,
+                color = KagaminTheme.colors.buttonIcon,
                 fontSize = 18.sp,
             )
         }
@@ -164,8 +164,8 @@ private fun AppNameOutlined(modifier: Modifier = Modifier) {
     Row(modifier) {
         OutlinedText(
             text = "Kag",
-            fillColor = KagaminTheme.theme.buttonIcon,
-            outlineColor = KagaminTheme.theme.thinBorder,
+            fillColor = KagaminTheme.colors.buttonIcon,
+            outlineColor = KagaminTheme.colors.thinBorder,
             fontSize = 18.sp,
             modifier = Modifier.height(32.dp),
             outlineDrawStyle = Stroke(4f)
@@ -174,7 +174,7 @@ private fun AppNameOutlined(modifier: Modifier = Modifier) {
             Image(
                 painterResource(Res.drawable.star64),
                 "App icon",
-                colorFilter = ColorFilter.tint(KagaminTheme.theme.thinBorder),
+                colorFilter = ColorFilter.tint(KagaminTheme.colors.thinBorder),
                 modifier = Modifier.size(32.dp).offset(y = (-3).dp).graphicsLayer(
                     scaleX = 1.25f, scaleY = 1.25f
                 )
@@ -182,14 +182,14 @@ private fun AppNameOutlined(modifier: Modifier = Modifier) {
             Image(
                 painterResource(Res.drawable.star64),
                 "App icon",
-                colorFilter = ColorFilter.tint(KagaminTheme.theme.buttonIcon),
+                colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon),
                 modifier = Modifier.size(30.dp).offset(y = (-3).dp)
             )
         }
         OutlinedText(
             text = "min",
-            fillColor = KagaminTheme.theme.buttonIcon,
-            outlineColor = KagaminTheme.theme.thinBorder,
+            fillColor = KagaminTheme.colors.buttonIcon,
+            outlineColor = KagaminTheme.colors.thinBorder,
             fontSize = 18.sp,
             modifier = Modifier.height(32.dp),
             outlineDrawStyle = Stroke(4f)

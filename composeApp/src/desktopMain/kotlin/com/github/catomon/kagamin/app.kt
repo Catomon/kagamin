@@ -5,8 +5,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.draganddrop.dragAndDropTarget
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -219,14 +217,14 @@ private fun WindowScope.AppFrame(kagaminViewModel: KagaminViewModel = get(Kagami
 fun Modifier.kagaminWindowDecoration() =
     if (WindowConfig.isTransparent) this.padding(8.dp).customShadow().drawBehind {
         drawRoundRect(
-            color = KagaminTheme.theme.thinBorder,
+            color = KagaminTheme.colors.thinBorder,
             topLeft = Offset(0f, 2f),
             size = this.size.copy(),
             cornerRadius = CornerRadius(12f)
         )
     }.clip(RoundedCornerShape(12.dp))
     else this.customShadow(cornerRadius = 0.dp).border(
-        2.dp, KagaminTheme.theme.thinBorder, RectangleShape
+        2.dp, KagaminTheme.colors.thinBorder, RectangleShape
     )
 
 

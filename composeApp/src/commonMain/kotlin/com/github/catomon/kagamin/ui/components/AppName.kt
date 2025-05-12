@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import kagamin.composeapp.generated.resources.Res
+import kagamin.composeapp.generated.resources.raki_sta_small
 import kagamin.composeapp.generated.resources.star64
 import org.jetbrains.compose.resources.painterResource
 
@@ -60,25 +61,63 @@ private fun AppNameNormal(modifier: Modifier = Modifier, height: Dp = 32.dp, fon
 }
 
 @Composable
+fun AppIcon(modifier: Modifier = Modifier, height: Dp = 32.dp) {
+    Box(contentAlignment = Alignment.Center, modifier = modifier) {
+        Image(
+            painterResource(Res.drawable.star64),
+            null,
+            colorFilter = ColorFilter.tint(KagaminTheme.colors.thinBorder),
+            modifier = Modifier.height(height)
+        )
+
+        Image(
+            painterResource(Res.drawable.star64),
+            "App Icon",
+            colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon),
+            modifier = Modifier.height(height)
+        )
+    }
+}
+
+@Composable
+fun LuckyStarLogo(modifier: Modifier = Modifier, height: Dp = 32.dp) {
+    Box(contentAlignment = Alignment.Center, modifier = modifier) {
+            Image(
+                painterResource(Res.drawable.raki_sta_small),
+                null,
+                colorFilter = ColorFilter.tint(KagaminTheme.colors.thinBorder),
+                modifier = Modifier.height(height)
+            )
+
+            Image(
+                painterResource(Res.drawable.raki_sta_small),
+                "LuckyStarLogo",
+                colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon),
+                modifier = Modifier.height(height)
+            )
+    }
+}
+
+@Composable
 private fun AppNameWShadowJapVariant(modifier: Modifier = Modifier, height: Dp = 32.dp, fontSize: TextUnit = 18.sp) {
     Box(contentAlignment = Alignment.Center, modifier = modifier) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.graphicsLayer(translationY = 3f)
-        ) {
-            Image(
-                painterResource(Res.drawable.star64),
-                "App icon",
-                colorFilter = ColorFilter.tint(KagaminTheme.colors.thinBorder),
-                modifier = Modifier.size(height)
-            )
-            Text(
-                text = "かがみん",
-                color = KagaminTheme.colors.thinBorder,
-                fontSize = fontSize,
-            )
-        }
+//        Row(
+//            verticalAlignment = Alignment.CenterVertically,
+//            horizontalArrangement = Arrangement.Center,
+//            modifier = Modifier.graphicsLayer(translationY = 3f)
+//        ) {
+//            Image(
+//                painterResource(Res.drawable.star64),
+//                "App icon",
+//                colorFilter = ColorFilter.tint(KagaminTheme.colors.thinBorder),
+//                modifier = Modifier.size(height)
+//            )
+//            Text(
+//                text = "かがみん",
+//                color = KagaminTheme.colors.thinBorder,
+//                fontSize = fontSize,
+//            )
+//        }
 
         Row(
             verticalAlignment = Alignment.CenterVertically,

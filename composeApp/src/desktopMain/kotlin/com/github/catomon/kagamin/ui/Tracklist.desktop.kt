@@ -256,7 +256,7 @@ actual fun TracklistHeader(
         horizontalArrangement = Arrangement.Start
     ) {
         Box(
-            modifier = modifier.fillMaxWidth().height(32.dp).background(color = backgroundColor)
+            modifier = modifier.fillMaxWidth().height(32.dp)//.background(color = backgroundColor)
                 .clickable {
                     onClick()
                 }.padding(4.dp), contentAlignment = Alignment.Center
@@ -294,7 +294,7 @@ actual fun TracklistHeader(
                                 updateProgress = updateProgress,
                                 progress = progressAnimated,
                                 modifier = Modifier.weight(1f).padding(end = 6.dp, start = 3.dp)
-                                    .height(16.dp).onPointerEvent(
+                                    .height(10.dp).onPointerEvent(
                                         PointerEventType.Move
                                     ) {
                                         progress = it.changes.first().position.x / size.width

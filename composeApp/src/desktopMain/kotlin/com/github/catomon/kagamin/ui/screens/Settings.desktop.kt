@@ -151,7 +151,7 @@ actual fun SettingsScreen(
                     random = player.playMode.value == AudioPlayer.PlayMode.RANDOM,
                 )
                 saveSettings(settings)
-                exitProcess(1)
+                exitProcess(0)
             }, modifier = Modifier.align(Alignment.BottomEnd).padding(end = 10.dp)
         ) {
             Text("Exit App", color = KagaminTheme.text)

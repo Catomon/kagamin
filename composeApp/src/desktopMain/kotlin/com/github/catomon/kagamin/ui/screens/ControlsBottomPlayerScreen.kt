@@ -16,6 +16,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,11 +31,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.github.catomon.kagamin.audio.AudioPlayer
 import com.github.catomon.kagamin.saveSettings
 import com.github.catomon.kagamin.ui.Playlists
 import com.github.catomon.kagamin.ui.Tracklist
 import com.github.catomon.kagamin.ui.components.AddButton
 import com.github.catomon.kagamin.ui.components.AppName
+import com.github.catomon.kagamin.ui.components.LuckyStarLogo
 import com.github.catomon.kagamin.ui.components.PlaybackButtons
 import com.github.catomon.kagamin.ui.components.RandomPlaybackButton
 import com.github.catomon.kagamin.ui.components.RepeatPlaylistPlaybackButton
@@ -38,8 +45,10 @@ import com.github.catomon.kagamin.ui.components.RepeatTrackPlaybackButton
 import com.github.catomon.kagamin.ui.components.TrackThumbnail
 import com.github.catomon.kagamin.ui.components.VolumeOptions
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
+import com.github.catomon.kagamin.ui.util.LayoutManager
 import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
+import kotlin.system.exitProcess
 
 @Composable
 fun ControlsBottomPlayerScreen(
@@ -97,6 +106,22 @@ fun ControlsBottomPlayerScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize()
         ) {
+            Box(Modifier.fillMaxWidth().height(32.dp).background(color = KagaminTheme.backgroundTransparent)) {
+                AppName(modifier = Modifier.align(Alignment.CenterStart).padding(horizontal = 8.dp), height = 26.dp)
+
+                IconButton({
+                    val player = viewModel.audioPlayer
+                    saveSettings(viewModel.settings.copy(
+                        repeat = player.playMode.value == AudioPlayer.PlayMode.REPEAT_TRACK,
+                        volume = player.volume.value,
+                        random = player.playMode.value == AudioPlayer.PlayMode.RANDOM,
+                    ))
+                    exitProcess(0)
+                }, modifier = Modifier.align(Alignment.CenterEnd)) {
+                    Icon(Icons.Default.Close, contentDescription = null, tint = KagaminTheme.colors.buttonIcon)
+                }
+            }
+
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
                 Playlists(
                     viewModel,
@@ -133,10 +158,21 @@ fun ControlsBottomPlayerScreen(
                     .background(color = KagaminTheme.backgroundTransparent),
                 contentAlignment = Alignment.Center
             ) {
-                AppName(
+//                AppName(
+//                    Modifier
+//                        .padding(horizontal = 12.dp)
+//                        .height(25.dp)
+//                        .clip(RoundedCornerShape(8.dp))
+//                        .clickable {
+//                            if (navController.currentDestination?.route != SettingsDestination.toString())
+//                                navController.navigate(SettingsDestination.toString())
+//                        }
+//                        .align(Alignment.CenterStart)
+//                )
+                LuckyStarLogo(
                     Modifier
                         .padding(horizontal = 12.dp)
-                        .height(25.dp)
+                        .height(40.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .clickable {
                             if (navController.currentDestination?.route != SettingsDestination.toString())

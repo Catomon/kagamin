@@ -106,20 +106,20 @@ fun ControlsBottomPlayerScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize()
         ) {
-            Box(Modifier.fillMaxWidth().height(32.dp).background(color = KagaminTheme.backgroundTransparent)) {
-                AppName(modifier = Modifier.align(Alignment.CenterStart).padding(horizontal = 8.dp), height = 26.dp)
-
-                IconButton({
-                    val player = viewModel.audioPlayer
-                    saveSettings(viewModel.settings.copy(
-                        repeat = player.playMode.value == AudioPlayer.PlayMode.REPEAT_TRACK,
-                        volume = player.volume.value,
-                        random = player.playMode.value == AudioPlayer.PlayMode.RANDOM,
-                    ))
-                    exitProcess(0)
-                }, modifier = Modifier.align(Alignment.CenterEnd)) {
-                    Icon(Icons.Default.Close, contentDescription = null, tint = KagaminTheme.colors.buttonIcon)
-                }
+            Box(Modifier.fillMaxWidth().height(8.dp).background(color = KagaminTheme.backgroundTransparent)) {
+//                AppName(modifier = Modifier.align(Alignment.CenterStart).padding(horizontal = 8.dp), height = 26.dp)
+//
+//                IconButton({
+//                    val player = viewModel.audioPlayer
+//                    saveSettings(viewModel.settings.copy(
+//                        repeat = player.playMode.value == AudioPlayer.PlayMode.REPEAT_TRACK,
+//                        volume = player.volume.value,
+//                        random = player.playMode.value == AudioPlayer.PlayMode.RANDOM,
+//                    ))
+//                    exitProcess(0)
+//                }, modifier = Modifier.align(Alignment.CenterEnd)) {
+//                    Icon(Icons.Default.Close, contentDescription = null, tint = KagaminTheme.colors.buttonIcon)
+//                }
             }
 
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {

@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,6 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
@@ -113,16 +115,7 @@ fun Tracklist(
         }
     }
 
-    Column(modifier.graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
-        .drawWithContent {
-            drawContent()
-            drawRect(
-                color = KagaminTheme.backgroundTransparent,
-                size = size,
-                blendMode = BlendMode.SrcOut
-            )
-            drawContent()
-        }) {
+    Column(modifier) {
         if (currentTrack != null) {
             TracklistHeader(viewModel.currentTrack!!, viewModel = viewModel, onClick = onClick@{
                 val curTrackIndex = index[currentTrack.uri] ?: return@onClick
@@ -148,7 +141,16 @@ fun Tracklist(
         ) {
             Column(Modifier.fillMaxSize()) {
                 LazyColumn(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+                        .drawWithContent {
+                            drawContent()
+                            drawRect(
+                                color = KagaminTheme.backgroundTransparent,
+                                size = size,
+                                blendMode = BlendMode.SrcOut
+                            )
+                            drawContent()
+                        }
 //                        .background(KagaminTheme.backgroundTransparent)
                         .pointerInput(allowAutoScroll) {
                             allowAutoScroll = false
@@ -256,10 +258,10 @@ actual fun TracklistHeader(
         horizontalArrangement = Arrangement.Start
     ) {
         Box(
-            modifier = modifier.fillMaxWidth().height(32.dp)//.background(color = backgroundColor)
-                .clickable {
+            modifier = modifier.fillMaxWidth().height(32.dp).background(color = backgroundColor)
+                .padding(4.dp).clip(RoundedCornerShape(8.dp)).clickable {
                     onClick()
-                }.padding(4.dp), contentAlignment = Alignment.Center
+                }, contentAlignment = Alignment.Center
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -332,7 +334,8 @@ actual fun TracklistHeader(
                                         )
                                     },
                                 textStyle = LocalTextStyle.current.copy(fontSize = 10.sp),
-                                cursorBrush = SolidColor(KagaminTheme.colors.buttonIcon)
+                                cursorBrush = SolidColor(KagaminTheme.colors.buttonIcon),
+                                maxLines = 1
                             )
                         }
 

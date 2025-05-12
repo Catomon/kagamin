@@ -260,6 +260,7 @@ private fun createTrackDragAndDropTarget(
         try {
             val trackFiles = ArrayList<File>(1000)
 
+            snackbar.currentSnackbarData?.dismiss()
             snackbar.showSnackbar("Filtering files...")
 
             withContext(Dispatchers.IO) {
@@ -278,6 +279,7 @@ private fun createTrackDragAndDropTarget(
                 filterMusicFiles(droppedFiles)
             }
 
+            snackbar.currentSnackbarData?.dismiss()
             snackbar.showSnackbar("Caching thumbnails...")
 
             withContext(Dispatchers.IO) {
@@ -286,6 +288,7 @@ private fun createTrackDragAndDropTarget(
                 }
             }
 
+            snackbar.currentSnackbarData?.dismiss()
             snackbar.showSnackbar("Adding tracks...")
 
             kagaminViewModel.audioPlayer.load(trackFiles.map { it.path })
@@ -297,6 +300,7 @@ private fun createTrackDragAndDropTarget(
                 )
             }
 
+            snackbar.currentSnackbarData?.dismiss()
             snackbar.showSnackbar("${trackFiles.size} tracks were added.")
             return true
         } catch (ex: Exception) {

@@ -96,11 +96,10 @@ class TracklistManager(
 }
 
 @Composable
-expect fun TrackItemHeader(
-    index: Int,
-    track: AudioTrack,
-    tracklistManager: TracklistManager,
+expect fun TracklistHeader(
+    currentTrack: AudioTrack,
     viewModel: KagaminViewModel,
     onClick: () -> Unit,
+    filterTracks: (String) -> Unit,
     modifier: Modifier = Modifier
 )

@@ -101,26 +101,20 @@ fun TrackProgressIndicator2(
     color: Color = KagaminTheme.colors.buttonIcon,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.pointerHoverIcon(
-            PointerIcon.Hand
-        ).pointerInput(currentTrack) {
-            if (currentTrack == null) return@pointerInput
-            val width = this.size.width
-            detectTapGestures {
-                player.seek((currentTrack.duration * (it.x / width)).toLong())
-                updateProgress()
-            }
-        }) {
-
         LinearProgressIndicator(
             progress = progress,
-            Modifier.fillMaxWidth().padding(top = 8.dp),
+            modifier.fillMaxWidth().padding(top = 6.dp).pointerHoverIcon(
+                PointerIcon.Hand
+            ).pointerInput(currentTrack) {
+                if (currentTrack == null) return@pointerInput
+                val width = this.size.width
+                detectTapGestures {
+                    player.seek((currentTrack.duration * (it.x / width)).toLong())
+                    updateProgress()
+                }
+            },
             color = color,
             trackColor = KagaminTheme.colors.thinBorder,
             strokeCap = StrokeCap.Round
         )
-    }
 }

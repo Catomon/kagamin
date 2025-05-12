@@ -205,7 +205,7 @@ private fun TrackItemBody(
         }
 
         AnimatedVisibility(isHovered || viewModel.lovedSongs[track.uri] != null, modifier = Modifier.align(Alignment.CenterEnd)) {
-            LikeSongButton(viewModel, track, 48.dp)
+            LikeSongButton(viewModel, track, 32.dp)
         }
 
         Row(

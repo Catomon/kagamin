@@ -61,17 +61,15 @@ fun Tracklist(
 
     Column(modifier) {
         if (currentTrack != null) {
-            TrackItemHeader(
-                -1,
+            TracklistHeader(
                 viewModel.currentTrack!!,
-                tracklistManager,
                 viewModel = viewModel,
                 onClick = onClick@{
                     val curTrackIndex = indexed[currentTrack.uri] ?: return@onClick
                     coroutineScope.launch {
                         listState.animateScrollToItem(curTrackIndex)
                     }
-                }
+                },
             )
         } else {
             Box(
@@ -87,10 +85,8 @@ fun Tracklist(
                 tracks[it].uri
             }) { index ->
                 val track = tracks[index]
-                TrackItemHeader(
-                    index,
+                TracklistHeader(
                     track,
-                    tracklistManager,
                     viewModel = viewModel,
                     onClick = onClick@{
                         if (tracklistManager.isAnySelected) {
@@ -107,7 +103,7 @@ fun Tracklist(
                             viewModel.isLoadingSong = null
                         }
                     },
-                    modifier = Modifier
+                    modifier = Modifier,
                 )
             }
         }
@@ -119,12 +115,11 @@ fun Tracklist(
 }
 
 @Composable
-actual fun TrackItemHeader(
-    index: Int,
-    track: AudioTrack,
-    tracklistManager: TracklistManager,
+actual fun TracklistHeader(
+    currentTrack: AudioTrack,
     viewModel: KagaminViewModel,
     onClick: () -> Unit,
+    filterTracks: (String) -> Unit,
     modifier: Modifier
 ) {
     val clipboard = LocalClipboardManager.current
@@ -139,7 +134,7 @@ actual fun TrackItemHeader(
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.Start
     ) {
-        if (index > -1 && viewModel.currentTrack == track) {
+        if (index > -1 && viewModel.currentTrack == currentTrack) {
             Box(
                 Modifier
                     .height(32.dp)
@@ -172,7 +167,7 @@ actual fun TrackItemHeader(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                track.name,
+                currentTrack.name,
                 fontSize = 12.sp,
                 color = KagaminTheme.text,
                 maxLines = 1,

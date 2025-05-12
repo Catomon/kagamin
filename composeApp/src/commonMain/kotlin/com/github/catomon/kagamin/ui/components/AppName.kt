@@ -26,7 +26,9 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun AppName(modifier: Modifier = Modifier,  height: Dp = 32.dp, fontSize: TextUnit = 18.sp) {
 //    AppNameWShadow(modifier)
-    AppNameWShadowJap(modifier, height, fontSize)
+//    AppNameWShadowJap(modifier, height, fontSize)
+    AppNameWShadowJapVariant(modifier, height, fontSize)
+//    AppNameWShadowVariant(modifier)
 }
 
 @Composable
@@ -54,6 +56,47 @@ private fun AppNameNormal(modifier: Modifier = Modifier, height: Dp = 32.dp, fon
             fontSize = 18.sp,
             modifier = Modifier.height(height),
         )
+    }
+}
+
+@Composable
+private fun AppNameWShadowJapVariant(modifier: Modifier = Modifier, height: Dp = 32.dp, fontSize: TextUnit = 18.sp) {
+    Box(contentAlignment = Alignment.Center, modifier = modifier) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.graphicsLayer(translationY = 3f)
+        ) {
+            Image(
+                painterResource(Res.drawable.star64),
+                "App icon",
+                colorFilter = ColorFilter.tint(KagaminTheme.colors.thinBorder),
+                modifier = Modifier.size(height)
+            )
+            Text(
+                text = "かがみん",
+                color = KagaminTheme.colors.thinBorder,
+                fontSize = fontSize,
+            )
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier
+        ) {
+            Image(
+                painterResource(Res.drawable.star64),
+                "App icon",
+                colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon),
+                modifier = Modifier.size(height)
+            )
+            Text(
+                text = "かがみん",
+                color = KagaminTheme.colors.buttonIcon,
+                fontSize = fontSize,
+            )
+        }
     }
 }
 
@@ -103,6 +146,48 @@ private fun AppNameWShadowJap(modifier: Modifier = Modifier, height: Dp = 32.dp,
                 text = "みん",
                 color = KagaminTheme.colors.buttonIcon,
                 fontSize = fontSize,
+            )
+        }
+    }
+}
+
+@Composable
+private fun AppNameWShadowVariant(modifier: Modifier = Modifier) {
+    Box(contentAlignment = Alignment.Center, modifier = modifier) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.graphicsLayer(translationY = 3f)
+        ) {
+            Image(
+                painterResource(Res.drawable.star64),
+                null,
+                colorFilter = ColorFilter.tint(KagaminTheme.colors.thinBorder),
+                modifier = Modifier.size(25.dp)
+            )
+            Text(
+                text = "Kagamin",
+                color = KagaminTheme.colors.thinBorder,
+                fontSize = 18.sp,
+            )
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier
+        ) {
+            Image(
+                painterResource(Res.drawable.star64),
+                "App icon",
+                colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon),
+                modifier = Modifier.size(25.dp)
+            )
+
+            Text(
+                text = "Kagamin",
+                color = KagaminTheme.colors.buttonIcon,
+                fontSize = 18.sp,
             )
         }
     }

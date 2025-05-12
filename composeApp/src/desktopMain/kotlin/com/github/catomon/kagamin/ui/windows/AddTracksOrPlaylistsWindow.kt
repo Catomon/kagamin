@@ -121,8 +121,8 @@ fun ApplicationScope.AddTracksOrPlaylistsWindow(
                             IconButton({
                                 viewModel.createPlaylistWindow = false
                                 viewModel.currentTab = Tabs.TRACKLIST
-                            }, modifier = Modifier.align(Alignment.BottomCenter)) {
-                                Icon(Icons.Default.Close, contentDescription = null, tint = KagaminTheme.colors.thinBorder)
+                            }, modifier = Modifier.align(Alignment.BottomEnd)) {
+                                Icon(Icons.Default.Close, contentDescription = null, tint = KagaminTheme.colors.buttonIcon)
                             }
                         }
                     }

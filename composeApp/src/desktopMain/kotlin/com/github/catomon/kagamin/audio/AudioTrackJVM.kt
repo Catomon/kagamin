@@ -11,13 +11,13 @@ class AudioTrackJVM(
 
     var audioTrack: AudioTrack? = null
 
-    override val author: String get() = audioTrack?.info?.author ?: ""
-    override val name: String get() = overrideName.ifBlank { audioTrack?.trackName?.let { if (it == "Unknown artist") "" else it } ?: "" }
+    override val author: String get() = audioTrack?.info?.author?.let { if (it == "Unknown artist") "" else it } ?: ""
+    override val name: String get() = overrideName.ifBlank { audioTrack?.trackName?.let { if (it == "Unknown title") "" else it } ?: "" }
     override val duration: Long get() = audioTrack?.duration ?: Long.MAX_VALUE
 
     constructor(audioTrack: AudioTrack) : this(
         audioTrack.info.uri,
-        audioTrack.info.identifier,
+        audioTrack.info.title,
     ) {
         this.audioTrack = audioTrack
     }

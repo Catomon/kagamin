@@ -149,15 +149,15 @@ object ThumbnailCacheManager {
         uriHash: Int,
         height: Int = SIZE.ORIGINAL,
         width: Int = SIZE.DEFAULT_WIDTH
-    ): Boolean {
+    ) {
         val cachedScaledFile = cacheFolder.resolve("thumbnails/$height/$uriHash")
         if (cachedScaledFile.exists())
-            return true
+            return
         else
             cachedScaledFile.parentFile?.mkdirs()
 
         Thumbnails.of(cachedSrcFile).size(width, height).outputFormat("png")
-            .outputQuality(1f).antialiasing(Antialiasing.ON).rendering(Rendering.QUALITY) .toFile(cachedScaledFile)
+            .outputQuality(0.75f).antialiasing(Antialiasing.ON).rendering(Rendering.QUALITY) .toFile(cachedScaledFile)
 
         Files.move(
             (cachedScaledFile.parentFile?.resolve("$uriHash.png")
@@ -166,7 +166,7 @@ object ThumbnailCacheManager {
                 ?: File("$uriHash")).toPath()
         )
 
-        return true
+        return
     }
 }
 

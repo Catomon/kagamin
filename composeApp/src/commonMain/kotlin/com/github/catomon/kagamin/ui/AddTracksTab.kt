@@ -79,7 +79,7 @@ fun AddTracksTab(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
             IconButton(onClick = {
                 filePicker.launch()
             }) {
-                Icon(painterResource(Res.drawable.folder), "Select files from folder")
+                Icon(painterResource(Res.drawable.folder), "Select files from folder", tint = KagaminTheme.colors.buttonIcon)
             }
         }
     }

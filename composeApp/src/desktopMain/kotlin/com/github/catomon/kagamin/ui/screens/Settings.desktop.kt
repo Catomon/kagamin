@@ -1,15 +1,17 @@
 package com.github.catomon.kagamin.ui.screens
 
+import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material3.Button
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.rememberScrollbarAdapter
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,12 +34,16 @@ import com.github.catomon.kagamin.audio.AudioPlayer
 import com.github.catomon.kagamin.data.AppSettings
 import com.github.catomon.kagamin.openInBrowser
 import com.github.catomon.kagamin.saveSettings
-import com.github.catomon.kagamin.ui.components.AppName
+import com.github.catomon.kagamin.ui.components.AppIcon
+import com.github.catomon.kagamin.ui.components.OutlinedTextButton
 import com.github.catomon.kagamin.ui.components.TrackThumbnail
 import com.github.catomon.kagamin.ui.theme.KagaminColors
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.LayoutManager
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
+import kagamin.composeapp.generated.resources.Res
+import kagamin.composeapp.generated.resources.arrow_left
+import org.jetbrains.compose.resources.painterResource
 import kotlin.system.exitProcess
 
 @Composable
@@ -47,6 +53,7 @@ actual fun SettingsScreen(
     val settings = viewModel.settings
     val theme = viewModel.settings.theme
     val currentLayout = LocalLayoutManager.current.currentLayout
+    val scrollState = rememberScrollState()
 
     LaunchedEffect(Unit) {
         if (currentLayout.value == LayoutManager.Layout.Tiny) currentLayout.value =
@@ -54,14 +61,12 @@ actual fun SettingsScreen(
     }
 
     Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center
     ) {
         TrackThumbnail(
-            viewModel.trackThumbnail,
+            viewModel.currentTrack?.uri,
             onSetProgress = {
-                if (viewModel.currentTrack != null)
-                    viewModel.audioPlayer.seek((viewModel.currentTrack!!.duration * it).toLong())
+                if (viewModel.currentTrack != null) viewModel.audioPlayer.seek((viewModel.currentTrack!!.duration * it).toLong())
             },
             0f,
             modifier = Modifier.fillMaxSize(),
@@ -80,13 +85,17 @@ actual fun SettingsScreen(
             fontSize = 12.sp
         )
 
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
+        Box(
+            contentAlignment = Alignment.Center,
             modifier = modifier.fillMaxSize()
         ) {
+            VerticalScrollbar(
+                rememberScrollbarAdapter(scrollState),
+                modifier = Modifier.align(Alignment.CenterEnd).clickable { })
+
             Column(
                 horizontalAlignment = Alignment.Start,
+                modifier = Modifier.verticalScroll(scrollState)
             ) {
                 ThemeRadioButtons(theme, settings, viewModel)
 
@@ -122,28 +131,37 @@ actual fun SettingsScreen(
             }
         }
 
-        Button(onClick = {
-            openInBrowser("https://github.com/Catomon")
-        }, modifier = Modifier.align(Alignment.BottomStart).padding(start = 10.dp)) {
-            Text("GitHub", color = KagaminTheme.text)
-        }
+        OutlinedTextButton(
+            text = "GitHub",
+            onClick = {
+                openInBrowser("https://github.com/Catomon")
+            },
+            modifier = Modifier.align(Alignment.BottomStart).padding(10.dp)
+        )
 
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.align(Alignment.TopStart)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.align(Alignment.TopStart)
+        ) {
             IconButton(onClick = {
                 if (navController.currentDestination?.route == SettingsDestination.toString()) navController.popBackStack()
                 val prev = currentLayout.value
                 currentLayout.value = LayoutManager.Layout.entries.first { it != prev }
                 currentLayout.value = prev
             }) {
-                Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, "Return", tint = KagaminTheme.colors.buttonIcon)
+                Icon(
+                     painterResource(Res.drawable.arrow_left),
+                    "Return",
+                    tint = KagaminTheme.colors.buttonIcon
+                )
             }
 
-            AppName()
+            AppIcon()
         }
 
-
-        Button(
-            {
+        OutlinedTextButton(
+            text = "Exit App",
+            onClick = {
                 val player = viewModel.audioPlayer
                 viewModel.settings = settings.copy(
                     repeat = player.playMode.value == AudioPlayer.PlayMode.REPEAT_TRACK,
@@ -152,10 +170,9 @@ actual fun SettingsScreen(
                 )
                 saveSettings(settings)
                 exitProcess(0)
-            }, modifier = Modifier.align(Alignment.BottomEnd).padding(end = 10.dp)
-        ) {
-            Text("Exit App", color = KagaminTheme.text)
-        }
+            },
+            modifier = Modifier.align(Alignment.BottomEnd).padding(10.dp)
+        )
     }
 }
 
@@ -170,29 +187,21 @@ private fun LayoutRadioButtons(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
     ) {
-        Text("Layout:", color = KagaminTheme.text)
+        Text("Layout:", color = KagaminTheme.text, modifier = Modifier.align(Alignment.Start))
         Row(verticalAlignment = Alignment.CenterVertically) {
+            Text("Simple", color = KagaminTheme.textSecondary)
             RadioButton(
                 selected = currentLayout != LayoutManager.Layout.BottomControls,
                 onClick = {
                     onLayoutSelected(LayoutManager.Layout.Default)
                 },
-                modifier = Modifier.drawBehind {
-                    drawCircle(
-                        color = Color.White, size.minDimension / 2.5f,
-                    )
-                },
             )
 
+            Text("Extended", color = KagaminTheme.textSecondary)
             RadioButton(
                 selected = currentLayout == LayoutManager.Layout.BottomControls,
                 onClick = {
                     onLayoutSelected(LayoutManager.Layout.BottomControls)
-                },
-                modifier = Modifier.drawBehind {
-                    drawCircle(
-                        color = Color.White, size.minDimension / 2.5f,
-                    )
                 },
             )
         }
@@ -208,7 +217,7 @@ private fun ThemeRadioButtons(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
     ) {
-        Text("Theme:", color = KagaminTheme.text)
+        Text("Theme:", color = KagaminTheme.text, modifier = Modifier.align(Alignment.Start))
         Row(verticalAlignment = Alignment.CenterVertically) {
             RadioButton(
                 selected = theme == KagaminColors.Violet.name,

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -31,12 +32,12 @@ import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.audio.createAudioTrack
 import com.github.catomon.kagamin.loadPlaylist
 import com.github.catomon.kagamin.ui.AddTracksTab
-import com.github.catomon.kagamin.ui.components.AppName
 import com.github.catomon.kagamin.ui.components.CompactCurrentTrackFrame
 import com.github.catomon.kagamin.ui.CreatePlaylistTab
 import com.github.catomon.kagamin.ui.Playlists
 import com.github.catomon.kagamin.ui.components.Sidebar
 import com.github.catomon.kagamin.ui.Tracklist
+import com.github.catomon.kagamin.ui.components.LuckyStarLogo
 import com.github.catomon.kagamin.ui.components.TrackThumbnail
 import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
@@ -90,16 +91,16 @@ fun TinyPlayerScreen(
         viewModel.updateThumbnail()
     }
 
-    Box(modifier.background(color = KagaminTheme.behindBackground, shape = RoundedCornerShape(16.dp))) {
+    Box(modifier) {
         TrackThumbnail(
-            image = viewModel.trackThumbnail,
+            currentTrack?.uri,
             onSetProgress = {
                 if (currentTrack != null) {
                     audioPlayer.seek((currentTrack.duration * it).toLong())
                 }
             },
             0f,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp)),
             contentScale = ContentScale.Crop,
             blur = true,
             controlProgress = false
@@ -116,11 +117,19 @@ fun TinyPlayerScreen(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier.fillMaxWidth().background(color = KagaminTheme.backgroundTransparent)
                 ) {
-                    AppName(Modifier
-                        .height(25.dp).graphicsLayer(translationY = 2f)
+//                    AppName(Modifier
+//                        .height(25.dp).graphicsLayer(translationY = 2f)
+//                        .clip(RoundedCornerShape(8.dp))
+//                        .clickable {
+//                            navController.navigate(SettingsDestination.toString())
+//                        })
+
+                    LuckyStarLogo(  Modifier.padding(horizontal = 12.dp).height(30.dp)
+                        .graphicsLayer(translationY = 2f)
                         .clip(RoundedCornerShape(8.dp))
                         .clickable {
-                            navController.navigate(SettingsDestination.toString())
+                            if (navController.currentDestination?.route != SettingsDestination.toString())
+                                navController.navigate(SettingsDestination.toString())
                         })
                 }
 
@@ -131,7 +140,6 @@ fun TinyPlayerScreen(
                         when (it) {
                             Tabs.PLAYBACK -> {
                                 CompactCurrentTrackFrame(
-                                    viewModel.trackThumbnail,
                                     currentTrack,
                                     audioPlayer,
                                     Modifier.width(160.dp).fillMaxHeight()

@@ -37,7 +37,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.platform.ClipboardManager
@@ -52,7 +51,6 @@ import com.github.catomon.kagamin.audio.AudioPlayer
 import com.github.catomon.kagamin.audio.AudioTrack
 import com.github.catomon.kagamin.ui.components.LikeSongButton
 import com.github.catomon.kagamin.ui.components.TrackThumbnail
-import com.github.catomon.kagamin.ui.components.getThumbnail
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.ui.windows.ConfirmWindowState
@@ -61,11 +59,8 @@ import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.pause
 import kagamin.composeapp.generated.resources.play
 import kagamin.composeapp.generated.resources.selected
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlinx.io.IOException
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -82,8 +77,6 @@ fun ThumbnailTrackItem(
     val confirmationWindow = LocalConfirmWindow.current
     val snackbar = LocalSnackbarHostState.current
     val backgroundColor = KagaminTheme.colors.listItem
-
-    var trackThumbnailUpdated by remember { mutableStateOf<ImageBitmap?>(null) }
 
     val height = 64.dp
 
@@ -104,17 +97,6 @@ fun ThumbnailTrackItem(
         }
     }
 
-    LaunchedEffect(track) {
-        trackThumbnailUpdated = try {
-            withContext(Dispatchers.IO) {
-                getThumbnail(track.uri)
-            }
-        } catch (e: IOException) {
-            e.printStackTrace()
-            null
-        }
-    }
-
     ContextMenuArea(items = {
         ThumbnailTrackItemDefaults.contextMenuItems(
             isCurrentTrack,
@@ -132,12 +114,14 @@ fun ThumbnailTrackItem(
                 PlaybackStateButton(height, backgroundColor, viewModel)
             }
 
-            Column(Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)).background(backgroundColor).clickable {
-                onClick()
-            }) {
+            Column(
+                Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)).background(backgroundColor)
+                    .clickable {
+                        onClick()
+                    }) {
                 Row(Modifier.weight(1f)) {
                     TrackThumbnail(
-                        trackThumbnailUpdated,
+                        track.uri,
                         modifier = Modifier.width(64.dp),//.alpha(0.75f),
                         shape = RoundedCornerShape(8.dp),
                         progress = progress,
@@ -204,7 +188,10 @@ private fun TrackItemBody(
             )
         }
 
-        AnimatedVisibility(isHovered || viewModel.lovedSongs[track.uri] != null, modifier = Modifier.align(Alignment.CenterEnd)) {
+        AnimatedVisibility(
+            isHovered || viewModel.lovedSongs[track.uri] != null,
+            modifier = Modifier.align(Alignment.CenterEnd)
+        ) {
             LikeSongButton(viewModel, track, 32.dp)
         }
 

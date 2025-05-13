@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.github.catomon.kagamin.isValidFileName
 import com.github.catomon.kagamin.savePlaylist
+import com.github.catomon.kagamin.ui.components.OutlinedTextButton
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
@@ -79,22 +80,23 @@ fun CreatePlaylistTab(viewModel: KagaminViewModel, modifier: Modifier) {
                     isLink = !isLink
                 })
 
-                Button(onClick = {
-                    if (isValidFileName(name)) {
-                        viewModel.currentPlaylistName = name
+                OutlinedTextButton(
+                    text = if (isLink) "Add" else "Create",
+                    onClick = {
+                        if (isValidFileName(name)) {
+                            viewModel.currentPlaylistName = name
 //                        if (isLink) { don't.
 //                            viewModel.audioPlayer.load(listOf(link))
 //                        }
-                        savePlaylist(
-                            viewModel.currentPlaylistName,
-                            emptyList()
-                        )
-                        viewModel.currentTab = Tabs.TRACKLIST
-                    } else
-                        isError = true
-                }) {
-                    Text(if (isLink) "Add" else "Create")
-                }
+                            savePlaylist(
+                                viewModel.currentPlaylistName,
+                                emptyList()
+                            )
+                            viewModel.currentTab = Tabs.TRACKLIST
+                        } else
+                            isError = true
+                    }
+                )
             }
         }
     }

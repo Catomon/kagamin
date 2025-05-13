@@ -38,7 +38,6 @@ import kotlinx.coroutines.delay
 @Composable
 fun CurrentTrackFrame(
     viewModel: KagaminViewModel,
-    thumbnail: ImageBitmap?,
     currentTrack: AudioTrack?, player: AudioPlayer<AudioTrack>, modifier: Modifier = Modifier
 ) {
     var progress by remember { mutableStateOf(-1f) }
@@ -62,7 +61,7 @@ fun CurrentTrackFrame(
             verticalArrangement = Arrangement.Center
         ) {
             TrackThumbnail(
-                thumbnail,
+                currentTrack?.uri,
                 onSetProgress = {
                     if (currentTrack != null) {
                         player.seek((currentTrack.duration * it).toLong())
@@ -79,7 +78,13 @@ fun CurrentTrackFrame(
 
             PlaybackOptionsButtons(player, Modifier.width(133.dp))
 
-            VolumeOptions(volume = player.volume.value, onVolumeChange =  { newVolume -> player.volume.value = newVolume; player.setVolume(newVolume) }, modifier = Modifier.width(133.dp))
+            VolumeOptions(
+                volume = player.volume.value,
+                onVolumeChange = { newVolume ->
+                    player.volume.value = newVolume; player.setVolume(newVolume)
+                },
+                modifier = Modifier.width(133.dp)
+            )
 
 //            TrackProgressIndicator(
 //                currentTrack,
@@ -100,7 +105,6 @@ fun CurrentTrackFrame(
 
 @Composable
 fun CompactCurrentTrackFrame(
-    thumbnail: ImageBitmap?,
     currentTrack: AudioTrack?,
     player: AudioPlayer<AudioTrack>,
     modifier: Modifier = Modifier
@@ -135,13 +139,13 @@ fun CompactCurrentTrackFrame(
         val aniColor = animateColorAsState(targetProgressColor)
 
         TrackThumbnail(
-            thumbnail,
-          onSetProgress = {
-              if (currentTrack != null) {
-                  player.seek((currentTrack.duration * it).toLong())
-                  updateProgress()
-              }
-          },
+            currentTrack?.uri,
+            onSetProgress = {
+                if (currentTrack != null) {
+                    player.seek((currentTrack.duration * it).toLong())
+                    updateProgress()
+                }
+            },
             floatAnimation,
             progressColor = aniColor.value,
             modifier = Modifier.padding(8.dp).size(145.dp)
@@ -170,7 +174,9 @@ fun CompactCurrentTrackFrame(
 
                 VolumeOptions(
                     volume = player.volume.value,
-                    onVolumeChange =  { newVolume -> player.volume.value = newVolume; player.setVolume(newVolume) },
+                    onVolumeChange = { newVolume ->
+                        player.volume.value = newVolume; player.setVolume(newVolume)
+                    },
                     modifier = Modifier.width(133.dp)
                 )
 

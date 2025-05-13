@@ -3,7 +3,6 @@ package com.github.catomon.kagamin.ui.windows
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -15,6 +14,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
+import com.github.catomon.kagamin.WindowDraggableArea
+import com.github.catomon.kagamin.kagaminWindowDecoration
+import com.github.catomon.kagamin.ui.components.OutlinedTextButton
+import com.github.catomon.kagamin.ui.theme.KagaminTheme
+import kagamin.composeapp.generated.resources.Res
+import kagamin.composeapp.generated.resources.kagamin_icon64
+import org.jetbrains.compose.resources.painterResource
 
 val LocalConfirmWindow = compositionLocalOf<MutableState<ConfirmWindowState>> {
     error("No ConfirmWindowState provided")
@@ -40,23 +46,36 @@ fun ConfirmWindow(
         title = "Just asking.",
         alwaysOnTop = true,
         resizable = false,
-        state = rememberWindowState(position = WindowPosition(Alignment.Center), size = DpSize(300.dp, 170.dp))
+        undecorated = true,
+        transparent = true,
+        state = rememberWindowState(
+            position = WindowPosition(Alignment.Center),
+            size = DpSize(300.dp, 170.dp)
+        ),
+        icon = painterResource(Res.drawable.kagamin_icon64)
     ) {
-        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-            Text("Are you sure?", modifier = Modifier.padding(bottom = 30.dp))
+        WindowDraggableArea {
+            KagaminTheme {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.fillMaxSize().kagaminWindowDecoration()
+                ) {
+                    Text("Are you sure?", modifier = Modifier.padding(bottom = 30.dp))
 
-            Button({
-                confirmWindowState.onCancel()
-                confirmWindowState.onClose()
-            }, modifier = Modifier.align(Alignment.BottomStart).padding(start = 12.dp)) {
-                Text("No")
-            }
+                    OutlinedTextButton(
+                        text = "No", {
+                            confirmWindowState.onCancel()
+                            confirmWindowState.onClose()
+                        }, modifier = Modifier.align(Alignment.BottomStart).padding(10.dp)
+                    )
 
-            Button({
-                confirmWindowState.onConfirm()
-                confirmWindowState.onClose()
-            }, modifier = Modifier.align(Alignment.BottomEnd).padding(end = 12.dp)) {
-                Text("Yea")
+                    OutlinedTextButton(
+                        text = "Yea", {
+                            confirmWindowState.onConfirm()
+                            confirmWindowState.onClose()
+                        }, modifier = Modifier.align(Alignment.BottomEnd).padding(10.dp)
+                    )
+                }
             }
         }
     }

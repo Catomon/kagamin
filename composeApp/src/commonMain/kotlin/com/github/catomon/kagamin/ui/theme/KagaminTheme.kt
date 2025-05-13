@@ -8,6 +8,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.sp
 import com.github.catomon.kagamin.LocalSnackbarHostState
 import com.github.catomon.kagamin.loadSettings
 import kagamin.composeapp.generated.resources.BadComic_Regular
@@ -91,6 +92,8 @@ object KagaminTheme {
             )
         }
 
+    val fontSize = 12.sp
+
     val fontFamily @Composable get() = FontFamily(Font(Res.font.BadComic_Regular))
 
     val typography
@@ -98,24 +101,25 @@ object KagaminTheme {
             val t = MaterialTheme.typography
             val fontFamily = fontFamily
             t.copy(
-                displayLarge = t.displayLarge.copy(fontFamily = fontFamily, color = colors.text),
-                displayMedium = t.displayMedium.copy(fontFamily = fontFamily, color = colors.text),
-                displaySmall = t.displaySmall.copy(fontFamily = fontFamily, color = colors.text),
-                headlineLarge = t.headlineLarge.copy(fontFamily = fontFamily, color = colors.text),
+                displayLarge = t.displayLarge.copy(fontFamily = fontFamily, color = colors.text, fontSize = fontSize),
+                displayMedium = t.displayMedium.copy(fontFamily = fontFamily, color = colors.text, fontSize = fontSize),
+                displaySmall = t.displaySmall.copy(fontFamily = fontFamily, color = colors.text, fontSize = fontSize),
+                headlineLarge = t.headlineLarge.copy(fontFamily = fontFamily, color = colors.text, fontSize = fontSize),
                 headlineMedium = t.headlineMedium.copy(
                     fontFamily = fontFamily,
-                    color = colors.text
+                    color = colors.text,
+                    fontSize = fontSize
                 ),
-                headlineSmall = t.headlineSmall.copy(fontFamily = fontFamily, color = colors.text),
-                titleLarge = t.titleLarge.copy(fontFamily = fontFamily, color = colors.text),
-                titleMedium = t.titleMedium.copy(fontFamily = fontFamily, color = colors.text),
-                titleSmall = t.titleSmall.copy(fontFamily = fontFamily, color = colors.text),
-                bodyLarge = t.bodyLarge.copy(fontFamily = fontFamily, color = colors.text),
-                bodyMedium = t.bodyMedium.copy(fontFamily = fontFamily, color = colors.text),
-                bodySmall = t.bodySmall.copy(fontFamily = fontFamily, color = colors.text),
-                labelLarge = t.labelLarge.copy(fontFamily = fontFamily, color = colors.text),
-                labelMedium = t.labelMedium.copy(fontFamily = fontFamily, color = colors.text),
-                labelSmall = t.labelSmall.copy(fontFamily = fontFamily, color = colors.text)
+                headlineSmall = t.headlineSmall.copy(fontFamily = fontFamily, color = colors.text, fontSize = fontSize),
+                titleLarge = t.titleLarge.copy(fontFamily = fontFamily, color = colors.text, fontSize = fontSize),
+                titleMedium = t.titleMedium.copy(fontFamily = fontFamily, color = colors.text, fontSize = fontSize),
+                titleSmall = t.titleSmall.copy(fontFamily = fontFamily, color = colors.text, fontSize = fontSize),
+                bodyLarge = t.bodyLarge.copy(fontFamily = fontFamily, color = colors.text, fontSize = fontSize),
+                bodyMedium = t.bodyMedium.copy(fontFamily = fontFamily, color = colors.text, fontSize = fontSize),
+                bodySmall = t.bodySmall.copy(fontFamily = fontFamily, color = colors.text, fontSize = fontSize),
+                labelLarge = t.labelLarge.copy(fontFamily = fontFamily, color = colors.text, fontSize = fontSize),
+                labelMedium = t.labelMedium.copy(fontFamily = fontFamily, color = colors.text, fontSize = fontSize),
+                labelSmall = t.labelSmall.copy(fontFamily = fontFamily, color = colors.text, fontSize = fontSize)
             )
         }
 }

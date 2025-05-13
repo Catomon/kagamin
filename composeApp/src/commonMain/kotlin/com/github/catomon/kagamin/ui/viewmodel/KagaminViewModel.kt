@@ -26,15 +26,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class KagaminViewModel(private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO) : ViewModel() {
+class KagaminViewModel(private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO) :
+    ViewModel() {
     val audioPlayer = createAudioPlayer
     val playlist by audioPlayer.playlist
     val currentTrack by audioPlayer.currentTrack
     val playState by audioPlayer.playState
     val playMode by audioPlayer.playMode
-
-    var trackThumbnail by mutableStateOf<ImageBitmap?>(null)
-    var loadingThumbnail by mutableStateOf(false)
+//
+//    var trackThumbnail by mutableStateOf<ImageBitmap?>(null)
+//    var loadingThumbnail by mutableStateOf(false)
 
     var currentPlaylistName by mutableStateOf("default")
 
@@ -88,26 +89,26 @@ class KagaminViewModel(private val ioDispatcher: CoroutineDispatcher = Dispatche
 
     suspend fun updateThumbnail() {
         echoMsg("Updating thumbnail.")
-
-        loadingThumbnail = true
-
-        val currentTrack = currentTrack
-        val trackThumbnailUpdated = if (currentTrack != null) {
-            try {
-                withContext(ioDispatcher) {
-                    getThumbnail(currentTrack.uri)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
-        } else {
-            null
-        }
-
-        trackThumbnail = trackThumbnailUpdated
-
-        loadingThumbnail = false
+//
+//        loadingThumbnail = true
+//
+//        val currentTrack = currentTrack
+//        val trackThumbnailUpdated = if (currentTrack != null) {
+//            try {
+//                withContext(ioDispatcher) {
+//                    getThumbnail(currentTrack.uri)
+//                }
+//            } catch (e: Exception) {
+//                e.printStackTrace()
+//                null
+//            }
+//        } else {
+//            null
+//        }
+//
+//        trackThumbnail = trackThumbnailUpdated
+//
+//        loadingThumbnail = false
     }
 
     fun reloadPlaylist() {

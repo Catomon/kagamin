@@ -180,7 +180,8 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                                 onValueChange = {
                                     searchTextValue = it
                                 },
-                                modifier = Modifier.weight(1f).fillMaxWidth().height(20.dp).padding(end = 6.dp)
+                                modifier = Modifier.weight(1f).fillMaxWidth().height(20.dp)
+                                    .padding(end = 6.dp)
                                     .offset(y = 2.dp).drawBehind {
                                         drawLine(
                                             KagaminTheme.colors.buttonIcon,
@@ -254,22 +255,9 @@ actual fun PlaylistItem(
 ) {
     val backColor = KagaminTheme.colors.listItem
 
-    var trackThumbnailUpdated by remember { mutableStateOf<ImageBitmap?>(null) }
-
     val height = 64.dp
 
-    LaunchedEffect(Unit) {
-        playlist.second.tracks.randomOrNull()?.uri?.let { uri ->
-            trackThumbnailUpdated = try {
-                withContext(Dispatchers.IO) {
-                    getThumbnail(uri)
-                }
-            } catch (e: IOException) {
-                e.printStackTrace()
-                null
-            }
-        }
-    }
+    val randomTrackUri = remember { playlist.second.tracks.randomOrNull()?.uri }
 
     ContextMenuArea(items = {
         listOf(
@@ -291,7 +279,7 @@ actual fun PlaylistItem(
 
             Box(Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp))) {
                 TrackThumbnail(
-                    trackThumbnailUpdated,
+                    randomTrackUri,
                     modifier = Modifier.fillMaxWidth().height(height),
                     shape = RectangleShape
                 )

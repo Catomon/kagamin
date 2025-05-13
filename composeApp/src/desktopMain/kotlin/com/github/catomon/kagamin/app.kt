@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -36,9 +37,15 @@ import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.rememberTrayState
 import androidx.compose.ui.window.rememberWindowState
 import androidx.lifecycle.viewModelScope
+import coil3.ImageLoader
+import coil3.compose.LocalPlatformContext
+import coil3.compose.setSingletonImageLoaderFactory
+import coil3.disk.DiskCache
+import coil3.request.crossfade
 import com.github.catomon.kagamin.WindowConfig.isTraySupported
 import com.github.catomon.kagamin.audio.AudioPlayer
 import com.github.catomon.kagamin.ui.KagaminApp
+import com.github.catomon.kagamin.ui.components.cacheThumbnail
 import com.github.catomon.kagamin.ui.components.getThumbnail
 import com.github.catomon.kagamin.ui.customShadow
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
@@ -55,6 +62,7 @@ import kagamin.composeapp.generated.resources.play_icon
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okio.Path.Companion.toOkioPath
 import org.jetbrains.compose.resources.painterResource
 import org.koin.java.KoinJavaComponent.get
 import java.awt.datatransfer.DataFlavor
@@ -203,13 +211,22 @@ private fun AppWindow(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun WindowScope.AppFrame(kagaminViewModel: KagaminViewModel = get(KagaminViewModel::class.java)) {
+    val settings = kagaminViewModel.settings //trigger recomposition
     WindowDraggableArea {
         val snackbar = LocalSnackbarHostState.current
         KagaminApp(
             kagaminViewModel,
             modifier = Modifier.kagaminWindowDecoration().dragAndDropTarget({ true }, remember {
                 createTrackDragAndDropTarget(kagaminViewModel, snackbar)
-            })
+            }).onPreviewKeyEvent {
+                return@onPreviewKeyEvent when (it.key) {
+                    Key.MediaPlay -> {
+                        kagaminViewModel.onPlayPause(); true
+                    }
+
+                    else -> false
+                }
+            }
         )
     }
 }
@@ -284,7 +301,7 @@ private fun createTrackDragAndDropTarget(
 
             withContext(Dispatchers.IO) {
                 trackFiles.forEach {
-                    getThumbnail(it.path)
+                    cacheThumbnail(it.path)
                 }
             }
 

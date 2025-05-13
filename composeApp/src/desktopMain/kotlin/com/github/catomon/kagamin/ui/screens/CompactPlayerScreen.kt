@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -33,8 +34,8 @@ import com.github.catomon.kagamin.ui.AddTracksTab
 import com.github.catomon.kagamin.ui.CreatePlaylistTab
 import com.github.catomon.kagamin.ui.Playlists
 import com.github.catomon.kagamin.ui.Tracklist
-import com.github.catomon.kagamin.ui.components.AppName
 import com.github.catomon.kagamin.ui.components.CurrentTrackFrame
+import com.github.catomon.kagamin.ui.components.LuckyStarLogo
 import com.github.catomon.kagamin.ui.components.Sidebar
 import com.github.catomon.kagamin.ui.components.TrackThumbnail
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
@@ -90,16 +91,16 @@ fun CompactPlayerScreen(
         viewModel.updateThumbnail()
     }
 
-    Box(modifier.background(color = KagaminTheme.behindBackground, shape = RoundedCornerShape(16.dp))) {
+    Box(modifier) {
         TrackThumbnail(
-            image = viewModel.trackThumbnail,
+            currentTrack?.uri,
             onSetProgress = {
                 if (currentTrack != null) {
                     audioPlayer.seek((currentTrack.duration * it).toLong())
                 }
             },
             progress = 0f,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp)),
             contentScale = ContentScale.Crop,
             blur = true,
             controlProgress = false
@@ -117,13 +118,20 @@ fun CompactPlayerScreen(
                     modifier = Modifier.fillMaxWidth()
                         .background(color = KagaminTheme.backgroundTransparent)
                 ) {
-                    AppName(
-                        Modifier
-                            .height(25.dp).graphicsLayer(translationY = 2f)
-                            .clip(RoundedCornerShape(8.dp))
-                            .clickable(onClickLabel = "Open options") {
+//                    AppName(
+//                        Modifier
+//                            .height(25.dp).graphicsLayer(translationY = 2f)
+//                            .clip(RoundedCornerShape(8.dp))
+//                            .clickable(onClickLabel = "Open options") {
+//                                navController.navigate(SettingsDestination.toString())
+//                            })
+                    LuckyStarLogo(  Modifier.padding(horizontal = 12.dp).height(30.dp)
+                        .graphicsLayer(translationY = 2f)
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable {
+                            if (navController.currentDestination?.route != SettingsDestination.toString())
                                 navController.navigate(SettingsDestination.toString())
-                            })
+                        })
                 }
 
                 Box(Modifier.weight(0.99f).fillMaxHeight()) {
@@ -134,7 +142,6 @@ fun CompactPlayerScreen(
                             Tabs.PLAYBACK -> {
                                 CurrentTrackFrame(
                                     viewModel,
-                                    viewModel.trackThumbnail,
                                     currentTrack,
                                     audioPlayer,
                                     Modifier.width(160.dp).fillMaxHeight()

@@ -8,8 +8,6 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -32,6 +30,9 @@ import com.github.catomon.kagamin.ui.components.TrackThumbnail
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
+import kagamin.composeapp.generated.resources.Res
+import kagamin.composeapp.generated.resources.arrow_left
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun ApplicationScope.AddTracksOrPlaylistsWindow(
@@ -64,7 +65,7 @@ fun ApplicationScope.AddTracksOrPlaylistsWindow(
                 ) {
                     Box {
                         TrackThumbnail(
-                            viewModel.trackThumbnail,
+                            currentTrack?.uri,
                             onSetProgress = {
                                 if (currentTrack != null) audioPlayer.seek((currentTrack.duration * it).toLong())
                             },
@@ -122,7 +123,7 @@ fun ApplicationScope.AddTracksOrPlaylistsWindow(
                                 viewModel.createPlaylistWindow = false
                                 viewModel.currentTab = Tabs.TRACKLIST
                             }, modifier = Modifier.align(Alignment.BottomEnd)) {
-                                Icon(Icons.Default.Close, contentDescription = null, tint = KagaminTheme.colors.buttonIcon)
+                                Icon(painterResource(Res.drawable.arrow_left), contentDescription = null, tint = KagaminTheme.colors.buttonIcon)
                             }
                         }
                     }

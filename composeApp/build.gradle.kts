@@ -53,8 +53,11 @@ kotlin {
 //            implementation(libs.filekit.core)
 //            implementation(libs.filekit.dialogs)
 
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network.okhttp)
+
             implementation(libs.filekit.dialogs.compose)
-            implementation(libs.filekit.coil)
+//            implementation(libs.filekit.coil)
 
             implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
         }

@@ -32,8 +32,8 @@ import com.github.catomon.kagamin.ui.AddTracksTab
 import com.github.catomon.kagamin.ui.CreatePlaylistTab
 import com.github.catomon.kagamin.ui.Playlists
 import com.github.catomon.kagamin.ui.Tracklist
-import com.github.catomon.kagamin.ui.components.AppName
 import com.github.catomon.kagamin.ui.components.CurrentTrackFrame
+import com.github.catomon.kagamin.ui.components.LuckyStarLogo
 import com.github.catomon.kagamin.ui.components.Sidebar
 import com.github.catomon.kagamin.ui.components.TrackThumbnail
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
@@ -75,19 +75,16 @@ actual fun PlayerScreen(
     }
 
     Box(
-        modifier.background(
-            color = KagaminTheme.behindBackground,
-            shape = RoundedCornerShape(16.dp)
-        )
+        modifier
     ) {
         TrackThumbnail(
-            viewModel.trackThumbnail,
+            currentTrack?.uri,
             onSetProgress = {
                 if (currentTrack != null)
                     audioPlayer.seek((currentTrack.duration * it).toLong())
             },
             0f,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp)),
             contentScale = ContentScale.Crop,
             blur = true,
             controlProgress = false
@@ -101,17 +98,24 @@ actual fun PlayerScreen(
                 modifier = Modifier.fillMaxHeight()
                     .background(color = KagaminTheme.backgroundTransparent)
             ) {
-                AppName(
-                    Modifier.padding(horizontal = 12.dp).height(25.dp)
-                        .graphicsLayer(translationY = 2f)
-                        .clip(RoundedCornerShape(8.dp))
-                        .clickable {
-                            if (navController.currentDestination?.route != SettingsDestination.toString())
-                                navController.navigate(SettingsDestination.toString())
-                        })
+//                AppName(
+//                    Modifier.padding(horizontal = 12.dp).height(25.dp)
+//                        .graphicsLayer(translationY = 2f)
+//                        .clip(RoundedCornerShape(8.dp))
+//                        .clickable {
+//                            if (navController.currentDestination?.route != SettingsDestination.toString())
+//                                navController.navigate(SettingsDestination.toString())
+//                        })
+                LuckyStarLogo(  Modifier.padding(horizontal = 12.dp).height(30.dp)
+                    .graphicsLayer(translationY = 2f)
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable {
+                        if (navController.currentDestination?.route != SettingsDestination.toString())
+                            navController.navigate(SettingsDestination.toString())
+                    })
 
                 CurrentTrackFrame(
-                    viewModel, viewModel.trackThumbnail,
+                    viewModel,
                     currentTrack, audioPlayer, Modifier.width(160.dp).fillMaxHeight()
                 )
             }

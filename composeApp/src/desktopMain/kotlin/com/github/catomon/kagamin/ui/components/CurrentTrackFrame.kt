@@ -69,7 +69,8 @@ fun CurrentTrackFrame(
                     }
                 },
                 progress,
-                modifier = Modifier.padding(8.dp).size(145.dp)
+                modifier = Modifier.padding(8.dp).size(145.dp),
+                height = ThumbnailCacheManager.SIZE.H150
             )
 
             PlaybackButtons(
@@ -148,7 +149,8 @@ fun CompactCurrentTrackFrame(
             },
             floatAnimation,
             progressColor = aniColor.value,
-            modifier = Modifier.padding(8.dp).size(145.dp)
+            modifier = Modifier.padding(8.dp).size(145.dp),
+            height = ThumbnailCacheManager.SIZE.H150
         )
 
         AnimatedVisibility(

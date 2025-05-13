@@ -50,6 +50,7 @@ import com.github.catomon.kagamin.LocalSnackbarHostState
 import com.github.catomon.kagamin.audio.AudioPlayer
 import com.github.catomon.kagamin.audio.AudioTrack
 import com.github.catomon.kagamin.ui.components.LikeSongButton
+import com.github.catomon.kagamin.ui.components.ThumbnailCacheManager
 import com.github.catomon.kagamin.ui.components.TrackThumbnail
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
@@ -125,7 +126,8 @@ fun ThumbnailTrackItem(
                         modifier = Modifier.width(64.dp),//.alpha(0.75f),
                         shape = RoundedCornerShape(8.dp),
                         progress = progress,
-                        controlProgress = false
+                        controlProgress = false,
+                        height = ThumbnailCacheManager.SIZE.H64
                     )
 
                     TrackItemBody(

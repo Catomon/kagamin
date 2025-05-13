@@ -17,13 +17,17 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 import kotlinx.io.IOException
+import net.coobird.thumbnailator.Thumbnails
+import net.coobird.thumbnailator.resizers.configurations.Antialiasing
+import net.coobird.thumbnailator.resizers.configurations.Rendering
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.IRect
 import org.jetbrains.skia.Image
 import java.io.File
+import java.nio.file.Files
 
+@Deprecated("")
 actual fun getThumbnail(trackUri: String): ImageBitmap? = try {
 //    println("Loading thumbnail: ")
 
@@ -65,7 +69,19 @@ object ThumbnailCacheManager {
 
     private val mutex = Mutex()
 
-    suspend fun cacheThumbnailOnce(trackUri: String): File? {
+    object SIZE {
+        const val ORIGINAL = 0
+        const val H64 = 64
+        const val H150 = 150
+        const val H250 = 250
+
+        const val DEFAULT_WIDTH = 1024
+    }
+
+    suspend fun cacheThumbnailSafe(
+        trackUri: String,
+        size: Int = SIZE.ORIGINAL
+    ): File? {
         return mutex.withLock {
             ongoingCacheJobs[trackUri]?.let { existingJob ->
                 return@withLock existingJob
@@ -84,19 +100,26 @@ object ThumbnailCacheManager {
                 }
             }
             newJob
-        }.await()
+        }.await().let { file ->
+            if (size > 0) {
+                file?.parentFile?.resolve("$size/${file.name}")
+            } else {
+                file
+            }
+        }
     }
 
-    private suspend fun cacheThumbnail(trackUri: String): File? {
+    suspend fun cacheThumbnail(
+        trackUri: String
+    ): File? {
         try {
-            cacheFolder.mkdirs()
-
             val uriHash = trackUri.hashCode()
-            val cachedFile = cacheFolder.resolve("thumbnails/$uriHash")
-            if (cachedFile.exists()) {
-                return cachedFile
+            val cachedSrcFile = cacheFolder.resolve("thumbnails/$uriHash")
+
+            if (cachedSrcFile.exists()) {
+                return cachedSrcFile
             } else {
-                cachedFile.parentFile.mkdirs()
+                cachedSrcFile.parentFile?.mkdirs()
 
                 val file = Mp3File(trackUri)
                 file.id3v2Tag.albumImage?.let { albumImage ->
@@ -104,47 +127,46 @@ object ThumbnailCacheManager {
 
                     val target = removeBlackBars(image.toComposeImageBitmap())
 
-                    cachedFile.outputStream().use { output ->
+                    cachedSrcFile.outputStream().use { output ->
                         output.write(target.encodeToByteArray())
                     }
                 }
-
-                return cachedFile
             }
+
+            createScaledThumbnailFile(cachedSrcFile, uriHash, SIZE.H64)
+            createScaledThumbnailFile(cachedSrcFile, uriHash, SIZE.H150)
+            createScaledThumbnailFile(cachedSrcFile, uriHash, SIZE.H250)
+
+            return cachedSrcFile
         } catch (e: IOException) {
             e.printStackTrace()
             return null
         }
     }
-}
 
-suspend fun cacheThumbnail(trackUri: String): File? = withContext(Dispatchers.IO) {
-    try {
-        cacheFolder.mkdirs()
+    private fun createScaledThumbnailFile(
+        cachedSrcFile: File,
+        uriHash: Int,
+        height: Int = SIZE.ORIGINAL,
+        width: Int = SIZE.DEFAULT_WIDTH
+    ): Boolean {
+        val cachedScaledFile = cacheFolder.resolve("thumbnails/$height/$uriHash")
+        if (cachedScaledFile.exists())
+            return true
+        else
+            cachedScaledFile.parentFile?.mkdirs()
 
-        val uriHash = trackUri.hashCode()
-        val cachedFile = cacheFolder.resolve("thumbnails/$uriHash")
-        if (cachedFile.exists()) {
-            cachedFile
-        } else {
-            cachedFile.parentFile.mkdirs()
+        Thumbnails.of(cachedSrcFile).size(width, height).outputFormat("png")
+            .outputQuality(1f).antialiasing(Antialiasing.ON).rendering(Rendering.QUALITY) .toFile(cachedScaledFile)
 
-            val file = Mp3File(trackUri)
-            file.id3v2Tag.albumImage?.let { albumImage ->
-                val image = Image.makeFromEncoded(albumImage)
+        Files.move(
+            (cachedScaledFile.parentFile?.resolve("$uriHash.png")
+                ?: File("$uriHash")).toPath(),
+            (cachedScaledFile.parentFile?.resolve("$uriHash")
+                ?: File("$uriHash")).toPath()
+        )
 
-                val target = removeBlackBars(image.toComposeImageBitmap())
-
-                cachedFile.outputStream().use { output ->
-                    output.write(target.encodeToByteArray())
-                }
-            }
-
-            cachedFile
-        }
-    } catch (e: IOException) {
-        e.printStackTrace()
-        null
+        return true
     }
 }
 
@@ -200,72 +222,3 @@ fun ImageBitmap.cropped(offset: IntOffset, size: IntSize): ImageBitmap {
 
     return dstBitmap.asComposeImageBitmap()
 }
-
-//actual fun getThumbnail(trackUri: String, maxSize: Int): ImageBitmap? = try {
-////    println("Loading thumbnail: ")
-//
-//    val uriHash = trackUri.hashCode()
-//    val cachedFile = cacheFolder.resolve((if (maxSize < 1024) "$maxSize/" else "") + "$uriHash")
-//    if (cachedFile.exists()) {
-//        val bufferedImage = javax.imageio.ImageIO.read(cachedFile)
-//        if (bufferedImage != null) {
-//            //            println("success.")
-//            bufferedImage.toComposeImageBitmap()
-//        } else {
-//            //        println("fail.")
-//            null
-//        }
-//    } else {
-//        cachedFile.parentFile.mkdirs()
-//
-//        val file = Mp3File(trackUri)
-//        file.id3v2Tag.albumImage?.let { albumImage ->
-//
-//            val image = Image.makeFromEncoded(albumImage)
-//
-//            val srcHeight = image.height
-//            val srcWidth = image.width
-//
-//            val diff = if (srcHeight > maxSize) maxSize / srcHeight.toFloat() else 1f
-//
-//            val width =  (srcWidth * diff).toInt()
-//            val height = (srcHeight * diff).toInt()
-//
-////            val info = ImageInfo(width, height, image.colorType, image.colorInfo.alphaType)
-////
-////            val bytesPerPixel = image.bytesPerPixel
-////            val rowBytes = width * bytesPerPixel
-////
-////            val buffer = Data.makeUninitialized(rowBytes * height)
-////
-////            val dstPixmap = Pixmap.make(info, buffer, rowBytes)
-//
-//            val dstPixmap = Bitmap()
-//            dstPixmap.allocN32Pixels(width, height)
-//
-//            val success = image.scalePixels(dstPixmap.peekPixels()!!, SamplingMode.LINEAR, cache = true)
-//
-//            if (!success) {
-//                echoWarn("[getThumbnail] Failed to scale image pixels")
-//            }
-//
-//            val scaledImage = Image.makeFromBitmap(dstPixmap)
-//
-//            cachedFile.outputStream().use { output ->
-//                val encodedData = scaledImage.encodeToData(EncodedImageFormat.PNG) ?: run {
-//                    echoWarn("[getThumbnail] encodeToData == null")
-//                    return@use
-//                }
-//                output.write(encodedData.bytes)//bytearray
-//            }
-//
-//            scaledImage.toComposeImageBitmap()
-//        }.also {
-////            println("success.")
-//        }
-//    }
-//} catch (e: IOException) {
-////        println("fail.")
-//    e.printStackTrace()
-//    null
-//}

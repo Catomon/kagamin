@@ -47,7 +47,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeJoin
@@ -59,8 +58,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.catomon.kagamin.data.PlaylistData
 import com.github.catomon.kagamin.ui.components.OutlinedText
+import com.github.catomon.kagamin.ui.components.ThumbnailCacheManager
 import com.github.catomon.kagamin.ui.components.TrackThumbnail
-import com.github.catomon.kagamin.ui.components.getThumbnail
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
@@ -70,7 +69,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.io.IOException
 import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -281,7 +279,8 @@ actual fun PlaylistItem(
                 TrackThumbnail(
                     randomTrackUri,
                     modifier = Modifier.fillMaxWidth().height(height),
-                    shape = RectangleShape
+                    shape = RectangleShape,
+                    height = ThumbnailCacheManager.SIZE.H250
                 )
 
                 PlaylistItemContent(viewModel, playlist, backColor)

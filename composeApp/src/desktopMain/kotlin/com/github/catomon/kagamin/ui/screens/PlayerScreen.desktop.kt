@@ -79,11 +79,8 @@ actual fun PlayerScreen(
     ) {
         TrackThumbnail(
             currentTrack?.uri,
-            onSetProgress = {
-                if (currentTrack != null)
-                    audioPlayer.seek((currentTrack.duration * it).toLong())
-            },
-            0f,
+            onSetProgress = {},
+            progress = 0f,
             modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp)),
             contentScale = ContentScale.Crop,
             blur = true,

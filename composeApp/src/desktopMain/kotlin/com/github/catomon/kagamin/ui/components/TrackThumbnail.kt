@@ -49,20 +49,19 @@ fun TrackThumbnail(
     contentScale: ContentScale = ContentScale.Crop,
     blur: Boolean = false,
     controlProgress: Boolean = true,
-    shape: Shape = RoundedCornerShape(12.dp)
+    shape: Shape = RoundedCornerShape(12.dp),
+    height: Int = ThumbnailCacheManager.SIZE.ORIGINAL
 ) {
     var cachedThumbnailFile by remember { mutableStateOf<File?>(null) }
     val defaultPainter = painterResource(Res.drawable.def_thumb)
 
     LaunchedEffect(trackUri) {
         cachedThumbnailFile = if (trackUri != null) withContext(Dispatchers.Default) {
-            ThumbnailCacheManager.cacheThumbnailOnce(trackUri)
+            ThumbnailCacheManager.cacheThumbnailSafe(trackUri, size = height)
         } else null
     }
 
     val density = LocalDensity.current
-
-    val context = LocalPlatformContext.current
 
     Box(
         contentAlignment = Alignment.Center,

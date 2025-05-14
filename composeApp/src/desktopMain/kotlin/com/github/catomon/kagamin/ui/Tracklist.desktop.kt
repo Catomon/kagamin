@@ -3,6 +3,7 @@ package com.github.catomon.kagamin.ui
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.MarqueeAnimationMode
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
@@ -346,7 +347,7 @@ actual fun TracklistHeader(
                                 color = KagaminTheme.colors.buttonIcon,
                                 maxLines = 1,
                                 modifier = Modifier.weight(1f)
-                                    .basicMarquee(iterations = Int.MAX_VALUE)
+                                    .basicMarquee(iterations = Int.MAX_VALUE, animationMode = MarqueeAnimationMode.WhileFocused)
                             )
                         }
                     }

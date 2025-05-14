@@ -79,15 +79,10 @@ actual fun PlayerScreen(
     ) {
         TrackThumbnail(
             currentTrack?.uri,
-            onSetProgress = {},
-            progress = 0f,
             modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp)),
             contentScale = ContentScale.Crop,
             blur = true,
-            controlProgress = false
         )
-
-//        BackgroundImage()
 
         Row() {
             Column(

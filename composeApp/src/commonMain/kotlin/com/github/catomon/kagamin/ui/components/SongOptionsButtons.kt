@@ -128,7 +128,7 @@ fun LikeSongButton(
         Icon(
             painter = painterResource(Res.drawable.like_song),
             contentDescription = "like song",
-            tint = if (loved) KagaminTheme.colors.forDisabledMostlyIdk else KagaminTheme.colors.buttonIconTransparent
+            tint = if (loved) KagaminTheme.colors.disabled else KagaminTheme.colors.buttonIconTransparent
         )
     }
 }

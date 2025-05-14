@@ -66,14 +66,9 @@ fun ApplicationScope.AddTracksOrPlaylistsWindow(
                     Box {
                         TrackThumbnail(
                             currentTrack?.uri,
-                            onSetProgress = {
-                                if (currentTrack != null) audioPlayer.seek((currentTrack.duration * it).toLong())
-                            },
-                            0f,
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop,
                             blur = true,
-                            controlProgress = false
                         )
 
                         Box(

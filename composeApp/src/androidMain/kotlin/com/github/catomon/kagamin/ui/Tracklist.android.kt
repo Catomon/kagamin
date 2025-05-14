@@ -125,7 +125,7 @@ actual fun TracklistHeader(
     val clipboard = LocalClipboardManager.current
     val isHeader = index == -1
     val backColor = if (isHeader) KagaminTheme.backgroundTransparent else
-        if (index % 2 == 0) KagaminTheme.colors.forDisabledMostlyIdk else KagaminTheme.colors.listItem
+        if (index % 2 == 0) KagaminTheme.colors.disabled else KagaminTheme.colors.listItem
 
     Row(
         verticalAlignment = Alignment.CenterVertically,

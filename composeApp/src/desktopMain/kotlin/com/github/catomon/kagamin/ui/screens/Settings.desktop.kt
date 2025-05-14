@@ -65,14 +65,9 @@ actual fun SettingsScreen(
     ) {
         TrackThumbnail(
             viewModel.currentTrack?.uri,
-            onSetProgress = {
-                if (viewModel.currentTrack != null) viewModel.audioPlayer.seek((viewModel.currentTrack!!.duration * it).toLong())
-            },
-            0f,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
             blur = true,
-            controlProgress = false
         )
 
         Box(Modifier.fillMaxSize().background(color = KagaminTheme.backgroundTransparent))
@@ -222,7 +217,7 @@ private fun ThemeRadioButtons(
             RadioButton(
                 selected = theme == KagaminColors.Violet.name,
                 colors = RadioButtonDefaults.colors(
-                    KagaminColors.Violet.background, KagaminColors.Violet.forDisabledMostlyIdk
+                    KagaminColors.Violet.background, KagaminColors.Violet.disabled
                 ),
                 onClick = {
                     KagaminTheme.colors = KagaminColors.Violet
@@ -236,7 +231,7 @@ private fun ThemeRadioButtons(
             RadioButton(
                 selected = theme == KagaminColors.Pink.name,
                 colors = RadioButtonDefaults.colors(
-                    KagaminColors.Pink.background, KagaminColors.Pink.forDisabledMostlyIdk
+                    KagaminColors.Pink.background, KagaminColors.Pink.disabled
                 ),
                 onClick = {
                     KagaminTheme.colors = KagaminColors.Pink
@@ -250,7 +245,7 @@ private fun ThemeRadioButtons(
             RadioButton(
                 selected = theme == KagaminColors.Blue.name,
                 colors = RadioButtonDefaults.colors(
-                    KagaminColors.Blue.background, KagaminColors.Blue.forDisabledMostlyIdk
+                    KagaminColors.Blue.background, KagaminColors.Blue.disabled
                 ),
                 onClick = {
                     KagaminTheme.colors = KagaminColors.Blue

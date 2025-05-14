@@ -103,7 +103,7 @@ fun TrackProgressIndicator2(
 ) {
         LinearProgressIndicator(
             progress = progress,
-            modifier.fillMaxWidth().padding(top = 6.dp).pointerHoverIcon(
+            modifier.fillMaxWidth().padding().pointerHoverIcon(
                 PointerIcon.Hand
             ).pointerInput(currentTrack) {
                 if (currentTrack == null) return@pointerInput

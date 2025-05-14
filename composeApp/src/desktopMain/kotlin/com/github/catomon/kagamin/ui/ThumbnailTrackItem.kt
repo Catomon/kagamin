@@ -52,6 +52,7 @@ import com.github.catomon.kagamin.audio.AudioTrack
 import com.github.catomon.kagamin.ui.components.LikeSongButton
 import com.github.catomon.kagamin.ui.components.ThumbnailCacheManager
 import com.github.catomon.kagamin.ui.components.TrackThumbnail
+import com.github.catomon.kagamin.ui.components.TrackThumbnailProgressOverlay
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.ui.windows.ConfirmWindowState
@@ -121,14 +122,23 @@ fun ThumbnailTrackItem(
                         onClick()
                     }) {
                 Row(Modifier.weight(1f)) {
-                    TrackThumbnail(
-                        track.uri,
-                        modifier = Modifier.width(64.dp),//.alpha(0.75f),
-                        shape = RoundedCornerShape(8.dp),
-                        progress = progress,
-                        controlProgress = false,
-                        height = ThumbnailCacheManager.SIZE.H64
-                    )
+//                    if (isCurrentTrack) {
+//                        TrackThumbnailProgressOverlay(
+//                            track.uri,
+//                            modifier = Modifier.width(64.dp),
+//                            shape = RoundedCornerShape(8.dp),
+//                            progress = progress,
+//                            controlProgress = false,
+//                            height = ThumbnailCacheManager.SIZE.H64
+//                        )
+//                    } else {
+                        TrackThumbnail(
+                            track.uri,
+                            modifier = Modifier.width(64.dp),
+                            shape = RoundedCornerShape(8.dp),
+                            height = ThumbnailCacheManager.SIZE.H64
+                        )
+//                    }
 
                     TrackItemBody(
                         viewModel = viewModel,

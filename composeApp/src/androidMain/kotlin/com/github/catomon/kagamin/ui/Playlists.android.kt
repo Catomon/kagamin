@@ -170,7 +170,7 @@ actual fun PlaylistItem(
         Column(
             Modifier
                 .fillMaxHeight()
-                .background(color = if (i % 2 == 0) KagaminTheme.colors.forDisabledMostlyIdk else KagaminTheme.colors.listItem)
+                .background(color = if (i % 2 == 0) KagaminTheme.colors.disabled else KagaminTheme.colors.listItem)
                 .clickable {
                     viewModel.currentPlaylistName = playlist.first
                     viewModel.currentTab = Tabs.TRACKLIST

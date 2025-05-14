@@ -140,7 +140,7 @@ private fun ThemeRadioButtons(
                 theme == KagaminColors.Violet.name,
                 colors = RadioButtonDefaults.colors(
                     KagaminColors.Violet.background,
-                    KagaminColors.Violet.forDisabledMostlyIdk
+                    KagaminColors.Violet.disabled
                 ),
                 onClick = {
                     KagaminTheme.colors = KagaminColors.Violet
@@ -156,7 +156,7 @@ private fun ThemeRadioButtons(
                 theme == KagaminColors.Pink.name,
                 colors = RadioButtonDefaults.colors(
                     KagaminColors.Pink.background,
-                    KagaminColors.Pink.forDisabledMostlyIdk
+                    KagaminColors.Pink.disabled
                 ),
                 onClick = {
                     KagaminTheme.colors = KagaminColors.Pink
@@ -172,7 +172,7 @@ private fun ThemeRadioButtons(
                 theme == KagaminColors.Blue.name,
                 colors = RadioButtonDefaults.colors(
                     KagaminColors.Blue.background,
-                    KagaminColors.Blue.forDisabledMostlyIdk
+                    KagaminColors.Blue.disabled
                 ),
                 onClick = {
                     KagaminTheme.colors = KagaminColors.Blue

@@ -60,7 +60,7 @@ fun CurrentTrackFrame(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            TrackThumbnail(
+            TrackThumbnailProgressOverlay(
                 currentTrack?.uri,
                 onSetProgress = {
                     if (currentTrack != null) {
@@ -68,7 +68,7 @@ fun CurrentTrackFrame(
                         updateProgress()
                     }
                 },
-                progress,
+                progress = progress,
                 modifier = Modifier.padding(8.dp).size(145.dp),
                 height = ThumbnailCacheManager.SIZE.H150
             )
@@ -139,7 +139,7 @@ fun CompactCurrentTrackFrame(
             remember(isHovered) { if (isHovered) KagaminTheme.backgroundTransparent else KagaminTheme.colors.thumbnailProgressIndicator }
         val aniColor = animateColorAsState(targetProgressColor)
 
-        TrackThumbnail(
+        TrackThumbnailProgressOverlay(
             currentTrack?.uri,
             onSetProgress = {
                 if (currentTrack != null) {
@@ -147,7 +147,7 @@ fun CompactCurrentTrackFrame(
                     updateProgress()
                 }
             },
-            floatAnimation,
+            progress = floatAnimation,
             progressColor = aniColor.value,
             modifier = Modifier.padding(8.dp).size(145.dp),
             height = ThumbnailCacheManager.SIZE.H150

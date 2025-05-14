@@ -88,7 +88,12 @@ object ThumbnailCacheManager {
             }
 
             val newJob = CoroutineScope(Dispatchers.IO).async {
-                cacheThumbnail(trackUri)
+                try {
+                    cacheThumbnail(trackUri)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    null
+                }
             }
 
             ongoingCacheJobs[trackUri] = newJob
@@ -133,11 +138,15 @@ object ThumbnailCacheManager {
                 }
             }
 
-            createScaledThumbnailFile(cachedSrcFile, uriHash, SIZE.H64)
-            createScaledThumbnailFile(cachedSrcFile, uriHash, SIZE.H150)
-            createScaledThumbnailFile(cachedSrcFile, uriHash, SIZE.H250)
+            if (cachedSrcFile.exists()) {
+                createScaledThumbnailFile(cachedSrcFile, uriHash, SIZE.H64)
+                createScaledThumbnailFile(cachedSrcFile, uriHash, SIZE.H150)
+                createScaledThumbnailFile(cachedSrcFile, uriHash, SIZE.H250)
 
-            return cachedSrcFile
+                return cachedSrcFile
+            } else {
+                return null
+            }
         } catch (e: IOException) {
             e.printStackTrace()
             return null

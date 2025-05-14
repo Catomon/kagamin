@@ -111,7 +111,7 @@ val AudioTrack.trackName: String
         .substring(identifier.lastIndexOf('/') + 1)
         .removeSuffix(".mp3")
 
-val com.github.catomon.kagamin.audio.AudioTrack.songAuthorPlusTitle get() = "$author - $name"
+val com.github.catomon.kagamin.audio.AudioTrack.songAuthorPlusTitle get() = "$author - $title"
 
 fun registeredSingerBySongName(track: com.github.catomon.kagamin.audio.AudioTrack): Singer =
     registeredSingerBySongName(track.songAuthorPlusTitle)

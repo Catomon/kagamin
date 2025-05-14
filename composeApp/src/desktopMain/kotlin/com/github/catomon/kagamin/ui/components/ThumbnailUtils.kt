@@ -29,8 +29,6 @@ import java.nio.file.Files
 
 @Deprecated("")
 actual fun getThumbnail(trackUri: String): ImageBitmap? = try {
-//    println("Loading thumbnail: ")
-
     cacheFolder.mkdirs()
 
     val uriHash = trackUri.hashCode()
@@ -38,10 +36,8 @@ actual fun getThumbnail(trackUri: String): ImageBitmap? = try {
     if (cachedFile.exists()) {
         val bufferedImage = javax.imageio.ImageIO.read(cachedFile)
         if (bufferedImage != null) {
-            //            println("success.")
             bufferedImage.toComposeImageBitmap()
         } else {
-            //        println("fail.")
             null
         }
     } else {
@@ -54,12 +50,9 @@ actual fun getThumbnail(trackUri: String): ImageBitmap? = try {
 
             Image.makeFromEncoded(albumImage)
                 .toComposeImageBitmap()
-        }.also {
-//            println("success.")
         }
     }
 } catch (e: IOException) {
-//        println("fail.")
     e.printStackTrace()
     null
 }
@@ -78,9 +71,10 @@ object ThumbnailCacheManager {
         const val DEFAULT_WIDTH = 1024
     }
 
-    suspend fun cacheThumbnailSafe(
+    suspend fun cacheThumbnail(
         trackUri: String,
-        size: Int = SIZE.ORIGINAL
+        size: Int = SIZE.ORIGINAL,
+        mp3File: Mp3File? = null
     ): File? {
         return mutex.withLock {
             ongoingCacheJobs[trackUri]?.let { existingJob ->
@@ -89,7 +83,10 @@ object ThumbnailCacheManager {
 
             val newJob = CoroutineScope(Dispatchers.IO).async {
                 try {
-                    cacheThumbnail(trackUri)
+                    if (mp3File != null)
+                        cacheThumbnail(trackUri, mp3File)
+                    else
+                        cacheThumbnail(trackUri)
                 } catch (e: Exception) {
                     e.printStackTrace()
                     null
@@ -114,8 +111,8 @@ object ThumbnailCacheManager {
         }
     }
 
-    suspend fun cacheThumbnail(
-        trackUri: String
+    private suspend fun cacheThumbnail(
+        trackUri: String, mp3File: Mp3File = Mp3File(trackUri)
     ): File? {
         try {
             val uriHash = trackUri.hashCode()
@@ -126,8 +123,7 @@ object ThumbnailCacheManager {
             } else {
                 cachedSrcFile.parentFile?.mkdirs()
 
-                val file = Mp3File(trackUri)
-                file.id3v2Tag.albumImage?.let { albumImage ->
+                mp3File.id3v2Tag.albumImage?.let { albumImage ->
                     val image = Image.makeFromEncoded(albumImage)
 
                     val target = removeBlackBars(image.toComposeImageBitmap())
@@ -166,7 +162,8 @@ object ThumbnailCacheManager {
             cachedScaledFile.parentFile?.mkdirs()
 
         Thumbnails.of(cachedSrcFile).size(width, height).outputFormat("png")
-            .outputQuality(0.75f).antialiasing(Antialiasing.ON).rendering(Rendering.QUALITY) .toFile(cachedScaledFile)
+            .outputQuality(0.75f).antialiasing(Antialiasing.ON).rendering(Rendering.QUALITY)
+            .toFile(cachedScaledFile)
 
         Files.move(
             (cachedScaledFile.parentFile?.resolve("$uriHash.png")

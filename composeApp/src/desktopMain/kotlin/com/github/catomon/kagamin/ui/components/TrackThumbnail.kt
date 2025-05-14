@@ -26,10 +26,8 @@ import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import coil3.compose.LocalPlatformContext
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.userDataFolder
 import kagamin.composeapp.generated.resources.Res
@@ -57,7 +55,7 @@ fun TrackThumbnail(
 
     LaunchedEffect(trackUri) {
         cachedThumbnailFile = if (trackUri != null) withContext(Dispatchers.Default) {
-            ThumbnailCacheManager.cacheThumbnailSafe(trackUri, size = height)
+            ThumbnailCacheManager.cacheThumbnail(trackUri, size = height)
         } else null
     }
 

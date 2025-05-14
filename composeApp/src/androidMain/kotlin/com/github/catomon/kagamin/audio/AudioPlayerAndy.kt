@@ -10,7 +10,7 @@ class AudioTrackAndy(
     override val uri: String,
     override val id: String = UUID.randomUUID().toString(),
     override var author: String = "",
-    override var name: String = "",
+    override var title: String = "",
     override var duration: Long = Long.MAX_VALUE
 ) : AudioTrack {
 
@@ -18,7 +18,7 @@ class AudioTrackAndy(
     set(value) {
         field = value
         author =  mediaItem?.mediaMetadata?.artist.toString() ?: ""
-        name = mediaItem?.mediaMetadata?.title.toString() ?: ""
+        title = mediaItem?.mediaMetadata?.title.toString() ?: ""
         duration = Long.MAX_VALUE
     }
 

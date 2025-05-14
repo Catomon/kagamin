@@ -88,7 +88,7 @@ actual fun PlayerScreen(
                 if (trackUris != null) {
                     audioPlayer.playlist.value = mutableListOf()
                     trackUris.forEach {
-                        audioPlayer.addToPlaylist(createAudioTrack(it.uri, it.name))
+                        audioPlayer.addToPlaylist(createAudioTrack())
                     }
                 }
             } catch (e: Exception) {

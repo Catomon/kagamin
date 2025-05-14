@@ -110,7 +110,7 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
             Text(
                 "No playlists.",
                 textAlign = TextAlign.Center,
-                color = KagaminTheme.backgroundTransparent
+                color = KagaminTheme.textSecondary
             )
         }
     } else {

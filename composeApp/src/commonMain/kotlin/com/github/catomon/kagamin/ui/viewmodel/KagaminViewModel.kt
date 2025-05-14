@@ -4,7 +4,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.catomon.kagamin.audio.AudioPlayer
@@ -17,13 +16,13 @@ import com.github.catomon.kagamin.loadPlaylist
 import com.github.catomon.kagamin.loadPlaylists
 import com.github.catomon.kagamin.loadSettings
 import com.github.catomon.kagamin.savePlaylist
-import com.github.catomon.kagamin.ui.components.getThumbnail
 import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.util.echoMsg
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 class KagaminViewModel(private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO) :
@@ -59,19 +58,20 @@ class KagaminViewModel(private val ioDispatcher: CoroutineDispatcher = Dispatche
         val lastPlaylistName = settings.lastPlaylistName.ifBlank { "default" }
         currentPlaylistName = lastPlaylistName
 
-        reloadPlaylists()
+        viewModelScope.launch {
+            reloadPlaylists()
+        }
     }
 
-    fun reloadPlaylists() {
-        viewModelScope.launch(ioDispatcher) {
-            playlists.value = loadPlaylists()
+    suspend fun reloadPlaylists() = withContext(ioDispatcher) {
+        playlists.value = loadPlaylists()
 
-            val lovedPl = playlists.value["loved"] ?: return@launch
-            val lovedMap = lovedPl.tracks.associateBy { it.uri }
-            withContext(Dispatchers.Main) {
-                lovedSongs.clear()
-                lovedSongs.putAll(lovedMap)
-            }
+        val lovedPl = playlists.value["loved"] ?: return@withContext
+        val lovedMap = lovedPl.tracks.associateBy { it.uri }
+
+        withContext(Dispatchers.Main) {
+            lovedSongs.clear()
+            lovedSongs.putAll(lovedMap)
         }
     }
 
@@ -114,11 +114,11 @@ class KagaminViewModel(private val ioDispatcher: CoroutineDispatcher = Dispatche
     fun reloadPlaylist() {
         isLoadingPlaylistFile = true
         try {
-            val trackUris = loadPlaylist(currentPlaylistName)?.tracks
-            if (trackUris != null) {
+            val tracksData = loadPlaylist(currentPlaylistName)?.tracks
+            if (tracksData != null) {
                 audioPlayer.playlist.value = mutableListOf()
-                trackUris.forEach {
-                    audioPlayer.addToPlaylist(createAudioTrack(it.uri, it.name))
+                tracksData.forEach {
+                    audioPlayer.addToPlaylist(createAudioTrack(it))
                 }
             } else {
                 currentPlaylistName = "default"
@@ -131,11 +131,17 @@ class KagaminViewModel(private val ioDispatcher: CoroutineDispatcher = Dispatche
     }
 
     fun removePlaylist(playlistName: String) {
-        com.github.catomon.kagamin.removePlaylist(playlistName)
-        if (currentPlaylistName == playlistName)
-            currentPlaylistName = "default"
+        if (playlistName == "default") return
 
-        reloadPlaylists()
+        clearPlaylist(playlistName)
+        com.github.catomon.kagamin.removePlaylist(playlistName)
+        if (currentPlaylistName == playlistName) {
+            currentPlaylistName = "default"
+        }
+
+        runBlocking {
+            reloadPlaylists()
+        }
     }
 
     fun clearPlaylist(playlistName: String) {
@@ -146,7 +152,9 @@ class KagaminViewModel(private val ioDispatcher: CoroutineDispatcher = Dispatche
         if (currentPlaylistName == playlistName)
             audioPlayer.playlist.value = mutableListOf()
 
-        reloadPlaylists()
+        viewModelScope.launch {
+            reloadPlaylists()
+        }
     }
 
     fun shufflePlaylist(playlistName: String) {
@@ -156,7 +164,9 @@ class KagaminViewModel(private val ioDispatcher: CoroutineDispatcher = Dispatche
             playlist.tracks.toList().shuffled()
         )
 
-        reloadPlaylists()
-        reloadPlaylist()
+        runBlocking {
+            reloadPlaylists()
+            reloadPlaylist()
+        }
     }
 }

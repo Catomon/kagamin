@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.github.catomon.kagamin.data.PlaylistData
 import com.github.catomon.kagamin.isValidFileName
 import com.github.catomon.kagamin.savePlaylist
 import com.github.catomon.kagamin.ui.components.OutlinedTextButton
@@ -92,7 +93,11 @@ fun CreatePlaylistTab(viewModel: KagaminViewModel, modifier: Modifier) {
                                 viewModel.currentPlaylistName,
                                 emptyList()
                             )
+
                             viewModel.currentTab = Tabs.TRACKLIST
+
+                            if (!isLink)
+                                viewModel.playlists.value += (name to PlaylistData(emptyArray()))
                         } else
                             isError = true
                     }

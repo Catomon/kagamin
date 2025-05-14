@@ -167,7 +167,7 @@ actual fun TracklistHeader(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                currentTrack.name,
+                currentTrack.title,
                 fontSize = 12.sp,
                 color = KagaminTheme.text,
                 maxLines = 1,

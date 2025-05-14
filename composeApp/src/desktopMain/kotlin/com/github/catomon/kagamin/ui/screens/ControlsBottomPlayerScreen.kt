@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,6 +28,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.github.catomon.kagamin.LocalWindow
 import com.github.catomon.kagamin.saveSettings
 import com.github.catomon.kagamin.ui.Playlists
 import com.github.catomon.kagamin.ui.Tracklist
@@ -40,6 +43,9 @@ import com.github.catomon.kagamin.ui.components.VolumeOptions
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
+import kagamin.composeapp.generated.resources.Res
+import kagamin.composeapp.generated.resources.minimize_window
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun ControlsBottomPlayerScreen(
@@ -95,6 +101,17 @@ fun ControlsBottomPlayerScreen(
                 Modifier.fillMaxWidth().height(8.dp)
                     .background(color = KagaminTheme.backgroundTransparent)
             ) {
+                val window = LocalWindow.current
+                IconButton({
+                    window.isMinimized = true
+                }, modifier = Modifier.align(Alignment.Center)) {
+                    Icon(
+                        painterResource(Res.drawable.minimize_window),
+                        contentDescription = null,
+                        tint = KagaminTheme.colors.buttonIcon
+                    )
+                }
+
 //                AppName(modifier = Modifier.align(Alignment.CenterStart).padding(horizontal = 8.dp), height = 26.dp)
 //
 //                IconButton({
@@ -113,7 +130,7 @@ fun ControlsBottomPlayerScreen(
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
                 Playlists(
                     viewModel,
-                    Modifier.weight(0.35f)
+                    Modifier.weight(0.35f).fillMaxHeight()
                 )
 
                 if (viewModel.playlist.isEmpty()) {

@@ -3,7 +3,6 @@ package com.github.catomon.kagamin.ui
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.MarqueeAnimationMode
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
@@ -91,7 +90,7 @@ fun Tracklist(
     LaunchedEffect(tracks, filterName) {
         withContext(Dispatchers.Default) {
             filteredTracks = if (filterName.isNotBlank()) {
-                tracks.filter { it.name.lowercase().contains(filterName.lowercase()) }
+                tracks.filter { it.title.lowercase().contains(filterName.lowercase()) }
             } else {
                 null
             }
@@ -341,13 +340,16 @@ actual fun TracklistHeader(
                         }
 
                         Content.TrackName -> {
+                            val interactionSource = remember { MutableInteractionSource() }
+                            val isHovered by interactionSource.collectIsHoveredAsState()
+
                             Text(
-                                currentTrack.name,
+                                currentTrack.title,
                                 fontSize = 10.sp,
                                 color = KagaminTheme.colors.buttonIcon,
                                 maxLines = 1,
-                                modifier = Modifier.weight(1f)
-                                    .basicMarquee(iterations = Int.MAX_VALUE, animationMode = MarqueeAnimationMode.WhileFocused)
+                                modifier = Modifier.weight(1f).hoverable(interactionSource)
+                                    .let { if (isHovered) it.basicMarquee(iterations = Int.MAX_VALUE) else it }
                             )
                         }
                     }

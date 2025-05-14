@@ -12,6 +12,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draganddrop.DragAndDropEvent
@@ -32,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.Tray
 import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowScope
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.rememberTrayState
@@ -39,6 +42,7 @@ import androidx.compose.ui.window.rememberWindowState
 import androidx.lifecycle.viewModelScope
 import com.github.catomon.kagamin.WindowConfig.isTraySupported
 import com.github.catomon.kagamin.audio.AudioPlayer
+import com.github.catomon.kagamin.data.TrackData
 import com.github.catomon.kagamin.ui.KagaminApp
 import com.github.catomon.kagamin.ui.components.ThumbnailCacheManager
 import com.github.catomon.kagamin.ui.customShadow
@@ -49,11 +53,15 @@ import com.github.catomon.kagamin.ui.windows.AddTracksOrPlaylistsWindow
 import com.github.catomon.kagamin.ui.windows.ConfirmWindow
 import com.github.catomon.kagamin.ui.windows.ConfirmWindowState
 import com.github.catomon.kagamin.ui.windows.LocalConfirmWindow
+import com.mpatric.mp3agic.ID3v2
+import com.mpatric.mp3agic.Mp3File
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.kagamin_icon64
 import kagamin.composeapp.generated.resources.pause_icon
 import kagamin.composeapp.generated.resources.play_icon
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.painterResource
@@ -64,6 +72,7 @@ import java.io.File
 @Composable
 fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
     val kagaminViewModel: KagaminViewModel = remember { get(KagaminViewModel::class.java) }
+    var openPlayerWindow by remember { mutableStateOf(true) }
 
     val layoutManager = remember {
         LayoutManager(
@@ -97,17 +106,25 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
         }
     }
 
-    val windowState =
-        rememberWindowState(size = windowSize)
+    if (openPlayerWindow) {
+        val windowState =
+            rememberWindowState(size = windowSize, position = WindowPosition(Alignment.Center))
 
-    LaunchedEffect(windowSize) {
-        windowState.size = windowSize
-    }
+        LaunchedEffect(windowSize) {
+            windowState.size = windowSize
+        }
 
-    CompositionLocalProvider(
-        LocalLayoutManager provides layoutManager, LocalConfirmWindow provides confirmWindowState
-    ) {
-        AppWindow(windowState, kagaminViewModel, onCloseRequest)
+        LaunchedEffect(windowState.isMinimized) {
+            if (windowState.isMinimized)
+                openPlayerWindow = false
+        }
+
+        CompositionLocalProvider(
+            LocalLayoutManager provides layoutManager,
+            LocalConfirmWindow provides confirmWindowState
+        ) {
+            AppWindow(windowState, kagaminViewModel, onCloseRequest)
+        }
     }
 
     if (kagaminViewModel.createPlaylistWindow) {
@@ -118,12 +135,20 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
         val trayState = rememberTrayState()
         Tray(
             painterResource(if (kagaminViewModel.playState == AudioPlayer.PlayState.PLAYING) Res.drawable.pause_icon else Res.drawable.play_icon),
-            tooltip = kagaminViewModel.currentTrack?.name,
+            tooltip = kagaminViewModel.currentTrack?.title,
             onAction = {
-                kagaminViewModel.onPlayPause()
+                openPlayerWindow = !openPlayerWindow
             },
             state = trayState
         ) {
+            Item("Kagamin", onClick = {
+                openPlayerWindow = true
+            })
+            Item(
+                if (kagaminViewModel.playState == AudioPlayer.PlayState.PLAYING) "Pause" else "Play",
+                onClick = {
+                    kagaminViewModel.onPlayPause()
+                })
             Item("Exit", onClick = {
                 onCloseRequest()
             })
@@ -239,7 +264,7 @@ fun Modifier.kagaminWindowDecoration() =
 
 
 @OptIn(ExperimentalComposeUiApi::class)
-private fun createTrackDragAndDropTarget(
+fun createTrackDragAndDropTarget(
     kagaminViewModel: KagaminViewModel, snackbar: SnackbarHostState
 ) = object : DragAndDropTarget {
     override fun onStarted(event: DragAndDropEvent) {
@@ -267,11 +292,19 @@ private fun createTrackDragAndDropTarget(
     }
 
     private suspend fun loadTrackFiles(droppedFiles: List<File>): Boolean {
-        try {
-            val trackFiles = ArrayList<File>(1000)
+        val snackbarScope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
+        val cachingScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-            snackbar.currentSnackbarData?.dismiss()
-            snackbar.showSnackbar("Filtering files...")
+        try {
+            val trackFiles = mutableListOf<File>()
+
+            println("Filtering files...")
+            snackbarScope.launch {
+                launch {
+                    snackbar.currentSnackbarData?.dismiss()
+                    snackbar.showSnackbar("Filtering files...")
+                }
+            }
 
             withContext(Dispatchers.IO) {
                 fun filterMusicFiles(files: List<File>) {
@@ -289,34 +322,64 @@ private fun createTrackDragAndDropTarget(
                 filterMusicFiles(droppedFiles)
             }
 
-            snackbar.currentSnackbarData?.dismiss()
-            snackbar.showSnackbar("Caching thumbnails...")
-
-            withContext(Dispatchers.IO) {
-                trackFiles.forEach {
-                    ThumbnailCacheManager.cacheThumbnail(it.path)
+            println("Reading metadata...")
+            snackbarScope.launch {
+                launch {
+                    snackbar.currentSnackbarData?.dismiss()
+                    snackbar.showSnackbar("Reading metadata...")
                 }
             }
 
-            snackbar.currentSnackbarData?.dismiss()
-            snackbar.showSnackbar("Adding tracks...")
+            val tacksDataList = withContext(Dispatchers.IO) {
+                trackFiles.map {
+                    val path = it.path
+                    val mp3File = Mp3File(path)
+                    val tag: ID3v2? = mp3File.id3v2Tag
 
-            kagaminViewModel.audioPlayer.load(trackFiles.map { it.path })
+                    cachingScope.launch {
+                        ThumbnailCacheManager.cacheThumbnail(trackUri = path, mp3File = mp3File)
+                    }
+
+                    TrackData(path, tag?.title ?: "", tag?.artist ?: "")
+                }
+            }
+
+            println("Adding tracks...")
+            snackbarScope.launch {
+                launch {
+                    snackbar.currentSnackbarData?.dismiss()
+                    snackbar.showSnackbar("Adding tracks...")
+                }
+            }
 
             withContext(Dispatchers.IO) {
                 savePlaylist(
                     kagaminViewModel.currentPlaylistName,
-                    kagaminViewModel.audioPlayer.playlist.value.toTypedArray()
+                    kagaminViewModel.playlist.map { it.trackData } + tacksDataList
                 )
             }
 
-            snackbar.currentSnackbarData?.dismiss()
-            snackbar.showSnackbar("${trackFiles.size} tracks were added.")
+            withContext(Dispatchers.Main) {
+                kagaminViewModel.reloadPlaylists()
+                kagaminViewModel.reloadPlaylist()
+            }
+
+            println("${trackFiles.size} tracks were added.")
+            snackbarScope.launch {
+                launch {
+                    snackbar.currentSnackbarData?.dismiss()
+                    snackbar.showSnackbar("${trackFiles.size} tracks were added.")
+                }
+            }
+
             return true
         } catch (ex: Exception) {
             ex.printStackTrace()
 
-            snackbar.showSnackbar(ex.message ?: "null")
+            snackbarScope.launch {
+                snackbar.currentSnackbarData?.dismiss()
+                snackbar.showSnackbar(ex.message ?: "null")
+            }
             return false
         }
     }

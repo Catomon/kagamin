@@ -1,3 +1,5 @@
 package com.github.catomon.kagamin.audio
 
-expect fun <T : AudioTrack> createAudioTrack(uri: String, name: String): T
+import com.github.catomon.kagamin.data.TrackData
+
+expect fun <T : AudioTrack> createAudioTrack(trackData: TrackData): T

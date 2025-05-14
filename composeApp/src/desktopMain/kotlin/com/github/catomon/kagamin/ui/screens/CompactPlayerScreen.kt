@@ -77,7 +77,7 @@ fun CompactPlayerScreen(
                 if (trackUris != null) {
                     audioPlayer.playlist.value = mutableListOf()
                     trackUris.forEach {
-                        audioPlayer.addToPlaylist(createAudioTrack(it.uri, it.name))
+                        audioPlayer.addToPlaylist(createAudioTrack(it))
                     }
                 }
             } catch (e: Exception) {

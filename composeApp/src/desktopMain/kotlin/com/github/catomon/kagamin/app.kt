@@ -81,9 +81,14 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
 
     val layoutManager = remember {
         LayoutManager(
-            LayoutManager.Layout.valueOf(
-                kagaminViewModel.settings.extra["layout"] ?: "Default"
-            )
+            try {
+                LayoutManager.Layout.valueOf(
+                    kagaminViewModel.settings.extra["layout"] ?: LayoutManager.Layout.BottomControls.name
+                )
+            } catch (e: Exception) {
+                e.printStackTrace()
+                LayoutManager.Layout.BottomControls
+            }
         )
     }
     val currentLayout by layoutManager.currentLayout

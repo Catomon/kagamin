@@ -124,12 +124,12 @@ object ThumbnailCacheManager {
         else
             cachedScaledFile.parentFile?.mkdirs()
 
-        Thumbnails.of(cachedSrcFile).size(width, height).outputFormat("png")
-            .outputQuality(0.75f).antialiasing(Antialiasing.ON).rendering(Rendering.QUALITY)
+        Thumbnails.of(cachedSrcFile).size(width, height).outputFormat("JPEG")
+            .outputQuality(0.85f).antialiasing(Antialiasing.ON).rendering(Rendering.QUALITY)
             .toFile(cachedScaledFile)
 
         Files.move(
-            (cachedScaledFile.parentFile?.resolve("$uriHash.png")
+            (cachedScaledFile.parentFile?.resolve("$uriHash.JPEG")
                 ?: File("$uriHash")).toPath(),
             (cachedScaledFile.parentFile?.resolve("$uriHash")
                 ?: File("$uriHash")).toPath()

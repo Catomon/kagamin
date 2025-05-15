@@ -124,12 +124,12 @@ fun ThumbnailTrackItem(
 //                            height = ThumbnailCacheManager.SIZE.H64
 //                        )
 //                    } else {
-                        TrackThumbnail(
-                            track.uri,
-                            modifier = Modifier.width(64.dp),
-                            shape = RoundedCornerShape(8.dp),
-                            height = ThumbnailCacheManager.SIZE.H64
-                        )
+                    TrackThumbnail(
+                        track.uri,
+                        modifier = Modifier.width(64.dp),
+                        shape = RoundedCornerShape(8.dp),
+                        height = ThumbnailCacheManager.SIZE.H64
+                    )
 //                    }
 
                     TrackItemBody(
@@ -230,7 +230,9 @@ private fun TrackItemBody(
                                 }
                         }
                     }
-                    isLoved = track?.let { viewModel.lovedSongs.containsKey(it.uri) } ?: false
+                    isLoved = viewModel.playlists.value
+                        .firstOrNull { playlist -> playlist.id == "loved" }?.tracks?.any { it.id == track.id }
+                        ?: false
                     updatingLike = false
                 }
             }, 32.dp)

@@ -1,9 +1,5 @@
 package com.github.catomon.kagamin.ui.screens
 
-import androidx.compose.animation.ContentTransform
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -20,7 +16,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,10 +26,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.github.catomon.kagamin.LocalWindow
-import com.github.catomon.kagamin.saveSettings
 import com.github.catomon.kagamin.ui.Playlists
 import com.github.catomon.kagamin.ui.Tracklist
-import com.github.catomon.kagamin.ui.components.AddButton
+import com.github.catomon.kagamin.ui.components.AddTrackOrPlaylistButton
 import com.github.catomon.kagamin.ui.components.LuckyStarLogo
 import com.github.catomon.kagamin.ui.components.PlaybackButtons
 import com.github.catomon.kagamin.ui.components.RandomPlaybackButton
@@ -41,7 +37,6 @@ import com.github.catomon.kagamin.ui.components.RepeatTrackPlaybackButton
 import com.github.catomon.kagamin.ui.components.TrackThumbnail
 import com.github.catomon.kagamin.ui.components.VolumeOptions
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
-import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.minimize_window
@@ -53,33 +48,9 @@ fun ControlsBottomPlayerScreen(
     navController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
-    val audioPlayer = viewModel.audioPlayer
-    val playlist = viewModel.playlist
-    val currentTrack = viewModel.currentTrack
-    val playState = viewModel.playState
-    val playMode = viewModel.playMode
-    val currentPlaylistName = viewModel.currentPlaylistName
-
-    val tabTransition: (Tabs) -> ContentTransform = { tab ->
-        when (tab) {
-            Tabs.ADD_TRACKS -> slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
-            Tabs.CREATE_PLAYLIST -> slideInHorizontally { -it } togetherWith slideOutHorizontally { it }
-            Tabs.TRACKLIST -> slideInHorizontally { -it } togetherWith slideOutHorizontally { it }
-            Tabs.PLAYLISTS -> slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
-
-            else -> slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
-        }
-    }
-
-    LaunchedEffect(currentPlaylistName) {
-        viewModel.reloadPlaylist()
-
-        saveSettings(viewModel.settings.copy(lastPlaylistName = currentPlaylistName))
-    }
-
-    LaunchedEffect(currentTrack) {
-        viewModel.updateThumbnail()
-    }
+    val currentTrack by viewModel.currentTrack.collectAsState()
+    val currentPlaylist by viewModel.currentPlaylist.collectAsState()
+    val volume by viewModel.volume.collectAsState()
 
     Box(
         modifier.background(
@@ -117,9 +88,9 @@ fun ControlsBottomPlayerScreen(
 //                IconButton({
 //                    val player = viewModel.audioPlayer
 //                    saveSettings(viewModel.settings.copy(
-//                        repeat = player.playMode.value == AudioPlayer.PlayMode.REPEAT_TRACK,
+//                        repeat = player.playMode.value == AudioPlayerService.PlayMode.REPEAT_TRACK,
 //                        volume = player.volume.value,
-//                        random = player.playMode.value == AudioPlayer.PlayMode.RANDOM,
+//                        random = player.playMode.value == AudioPlayerService.PlayMode.RANDOM,
 //                    ))
 //                    exitProcess(0)
 //                }, modifier = Modifier.align(Alignment.CenterEnd)) {
@@ -133,7 +104,7 @@ fun ControlsBottomPlayerScreen(
                     Modifier.weight(0.35f).fillMaxHeight()
                 )
 
-                if (viewModel.playlist.isEmpty()) {
+                if (currentPlaylist.tracks.isEmpty()) {
                     Box(
                         Modifier
                             .weight(0.65f)
@@ -150,7 +121,6 @@ fun ControlsBottomPlayerScreen(
                 } else {
                     Tracklist(
                         viewModel,
-                        viewModel.playlist,
                         Modifier.weight(0.65f)
                     )
                 }
@@ -190,18 +160,18 @@ fun ControlsBottomPlayerScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.align(Alignment.CenterEnd)
                 ) {
-                    RepeatPlaylistPlaybackButton(audioPlayer)
+                    RepeatPlaylistPlaybackButton(viewModel)
 
-                    RepeatTrackPlaybackButton(audioPlayer)
+                    RepeatTrackPlaybackButton(viewModel)
 
-                    PlaybackButtons(audioPlayer)
+                    PlaybackButtons(viewModel)
 
-                    RandomPlaybackButton(audioPlayer)
+                    RandomPlaybackButton(viewModel)
 
                     VolumeOptions(
-                        volume = audioPlayer.volume.value,
+                        volume = volume,
                         onVolumeChange = { newVolume ->
-                            audioPlayer.volume.value = newVolume; audioPlayer.setVolume(newVolume)
+                            viewModel.setVolume(newVolume)
                         },
                         modifier = Modifier.width(133.dp)
                     )
@@ -211,17 +181,4 @@ fun ControlsBottomPlayerScreen(
             }
         }
     }
-}
-
-@Composable
-fun AddTrackOrPlaylistButton(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
-    AddButton(
-        onClick = {
-            viewModel.currentTab = Tabs.CREATE_PLAYLIST
-            viewModel.createPlaylistWindow = !viewModel.createPlaylistWindow
-        },
-        modifier = modifier,
-        color = if (viewModel.currentTab == Tabs.ADD_TRACKS || viewModel.currentTab == Tabs.CREATE_PLAYLIST) KagaminTheme.colors.buttonIconSmallSelected else KagaminTheme.colors.buttonIconSmall,
-        size = 24.dp
-    )
 }

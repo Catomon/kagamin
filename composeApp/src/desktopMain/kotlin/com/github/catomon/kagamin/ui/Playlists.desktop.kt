@@ -56,9 +56,9 @@ import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.catomon.kagamin.data.PlaylistData
+import com.github.catomon.kagamin.data.Playlist
 import com.github.catomon.kagamin.ui.components.OutlinedText
-import com.github.catomon.kagamin.ui.components.ThumbnailCacheManager
+import com.github.catomon.kagamin.data.cache.ThumbnailCacheManager
 import com.github.catomon.kagamin.ui.components.TrackThumbnail
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.Tabs
@@ -74,9 +74,9 @@ import org.jetbrains.compose.resources.painterResource
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
-    val playlistsMap by viewModel.playlists.collectAsState()
-    val playlists = remember(playlistsMap) { playlistsMap.map { it.key to it.value } }
-    val index = remember(playlists) { playlists.mapIndexed { i, pl -> (pl.first to i) }.toMap() }
+    val currentPlaylist by viewModel.currentPlaylist.collectAsState()
+    val playlists by viewModel.playlists.collectAsState()
+    val index = remember(playlists) { playlists.mapIndexed { i, pl -> (pl to i) }.toMap() }
 
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
@@ -86,12 +86,12 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
     var searchTextValue by remember { mutableStateOf("") }
 
     var filterName by remember { mutableStateOf("") }
-    var filteredPlaylists by remember { mutableStateOf<List<Pair<String, PlaylistData>>?>(null) }
+    var filteredPlaylists by remember { mutableStateOf<List<Playlist>?>(null) }
 
     LaunchedEffect(playlists, filterName) {
         withContext(Dispatchers.Default) {
             filteredPlaylists = if (filterName.isNotBlank()) {
-                playlists.filter { it.first.lowercase().contains(filterName.lowercase()) }
+                playlists.filter { it.name.lowercase().contains(filterName.lowercase()) }
             } else {
                 null
             }
@@ -99,7 +99,7 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
     }
 
     LaunchedEffect(Unit) {
-        listState.scrollToItem(index[viewModel.currentPlaylistName] ?: 0)
+        listState.scrollToItem(index[currentPlaylist] ?: 0)
     }
 
     if (playlists.isEmpty()) {
@@ -121,7 +121,7 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
             Box(
                 modifier = Modifier.background(KagaminTheme.backgroundTransparent).height(32.dp)
                     .fillMaxWidth().padding(4.dp).clip(RoundedCornerShape(8.dp)).clickable {
-                        val curTrackIndex = index[viewModel.currentPlaylistName] ?: return@clickable
+                        val curTrackIndex = index[currentPlaylist] ?: return@clickable
                         coroutineScope.launch {
                             listState.animateScrollToItem(curTrackIndex)
                         }
@@ -193,7 +193,7 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                             )
                         } else {
                             Text(
-                                viewModel.currentPlaylistName,
+                                currentPlaylist.name,
                                 fontSize = 10.sp,
                                 color = KagaminTheme.colors.buttonIcon,
                                 modifier = Modifier.weight(1f)
@@ -212,15 +212,15 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                     ) {
                         val playlists = filteredPlaylists ?: playlists
                         items(playlists.size, key = {
-                            playlists[it]
+                            playlists.elementAt(it)
                         }) { i ->
-                            val playlist = playlists[i]
-                            PlaylistItem(playlist, viewModel, playlists, i, remove = {
-                                viewModel.removePlaylist(playlist.first)
+                            val playlist = playlists.elementAt(i)
+                            PlaylistItem(playlist, viewModel, playlists, currentPlaylist == playlist, i, remove = {
+                                viewModel.removePlaylist(playlist)
                             }, clear = {
-                                viewModel.clearPlaylist(playlist.first)
+                                viewModel.clearPlaylist(playlist)
                             }, shuffle = {
-                                viewModel.shufflePlaylist(playlist.first)
+                                viewModel.shufflePlaylist(playlist)
                             })
                         }
                     }
@@ -242,20 +242,19 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
 }
 
 @Composable
-actual fun PlaylistItem(
-    playlist: Pair<String, PlaylistData>,
+fun PlaylistItem(
+    playlist: Playlist,
     viewModel: KagaminViewModel,
-    playlists: List<Pair<String, PlaylistData>>,
+    playlists: List<Playlist>,
+    isCurrent: Boolean,
     i: Int,
     remove: () -> Unit,
     clear: () -> Unit,
     shuffle: () -> Unit
 ) {
     val backColor = KagaminTheme.colors.listItem
-
     val height = 64.dp
-
-    val randomTrackUri = remember { playlist.second.tracks.randomOrNull()?.uri }
+    val randomTrackUri = remember { playlist.tracks.randomOrNull()?.uri }
 
     ContextMenuArea(items = {
         listOf(
@@ -271,7 +270,7 @@ actual fun PlaylistItem(
         )
     }) {
         Row(Modifier.height(height).padding(2.dp)) {
-            AnimatedVisibility(viewModel.currentPlaylistName == playlist.first) {
+            AnimatedVisibility(isCurrent) {
                 PlaybackStateButton(height, backColor, viewModel)
             }
 
@@ -291,14 +290,14 @@ actual fun PlaylistItem(
 
 @Composable
 private fun PlaylistItemContent(
-    viewModel: KagaminViewModel, playlist: Pair<String, PlaylistData>, backColor: Color
+    viewModel: KagaminViewModel, playlist: Playlist, backColor: Color
 ) {
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
         Column(
             Modifier.fillMaxHeight()
                 //.background(color = backColor)
                 .clickable {
-                    viewModel.currentPlaylistName = playlist.first
+                    viewModel.updateCurrentPlaylist(playlist)
                     viewModel.currentTab = Tabs.TRACKLIST
                 }.padding(4.dp)
         ) {
@@ -306,7 +305,7 @@ private fun PlaylistItemContent(
                 horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
             ) {
                 OutlinedText(
-                    playlist.first, fontSize = 10.sp, fillColor = KagaminTheme.text, maxLines = 1,
+                    playlist.name, fontSize = 10.sp, fillColor = KagaminTheme.text, maxLines = 1,
                     outlineColor = Color.Black.copy(alpha = 0.25f),
                     outlineDrawStyle = Stroke(
                         width = 3f,
@@ -317,7 +316,7 @@ private fun PlaylistItemContent(
 
             Row(Modifier.fillMaxWidth()) {
                 OutlinedText(
-                    "Tracks: ${playlist.second.tracks.size}",
+                    "Tracks: ${playlist.tracks.size}",
                     fontSize = 10.sp,
                     fillColor = KagaminTheme.text,
                     outlineColor = Color.Black.copy(alpha = 0.25f),

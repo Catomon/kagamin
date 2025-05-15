@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.catomon.kagamin.audio.AudioPlayer
+import com.github.catomon.kagamin.audio.AudioPlayerService
 import com.github.catomon.kagamin.audio.AudioTrack
 import kotlinx.coroutines.delay
 
@@ -26,7 +26,7 @@ import kotlinx.coroutines.delay
 fun CurrentTrackFrame2(
     thumbnail: ImageBitmap?,
     currentTrack: AudioTrack?,
-    player: AudioPlayer<AudioTrack>,
+    player: AudioPlayerService<AudioTrack>,
     modifier: Modifier = Modifier
 ) {
     val playMode by player.playMode
@@ -42,7 +42,7 @@ fun CurrentTrackFrame2(
 
     LaunchedEffect(currentTrack) {
         while (true) {
-            if (player.playState.value == AudioPlayer.PlayState.PLAYING) updateProgress()
+            if (player.playState.value == AudioPlayerService.PlayState.PLAYING) updateProgress()
             delay(1000)
         }
     }

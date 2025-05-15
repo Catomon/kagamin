@@ -6,37 +6,39 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.catomon.kagamin.audio.AudioPlayer
-import com.github.catomon.kagamin.audio.AudioTrack
-import com.github.catomon.kagamin.audio.createAudioPlayer
-import com.github.catomon.kagamin.audio.createAudioTrack
-import com.github.catomon.kagamin.data.PlaylistData
-import com.github.catomon.kagamin.data.TrackData
-import com.github.catomon.kagamin.loadPlaylist
-import com.github.catomon.kagamin.loadPlaylists
-import com.github.catomon.kagamin.loadSettings
-import com.github.catomon.kagamin.savePlaylist
+import com.github.catomon.kagamin.audio.AudioPlayerService
+import com.github.catomon.kagamin.audio.PlaylistsManager
+import com.github.catomon.kagamin.data.AudioTrack
+import com.github.catomon.kagamin.data.Playlist
+import com.github.catomon.kagamin.data.PlaylistsLoader
+import com.github.catomon.kagamin.data.loadSettings
+import com.github.catomon.kagamin.data.saveSettings
 import com.github.catomon.kagamin.ui.util.Tabs
-import com.github.catomon.kagamin.util.echoMsg
+import com.github.catomon.kagamin.util.echoWarn
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import kotlin.system.exitProcess
 
-class KagaminViewModel(private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO) :
-    ViewModel() {
-    val audioPlayer = createAudioPlayer
-    val playlist by audioPlayer.playlist
-    val currentTrack by audioPlayer.currentTrack
-    val playState by audioPlayer.playState
-    val playMode by audioPlayer.playMode
-//
-//    var trackThumbnail by mutableStateOf<ImageBitmap?>(null)
-//    var loadingThumbnail by mutableStateOf(false)
+class KagaminViewModel(
+    private val audioPlayerService: AudioPlayerService,
+    private val playlistsManager: PlaylistsManager,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+) : ViewModel() {
 
-    var currentPlaylistName by mutableStateOf("default")
+    val playState: StateFlow<AudioPlayerService.PlayState> = audioPlayerService.playState
+    val currentTrack: StateFlow<AudioTrack?> = audioPlayerService.currentTrack
+    val position: StateFlow<Long> = audioPlayerService.position
+    val volume: StateFlow<Float> = audioPlayerService.volume
+
+    val playlists: StateFlow<List<Playlist>> = playlistsManager.playlists
+    val currentPlaylist: StateFlow<Playlist> = playlistsManager.currentPlaylist
+    val queueState: StateFlow<List<AudioTrack>> = playlistsManager.queueState
+
+    //    val currentTrack: StateFlow<AudioTrack?> = playlistsManager.currentTrack
+    val playMode: StateFlow<PlaylistsManager.PlayMode> = playlistsManager.playMode
 
     var isLoadingPlaylistFile by mutableStateOf(false)
     var isLoadingSong by mutableStateOf<AudioTrack?>(null)
@@ -46,127 +48,140 @@ class KagaminViewModel(private val ioDispatcher: CoroutineDispatcher = Dispatche
 
     var settings by mutableStateOf(loadSettings())
 
-    var playlists: MutableStateFlow<Map<String, PlaylistData>> = MutableStateFlow(emptyMap())
-        private set
-
-    var lovedSongs = mutableStateMapOf<String, TrackData>()
+    var lovedSongs = mutableStateMapOf<String, AudioTrack>()
         private set
 
     var createPlaylistWindow by mutableStateOf(false)
 
     init {
-        val lastPlaylistName = settings.lastPlaylistName.ifBlank { "default" }
-        currentPlaylistName = lastPlaylistName
-
         viewModelScope.launch {
             reloadPlaylists()
+            loadLastPlaylist()
         }
+    }
+
+    private fun loadLastPlaylist() {
+        val lastPlaylistName = settings.lastPlaylistName.ifBlank { "default" }
+        playlistsManager.updateCurrentPlaylist(playlists.value.firstOrNull { it.name == lastPlaylistName }
+            ?: return)
+    }
+
+    fun play(track: AudioTrack) {
+        viewModelScope.launch {
+            audioPlayerService.play(track)
+        }
+    }
+
+    fun pause() {
+        audioPlayerService.pause()
+    }
+
+    fun resume() {
+        audioPlayerService.resume()
+    }
+
+    fun stop() {
+        audioPlayerService.stop()
+    }
+
+    fun seek(position: Long) {
+        viewModelScope.launch {
+            audioPlayerService.seek(position)
+        }
+    }
+
+    fun setVolume(volume: Float) {
+        audioPlayerService.setVolume(volume)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
     }
 
     suspend fun reloadPlaylists() = withContext(ioDispatcher) {
-        playlists.value = loadPlaylists()
-
-        val lovedPl = playlists.value["loved"] ?: return@withContext
-        val lovedMap = lovedPl.tracks.associateBy { it.uri }
-
-        withContext(Dispatchers.Main) {
-            lovedSongs.clear()
-            lovedSongs.putAll(lovedMap)
-        }
+        val loadedPlaylists = PlaylistsLoader.loadPlaylists()
+        if (loadedPlaylists.isNotEmpty())
+            playlistsManager.updatePlaylists(loadedPlaylists)
+        else
+            PlaylistsLoader.savePlaylist(currentPlaylist.value)
     }
 
     fun onPlayPause() {
-        when (audioPlayer.playState.value) {
-            AudioPlayer.PlayState.PLAYING -> audioPlayer.pause()
-            AudioPlayer.PlayState.PAUSED -> audioPlayer.resume()
-            AudioPlayer.PlayState.IDLE -> audioPlayer.resume()
+        when (playState.value) {
+            AudioPlayerService.PlayState.PLAYING -> audioPlayerService.pause()
+            AudioPlayerService.PlayState.PAUSED -> audioPlayerService.resume()
+            AudioPlayerService.PlayState.IDLE -> nextTrack()
         }
     }
 
-    fun playTrack(track: AudioTrack) {
-        TODO()
+    /** Sets [currentPlaylist] to [playlist] **/
+    fun updateCurrentPlaylist(playlist: Playlist) {
+        playlistsManager.updateCurrentPlaylist(playlist)
+
+        saveSettings(settings.copy(lastPlaylistName = playlist.name))
     }
 
-    suspend fun updateThumbnail() {
-        echoMsg("Updating thumbnail.")
-//
-//        loadingThumbnail = true
-//
-//        val currentTrack = currentTrack
-//        val trackThumbnailUpdated = if (currentTrack != null) {
-//            try {
-//                withContext(ioDispatcher) {
-//                    getThumbnail(currentTrack.uri)
-//                }
-//            } catch (e: Exception) {
-//                e.printStackTrace()
-//                null
-//            }
-//        } else {
-//            null
-//        }
-//
-//        trackThumbnail = trackThumbnailUpdated
-//
-//        loadingThumbnail = false
+    fun reloadPlaylist(playlist: Playlist) {
+        val loadedPlaylist = PlaylistsLoader.loadPlaylist(playlist) ?: kotlin.run {
+            echoWarn("Failed to load a playlist: ${playlist.name}")
+            return
+        }
+
+        playlistsManager.updatePlaylist(loadedPlaylist)
     }
 
-    fun reloadPlaylist() {
-        isLoadingPlaylistFile = true
-        try {
-            val tracksData = loadPlaylist(currentPlaylistName)?.tracks
-            if (tracksData != null) {
-                audioPlayer.playlist.value = mutableListOf()
-                tracksData.forEach {
-                    audioPlayer.addToPlaylist(createAudioTrack(it))
-                }
-            } else {
-                currentPlaylistName = "default"
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        } finally {
-            isLoadingPlaylistFile = false
+    fun createPlaylist(playlist: Playlist) {
+        playlistsManager.addPlaylist(playlist)
+        PlaylistsLoader.savePlaylist(playlist)
+    }
+
+    fun removePlaylist(playlist: Playlist) {
+        if (playlist.id == "default") return
+
+        playlistsManager.removePlaylist(playlist)
+    }
+
+    fun updatePlaylist(playlist: Playlist) {
+        playlistsManager.updatePlaylist(playlist)
+    }
+
+    fun clearPlaylist(playlist: Playlist) {
+        playlistsManager.updatePlaylist(playlist.copy(tracks = emptyList()))
+    }
+
+    fun shufflePlaylist(playlist: Playlist) {
+        playlists.value.firstOrNull { it == playlist }?.let {
+            playlistsManager.updatePlaylist(
+                playlist.copy(
+                    tracks = playlist.tracks.shuffled()
+                )
+            )
         }
     }
 
-    fun removePlaylist(playlistName: String) {
-        if (playlistName == "default") return
-
-        clearPlaylist(playlistName)
-        com.github.catomon.kagamin.removePlaylist(playlistName)
-        if (currentPlaylistName == playlistName) {
-            currentPlaylistName = "default"
-        }
-
-        runBlocking {
-            reloadPlaylists()
-        }
-    }
-
-    fun clearPlaylist(playlistName: String) {
-        savePlaylist(
-            playlistName,
-            arrayOf()
-        )
-        if (currentPlaylistName == playlistName)
-            audioPlayer.playlist.value = mutableListOf()
-
+    fun nextTrack() {
         viewModelScope.launch {
-            reloadPlaylists()
+            playlistsManager.nextTrack()
         }
     }
 
-    fun shufflePlaylist(playlistName: String) {
-        val playlist = playlists.value[playlistName] ?: return
-        savePlaylist(
-            playlistName,
-            playlist.tracks.toList().shuffled()
-        )
-
-        runBlocking {
-            reloadPlaylists()
-            reloadPlaylist()
+    fun prevTrack() {
+        viewModelScope.launch {
+            playlistsManager.prevTrack()
         }
+    }
+
+    fun setPlayMode(playMode: PlaylistsManager.PlayMode) {
+        playlistsManager.setPlayMode(playMode)
+    }
+
+    fun exitApp() {
+        settings = settings.copy(
+            repeat = playMode.value == PlaylistsManager.PlayMode.REPEAT_TRACK,
+            volume = volume.value,
+            random = playMode.value == PlaylistsManager.PlayMode.RANDOM,
+        )
+        saveSettings(settings)
+        exitProcess(0)
     }
 }

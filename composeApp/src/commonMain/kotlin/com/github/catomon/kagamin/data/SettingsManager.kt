@@ -1,7 +1,5 @@
-package com.github.catomon.kagamin
+package com.github.catomon.kagamin.data
 
-import com.github.catomon.kagamin.data.AppSettings
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
 

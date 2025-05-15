@@ -4,9 +4,8 @@ import androidx.compose.ui.window.application
 import coil3.ImageLoader
 import coil3.compose.setSingletonImageLoaderFactory
 import coil3.disk.DiskCache
-import coil3.request.CachePolicy
 import coil3.request.crossfade
-import coil3.size.Precision
+import com.github.catomon.kagamin.data.cacheFolder
 import com.github.catomon.kagamin.util.echoMsg
 import com.github.catomon.kagamin.util.echoWarn
 import com.github.catomon.kagamin.di.appModule

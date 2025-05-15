@@ -7,14 +7,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.github.catomon.kagamin.audio.AudioPlayer
-import com.github.catomon.kagamin.audio.AudioTrack
+import com.github.catomon.kagamin.audio.AudioPlayerService
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
+import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.next
 import kagamin.composeapp.generated.resources.pause
@@ -23,7 +25,13 @@ import kagamin.composeapp.generated.resources.prev
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun PlaybackButtons(player: AudioPlayer<AudioTrack>, modifier: Modifier = Modifier, buttonsSize: Dp = 32.dp) {
+fun PlaybackButtons(
+    viewModel: KagaminViewModel,
+    modifier: Modifier = Modifier,
+    buttonsSize: Dp = 32.dp
+) {
+    val playState by viewModel.playState.collectAsState()
+
     Row(
         modifier = modifier.height(buttonsSize * 1.5f),//.background(Colors.noteBackground.copy(alpha = 0.75f)),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -32,7 +40,7 @@ fun PlaybackButtons(player: AudioPlayer<AudioTrack>, modifier: Modifier = Modifi
         IconButton(
             modifier = Modifier.size(buttonsSize),
             onClick = {
-                player.prevTrack()
+                viewModel.prevTrack()
             }
         ) {
             ImageWithShadow(
@@ -46,15 +54,11 @@ fun PlaybackButtons(player: AudioPlayer<AudioTrack>, modifier: Modifier = Modifi
         IconButton(
             modifier = Modifier.size(buttonsSize * 1.25f),
             onClick = {
-                when (player.playState.value) {
-                    AudioPlayer.PlayState.PLAYING -> player.pause()
-                    AudioPlayer.PlayState.PAUSED -> player.resume()
-                    AudioPlayer.PlayState.IDLE -> player.resume()
-                }
+                viewModel.onPlayPause()
             }
         ) {
-            AnimatedContent(player.playState) {
-                if (it.value != AudioPlayer.PlayState.PLAYING) {
+            AnimatedContent(playState) { playState ->
+                if (playState != AudioPlayerService.PlayState.PLAYING) {
                     ImageWithShadow(
                         painterResource(Res.drawable.play),
                         "Play",
@@ -75,7 +79,7 @@ fun PlaybackButtons(player: AudioPlayer<AudioTrack>, modifier: Modifier = Modifi
         IconButton(
             modifier = Modifier.size(buttonsSize),
             onClick = {
-                player.nextTrack()
+                viewModel.nextTrack()
             }
         ) {
             ImageWithShadow(

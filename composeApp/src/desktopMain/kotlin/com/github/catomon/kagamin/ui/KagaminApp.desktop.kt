@@ -22,7 +22,7 @@ import com.github.catomon.kagamin.ui.theme.KagaminTheme
 
 @Composable
 //Todo: not app, main window
-actual fun KagaminApp(
+fun KagaminApp(
     kagaminViewModel: KagaminViewModel,
     modifier: Modifier
 ) {

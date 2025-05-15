@@ -31,8 +31,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
-import com.github.catomon.kagamin.data.PlaylistData
-import com.github.catomon.kagamin.audio.AudioPlayer
+import com.github.catomon.kagamin.data.Playlist
+import com.github.catomon.kagamin.audio.AudioPlayerService
 import com.github.catomon.kagamin.removePlaylist
 import com.github.catomon.kagamin.savePlaylist
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
@@ -136,9 +136,9 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
 
 @Composable
 actual fun PlaylistItem(
-    playlist: Pair<String, PlaylistData>,
+    playlist: Pair<String, Playlist>,
     viewModel: KagaminViewModel,
-    playlists: List<Pair<String, PlaylistData>>,
+    playlists: List<Pair<String, Playlist>>,
     i: Int,
     remove: () -> Unit,
     clear: () -> Unit,
@@ -157,7 +157,7 @@ actual fun PlaylistItem(
                 }, contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painterResource(if (viewModel.playState == AudioPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
+                    painterResource(if (viewModel.playState == AudioPlayerService.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
                     "current playlist playback state icon",
                     modifier = Modifier
                         .size(16.dp)

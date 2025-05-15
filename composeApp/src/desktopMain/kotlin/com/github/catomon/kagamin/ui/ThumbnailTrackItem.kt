@@ -25,10 +25,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -44,10 +44,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import com.github.catomon.kagamin.LocalSnackbarHostState
-import com.github.catomon.kagamin.audio.AudioPlayer
-import com.github.catomon.kagamin.audio.AudioTrack
+import com.github.catomon.kagamin.audio.AudioPlayerService
+import com.github.catomon.kagamin.data.AudioTrack
+import com.github.catomon.kagamin.data.Playlist
+import com.github.catomon.kagamin.data.PlaylistsLoader
 import com.github.catomon.kagamin.ui.components.LikeSongButton
-import com.github.catomon.kagamin.ui.components.ThumbnailCacheManager
+import com.github.catomon.kagamin.data.cache.ThumbnailCacheManager
 import com.github.catomon.kagamin.ui.components.TrackThumbnail
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
@@ -57,7 +59,6 @@ import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.pause
 import kagamin.composeapp.generated.resources.play
 import kagamin.composeapp.generated.resources.selected
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 
@@ -78,22 +79,16 @@ fun ThumbnailTrackItem(
 
     val height = 64.dp
 
-    var progress by remember(isCurrentTrack) { mutableFloatStateOf(0f) }
-    val updateProgress = {
-        progress = when {
-            !isCurrentTrack -> 0f
-            else -> if (track.duration > 0 && track.duration < Long.MAX_VALUE) viewModel.audioPlayer.position.toFloat() / track.duration else 0f
-        }
-    }
-
-    LaunchedEffect(isCurrentTrack) {
-        if (!isCurrentTrack) return@LaunchedEffect
-
-        while (true) {
-            if (viewModel.audioPlayer.playState.value == AudioPlayer.PlayState.PLAYING) updateProgress()
-            delay(250)
-        }
-    }
+//    val position by viewModel.position.collectAsState()
+//
+//    val progress by remember {
+//        derivedStateOf {
+//            when (currentTrack) {
+//                null -> 0f
+//                else -> if (currentTrack.duration > 0 && currentTrack.duration < Long.MAX_VALUE) position.toFloat() / currentTrack.duration else -1f
+//            }
+//        }
+//    }
 
     ContextMenuArea(items = {
         ThumbnailTrackItemDefaults.contextMenuItems(
@@ -104,11 +99,12 @@ fun ThumbnailTrackItem(
             clipboard,
             viewModel,
             confirmationWindow,
-            snackbar
+            snackbar,
+            isCurrentTrack = isCurrentTrack
         )
     }) {
         Row(modifier.height(height)) {
-            AnimatedVisibility(index > -1 && viewModel.currentTrack == track) {
+            AnimatedVisibility(index > -1 && isCurrentTrack) {
                 PlaybackStateButton(height, backgroundColor, viewModel)
             }
 
@@ -158,6 +154,16 @@ private fun TrackItemBody(
 
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
+    var updatingLike by remember { mutableStateOf(false) }
+    var isLoved by remember(
+        updatingLike,
+        track
+    ) {
+        mutableStateOf(track?.let {
+            viewModel.playlists.value
+                .firstOrNull { playlist -> playlist.id == "loved" }?.tracks?.any { it.id == track.id }
+        } ?: false)
+    }
 
     Box(
         modifier = modifier.fillMaxWidth().hoverable(interactionSource),
@@ -178,7 +184,7 @@ private fun TrackItemBody(
             )
 
             Text(
-                track.author,
+                track.artist,
                 fontSize = 8.sp,
                 color = KagaminTheme.textSecondary,
                 maxLines = 1,
@@ -187,10 +193,47 @@ private fun TrackItemBody(
         }
 
         AnimatedVisibility(
-            isHovered || viewModel.lovedSongs[track.uri] != null,
+            isHovered || isLoved,
             modifier = Modifier.align(Alignment.CenterEnd)
         ) {
-            LikeSongButton(viewModel, track, 32.dp)
+
+            LikeSongButton(isLoved, {
+                viewModel.viewModelScope.launch {
+                    if (updatingLike) return@launch
+                    updatingLike = true
+                    if (!isLoved) {
+                        track?.let addToLoved@{ track ->
+                            //get loved playlist or create new and then add the track to it and finally save playlist
+                            viewModel.playlists.value
+                                .firstOrNull { playlist -> playlist.id == "loved" }
+                                ?.let { playlist ->
+                                    if (playlist.tracks.any { it.id == track.id }) return@addToLoved
+                                    viewModel.updatePlaylist(playlist.copy(tracks = playlist.tracks + track)); playlist
+                                } ?: Playlist("loved", "loved", listOf(track))
+                                .also { playlist ->
+                                    viewModel.createPlaylist(
+                                        playlist
+                                    )
+                                }.also {
+                                    PlaylistsLoader.savePlaylist(it)
+                                }
+
+                        }
+                    } else {
+                        //remove the track from the loved playlist and then save playlist
+                        track?.let { track ->
+                            viewModel.playlists.value
+                                .firstOrNull { playlist -> playlist.id == "loved" }
+                                ?.let { playlist ->
+                                    viewModel.updatePlaylist(playlist.copy(tracks = playlist.tracks - track))
+                                    PlaylistsLoader.savePlaylist(playlist)
+                                }
+                        }
+                    }
+                    isLoved = track?.let { viewModel.lovedSongs.containsKey(it.uri) } ?: false
+                    updatingLike = false
+                }
+            }, 32.dp)
         }
 
         Row(
@@ -209,6 +252,8 @@ fun PlaybackStateButton(
     backColor: Color,
     viewModel: KagaminViewModel
 ) {
+    val playSate by viewModel.playState.collectAsState()
+
     Box(
         Modifier
             .height(height)
@@ -231,8 +276,8 @@ fun PlaybackStateButton(
 //            )
         ) {
             Image(
-                painterResource(if (viewModel.playState == AudioPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
-                if (viewModel.playState == AudioPlayer.PlayState.PAUSED) "play" else "pause",
+                painterResource(if (playSate == AudioPlayerService.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
+                if (playSate == AudioPlayerService.PlayState.PAUSED) "Play" else "Pause",
                 modifier = Modifier.size(16.dp),
                 colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon)
             )
@@ -249,7 +294,8 @@ object ThumbnailTrackItemDefaults {
         clipboard: ClipboardManager,
         viewModel: KagaminViewModel,
         confirmationWindow: MutableState<ConfirmWindowState>,
-        snackbar: SnackbarHostState
+        snackbar: SnackbarHostState,
+        isCurrentTrack: Boolean
     ) = listOf(
         ContextMenuItem("Select") {
             if (!isHeader)
@@ -272,8 +318,8 @@ object ThumbnailTrackItemDefaults {
                 confirmationWindow.value = ConfirmWindowState(
                     true,
                     onConfirm = {
-                        if (viewModel.currentTrack == track)
-                            viewModel.audioPlayer.stop()
+                        if (isCurrentTrack)
+                            viewModel.stop()
 
                         viewModel.viewModelScope.launch {
                             tracklistManager.deleteFile(track)
@@ -293,7 +339,7 @@ object ThumbnailTrackItemDefaults {
                     true,
                     onConfirm = {
                         if (tracklistManager.selected.any { it.value == track })
-                            viewModel.audioPlayer.stop()
+                            viewModel.stop()
 
                         tracklistManager.deleteSelectedFiles()
                         tracklistManager.contextMenuRemovePressed(viewModel, track)

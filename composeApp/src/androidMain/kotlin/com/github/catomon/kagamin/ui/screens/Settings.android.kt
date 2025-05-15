@@ -24,9 +24,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.data.AppSettings
-import com.github.catomon.kagamin.audio.AudioPlayer
+import com.github.catomon.kagamin.audio.AudioPlayerService
 import com.github.catomon.kagamin.openInBrowser
-import com.github.catomon.kagamin.saveSettings
+import com.github.catomon.kagamin.data.saveSettings
 import com.github.catomon.kagamin.ui.components.AppName
 import com.github.catomon.kagamin.ui.theme.KagaminColors
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
@@ -105,10 +105,10 @@ actual fun SettingsScreen(
             {
                 val player = viewModel.audioPlayer
                 viewModel.settings = settings.copy(
-                    repeat = player.playMode.value == AudioPlayer.PlayMode.REPEAT_TRACK,
+                    repeat = player.playMode.value == AudioPlayerService.PlayMode.REPEAT_TRACK,
                     volume = player.volume.value,
-                    random = player.playMode.value == AudioPlayer.PlayMode.RANDOM,
-                    repeatPlaylist = player.playMode.value == AudioPlayer.PlayMode.REPEAT_PLAYLIST
+                    random = player.playMode.value == AudioPlayerService.PlayMode.RANDOM,
+                    repeatPlaylist = player.playMode.value == AudioPlayerService.PlayMode.REPEAT_PLAYLIST
                 )
                 saveSettings(settings)
                 exitProcess(1)

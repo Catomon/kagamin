@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.draganddrop.dragAndDropTarget
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -41,10 +42,12 @@ import androidx.compose.ui.window.rememberTrayState
 import androidx.compose.ui.window.rememberWindowState
 import androidx.lifecycle.viewModelScope
 import com.github.catomon.kagamin.WindowConfig.isTraySupported
-import com.github.catomon.kagamin.audio.AudioPlayer
-import com.github.catomon.kagamin.data.TrackData
+import com.github.catomon.kagamin.audio.AudioPlayerService
+import com.github.catomon.kagamin.data.AudioTrack
+import com.github.catomon.kagamin.data.PlaylistsLoader
 import com.github.catomon.kagamin.ui.KagaminApp
-import com.github.catomon.kagamin.ui.components.ThumbnailCacheManager
+import com.github.catomon.kagamin.data.cache.ThumbnailCacheManager
+import com.github.catomon.kagamin.data.loadSettings
 import com.github.catomon.kagamin.ui.customShadow
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.LayoutManager
@@ -68,6 +71,8 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.java.KoinJavaComponent.get
 import java.awt.datatransfer.DataFlavor
 import java.io.File
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 @Composable
 fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
@@ -134,8 +139,8 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
     if (isTraySupported) {
         val trayState = rememberTrayState()
         Tray(
-            painterResource(if (kagaminViewModel.playState == AudioPlayer.PlayState.PLAYING) Res.drawable.pause_icon else Res.drawable.play_icon),
-            tooltip = kagaminViewModel.currentTrack?.title,
+            painterResource(if (kagaminViewModel.playState.value == AudioPlayerService.PlayState.PLAYING) Res.drawable.pause_icon else Res.drawable.play_icon),
+            tooltip = kagaminViewModel.currentTrack.value?.title,
             onAction = {
                 openPlayerWindow = !openPlayerWindow
             },
@@ -145,7 +150,7 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
                 openPlayerWindow = true
             })
             Item(
-                if (kagaminViewModel.playState == AudioPlayer.PlayState.PLAYING) "Pause" else "Play",
+                if (kagaminViewModel.playState.value == AudioPlayerService.PlayState.PLAYING) "Pause" else "Play",
                 onClick = {
                     kagaminViewModel.onPlayPause()
                 })
@@ -281,7 +286,7 @@ fun createTrackDragAndDropTarget(
                 val droppedFiles = it.getTransferData(DataFlavor.javaFileListFlavor) as List<File>
 
                 kagaminViewModel.viewModelScope.launch {
-                    loadTrackFiles(droppedFiles)
+                    loadTrackFilesToCurrentPlaylist(droppedFiles, kagaminViewModel, snackbar)
                 }
 
                 return true
@@ -290,97 +295,120 @@ fun createTrackDragAndDropTarget(
             }
         }
     }
+}
 
-    private suspend fun loadTrackFiles(droppedFiles: List<File>): Boolean {
-        val snackbarScope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
-        val cachingScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+@OptIn(ExperimentalUuidApi::class)
+suspend fun loadTrackFilesToCurrentPlaylist(
+    files: List<File>,
+    kagaminViewModel: KagaminViewModel,
+    snackbar: SnackbarHostState? = null
+): Boolean {
+    val snackbarScope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
+    val cachingScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-        try {
-            val trackFiles = mutableListOf<File>()
+    try {
+        val trackFiles = mutableListOf<File>()
 
-            println("Filtering files...")
+        println("Filtering files...")
+        if (snackbar != null)
             snackbarScope.launch {
                 launch {
                     snackbar.currentSnackbarData?.dismiss()
-                    snackbar.showSnackbar("Filtering files...")
+                    snackbar.showSnackbar("Filtering files...", duration = SnackbarDuration.Indefinite)
                 }
             }
 
-            withContext(Dispatchers.IO) {
-                fun filterMusicFiles(files: List<File>) {
-                    for (file in files) {
-                        if (file.isDirectory) {
-                            file.listFiles()?.let { filterMusicFiles(it.toList()) }
-                        } else {
-                            if (file.extension == "mp3" || file.extension == "wav") {
-                                trackFiles.add(file)
-                            }
+        withContext(Dispatchers.IO) {
+            fun filterMusicFiles(files: List<File>) {
+                for (file in files) {
+                    if (file.isDirectory) {
+                        file.listFiles()?.let { filterMusicFiles(it.toList()) }
+                    } else {
+                        if (file.extension == "mp3" || file.extension == "wav") {
+                            trackFiles.add(file)
                         }
                     }
                 }
-
-                filterMusicFiles(droppedFiles)
             }
 
-            println("Reading metadata...")
+            filterMusicFiles(files)
+        }
+
+        println("Reading metadata...")
+        if (snackbar != null)
             snackbarScope.launch {
                 launch {
                     snackbar.currentSnackbarData?.dismiss()
-                    snackbar.showSnackbar("Reading metadata...")
+                    snackbar.showSnackbar("Reading metadata...", duration = SnackbarDuration.Indefinite)
                 }
             }
 
-            val tacksDataList = withContext(Dispatchers.IO) {
-                trackFiles.map {
-                    val path = it.path
-                    val mp3File = Mp3File(path)
-                    val tag: ID3v2? = mp3File.id3v2Tag
+        val loadedTracks = withContext(Dispatchers.IO) {
+            trackFiles.map {
+                val path = it.path
+                val mp3File = Mp3File(path)
+                val tag: ID3v2? = mp3File.id3v2Tag
 
-                    cachingScope.launch {
-                        ThumbnailCacheManager.cacheThumbnail(trackUri = path, mp3File = mp3File)
-                    }
-
-                    TrackData(path, tag?.title ?: "", tag?.artist ?: "")
+                cachingScope.launch {
+                    ThumbnailCacheManager.cacheThumbnail(trackUri = path, mp3File = mp3File)
                 }
-            }
 
-            println("Adding tracks...")
+                AudioTrack(
+                    id = Uuid.random().toString(),
+                    uri = path,
+                    title = tag?.title ?: "",
+                    artist = tag?.artist ?: "",
+                    album = tag?.album ?: "",
+                    duration = mp3File.lengthInMilliseconds,
+                    artworkUri = null
+                )
+            }
+        }
+
+        println("Adding tracks...")
+        if (snackbar != null)
             snackbarScope.launch {
                 launch {
                     snackbar.currentSnackbarData?.dismiss()
-                    snackbar.showSnackbar("Adding tracks...")
+                    snackbar.showSnackbar("Adding tracks...", duration = SnackbarDuration.Indefinite)
                 }
             }
+
+        val currentTracks = kagaminViewModel.currentPlaylist.value.tracks
+        val uniqueTracks =
+            loadedTracks.filter { loadedTrack -> currentTracks.none { it.uri == loadedTrack.uri } }
+
+        if (uniqueTracks.isNotEmpty()) {
+            val updatedPlaylist =
+                kagaminViewModel.currentPlaylist.value.copy(tracks = currentTracks + uniqueTracks)
 
             withContext(Dispatchers.IO) {
-                savePlaylist(
-                    kagaminViewModel.currentPlaylistName,
-                    kagaminViewModel.playlist.map { it.trackData } + tacksDataList
-                )
+                PlaylistsLoader.savePlaylist(updatedPlaylist)
             }
 
             withContext(Dispatchers.Main) {
-                kagaminViewModel.reloadPlaylists()
-                kagaminViewModel.reloadPlaylist()
+                kagaminViewModel.updatePlaylist(updatedPlaylist)
             }
+        }
 
-            println("${trackFiles.size} tracks were added.")
+        println("${uniqueTracks.size} tracks were added.")
+        if (snackbar != null)
             snackbarScope.launch {
                 launch {
                     snackbar.currentSnackbarData?.dismiss()
-                    snackbar.showSnackbar("${trackFiles.size} tracks were added.")
+                    snackbar.showSnackbar("${uniqueTracks.size} tracks were added.")
                 }
             }
 
-            return true
-        } catch (ex: Exception) {
-            ex.printStackTrace()
+        return true
+    } catch (ex: Exception) {
+        ex.printStackTrace()
 
+        if (snackbar != null)
             snackbarScope.launch {
                 snackbar.currentSnackbarData?.dismiss()
                 snackbar.showSnackbar(ex.message ?: "null")
             }
-            return false
-        }
+        return false
     }
 }

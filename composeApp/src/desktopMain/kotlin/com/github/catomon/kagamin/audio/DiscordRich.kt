@@ -2,8 +2,8 @@ package com.github.catomon.kagamin.audio
 
 import com.github.catomon.kagamin.appName
 import com.github.catomon.kagamin.appNameEng
-import com.github.catomon.kagamin.loadSettings
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack
+import com.github.catomon.kagamin.data.AudioTrack
+import com.github.catomon.kagamin.data.loadSettings
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.denpa
 import kagamin.composeapp.generated.resources.higurashi
@@ -102,18 +102,18 @@ private const val defaultSingerName: String = appNameEng
 @OptIn(ExperimentalResourceApi::class)
 val denpaSinger = Singer(defaultSingerName).icons("denpa").res(Res.drawable.denpa)
 
-private val AudioTrack.trackInfoString: String get() = info.author + " - " + info.title + " - " + info.uri
+private val AudioTrack.trackInfoString: String get() = "$artist - $title - $uri"
 
 val AudioTrack.trackName: String
-    get() = if (info.uri.contains("https://")) info.title
-    else identifier
-        .substring(identifier.lastIndexOf('\\') + 1)
-        .substring(identifier.lastIndexOf('/') + 1)
+    get() = if (uri.contains("https://")) title
+    else uri
+        .substring(uri.lastIndexOf('\\') + 1)
+        .substring(uri.lastIndexOf('/') + 1)
         .removeSuffix(".mp3")
 
-val com.github.catomon.kagamin.audio.AudioTrack.songAuthorPlusTitle get() = "$author - $title"
+val AudioTrack.songAuthorPlusTitle get() = "$artist - $title"
 
-fun registeredSingerBySongName(track: com.github.catomon.kagamin.audio.AudioTrack): Singer =
+fun registeredSingerBySongName(track: AudioTrack): Singer =
     registeredSingerBySongName(track.songAuthorPlusTitle)
 
 fun registeredSingerBySongName(songName: String = defaultSingerName): Singer {
@@ -157,8 +157,8 @@ fun discordRich(rich: Rich, track: AudioTrack?) {
 
                 if (showSongDetails) {
                     details = "$songName"
-                    endTimestamp = System.currentTimeMillis() + (track?.duration
-                        ?: Long.MAX_VALUE) - (track?.position ?: 0L)
+//              //todo?      endTimestamp = System.currentTimeMillis() + (track?.duration
+//                        ?: Long.MAX_VALUE) - (track?.position ?: 0L)
                 }
             }
 

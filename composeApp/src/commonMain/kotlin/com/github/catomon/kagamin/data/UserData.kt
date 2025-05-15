@@ -4,5 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UserData(
-    val playliststs: Array<PlaylistData>
+    val playliststs: Array<Playlist>
 )

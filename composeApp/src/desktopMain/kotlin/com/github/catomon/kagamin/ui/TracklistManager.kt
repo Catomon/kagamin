@@ -1,11 +1,8 @@
 package com.github.catomon.kagamin.ui
 
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.snapshots.SnapshotStateMap
-import androidx.compose.ui.Modifier
-import com.github.catomon.kagamin.audio.AudioTrack
-import com.github.catomon.kagamin.savePlaylist
+import com.github.catomon.kagamin.data.AudioTrack
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -39,8 +36,7 @@ class TracklistManager(
             if (File(track.uri).delete()) {
                 println("ok.")
                 return true
-            }
-            else {
+            } else {
                 println("fail.")
                 return false
             }
@@ -66,40 +62,13 @@ class TracklistManager(
         coroutineScope.launch {
             if (isAnySelected) {
                 selected.values.forEach { track ->
-                    viewModel.isLoadingSong = track
-                    viewModel.audioPlayer.removeFromPlaylist(track)
-                    viewModel.audioPlayer.playlist.value =
-                        viewModel.audioPlayer.playlist.value
-                    savePlaylist(
-                        viewModel.currentPlaylistName,
-                        viewModel.audioPlayer.playlist.value.toTypedArray()
-                    )
-                    //listState.scrollToItem(i, -60)
-                    viewModel.isLoadingSong = null
+                    viewModel.clearPlaylist(viewModel.currentPlaylist.value.copy(tracks = viewModel.currentPlaylist.value.tracks - track))
                 }
 
                 deselectAll()
             } else {
-                viewModel.isLoadingSong = track
-                viewModel.audioPlayer.removeFromPlaylist(track)
-                viewModel.audioPlayer.playlist.value =
-                    viewModel.audioPlayer.playlist.value
-                savePlaylist(
-                    viewModel.currentPlaylistName,
-                    viewModel.audioPlayer.playlist.value.toTypedArray()
-                )
-                //listState.scrollToItem(i, -60)
-                viewModel.isLoadingSong = null
+                viewModel.clearPlaylist(viewModel.currentPlaylist.value.copy(tracks = viewModel.currentPlaylist.value.tracks - track))
             }
         }
     }
 }
-
-@Composable
-expect fun TracklistHeader(
-    currentTrack: AudioTrack,
-    viewModel: KagaminViewModel,
-    onClick: () -> Unit,
-    filterTracks: (String) -> Unit,
-    modifier: Modifier = Modifier
-)

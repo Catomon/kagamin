@@ -8,12 +8,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,9 +21,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.github.catomon.kagamin.data.PlaylistData
+import com.github.catomon.kagamin.data.Playlist
 import com.github.catomon.kagamin.isValidFileName
-import com.github.catomon.kagamin.savePlaylist
 import com.github.catomon.kagamin.ui.components.OutlinedTextButton
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.Tabs
@@ -31,13 +30,17 @@ import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.yt_ic
 import org.jetbrains.compose.resources.painterResource
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
+@OptIn(ExperimentalUuidApi::class)
 @Composable
 fun CreatePlaylistTab(viewModel: KagaminViewModel, modifier: Modifier) {
     var name by remember { mutableStateOf("") }
     var isError by remember { mutableStateOf(false) }
     var isLink by remember { mutableStateOf(false) }
     var link by remember(isLink) { mutableStateOf("") }
+    val currentPlaylist by viewModel.currentPlaylist.collectAsState()
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -85,21 +88,14 @@ fun CreatePlaylistTab(viewModel: KagaminViewModel, modifier: Modifier) {
                     text = if (isLink) "Add" else "Create",
                     onClick = {
                         if (isValidFileName(name)) {
-                            viewModel.currentPlaylistName = name
-//                        if (isLink) { don't.
-//                            viewModel.audioPlayer.load(listOf(link))
-//                        }
-                            savePlaylist(
-                                viewModel.currentPlaylistName,
-                                emptyList()
-                            )
+                            val newPlaylist = Playlist(Uuid.random().toString(), name, emptyList())
+                            viewModel.createPlaylist(newPlaylist)
+                            viewModel.updateCurrentPlaylist(newPlaylist)
 
-                            viewModel.currentTab = Tabs.TRACKLIST
-
-                            if (!isLink)
-                                viewModel.playlists.value += (name to PlaylistData(emptyArray()))
-                        } else
+                            viewModel.currentTab = Tabs.ADD_TRACKS
+                        } else {
                             isError = true
+                        }
                     }
                 )
             }

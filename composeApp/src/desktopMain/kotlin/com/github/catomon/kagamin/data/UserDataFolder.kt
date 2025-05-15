@@ -1,5 +1,6 @@
-package com.github.catomon.kagamin
+package com.github.catomon.kagamin.data
 
+import com.github.catomon.kagamin.osName
 import java.io.File
 
 actual val userDataFolder: File =

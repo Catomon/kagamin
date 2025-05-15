@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
-import com.github.catomon.kagamin.audio.AudioPlayer
+import com.github.catomon.kagamin.audio.AudioPlayerService
 import com.github.catomon.kagamin.audio.AudioTrack
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import kagamin.composeapp.generated.resources.Res
@@ -48,7 +48,7 @@ fun Tracklist(
     modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val tracklistManager = remember { TracklistManager(coroutineScope) }
+    val tracklistManager = remember { com.github.catomon.kagamin.ui.TracklistManager(coroutineScope) }
     var indexed = remember(tracks) { emptyMap<String, Int>() }
     val currentTrack = viewModel.currentTrack
 
@@ -147,7 +147,7 @@ actual fun TracklistHeader(
                     }, contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painterResource(if (viewModel.playState == AudioPlayer.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
+                    painterResource(if (viewModel.playState == AudioPlayerService.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
                     "track playback state icon",
                     modifier = Modifier.size(16.dp),
                     colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon)

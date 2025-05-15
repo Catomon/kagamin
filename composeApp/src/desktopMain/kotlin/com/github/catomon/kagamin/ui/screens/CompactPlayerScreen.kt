@@ -20,6 +20,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,8 +30,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.github.catomon.kagamin.audio.createAudioTrack
-import com.github.catomon.kagamin.loadPlaylist
 import com.github.catomon.kagamin.ui.AddTracksTab
 import com.github.catomon.kagamin.ui.CreatePlaylistTab
 import com.github.catomon.kagamin.ui.Playlists
@@ -51,12 +51,8 @@ fun CompactPlayerScreen(
     navController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
-    val audioPlayer = viewModel.audioPlayer
-    val playlist = viewModel.playlist
-    val currentTrack = viewModel.currentTrack
-    val playState = viewModel.playState
-    val playMode = viewModel.playMode
-    val currentPlaylistName = viewModel.currentPlaylistName
+    val currentTrack by viewModel.currentTrack.collectAsState()
+    val currentPlaylist by viewModel.currentPlaylist.collectAsState()
 
     val tabTransition: (Tabs) -> ContentTransform = { tab ->
         when (tab) {
@@ -67,28 +63,6 @@ fun CompactPlayerScreen(
 
             else -> slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
         }
-    }
-
-    LaunchedEffect(currentPlaylistName) {
-        CoroutineScope(Dispatchers.Default).launch {
-            viewModel.isLoadingPlaylistFile = true
-            try {
-                val trackUris = loadPlaylist(currentPlaylistName)?.tracks
-                if (trackUris != null) {
-                    audioPlayer.playlist.value = mutableListOf()
-                    trackUris.forEach {
-                        audioPlayer.addToPlaylist(createAudioTrack(it))
-                    }
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-            viewModel.isLoadingPlaylistFile = false
-        }
-    }
-
-    LaunchedEffect(currentTrack) {
-        viewModel.updateThumbnail()
     }
 
     Box(modifier) {
@@ -134,7 +108,6 @@ fun CompactPlayerScreen(
                                 CurrentTrackFrame(
                                     viewModel,
                                     currentTrack,
-                                    audioPlayer,
                                     Modifier.width(160.dp).fillMaxHeight()
                                         .background(color = KagaminTheme.backgroundTransparent)
                                 )
@@ -149,10 +122,10 @@ fun CompactPlayerScreen(
                             }
 
                             Tabs.TRACKLIST -> {
-                                if (viewModel.playlist.isEmpty()) {
+                                if (currentPlaylist.tracks.isEmpty()) {
                                     Box(
                                         Modifier.fillMaxHeight()
-                                            .background(KagaminTheme.colors.listItem),
+                                            .background(KagaminTheme.colors.backgroundTransparent),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text(
@@ -164,9 +137,8 @@ fun CompactPlayerScreen(
                                 } else {
                                     Tracklist(
                                         viewModel,
-                                        viewModel.playlist,
                                         Modifier.align(Alignment.Center)
-                                            .fillMaxHeight()//.padding(start = 16.dp, end = 16.dp)
+                                            .fillMaxHeight()
                                     )
                                 }
                             }

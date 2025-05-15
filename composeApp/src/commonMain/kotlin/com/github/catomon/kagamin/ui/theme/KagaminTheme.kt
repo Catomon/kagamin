@@ -10,7 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.sp
 import com.github.catomon.kagamin.LocalSnackbarHostState
-import com.github.catomon.kagamin.loadSettings
+import com.github.catomon.kagamin.data.loadSettings
 import kagamin.composeapp.generated.resources.BadComic_Regular
 import kagamin.composeapp.generated.resources.Res
 import org.jetbrains.compose.resources.Font

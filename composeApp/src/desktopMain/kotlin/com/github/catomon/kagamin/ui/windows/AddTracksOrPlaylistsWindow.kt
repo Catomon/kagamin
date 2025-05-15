@@ -5,7 +5,6 @@ import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.background
 import androidx.compose.foundation.draganddrop.dragAndDropTarget
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +13,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,8 +42,7 @@ import org.jetbrains.compose.resources.painterResource
 fun ApplicationScope.AddTracksOrPlaylistsWindow(
     viewModel: KagaminViewModel, modifier: Modifier = Modifier
 ) {
-    val audioPlayer = viewModel.audioPlayer
-    val currentTrack = viewModel.currentTrack
+    val currentTrack by viewModel.currentTrack.collectAsState()
 
     val tabTransition: (Tabs) -> ContentTransform = { tab ->
         when (tab) {

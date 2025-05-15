@@ -1,4 +1,4 @@
-package com.github.catomon.kagamin
+package com.github.catomon.kagamin.data
 
 import java.io.File
 

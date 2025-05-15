@@ -18,42 +18,36 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.dp
-import com.github.catomon.kagamin.audio.AudioPlayer
-import com.github.catomon.kagamin.audio.AudioTrack
+import com.github.catomon.kagamin.data.AudioTrack
+import com.github.catomon.kagamin.data.cache.ThumbnailCacheManager
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
-import kotlinx.coroutines.delay
 
 @Composable
 fun CurrentTrackFrame(
     viewModel: KagaminViewModel,
-    currentTrack: AudioTrack?, player: AudioPlayer<AudioTrack>, modifier: Modifier = Modifier
+    currentTrack: AudioTrack?, modifier: Modifier = Modifier
 ) {
-    var progress by remember { mutableStateOf(-1f) }
-    val updateProgress = {
-        progress = when (currentTrack) {
-            null -> 0f
-            else -> if (currentTrack.duration > 0 && currentTrack.duration < Long.MAX_VALUE) player.position.toFloat() / currentTrack.duration else -1f
+    val position by viewModel.position.collectAsState()
+
+    val progress by remember {
+        derivedStateOf {
+            when (currentTrack) {
+                null -> 0f
+                else -> if (currentTrack.duration > 0 && currentTrack.duration < Long.MAX_VALUE) position.toFloat() / currentTrack.duration else -1f
+            }
         }
     }
 
-    LaunchedEffect(currentTrack) {
-        while (true) {
-            if (player.playState.value == AudioPlayer.PlayState.PLAYING) updateProgress()
-            delay(250)
-        }
-    }
 
     Box(modifier) {
         Column(
@@ -64,8 +58,7 @@ fun CurrentTrackFrame(
                 currentTrack?.uri,
                 onSetProgress = {
                     if (currentTrack != null) {
-                        player.seek((currentTrack.duration * it).toLong())
-                        updateProgress()
+                        viewModel.seek((currentTrack.duration * it).toLong())
                     }
                 },
                 progress = progress,
@@ -74,15 +67,15 @@ fun CurrentTrackFrame(
             )
 
             PlaybackButtons(
-                player = player, Modifier.width(133.dp)
+                viewModel, Modifier.width(133.dp)
             )
 
-            PlaybackOptionsButtons(player, Modifier.width(133.dp))
+            PlaybackOptionsButtons(viewModel, Modifier.width(133.dp))
 
             VolumeOptions(
-                volume = player.volume.value,
+                volume = viewModel.volume.value,
                 onVolumeChange = { newVolume ->
-                    player.volume.value = newVolume; player.setVolume(newVolume)
+                    viewModel.setVolume(newVolume)
                 },
                 modifier = Modifier.width(133.dp)
             )
@@ -106,22 +99,18 @@ fun CurrentTrackFrame(
 
 @Composable
 fun CompactCurrentTrackFrame(
+    viewModel: KagaminViewModel,
     currentTrack: AudioTrack?,
-    player: AudioPlayer<AudioTrack>,
     modifier: Modifier = Modifier
 ) {
-    var progress by remember { mutableStateOf(-1f) }
-    val updateProgress = {
-        progress = when (currentTrack) {
-            null -> 0f
-            else -> if (currentTrack.duration > 0 && currentTrack.duration < Long.MAX_VALUE) player.position.toFloat() / currentTrack.duration else -1f
-        }
-    }
+    val position by viewModel.position.collectAsState()
 
-    LaunchedEffect(currentTrack) {
-        while (true) {
-            if (player.playState.value == AudioPlayer.PlayState.PLAYING) updateProgress()
-            delay(250)
+    val progress by remember {
+        derivedStateOf {
+            when (currentTrack) {
+                null -> 0f
+                else -> if (currentTrack.duration > 0 && currentTrack.duration < Long.MAX_VALUE) position.toFloat() / currentTrack.duration else -1f
+            }
         }
     }
 
@@ -143,8 +132,7 @@ fun CompactCurrentTrackFrame(
             currentTrack?.uri,
             onSetProgress = {
                 if (currentTrack != null) {
-                    player.seek((currentTrack.duration * it).toLong())
-                    updateProgress()
+                    viewModel.seek((currentTrack.duration * it).toLong())
                 }
             },
             progress = floatAnimation,
@@ -168,16 +156,16 @@ fun CompactCurrentTrackFrame(
             ) {
                 Spacer(Modifier.height(16.dp))
 
-                PlaybackOptionsButtons(player, Modifier.width(133.dp))
+                PlaybackOptionsButtons(viewModel, Modifier.width(133.dp))
 
                 PlaybackButtons(
-                    player = player, Modifier.width(133.dp)
+                    viewModel, Modifier.width(133.dp)
                 )
 
                 VolumeOptions(
-                    volume = player.volume.value,
+                    volume = viewModel.volume.value,
                     onVolumeChange = { newVolume ->
-                        player.volume.value = newVolume; player.setVolume(newVolume)
+                        viewModel.setVolume(newVolume)
                     },
                     modifier = Modifier.width(133.dp)
                 )

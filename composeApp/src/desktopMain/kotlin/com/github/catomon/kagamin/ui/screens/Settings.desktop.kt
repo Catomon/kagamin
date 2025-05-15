@@ -30,10 +30,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.github.catomon.kagamin.LocalLayoutManager
-import com.github.catomon.kagamin.audio.AudioPlayer
+import com.github.catomon.kagamin.audio.AudioPlayerService
 import com.github.catomon.kagamin.data.AppSettings
 import com.github.catomon.kagamin.openInBrowser
-import com.github.catomon.kagamin.saveSettings
+import com.github.catomon.kagamin.data.saveSettings
 import com.github.catomon.kagamin.ui.components.AppIcon
 import com.github.catomon.kagamin.ui.components.OutlinedTextButton
 import com.github.catomon.kagamin.ui.components.TrackThumbnail
@@ -43,12 +43,20 @@ import com.github.catomon.kagamin.ui.util.LayoutManager
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.arrow_left
+import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.painterResource
 import kotlin.system.exitProcess
 
+@Serializable
+object SettingsDestination {
+    override fun toString(): String {
+        return "settings"
+    }
+}
+
 @Composable
-actual fun SettingsScreen(
-    viewModel: KagaminViewModel, navController: NavHostController, modifier: Modifier
+fun SettingsScreen(
+    viewModel: KagaminViewModel, navController: NavHostController, modifier: Modifier = Modifier
 ) {
     val settings = viewModel.settings
     val theme = viewModel.settings.theme
@@ -64,7 +72,7 @@ actual fun SettingsScreen(
         modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center
     ) {
         TrackThumbnail(
-            viewModel.currentTrack?.uri,
+            viewModel.currentTrack.value?.uri,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
             blur = true,
@@ -157,14 +165,7 @@ actual fun SettingsScreen(
         OutlinedTextButton(
             text = "Exit App",
             onClick = {
-                val player = viewModel.audioPlayer
-                viewModel.settings = settings.copy(
-                    repeat = player.playMode.value == AudioPlayer.PlayMode.REPEAT_TRACK,
-                    volume = player.volume.value,
-                    random = player.playMode.value == AudioPlayer.PlayMode.RANDOM,
-                )
-                saveSettings(settings)
-                exitProcess(0)
+                viewModel.exitApp()
             },
             modifier = Modifier.align(Alignment.BottomEnd).padding(10.dp)
         )

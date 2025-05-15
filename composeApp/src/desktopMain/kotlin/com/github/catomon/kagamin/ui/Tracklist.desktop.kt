@@ -35,8 +35,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -59,9 +60,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import com.github.catomon.kagamin.LocalWindow
-import com.github.catomon.kagamin.audio.AudioPlayer
-import com.github.catomon.kagamin.audio.AudioTrack
-import com.github.catomon.kagamin.ui.components.TrackProgressIndicator2
+import com.github.catomon.kagamin.audio.AudioPlayerService
+import com.github.catomon.kagamin.audio.PlaylistsManager
+import com.github.catomon.kagamin.data.AudioTrack
+import com.github.catomon.kagamin.ui.components.TrackProgressIndicator
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.formatTime
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
@@ -75,22 +77,27 @@ import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun Tracklist(
-    viewModel: KagaminViewModel, tracks: List<AudioTrack>, modifier: Modifier = Modifier
+    viewModel: KagaminViewModel, modifier: Modifier = Modifier
 ) {
+    val currentPlaylist by viewModel.currentPlaylist.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val tracklistManager = remember { TracklistManager(coroutineScope) }
-    val index = remember(tracks) { tracks.mapIndexed { i, track -> (track.uri to i) }.toMap() }
-    val currentTrack = viewModel.currentTrack
+    val index = remember(currentPlaylist) {
+        currentPlaylist.tracks.mapIndexed { i, track -> (track.uri to i) }.toMap()
+    }
+    val currentTrack by viewModel.currentTrack.collectAsState()
     val listState = rememberLazyListState()
     var allowAutoScroll by remember { mutableStateOf(true) }
     val window = LocalWindow.current
     var filterName by remember { mutableStateOf("") }
     var filteredTracks by remember { mutableStateOf<List<AudioTrack>?>(null) }
 
-    LaunchedEffect(tracks, filterName) {
+    LaunchedEffect(currentPlaylist, filterName) {
         withContext(Dispatchers.Default) {
             filteredTracks = if (filterName.isNotBlank()) {
-                tracks.filter { it.title.lowercase().contains(filterName.lowercase()) }
+                currentPlaylist.tracks.filter {
+                    it.title.lowercase().contains(filterName.lowercase())
+                }
             } else {
                 null
             }
@@ -102,7 +109,7 @@ fun Tracklist(
         allowAutoScroll = true
     }
 
-    LaunchedEffect(viewModel.currentPlaylistName) {
+    LaunchedEffect(currentPlaylist) {
         listState.scrollToItem(index[currentTrack?.uri] ?: 0)
     }
 
@@ -110,15 +117,17 @@ fun Tracklist(
         if (!window.isMinimized && viewModel.settings.autoScrollNextTrack && allowAutoScroll) {
             val nextIndex =
                 index[currentTrack?.uri ?: return@LaunchedEffect] ?: return@LaunchedEffect
-            if (viewModel.playMode == AudioPlayer.PlayMode.RANDOM) listState.scrollToItem(nextIndex)
+            if (viewModel.playMode.value == PlaylistsManager.PlayMode.RANDOM) listState.scrollToItem(
+                nextIndex
+            )
             else listState.animateScrollToItem(nextIndex)
         }
     }
 
     Column(modifier) {
         if (currentTrack != null) {
-            TracklistHeader(viewModel.currentTrack!!, viewModel = viewModel, onClick = onClick@{
-                val curTrackIndex = index[currentTrack.uri] ?: return@onClick
+            TracklistHeader(currentTrack, viewModel = viewModel, onClick = onClick@{
+                val curTrackIndex = currentTrack?.let { index[it.uri] } ?: return@onClick
                 coroutineScope.launch {
                     listState.animateScrollToItem(curTrackIndex)
                 }
@@ -141,7 +150,8 @@ fun Tracklist(
         ) {
             Column(Modifier.fillMaxSize()) {
                 LazyColumn(
-                    modifier = Modifier.fillMaxWidth().graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+                    modifier = Modifier.fillMaxWidth()
+                        .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
                         .drawWithContent {
                             drawContent()
                             drawRect(
@@ -156,7 +166,7 @@ fun Tracklist(
                             allowAutoScroll = false
                         }, state = listState, contentPadding = PaddingValues(2.dp)
                 ) {
-                    val tracks = filteredTracks ?: tracks
+                    val tracks = filteredTracks ?: currentPlaylist.tracks
                     items(tracks.size, key = {
                         tracks[it].id
                     }) { index ->
@@ -180,9 +190,7 @@ fun Tracklist(
                                 if (viewModel.isLoadingSong != null) return@onClick
 
                                 viewModel.viewModelScope.launch {
-                                    viewModel.isLoadingSong = track
-                                    viewModel.audioPlayer.play(track)
-                                    viewModel.isLoadingSong = null
+                                    viewModel.play(track)
                                 }
                             },
                             modifier = Modifier.padding(2.dp)
@@ -213,37 +221,36 @@ private enum class Content {
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-actual fun TracklistHeader(
-    currentTrack: AudioTrack,
+fun TracklistHeader(
+    currentTrack: AudioTrack?,
     viewModel: KagaminViewModel,
     onClick: () -> Unit,
     filterTracks: (String) -> Unit,
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ) {
     val backgroundColor = KagaminTheme.backgroundTransparent
     var shownContent by remember { mutableStateOf(Content.TrackName) }
     var isIndicatorHovered by remember { mutableStateOf(false) }
     var showSearchIcon by remember { mutableStateOf(false) }
 
-    var progress by remember { mutableFloatStateOf(-1f) }
-    val progressAnimated by animateFloatAsState(progress)
-    val updateProgress = {
-        if (!isIndicatorHovered) {
-            progress = when (currentTrack) {
-                null -> 0f
-                else -> if (currentTrack.duration > 0 && currentTrack.duration < Long.MAX_VALUE) viewModel.audioPlayer.position.toFloat() / currentTrack.duration else -1f
+    val position by viewModel.position.collectAsState()
+
+    val progress by remember {
+        derivedStateOf {
+            if (!isIndicatorHovered) {
+                when (currentTrack) {
+                    null -> 0f
+                    else -> if (currentTrack.duration > 0 && currentTrack.duration < Long.MAX_VALUE) position.toFloat() / currentTrack.duration else -1f
+                }
+            } else {
+                0f
             }
         }
     }
 
-    var searchTextValue by remember { mutableStateOf("") }
+    val progressAnimated by animateFloatAsState(progress)
 
-    LaunchedEffect(currentTrack) {
-        while (true) {
-            if (viewModel.audioPlayer.playState.value == AudioPlayer.PlayState.PLAYING) updateProgress()
-            delay(1000)
-        }
-    }
+    var searchTextValue by remember { mutableStateOf("") }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -290,16 +297,19 @@ actual fun TracklistHeader(
                 AnimatedContent(shownContent, modifier.weight(1f)) { shownContent ->
                     when (shownContent) {
                         Content.Indicator -> {
-                            TrackProgressIndicator2(
+                            var progressOnHover by remember { mutableStateOf(0f) }
+
+                            TrackProgressIndicator(
                                 currentTrack = currentTrack,
-                                player = viewModel.audioPlayer,
-                                updateProgress = updateProgress,
-                                progress = progressAnimated,
+                                seek = {
+                                    viewModel.seek(it)
+                                },
+                                progress = if (isIndicatorHovered) progressOnHover else progressAnimated,
                                 modifier = Modifier.weight(1f).padding(end = 6.dp, start = 3.dp)
                                     .height(10.dp).onPointerEvent(
                                         PointerEventType.Move
                                     ) {
-                                        progress = it.changes.first().position.x / size.width
+                                        progressOnHover = it.changes.first().position.x / size.width
                                     }.onPointerEvent(PointerEventType.Enter) {
                                         isIndicatorHovered = true
                                     }.onPointerEvent(PointerEventType.Exit) {
@@ -344,7 +354,7 @@ actual fun TracklistHeader(
                             val isHovered by interactionSource.collectIsHoveredAsState()
 
                             Text(
-                                currentTrack.title,
+                                currentTrack?.title ?: "",
                                 fontSize = 10.sp,
                                 color = KagaminTheme.colors.buttonIcon,
                                 maxLines = 1,
@@ -365,16 +375,18 @@ actual fun TracklistHeader(
                     var trackDurationText by remember { mutableStateOf("-:-") }
 
                     LaunchedEffect(currentTrack) {
+                        @Suppress("NAME_SHADOWING") val currentTrack = currentTrack ?: return@LaunchedEffect
+
                         trackDurationText = formatTime(currentTrack.duration)
 
                         while (true) {
-                            if (viewModel.audioPlayer.playState.value == AudioPlayer.PlayState.PLAYING) {
-                                if (viewModel.audioPlayer.position < 1000) trackDurationText =
+                            if (viewModel.playState.value == AudioPlayerService.PlayState.PLAYING) {
+                                if (viewModel.position.value < 1000) trackDurationText =
                                     formatTime(currentTrack.duration)
 
                                 timePastText =
                                     if (isIndicatorHovered) formatTime((currentTrack.duration * progress).toLong())
-                                    else formatTime(currentTrack.let { viewModel.audioPlayer.position })
+                                    else formatTime(currentTrack.let { viewModel.position.value })
                             }
 
                             if (isIndicatorHovered) delay(25)

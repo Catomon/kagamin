@@ -18,7 +18,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,7 +28,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.github.catomon.kagamin.saveSettings
 import com.github.catomon.kagamin.ui.AddTracksTab
 import com.github.catomon.kagamin.ui.CreatePlaylistTab
 import com.github.catomon.kagamin.ui.Playlists
@@ -39,19 +39,23 @@ import com.github.catomon.kagamin.ui.components.TrackThumbnail
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
+import kotlinx.serialization.Serializable
+
+@Serializable
+object PlayerScreenDestination {
+    override fun toString(): String {
+        return "player_screen"
+    }
+}
 
 @Composable
-actual fun PlayerScreen(
+fun PlayerScreen(
     viewModel: KagaminViewModel,
     navController: NavHostController,
-    modifier: Modifier,
+    modifier: Modifier = Modifier
 ) {
-    val audioPlayer = viewModel.audioPlayer
-    val playlist = viewModel.playlist
-    val currentTrack = viewModel.currentTrack
-    val playState = viewModel.playState
-    val playMode = viewModel.playMode
-    val currentPlaylistName = viewModel.currentPlaylistName
+    val currentTrack by viewModel.currentTrack.collectAsState()
+    val currentPlaylist by viewModel.currentPlaylist.collectAsState()
 
     val tabTransition: (Tabs) -> ContentTransform = { tab ->
         when (tab) {
@@ -62,16 +66,6 @@ actual fun PlayerScreen(
 
             else -> slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
         }
-    }
-
-    LaunchedEffect(currentPlaylistName) {
-        viewModel.reloadPlaylist()
-
-        saveSettings(viewModel.settings.copy(lastPlaylistName = currentPlaylistName))
-    }
-
-    LaunchedEffect(currentTrack) {
-        viewModel.updateThumbnail()
     }
 
     Box(
@@ -108,7 +102,7 @@ actual fun PlayerScreen(
 
                 CurrentTrackFrame(
                     viewModel,
-                    currentTrack, audioPlayer, Modifier.width(160.dp).fillMaxHeight()
+                    currentTrack, Modifier.width(160.dp).fillMaxHeight()
                 )
             }
 
@@ -126,10 +120,10 @@ actual fun PlayerScreen(
                         }
 
                         Tabs.TRACKLIST -> {
-                            if (viewModel.playlist.isEmpty()) {
+                            if (currentPlaylist.tracks.isEmpty()) {
                                 Box(
                                     Modifier.fillMaxSize()
-                                        .background(KagaminTheme.colors.listItem),
+                                        .background(KagaminTheme.colors.backgroundTransparent),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
@@ -139,12 +133,10 @@ actual fun PlayerScreen(
                                     )
                                 }
                             } else {
-                                //https://www.youtube.com/playlist?list=PLjw1aNT6Kz2m00RTIUwY6u_vZAwKm8RKn
                                 Tracklist(
                                     viewModel,
-                                    viewModel.playlist,
                                     Modifier.align(Alignment.Center)
-                                        .fillMaxSize()//.padding(start = 16.dp, end = 16.dp)
+                                        .fillMaxSize()
                                 )
                             }
                         }

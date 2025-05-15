@@ -1,11 +1,7 @@
 package com.github.catomon.kagamin
 
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.compositionLocalOf
-import com.github.catomon.kagamin.audio.AudioPlayer
-import com.github.catomon.kagamin.audio.AudioTrack
 import java.awt.Desktop
 import java.net.URI
 import java.util.Locale

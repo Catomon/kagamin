@@ -198,7 +198,7 @@ actual fun PlayerScreen(
                             Tabs.OPTIONS -> TODO()
 
                             Tabs.ADD_TRACKS -> {
-                                AddTracksTab(
+                                com.github.catomon.kagamin.ui.AddTracksTab(
                                     viewModel, Modifier
                                         .fillMaxHeight()
                                         .align(Alignment.Center)

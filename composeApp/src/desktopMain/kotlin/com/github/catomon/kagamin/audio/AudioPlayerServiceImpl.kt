@@ -37,7 +37,7 @@ class AudioPlayerServiceImpl(
     private val _crossfade = MutableStateFlow(false)
     override val crossfade: StateFlow<Boolean> = _crossfade
 
-    val playlistsManager = PlaylistsManagerImpl(this)
+    override val playlistsManager = PlaylistsManagerImpl(this)
 
     val audioLoader = LavaAudioLoader(LavaLoaderListener())
 
@@ -146,26 +146,30 @@ class AudioPlayerServiceImpl(
         }
 
         override fun onTrackPlaybackEnded(track: LavaAudioTrack) {
-            if (playlistsManager.playMode.value != PlaylistsManager.PlayMode.ONCE)
-                coroutineScope.launch {
+            if (playlistsManager.playMode.value != PlaylistsManager.PlayMode.ONCE) {
+                coroutineScope.launch(Dispatchers.Main) {
                     playlistsManager.nextTrack()
                 }
+            } else {
+                stop()
+            }
         }
 
         override fun onTrackPlaybackEndedLoadFailed(track: LavaAudioTrack) {
-            coroutineScope.launch {
+            coroutineScope.launch(Dispatchers.Main) {
                 playlistsManager.nextTrack()
             }
         }
 
         override fun onTrackPlaybackStuck(track: LavaAudioTrack) {
-            coroutineScope.launch {
+            coroutineScope.launch(Dispatchers.Main) {
                 playlistsManager.nextTrack()
+
             }
         }
 
         override fun onTrackPlaybackError(track: LavaAudioTrack) {
-            coroutineScope.launch {
+            coroutineScope.launch(Dispatchers.Main) {
                 playlistsManager.nextTrack()
             }
         }

@@ -24,7 +24,6 @@ import kotlin.system.exitProcess
 
 class KagaminViewModel(
     private val audioPlayerService: AudioPlayerService,
-    private val playlistsManager: PlaylistsManager,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {
 
@@ -32,6 +31,8 @@ class KagaminViewModel(
     val currentTrack: StateFlow<AudioTrack?> = audioPlayerService.currentTrack
     val position: StateFlow<Long> = audioPlayerService.position
     val volume: StateFlow<Float> = audioPlayerService.volume
+
+    private val playlistsManager: PlaylistsManager = audioPlayerService.playlistsManager
 
     val playlists: StateFlow<List<Playlist>> = playlistsManager.playlists
     val currentPlaylist: StateFlow<Playlist> = playlistsManager.currentPlaylist

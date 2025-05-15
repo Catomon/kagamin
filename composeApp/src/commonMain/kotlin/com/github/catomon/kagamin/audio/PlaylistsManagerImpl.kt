@@ -32,7 +32,7 @@ class PlaylistsManagerImpl(
     private val _currentTrack = MutableStateFlow<AudioTrack?>(null)
     override val currentTrack: StateFlow<AudioTrack?> = _currentTrack.asStateFlow()
 
-    private val _playMode = MutableStateFlow(PlaylistsManager.PlayMode.ONCE)
+    private val _playMode = MutableStateFlow(PlaylistsManager.PlayMode.PLAYLIST)
     override val playMode: StateFlow<PlaylistsManager.PlayMode> = _playMode.asStateFlow()
 
     private val mutex = Mutex()

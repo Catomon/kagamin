@@ -13,6 +13,8 @@ interface AudioPlayerService {
     val position: StateFlow<Long>
     val crossfade: StateFlow<Boolean>
 
+    val playlistsManager: PlaylistsManager
+
     suspend fun play(track: AudioTrack): Result<Boolean>
 
     fun pause()

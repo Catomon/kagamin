@@ -150,7 +150,7 @@ fun Tracklist(
         ) {
             Column(Modifier.fillMaxSize()) {
                 val tracks by remember { derivedStateOf {
-                    filteredTracks ?: currentPlaylist.tracks
+                    filteredTracks ?: currentPlaylist.tracks //todo sorting
                 } }
 
                 LazyColumn(

@@ -4,6 +4,9 @@ import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,7 +53,11 @@ fun ApplicationScope.setComposeExceptionHandler() {
                 val clipboard = LocalClipboardManager.current
 
                 Box(contentAlignment = Alignment.Center) {
-                    Text(e.stackTraceToString(), Modifier.fillMaxSize())
+                    SelectionContainer {
+                        Text(e.stackTraceToString(), Modifier.fillMaxSize().verticalScroll(
+                            rememberScrollState()
+                        ))
+                    }
                     Button({
                         clipboard.setText(AnnotatedString(e.stackTraceToString()))
                     }, Modifier.align(Alignment.BottomCenter)) {

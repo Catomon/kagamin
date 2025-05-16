@@ -20,6 +20,8 @@ fun main() {
     setDefaultExceptionHandler()
 
     FileKit.init(appId = "Kagamin")
+    System.setProperty("jna.nosys", "true");
+//    AbstractID3Tag.logger.level = Level.OFF
 
     application {
         setComposeExceptionHandler()
@@ -43,9 +45,6 @@ fun main() {
                 }
                 .build()
         }
-
-        AbstractID3Tag.logger.level = Level.OFF
-
         AppContainer(::exitApplication)
     }
 }

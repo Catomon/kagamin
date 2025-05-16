@@ -49,23 +49,28 @@ kotlin {
 
             implementation(libs.kotlinx.serialization.json)
 //            implementation(libs.mpfilepicker)
-           // implementation(libs.mp3agic)
+            // implementation(libs.mp3agic)
 //            implementation(libs.filekit.core)
 //            implementation(libs.filekit.dialogs)
 
             implementation(libs.coil.compose)
             implementation(libs.coil.network.okhttp)
 
-            implementation(libs.filekit.dialogs.compose)
-//            implementation(libs.filekit.coil)
+            implementation("io.github.vinceglb:filekit-dialogs-compose:0.10.0-beta02") {
+                exclude(group = "net.java.dev.jna", module = "jna")
+//                exclude(group = "net.java.dev.jna", module = "jna-platform")
+            }
 
-            implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+//            implementation("net.java.dev.jna:jna-platform:4.1.0")
+            implementation("net.java.dev.jna:jna:5.2.0")
+//            implementation(libs.filekit.coil)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
 
-            implementation(libs.discord.rpc)
+//            implementation(libs.discord.rpc)
+
             implementation(libs.lavaplayer)
             implementation("org.slf4j:slf4j-api:2.0.7")
             implementation("org.slf4j:slf4j-simple:2.0.7")
@@ -121,11 +126,20 @@ compose.desktop {
             packageName = "Kagamin"
             packageVersion = "1.0.6"
 
-            modules("java.compiler", "java.instrument", "java.naming", "java.scripting", "java.security.jgss", "java.sql", "jdk.management", "jdk.unsupported")
+            modules(
+                "java.compiler",
+                "java.instrument",
+                "java.naming",
+                "java.scripting",
+                "java.security.jgss",
+                "java.sql",
+                "jdk.management",
+                "jdk.unsupported"
+            )
 
             buildTypes.release.proguard {
-//                configurationFiles.from(project.file("compose-desktop.pro"))
-                isEnabled = false
+                configurationFiles.from(project.file("compose-desktop.pro"))
+                isEnabled = true
             }
 
             linux {

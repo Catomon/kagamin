@@ -138,11 +138,11 @@ class AudioPlayerServiceImpl(
         }
 
         override fun onPlaylistLoaded(playlist: LavaAudioPlaylist) {
-            TODO("Not yet implemented")
+            stop()
         }
 
         override fun onLoadFailed() {
-            TODO("Not yet implemented")
+            stop()
         }
 
         override fun onTrackPlaybackEnded(track: LavaAudioTrack) {

@@ -9,9 +9,9 @@ import kagamin.composeapp.generated.resources.denpa
 import kagamin.composeapp.generated.resources.higurashi
 import kagamin.composeapp.generated.resources.nanahira
 import kagamin.composeapp.generated.resources.toromi
-import net.arikia.dev.drpc.DiscordEventHandlers
-import net.arikia.dev.drpc.DiscordRPC
-import net.arikia.dev.drpc.DiscordRichPresence
+//import net.arikia.dev.drpc.DiscordEventHandlers
+//import net.arikia.dev.drpc.DiscordRPC
+//import net.arikia.dev.drpc.DiscordRichPresence
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 
@@ -19,22 +19,21 @@ var discordRichDisabled = !loadSettings().discordIntegration
 var showSongDetails = true
 
 fun startDiscordRich() {
-    try {
-        DiscordRPC.discordInitialize("1335867032759042058", DiscordEventHandlers(), true)
-    } catch (e: Exception) {
-        e.printStackTrace()
-        discordRichDisabled = true
-    }
-
+//    try {
+//        DiscordRPC.discordInitialize("1335867032759042058", DiscordEventHandlers(), true)
+//    } catch (e: Exception) {
+//        e.printStackTrace()
+//        discordRichDisabled = true
+//    }
 }
 
 fun stopDiscordRich() {
-    try {
-        DiscordRPC.discordShutdown()
-    } catch (e: Exception) {
-        e.printStackTrace()
-        discordRichDisabled = true
-    }
+//    try {
+//        DiscordRPC.discordShutdown()
+//    } catch (e: Exception) {
+//        e.printStackTrace()
+//        discordRichDisabled = true
+//    }
 }
 
 enum class Rich {
@@ -131,49 +130,49 @@ fun registeredSingerBySongName(songName: String = defaultSingerName): Singer {
 val hideSingerIcon = !loadSettings().showSingerIcons
 
 fun discordRich(rich: Rich, track: AudioTrack?) {
-    if (discordRichDisabled) return
-
-    val songName = track?.trackName
-
-    val singer = registeredSingerBySongName(track?.trackInfoString ?: defaultSingerName)
-    val singerName = singer.names.first()
-    val singerIconId = singer.iconIds.random().replace(".", "_").replace(" ", "_").lowercase()
-
-    val presence = DiscordRichPresence().apply {
-        when (rich) {
-            Rich.IDLE -> {
-                largeImageKey = "kagamin512"
-                largeImageText = appName
-                smallImageKey = "idle"
-                smallImageText = "待機中"
-                details = "待機中" //"Idle"
-            }
-
-            Rich.LISTENING -> {
-                largeImageKey = if (hideSingerIcon) "kagamin512" else singerIconId
-                largeImageText = if (hideSingerIcon) appName else singerName
-                smallImageKey = "playing"
-                smallImageText = "視聴中" // "Listening"
-
-                if (showSongDetails) {
-                    details = "$songName"
-//              //todo?      endTimestamp = System.currentTimeMillis() + (track?.duration
-//                        ?: Long.MAX_VALUE) - (track?.position ?: 0L)
-                }
-            }
-
-            Rich.PAUSED -> {
-                largeImageKey = if (hideSingerIcon) "kagamin512" else singerIconId
-                largeImageText = if (hideSingerIcon) appName else singerName
-                smallImageKey = "paused"
-                smallImageText = "一時停止中" // "Paused"
-                if (showSongDetails)
-                    details = "$songName"
-            }
-        }
-    }
-
-    DiscordRPC.discordUpdatePresence(presence)
+//    if (discordRichDisabled) return
+//
+//    val songName = track?.trackName
+//
+//    val singer = registeredSingerBySongName(track?.trackInfoString ?: defaultSingerName)
+//    val singerName = singer.names.first()
+//    val singerIconId = singer.iconIds.random().replace(".", "_").replace(" ", "_").lowercase()
+//
+//    val presence = DiscordRichPresence().apply {
+//        when (rich) {
+//            Rich.IDLE -> {
+//                largeImageKey = "kagamin512"
+//                largeImageText = appName
+//                smallImageKey = "idle"
+//                smallImageText = "待機中"
+//                details = "待機中" //"Idle"
+//            }
+//
+//            Rich.LISTENING -> {
+//                largeImageKey = if (hideSingerIcon) "kagamin512" else singerIconId
+//                largeImageText = if (hideSingerIcon) appName else singerName
+//                smallImageKey = "playing"
+//                smallImageText = "視聴中" // "Listening"
+//
+//                if (showSongDetails) {
+//                    details = "$songName"
+////              //todo?      endTimestamp = System.currentTimeMillis() + (track?.duration
+////                        ?: Long.MAX_VALUE) - (track?.position ?: 0L)
+//                }
+//            }
+//
+//            Rich.PAUSED -> {
+//                largeImageKey = if (hideSingerIcon) "kagamin512" else singerIconId
+//                largeImageText = if (hideSingerIcon) appName else singerName
+//                smallImageKey = "paused"
+//                smallImageText = "一時停止中" // "Paused"
+//                if (showSongDetails)
+//                    details = "$songName"
+//            }
+//        }
+//    }
+//
+//    DiscordRPC.discordUpdatePresence(presence)
 }
 
 /** returns empty string if not contained, this otherwise */

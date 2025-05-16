@@ -205,17 +205,20 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
 
             Box(Modifier.fillMaxSize().hoverable(interactionSource)) {
                 Column {
+                    val displayedPlaylists = remember(filteredPlaylists, playlists) {
+                        (filteredPlaylists ?: playlists).sortedBy { it.name.lowercase() }
+                    }
+
                     LazyColumn(
                         state = listState, horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.background(KagaminTheme.backgroundTransparent),
                         contentPadding = PaddingValues(2.dp)
                     ) {
-                        val playlists = filteredPlaylists ?: playlists
-                        items(playlists.size, key = {
-                            playlists.elementAt(it)
+                        items(displayedPlaylists.size, key = {
+                            displayedPlaylists.elementAt(it)
                         }) { i ->
-                            val playlist = playlists.elementAt(i)
-                            PlaylistItem(playlist, viewModel, playlists, currentPlaylist == playlist, i, remove = {
+                            val playlist = displayedPlaylists.elementAt(i)
+                            PlaylistItem(playlist, viewModel, displayedPlaylists, currentPlaylist == playlist, i, remove = {
                                 viewModel.removePlaylist(playlist)
                             }, clear = {
                                 viewModel.clearPlaylist(playlist)

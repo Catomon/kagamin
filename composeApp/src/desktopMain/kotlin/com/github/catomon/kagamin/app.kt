@@ -45,9 +45,9 @@ import com.github.catomon.kagamin.WindowConfig.isTraySupported
 import com.github.catomon.kagamin.audio.AudioPlayerService
 import com.github.catomon.kagamin.data.AudioTrack
 import com.github.catomon.kagamin.data.PlaylistsLoader
-import com.github.catomon.kagamin.ui.KagaminApp
 import com.github.catomon.kagamin.data.cache.ThumbnailCacheManager
 import com.github.catomon.kagamin.data.loadSettings
+import com.github.catomon.kagamin.ui.KagaminApp
 import com.github.catomon.kagamin.ui.customShadow
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.LayoutManager
@@ -56,8 +56,6 @@ import com.github.catomon.kagamin.ui.windows.AddTracksOrPlaylistsWindow
 import com.github.catomon.kagamin.ui.windows.ConfirmWindow
 import com.github.catomon.kagamin.ui.windows.ConfirmWindowState
 import com.github.catomon.kagamin.ui.windows.LocalConfirmWindow
-import com.mpatric.mp3agic.ID3v2
-import com.mpatric.mp3agic.Mp3File
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.kagamin_icon64
 import kagamin.composeapp.generated.resources.pause_icon
@@ -67,12 +65,19 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jaudiotagger.audio.AudioFileIO
+import org.jaudiotagger.audio.AudioHeader
+import org.jaudiotagger.tag.FieldKey
+import org.jaudiotagger.tag.Tag
 import org.jetbrains.compose.resources.painterResource
 import org.koin.java.KoinJavaComponent.get
+import java.awt.Image
 import java.awt.datatransfer.DataFlavor
+import java.awt.image.BufferedImage
 import java.io.File
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
+
 
 @Composable
 fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
@@ -83,7 +88,8 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
         LayoutManager(
             try {
                 LayoutManager.Layout.valueOf(
-                    kagaminViewModel.settings.extra["layout"] ?: LayoutManager.Layout.BottomControls.name
+                    kagaminViewModel.settings.extra["layout"]
+                        ?: LayoutManager.Layout.BottomControls.name
                 )
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -319,7 +325,10 @@ suspend fun loadTrackFilesToCurrentPlaylist(
             snackbarScope.launch {
                 launch {
                     snackbar.currentSnackbarData?.dismiss()
-                    snackbar.showSnackbar("Filtering files...", duration = SnackbarDuration.Indefinite)
+                    snackbar.showSnackbar(
+                        "Filtering files...",
+                        duration = SnackbarDuration.Indefinite
+                    )
                 }
             }
 
@@ -344,27 +353,46 @@ suspend fun loadTrackFilesToCurrentPlaylist(
             snackbarScope.launch {
                 launch {
                     snackbar.currentSnackbarData?.dismiss()
-                    snackbar.showSnackbar("Reading metadata...", duration = SnackbarDuration.Indefinite)
+                    snackbar.showSnackbar(
+                        "Reading metadata...",
+                        duration = SnackbarDuration.Indefinite
+                    )
                 }
             }
 
         val loadedTracks = withContext(Dispatchers.IO) {
-            trackFiles.map {
-                val path = it.path
-                val mp3File = Mp3File(path)
-                val tag: ID3v2? = mp3File.id3v2Tag
+            trackFiles.map { audioFile ->
+                val path = audioFile.path
+
+                val (tag: Tag?, audioHeader: AudioHeader?) = try {
+                    AudioFileIO.read(audioFile)
+                        .let {
+                            it.tag to it.audioHeader
+                        }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    null to null
+                }
 
                 cachingScope.launch {
-                    ThumbnailCacheManager.cacheThumbnail(trackUri = path, mp3File = mp3File)
+                    ThumbnailCacheManager.cacheThumbnail(trackUri = path, retrieveImage = {
+                            tag?.firstArtwork?.image as BufferedImage?
+                    })
                 }
+
+                fun Tag.getOrNull(key: FieldKey): String? =
+                    if (tag?.hasField(key) == true) getFirst(key) else null
+
+                val preciseLengthInSeconds: Double = audioHeader?.preciseTrackLength ?: 0.0
+                val preciseLengthInMilliseconds = (preciseLengthInSeconds * 1000).toLong()
 
                 AudioTrack(
                     id = Uuid.random().toString(),
                     uri = path,
-                    title = tag?.title ?: "",
-                    artist = tag?.artist ?: "",
-                    album = tag?.album ?: "",
-                    duration = mp3File.lengthInMilliseconds,
+                    title = tag?.getOrNull(FieldKey.TITLE)?.ifBlank { null } ?: audioFile.nameWithoutExtension,
+                    artist = tag?.getOrNull(FieldKey.ARTIST) ?: "",
+                    album = tag?.getOrNull(FieldKey.ALBUM) ?: "",
+                    duration = preciseLengthInMilliseconds,
                     artworkUri = null
                 )
             }
@@ -375,7 +403,10 @@ suspend fun loadTrackFilesToCurrentPlaylist(
             snackbarScope.launch {
                 launch {
                     snackbar.currentSnackbarData?.dismiss()
-                    snackbar.showSnackbar("Adding tracks...", duration = SnackbarDuration.Indefinite)
+                    snackbar.showSnackbar(
+                        "Adding tracks...",
+                        duration = SnackbarDuration.Indefinite
+                    )
                 }
             }
 

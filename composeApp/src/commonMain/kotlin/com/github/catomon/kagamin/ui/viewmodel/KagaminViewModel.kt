@@ -36,7 +36,7 @@ class KagaminViewModel(
 
     val playlists: StateFlow<List<Playlist>> = playlistsManager.playlists
     val currentPlaylist: StateFlow<Playlist> = playlistsManager.currentPlaylist
-    val queueState: StateFlow<List<AudioTrack>> = playlistsManager.queueState
+    val queue: StateFlow<List<AudioTrack>> = playlistsManager.queueState
 
     //    val currentTrack: StateFlow<AudioTrack?> = playlistsManager.currentTrack
     val playMode: StateFlow<PlaylistsManager.PlayMode> = playlistsManager.playMode
@@ -104,7 +104,7 @@ class KagaminViewModel(
         if (loadedPlaylists.isNotEmpty())
             playlistsManager.updatePlaylists(loadedPlaylists)
         else
-            PlaylistsLoader.savePlaylist(currentPlaylist.value)
+            PlaylistsLoader.savePlaylist(currentPlaylist.value) //if no playlists saved on the disk, save default playlist
     }
 
     fun onPlayPause() {

@@ -3,7 +3,6 @@ package com.github.catomon.kagamin.data.cache
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import com.github.catomon.kagamin.data.cacheFolder
 import com.github.catomon.kagamin.ui.util.removeBlackBars
-import com.mpatric.mp3agic.Mp3File
 import io.github.vinceglb.filekit.dialogs.compose.util.encodeToByteArray
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -16,7 +15,9 @@ import kotlinx.io.IOException
 import net.coobird.thumbnailator.Thumbnails
 import net.coobird.thumbnailator.resizers.configurations.Antialiasing
 import net.coobird.thumbnailator.resizers.configurations.Rendering
+import org.jaudiotagger.audio.AudioFileIO
 import org.jetbrains.skia.Image
+import java.awt.image.BufferedImage
 import java.io.File
 import java.nio.file.Files
 
@@ -37,7 +38,7 @@ object ThumbnailCacheManager {
     suspend fun cacheThumbnail(
         trackUri: String,
         size: Int = SIZE.ORIGINAL,
-        mp3File: Mp3File? = null
+        retrieveImage: (() -> BufferedImage?)? = null,
     ): File? {
         return mutex.withLock {
             ongoingCacheJobs[trackUri]?.let { existingJob ->
@@ -46,10 +47,16 @@ object ThumbnailCacheManager {
 
             val newJob = CoroutineScope(Dispatchers.IO).async {
                 try {
-                    if (mp3File != null)
-                        cacheThumbnail(trackUri, mp3File)
+                    if (retrieveImage != null)
+                        cacheThumbnail(trackUri, retrieveImage() ?: return@async null)
                     else
-                        cacheThumbnail(trackUri)
+                        cacheThumbnail(
+                            trackUri,
+                            AudioFileIO.read(File(trackUri))
+                                .let {
+                                    it.tag?.firstArtwork?.image as BufferedImage
+                                }
+                        )
                 } catch (e: Exception) {
                     e.printStackTrace()
                     null
@@ -75,7 +82,7 @@ object ThumbnailCacheManager {
     }
 
     private suspend fun cacheThumbnail(
-        trackUri: String, mp3File: Mp3File = Mp3File(trackUri)
+        trackUri: String, image: BufferedImage
     ): File? {
         try {
             val uriHash = trackUri.hashCode()
@@ -86,14 +93,9 @@ object ThumbnailCacheManager {
             } else {
                 cachedSrcFile.parentFile?.mkdirs()
 
-                mp3File.id3v2Tag.albumImage?.let { albumImage ->
-                    val image = Image.makeFromEncoded(albumImage)
-
-                    val target = image.toComposeImageBitmap().removeBlackBars()
-
-                    cachedSrcFile.outputStream().use { output ->
-                        output.write(target.encodeToByteArray())
-                    }
+                val target = image.toComposeImageBitmap().removeBlackBars()
+                cachedSrcFile.outputStream().use { output ->
+                    output.write(target.encodeToByteArray())
                 }
             }
 

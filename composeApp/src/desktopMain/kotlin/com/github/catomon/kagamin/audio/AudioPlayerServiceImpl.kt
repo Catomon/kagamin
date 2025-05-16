@@ -37,7 +37,7 @@ class AudioPlayerServiceImpl(
     private val _crossfade = MutableStateFlow(false)
     override val crossfade: StateFlow<Boolean> = _crossfade
 
-    override val playlistsManager = PlaylistsManagerImpl(this)
+    override val playlistsManager: PlaylistsManager = PlaylistsManagerImpl(this)
 
     val audioLoader = LavaAudioLoader(LavaLoaderListener())
 

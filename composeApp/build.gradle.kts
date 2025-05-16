@@ -49,7 +49,7 @@ kotlin {
 
             implementation(libs.kotlinx.serialization.json)
 //            implementation(libs.mpfilepicker)
-            implementation(libs.mp3agic)
+           // implementation(libs.mp3agic)
 //            implementation(libs.filekit.core)
 //            implementation(libs.filekit.dialogs)
 
@@ -73,6 +73,8 @@ kotlin {
             implementation("dev.lavalink.youtube:v2:1.12.0")
 
             implementation("net.coobird:thumbnailator:0.4.20")
+
+            implementation("com.github.Adonai:jaudiotagger:2.3.14")
         }
     }
 }

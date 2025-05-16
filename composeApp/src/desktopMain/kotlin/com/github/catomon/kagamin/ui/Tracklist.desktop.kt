@@ -109,7 +109,7 @@ fun Tracklist(
         allowAutoScroll = true
     }
 
-    LaunchedEffect(currentPlaylist) {
+    LaunchedEffect(currentPlaylist.id) {
         listState.scrollToItem(index[currentTrack?.uri] ?: 0)
     }
 
@@ -149,6 +149,10 @@ fun Tracklist(
             modifier = Modifier.fillMaxSize().weight(2f).hoverable(interactionSource)
         ) {
             Column(Modifier.fillMaxSize()) {
+                val tracks by remember { derivedStateOf {
+                    filteredTracks ?: currentPlaylist.tracks
+                } }
+
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth()
                         .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
@@ -166,7 +170,6 @@ fun Tracklist(
                             allowAutoScroll = false
                         }, state = listState, contentPadding = PaddingValues(2.dp)
                 ) {
-                    val tracks = filteredTracks ?: currentPlaylist.tracks
                     items(tracks.size, key = {
                         tracks[it].id
                     }) { index ->
@@ -230,12 +233,15 @@ fun TracklistHeader(
 ) {
     val backgroundColor = KagaminTheme.backgroundTransparent
     var shownContent by remember { mutableStateOf(Content.TrackName) }
-    var isIndicatorHovered by remember { mutableStateOf(false) }
     var showSearchIcon by remember { mutableStateOf(false) }
 
+    var searchTextValue by remember { mutableStateOf("") }
+
+    val interactionSource = remember { MutableInteractionSource() }
+    val isIndicatorHovered by interactionSource.collectIsHoveredAsState()
     val position by viewModel.position.collectAsState()
 
-    val progress by remember {
+    val progress by remember(currentTrack) {
         derivedStateOf {
             if (!isIndicatorHovered) {
                 when (currentTrack) {
@@ -249,8 +255,6 @@ fun TracklistHeader(
     }
 
     val progressAnimated by animateFloatAsState(progress)
-
-    var searchTextValue by remember { mutableStateOf("") }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -310,11 +314,8 @@ fun TracklistHeader(
                                         PointerEventType.Move
                                     ) {
                                         progressOnHover = it.changes.first().position.x / size.width
-                                    }.onPointerEvent(PointerEventType.Enter) {
-                                        isIndicatorHovered = true
-                                    }.onPointerEvent(PointerEventType.Exit) {
-                                        isIndicatorHovered = false
-                                    })
+                                    }.hoverable(interactionSource)
+                            )
                         }
 
                         Content.SearchBar -> {
@@ -350,7 +351,8 @@ fun TracklistHeader(
                         }
 
                         Content.TrackName -> {
-                            val interactionSource = remember { MutableInteractionSource() }
+                            @Suppress("NAME_SHADOWING") val interactionSource =
+                                remember { MutableInteractionSource() }
                             val isHovered by interactionSource.collectIsHoveredAsState()
 
                             Text(
@@ -375,7 +377,8 @@ fun TracklistHeader(
                     var trackDurationText by remember { mutableStateOf("-:-") }
 
                     LaunchedEffect(currentTrack) {
-                        @Suppress("NAME_SHADOWING") val currentTrack = currentTrack ?: return@LaunchedEffect
+                        @Suppress("NAME_SHADOWING") val currentTrack =
+                            currentTrack ?: return@LaunchedEffect
 
                         trackDurationText = formatTime(currentTrack.duration)
 

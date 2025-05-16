@@ -27,4 +27,4 @@ interface AudioPlayerService {
     fun setVolume(volume: Float)
 }
 
-expect fun getAudioPlayerServiceImpl() : AudioPlayerService
+expect fun getAudioPlayerServiceImpl(): AudioPlayerService

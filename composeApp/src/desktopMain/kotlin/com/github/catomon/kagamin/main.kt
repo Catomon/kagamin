@@ -11,7 +11,9 @@ import com.github.catomon.kagamin.util.echoWarn
 import com.github.catomon.kagamin.di.appModule
 import io.github.vinceglb.filekit.FileKit
 import okio.Path.Companion.toOkioPath
+import org.jaudiotagger.tag.id3.AbstractID3Tag
 import org.koin.core.context.GlobalContext.startKoin
+import java.util.logging.Level
 import javax.swing.JOptionPane
 
 fun main() {
@@ -41,6 +43,8 @@ fun main() {
                 }
                 .build()
         }
+
+        AbstractID3Tag.logger.level = Level.OFF
 
         AppContainer(::exitApplication)
     }

@@ -86,19 +86,19 @@ fun TrackProgressIndicator(
     color: Color = KagaminTheme.colors.buttonIcon,
     modifier: Modifier = Modifier,
 ) {
-        LinearProgressIndicator(
-            progress = progress,
-            modifier.fillMaxWidth().padding().pointerHoverIcon(
-                PointerIcon.Hand
-            ).pointerInput(currentTrack) {
-                if (currentTrack == null) return@pointerInput
-                val width = this.size.width
-                detectTapGestures {
-                    seek((currentTrack.duration * (it.x / width)).toLong())
-                }
-            },
-            color = color,
-            trackColor = KagaminTheme.colors.thinBorder,
-            strokeCap = StrokeCap.Round
-        )
+    LinearProgressIndicator(
+        progress = { progress },
+        modifier = modifier.fillMaxWidth().padding().pointerHoverIcon(
+            PointerIcon.Hand
+        ).pointerInput(currentTrack) {
+            if (currentTrack == null) return@pointerInput
+            val width = this.size.width
+            detectTapGestures {
+                seek((currentTrack.duration * (it.x / width)).toLong())
+            }
+        },
+        color = color,
+        trackColor = KagaminTheme.colors.thinBorder,
+        strokeCap = StrokeCap.Round,
+    )
 }

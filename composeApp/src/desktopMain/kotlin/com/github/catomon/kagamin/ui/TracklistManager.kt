@@ -62,12 +62,12 @@ class TracklistManager(
         coroutineScope.launch {
             if (isAnySelected) {
                 selected.values.forEach { track ->
-                    viewModel.clearPlaylist(viewModel.currentPlaylist.value.copy(tracks = viewModel.currentPlaylist.value.tracks - track))
+                    viewModel.updatePlaylist(viewModel.currentPlaylist.value.copy(tracks = viewModel.currentPlaylist.value.tracks - track))
                 }
 
                 deselectAll()
             } else {
-                viewModel.clearPlaylist(viewModel.currentPlaylist.value.copy(tracks = viewModel.currentPlaylist.value.tracks - track))
+                viewModel.updatePlaylist(viewModel.currentPlaylist.value.copy(tracks = viewModel.currentPlaylist.value.tracks - track))
             }
         }
     }

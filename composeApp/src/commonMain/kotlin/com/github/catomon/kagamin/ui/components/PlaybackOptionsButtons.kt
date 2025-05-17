@@ -37,23 +37,6 @@ fun PlaybackOptionsButtons(
     modifier: Modifier = Modifier,
     buttonsSize: Dp = 32.dp
 ) {
-    val playMode by viewModel.playMode.collectAsState()
-    val volume by viewModel.volume.collectAsState()
-    var showVolumeSlider by remember { mutableStateOf(false) }
-    var timer by remember { mutableFloatStateOf(0f) }
-
-    LaunchedEffect(showVolumeSlider, volume) {
-        timer = 0f
-        while (true) {
-            timer += 0.1f
-            if (timer >= 3f) {
-                showVolumeSlider = false
-            }
-
-            delay(100)
-        }
-    }
-
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

@@ -71,7 +71,6 @@ import org.jaudiotagger.tag.FieldKey
 import org.jaudiotagger.tag.Tag
 import org.jetbrains.compose.resources.painterResource
 import org.koin.java.KoinJavaComponent.get
-import java.awt.Image
 import java.awt.datatransfer.DataFlavor
 import java.awt.image.BufferedImage
 import java.io.File
@@ -175,6 +174,47 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
         ConfirmWindow(confirmWindowState.value)
     }
 }
+
+//    //    if (isTraySupported) {
+//    //        var lastClickTime by remember { mutableStateOf(0L) }
+//    //        var clickJob by remember { mutableStateOf<Job?>(null) }
+//    //
+//    //        Tray(
+//    //            iconContent = {
+//    //                Image(
+//    //                    painterResource(if (kagaminViewModel.playState.value == AudioPlayerService.PlayState.PLAYING) Res.drawable.pause_icon else Res.drawable.play_icon),
+//    //                    null, modifier = Modifier.fillMaxSize()
+//    //                )
+//    //            },
+//    //            tooltip = kagaminViewModel.currentTrack.value?.title ?: "Kagamin - Idle",
+//    //            primaryAction = {
+//    //                val currentTime = System.currentTimeMillis()
+//    //                if (currentTime - lastClickTime < 300) {
+//    //                    clickJob?.cancel()
+//    //                    openPlayerWindow = !openPlayerWindow
+//    //                } else {
+//    //                    clickJob?.cancel()
+//    //                    clickJob = CoroutineScope(Dispatchers.Main).launch {
+//    //                        delay(300)
+//    //                        kagaminViewModel.onPlayPause()
+//    //                    }
+//    //                }
+//    //                lastClickTime = currentTime
+//    //            },
+//    //        ) {
+//    //            Item("Kagamin", onClick = {
+//    //                openPlayerWindow = true
+//    //            })
+//    //            Item(
+//    //                if (kagaminViewModel.playState.value == AudioPlayerService.PlayState.PLAYING) "Pause" else "Play",
+//    //                onClick = {
+//    //                    kagaminViewModel.onPlayPause()
+//    //                })
+//    //            Item("Exit", onClick = {
+//    //                onCloseRequest()
+//    //            })
+//    //        }
+//    //    }
 
 @Composable
 private fun AppWindow(
@@ -376,7 +416,7 @@ suspend fun loadTrackFilesToCurrentPlaylist(
 
                 cachingScope.launch {
                     ThumbnailCacheManager.cacheThumbnail(trackUri = path, retrieveImage = {
-                            tag?.firstArtwork?.image as BufferedImage?
+                        tag?.firstArtwork?.image as BufferedImage?
                     })
                 }
 
@@ -389,7 +429,8 @@ suspend fun loadTrackFilesToCurrentPlaylist(
                 AudioTrack(
                     id = Uuid.random().toString(),
                     uri = path,
-                    title = tag?.getOrNull(FieldKey.TITLE)?.ifBlank { null } ?: audioFile.nameWithoutExtension,
+                    title = tag?.getOrNull(FieldKey.TITLE)?.ifBlank { null }
+                        ?: audioFile.nameWithoutExtension,
                     artist = tag?.getOrNull(FieldKey.ARTIST) ?: "",
                     album = tag?.getOrNull(FieldKey.ALBUM) ?: "",
                     duration = preciseLengthInMilliseconds,

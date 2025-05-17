@@ -11,6 +11,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -19,23 +20,24 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack as LavaAudioTrack
 
 class AudioPlayerServiceImpl(
     val dispatcherDefault: CoroutineDispatcher = Dispatchers.Default,
-    val dispatcherIO: CoroutineDispatcher = Dispatchers.IO
+    val dispatcherIO: CoroutineDispatcher = Dispatchers.IO,
+    val dispatcherMain: CoroutineDispatcher = Dispatchers.Main
 ) : AudioPlayerService {
 
     private val _playState = MutableStateFlow(AudioPlayerService.PlayState.IDLE)
-    override val playState: StateFlow<AudioPlayerService.PlayState> = _playState
+    override val playState: StateFlow<AudioPlayerService.PlayState> = _playState.asStateFlow()
 
     private val _currentTrack = MutableStateFlow<AudioTrack?>(null)
-    override val currentTrack: StateFlow<AudioTrack?> = _currentTrack
+    override val currentTrack: StateFlow<AudioTrack?> = _currentTrack.asStateFlow()
 
     private val _volume = MutableStateFlow(0.25f)
-    override val volume: StateFlow<Float> = _volume
+    override val volume: StateFlow<Float> = _volume.asStateFlow()
 
     private val _position = MutableStateFlow(0L)
-    override val position: StateFlow<Long> = _position
+    override val position: StateFlow<Long> = _position.asStateFlow()
 
     private val _crossfade = MutableStateFlow(false)
-    override val crossfade: StateFlow<Boolean> = _crossfade
+    override val crossfade: StateFlow<Boolean> = _crossfade.asStateFlow()
 
     override val playlistsManager: PlaylistsManager = PlaylistsManagerImpl(this)
 
@@ -147,7 +149,7 @@ class AudioPlayerServiceImpl(
 
         override fun onTrackPlaybackEnded(track: LavaAudioTrack) {
             if (playlistsManager.playMode.value != PlaylistsManager.PlayMode.ONCE) {
-                coroutineScope.launch(Dispatchers.Main) {
+                coroutineScope.launch(dispatcherMain) {
                     playlistsManager.nextTrack()
                 }
             } else {
@@ -156,20 +158,20 @@ class AudioPlayerServiceImpl(
         }
 
         override fun onTrackPlaybackEndedLoadFailed(track: LavaAudioTrack) {
-            coroutineScope.launch(Dispatchers.Main) {
+            coroutineScope.launch(dispatcherMain) {
                 playlistsManager.nextTrack()
             }
         }
 
         override fun onTrackPlaybackStuck(track: LavaAudioTrack) {
-            coroutineScope.launch(Dispatchers.Main) {
+            coroutineScope.launch(dispatcherMain) {
                 playlistsManager.nextTrack()
 
             }
         }
 
         override fun onTrackPlaybackError(track: LavaAudioTrack) {
-            coroutineScope.launch(Dispatchers.Main) {
+            coroutineScope.launch(dispatcherMain) {
                 playlistsManager.nextTrack()
             }
         }

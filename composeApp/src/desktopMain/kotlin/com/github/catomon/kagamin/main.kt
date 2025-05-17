@@ -21,7 +21,7 @@ fun main() {
 
     FileKit.init(appId = "Kagamin")
     System.setProperty("jna.nosys", "true");
-//    AbstractID3Tag.logger.level = Level.OFF
+    AbstractID3Tag.logger.level = Level.OFF
 
     application {
         setComposeExceptionHandler()

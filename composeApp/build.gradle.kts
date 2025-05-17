@@ -80,6 +80,8 @@ kotlin {
             implementation("net.coobird:thumbnailator:0.4.20")
 
             implementation("com.github.Adonai:jaudiotagger:2.3.14")
+
+            implementation("io.github.kdroidfilter:composenativetray:0.6.0")
         }
     }
 }

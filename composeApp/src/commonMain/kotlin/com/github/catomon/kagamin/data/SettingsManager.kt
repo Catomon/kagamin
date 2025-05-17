@@ -3,6 +3,7 @@ package com.github.catomon.kagamin.data
 import kotlinx.serialization.json.Json
 import java.io.File
 
+//todo suspend
 fun saveSettings(settings: AppSettings) {
     try {
         val settingsFolder = File(userDataFolder.path)

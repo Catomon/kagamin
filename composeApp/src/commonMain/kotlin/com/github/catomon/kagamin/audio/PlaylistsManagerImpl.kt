@@ -8,7 +8,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -28,10 +27,9 @@ class PlaylistsManagerImpl(
 
     private val queue = ArrayDeque<AudioTrack>()
     private val _queueState = MutableStateFlow<List<AudioTrack>>(emptyList())
-    override val queueState: StateFlow<List<AudioTrack>> = _queueState
+    override val queueState: StateFlow<List<AudioTrack>> = _queueState.asStateFlow()
 
-    private val _currentTrack = MutableStateFlow<AudioTrack?>(null)
-    override val currentTrack: StateFlow<AudioTrack?> = _currentTrack.asStateFlow()
+    override val currentTrack: StateFlow<AudioTrack?> = player.currentTrack
 
     private val _playMode = MutableStateFlow(PlaylistsManager.PlayMode.PLAYLIST)
     override val playMode: StateFlow<PlaylistsManager.PlayMode> = _playMode.asStateFlow()
@@ -79,8 +77,7 @@ class PlaylistsManagerImpl(
     override fun removeFromQueue(track: AudioTrack) {
         queue -= track
         updateQueueState()
-        if (_currentTrack.value == track) {
-            _currentTrack.value = null
+        if (currentTrack.value == track) {
             player.stop()
         }
     }
@@ -88,8 +85,7 @@ class PlaylistsManagerImpl(
     override fun removeFromQueue(track: List<AudioTrack>) {
         queue.removeAll(track)
         updateQueueState()
-        if (_currentTrack.value != null && track.contains(_currentTrack.value)) {
-            _currentTrack.value = null
+        if (currentTrack.value != null && track.contains(currentTrack.value)) {
             player.stop()
         }
     }
@@ -109,7 +105,7 @@ class PlaylistsManagerImpl(
         logMsg("Next track.")
 
         val oldTrack = currentTrack.value
-        val track = if (queueState.value.isEmpty()) {
+        val nextTrack = if (queueState.value.isEmpty()) {
             if (currentPlaylist.value.tracks.isEmpty()) return null
 
             when (playMode.value) {
@@ -137,24 +133,20 @@ class PlaylistsManagerImpl(
             }
         }
 
-        _currentTrack.value = track
-
-        val nextAudioTrack = track
-
-        nextAudioTrack ?: run {
+        nextTrack ?: run {
             player.stop()
             return null
         }
 
-        if (!nextAudioTrack.uri.startsWith("http")) {
+        if (!nextTrack.uri.startsWith("http")) {
             if (filePlayTried >= currentPlaylist.value.tracks.size) {
                 logWarn("Playlist has no files to play.")
                 return null
             }
             filePlayTried++
 
-            if (withContext(Dispatchers.IO) { !File(nextAudioTrack.uri).exists() }) {
-                logWarn("Track file does not exist: ${nextAudioTrack.uri}")
+            if (withContext(Dispatchers.IO) { !File(nextTrack.uri).exists() }) {
+                logWarn("Track file does not exist: ${nextTrack.uri}")
 
                 return nextTrack()
             }
@@ -162,16 +154,16 @@ class PlaylistsManagerImpl(
 
         filePlayTried = 0
 
-        player.play(nextAudioTrack)
+        player.play(nextTrack)
 
-        return nextAudioTrack
+        return nextTrack
     }
 
     override suspend fun prevTrack(): AudioTrack? = mutex.withLock {
         logMsg("Prev track.")
 
         val oldTrack = currentTrack.value
-        val track = if (queue.isEmpty()) {
+        val prevTrack = if (queue.isEmpty()) {
             if (currentPlaylist.value.tracks.isEmpty()) return null
 
             val oldIndex = currentPlaylist.value.tracks.indexOf(oldTrack)
@@ -181,13 +173,9 @@ class PlaylistsManagerImpl(
             )
         } else oldTrack
 
-        _currentTrack.value = track
 
-        val nextAudioTrack = track
+        player.play(prevTrack ?: return null)
 
-//        player.stop()
-        player.play(nextAudioTrack ?: return null)
-
-        return nextAudioTrack
+        return prevTrack
     }
 }

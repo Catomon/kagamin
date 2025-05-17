@@ -14,7 +14,10 @@ import com.github.catomon.kagamin.data.PlaylistsLoader
 import com.github.catomon.kagamin.data.loadSettings
 import com.github.catomon.kagamin.data.saveSettings
 import com.github.catomon.kagamin.ui.util.Tabs
+import com.github.catomon.kagamin.util.echoErr
 import com.github.catomon.kagamin.util.echoWarn
+import com.github.catomon.kagamin.util.logErr
+import com.github.catomon.kagamin.util.logWarn
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
@@ -24,7 +27,9 @@ import kotlin.system.exitProcess
 
 class KagaminViewModel(
     private val audioPlayerService: AudioPlayerService,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val mainDispatcher: CoroutineDispatcher = Dispatchers.Main,
+    private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Main,
 ) : ViewModel() {
 
     val playState: StateFlow<AudioPlayerService.PlayState> = audioPlayerService.playState
@@ -118,46 +123,74 @@ class KagaminViewModel(
     /** Sets [currentPlaylist] to [playlist] **/
     fun updateCurrentPlaylist(playlist: Playlist) {
         playlistsManager.updateCurrentPlaylist(playlist)
-
         saveSettings(settings.copy(lastPlaylistName = playlist.name))
     }
 
     fun reloadPlaylist(playlist: Playlist) {
-        val loadedPlaylist = PlaylistsLoader.loadPlaylist(playlist) ?: kotlin.run {
-            echoWarn("Failed to load a playlist: ${playlist.name}")
-            return
+        viewModelScope.launch(ioDispatcher) {
+            val loadedPlaylist = PlaylistsLoader.loadPlaylist(playlist)
+            if (loadedPlaylist != null) {
+                withContext(mainDispatcher) {
+                    playlistsManager.updatePlaylist(loadedPlaylist)
+                }
+            } else {
+                logErr { "Failed to reload playlist: ${playlist.name}" }
+            }
         }
-
-        playlistsManager.updatePlaylist(loadedPlaylist)
     }
 
     fun createPlaylist(playlist: Playlist) {
-        playlistsManager.addPlaylist(playlist)
-        PlaylistsLoader.savePlaylist(playlist)
+        viewModelScope.launch {
+            if (PlaylistsLoader.exists(playlist.name)) {
+                logErr { "Playlist with such name already exist: ${playlist.name}" }
+                return@launch
+            }
+
+            if (PlaylistsLoader.savePlaylist(playlist)) {
+                withContext(mainDispatcher) {
+                    playlistsManager.addPlaylist(playlist)
+                }
+            } else {
+                logErr { "Failed to create playlist: ${playlist.name}" }
+            }
+        }
     }
 
     fun removePlaylist(playlist: Playlist) {
         if (playlist.id == "default") return
 
-        playlistsManager.removePlaylist(playlist)
+        viewModelScope.launch(ioDispatcher) {
+            if (PlaylistsLoader.removePlaylist(playlist))
+                withContext(mainDispatcher) {
+                    playlistsManager.removePlaylist(playlist)
+                }
+            else
+                echoErr { "Failed to remove playlist: ${playlist.name}" }
+        }
     }
 
     fun updatePlaylist(playlist: Playlist) {
         playlistsManager.updatePlaylist(playlist)
+
+        viewModelScope.launch(ioDispatcher) {
+            PlaylistsLoader.savePlaylist(playlist)
+        }
     }
 
     fun clearPlaylist(playlist: Playlist) {
         playlistsManager.updatePlaylist(playlist.copy(tracks = emptyList()))
+
+        viewModelScope.launch(ioDispatcher) {
+            PlaylistsLoader.savePlaylist(playlist)
+        }
     }
 
     fun shufflePlaylist(playlist: Playlist) {
-        playlists.value.firstOrNull { it == playlist }?.let {
-            playlistsManager.updatePlaylist(
-                playlist.copy(
-                    tracks = playlist.tracks.shuffled()
-                )
+        updatePlaylist(
+            playlist.copy(
+                tracks = playlist.tracks.shuffled()
             )
-        }
+        )
     }
 
     fun nextTrack() {
@@ -181,6 +214,7 @@ class KagaminViewModel(
             repeat = playMode.value == PlaylistsManager.PlayMode.REPEAT_TRACK,
             volume = volume.value,
             random = playMode.value == PlaylistsManager.PlayMode.RANDOM,
+            repeatPlaylist = playMode.value == PlaylistsManager.PlayMode.REPEAT_PLAYLIST
         )
         saveSettings(settings)
         exitProcess(0)

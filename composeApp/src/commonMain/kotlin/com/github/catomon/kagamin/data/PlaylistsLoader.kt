@@ -1,43 +1,59 @@
 package com.github.catomon.kagamin.data
 
 import com.github.catomon.kagamin.util.echoMsg
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
 import java.io.File
 
 object PlaylistsLoader {
     val playlistsFolder get() = userDataFolder.path + "/playlists/"
-    private val json = Json { ignoreUnknownKeys = true;  }
+    private val json = Json { ignoreUnknownKeys = true; }
 
-    fun removePlaylist(name: String) {
-        val playlistsFolder = File(userDataFolder.path + "/playlists")
-        if (!playlistsFolder.exists())
-            return
+    private val mutex = Mutex()
 
-        val file = File(userDataFolder.path + "/playlists/$name.pl")
-        if (!file.exists())
-            return
-        if (file.delete())
-            echoMsg("Playlist saved: $name")
-    }
-
-    //todo suspend
-    fun savePlaylist(playlist: Playlist) {
+    suspend fun removePlaylist(playlist: Playlist) = mutex.withLock {
         val name = playlist.name
 
         val playlistsFolder = File(userDataFolder.path + "/playlists")
         if (!playlistsFolder.exists())
-            playlistsFolder.mkdirs()
+            return true
 
         val file = File(userDataFolder.path + "/playlists/$name.pl")
-        if (!file.exists()) {
-            file.createNewFile()
-        }
-        file.writeText(json.encodeToString(playlist))
+        if (!file.exists())
+            return true
 
-        echoMsg("Playlist saved: $name")
+
+        file.delete().also {
+            if (it) echoMsg("Playlist removed: $name")
+        }
     }
 
-    fun loadPlaylists(): List<Playlist> {
+    suspend fun savePlaylist(playlist: Playlist) = mutex.withLock {
+        val name = playlist.name
+
+        try {
+            val playlistsFolder = File(userDataFolder.path + "/playlists")
+            if (!playlistsFolder.exists())
+                playlistsFolder.mkdirs()
+
+            val file = File(userDataFolder.path + "/playlists/$name.pl")
+            if (!file.exists()) {
+                file.createNewFile()
+            }
+            file.writeText(json.encodeToString(playlist))
+
+            echoMsg("Playlist saved: $name")
+
+            return@withLock true
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        return@withLock false
+    }
+
+    suspend fun loadPlaylists(): List<Playlist> = mutex.withLock {
         val playlists = mutableListOf<Playlist>()
         val playlistsFolder = File(playlistsFolder)
 
@@ -53,8 +69,7 @@ object PlaylistsLoader {
         return playlists
     }
 
-    //todo forbid creation playlists with same name
-    fun loadPlaylist(playlist: Playlist): Playlist? {
+    suspend fun loadPlaylist(playlist: Playlist): Playlist? = mutex.withLock {
         val name = playlist.name
         val file = File("$playlistsFolder$name.pl")
         if (!file.exists())
@@ -64,4 +79,8 @@ object PlaylistsLoader {
 
         return json.decodeFromString(file.readText())
     }
+
+    fun exists(playlist: Playlist) = exists(playlist.name)
+
+    fun exists(name: String) = File("$playlistsFolder$name.pl").exists()
 }

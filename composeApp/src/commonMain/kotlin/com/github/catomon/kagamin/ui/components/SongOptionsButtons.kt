@@ -95,10 +95,7 @@ fun SongOptionsButtons(
                                 viewModel.createPlaylist(
                                     playlist
                                 )
-                            }.also {
-                                PlaylistsLoader.savePlaylist(it)
                             }
-
                     }
                 } else {
                     //remove the track from the loved playlist and then save playlist
@@ -107,7 +104,6 @@ fun SongOptionsButtons(
                             .firstOrNull { playlist -> playlist.id == "loved" }
                             ?.let { playlist ->
                                 viewModel.updatePlaylist(playlist.copy(tracks = playlist.tracks - track))
-                                PlaylistsLoader.savePlaylist(playlist)
                             }
                     }
                 }

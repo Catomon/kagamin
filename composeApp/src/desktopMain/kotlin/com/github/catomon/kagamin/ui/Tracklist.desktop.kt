@@ -149,9 +149,11 @@ fun Tracklist(
             modifier = Modifier.fillMaxSize().weight(2f).hoverable(interactionSource)
         ) {
             Column(Modifier.fillMaxSize()) {
-                val tracks by remember { derivedStateOf {
-                    filteredTracks ?: currentPlaylist.tracks //todo sorting
-                } }
+                val tracks by remember {
+                    derivedStateOf {
+                        filteredTracks ?: currentPlaylist.tracks //todo sorting
+                    }
+                }
 
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth()
@@ -373,32 +375,19 @@ fun TracklistHeader(
                     modifier = Modifier.onPointerEvent(PointerEventType.Enter) {
                         shownContent = Content.Indicator
                     }) {
-                    var timePastText by remember { mutableStateOf("-:-") }
-                    var trackDurationText by remember { mutableStateOf("-:-") }
-
-                    LaunchedEffect(currentTrack) {
-                        @Suppress("NAME_SHADOWING") val currentTrack =
-                            currentTrack ?: return@LaunchedEffect
-
-                        trackDurationText = formatTime(currentTrack.duration)
-
-                        while (true) {
-                            if (viewModel.playState.value == AudioPlayerService.PlayState.PLAYING) {
-                                if (viewModel.position.value < 1000) trackDurationText =
-                                    formatTime(currentTrack.duration)
-
-                                timePastText =
+                    val trackDurationText by remember(currentTrack) {
+                        derivedStateOf {
+                            if (currentTrack == null) "-:-/-:-"
+                            else
+                                "${
                                     if (isIndicatorHovered) formatTime((currentTrack.duration * progress).toLong())
-                                    else formatTime(currentTrack.let { viewModel.position.value })
-                            }
-
-                            if (isIndicatorHovered) delay(25)
-                            else delay(250)
+                                    else formatTime(currentTrack.let { position })
+                                }/${formatTime(currentTrack.duration)}"
                         }
                     }
 
                     Text(
-                        "$timePastText/$trackDurationText",
+                        trackDurationText,
                         fontSize = 10.sp,
                         color = KagaminTheme.colors.buttonIcon
                     )

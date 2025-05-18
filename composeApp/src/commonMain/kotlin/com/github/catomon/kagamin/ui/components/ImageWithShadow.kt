@@ -21,15 +21,15 @@ fun ImageWithShadow(
     colorFilter: ColorFilter
 ) {
 
-    val pad = with(LocalDensity.current) { 2.dp.toPx() }
+    val pad = with(LocalDensity.current) { 0.dp.toPx() } //2
 
     Box(contentAlignment = Alignment.Center, modifier = modifier) {
-        Image(
-            painterResource,
-            contentDescription = s,
-            colorFilter = ColorFilter.tint(KagaminTheme.colors.thinBorder),
-            modifier = Modifier.graphicsLayer(translationY = pad).fillMaxSize()
-        )
+//        Image(
+//            painterResource,
+//            contentDescription = s,
+//            colorFilter = ColorFilter.tint(KagaminTheme.colors.thinBorder),
+//            modifier = Modifier.graphicsLayer(translationY = pad).fillMaxSize()
+//        )
 
         Image(
             painterResource,

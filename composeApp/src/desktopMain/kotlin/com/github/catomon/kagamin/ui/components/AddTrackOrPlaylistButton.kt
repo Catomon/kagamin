@@ -6,9 +6,12 @@ import androidx.compose.ui.unit.dp
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
+import com.github.catomon.kagamin.util.echoTrace
 
 @Composable
 fun AddTrackOrPlaylistButton(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
+    echoTrace { "AddTrackOrPlaylistButton" }
+
     AddButton(
         onClick = {
             viewModel.currentTab = Tabs.CREATE_PLAYLIST

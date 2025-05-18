@@ -55,6 +55,7 @@ import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.ui.windows.ConfirmWindowState
 import com.github.catomon.kagamin.ui.windows.LocalConfirmWindow
+import com.github.catomon.kagamin.util.echoTrace
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.pause
 import kagamin.composeapp.generated.resources.play
@@ -72,6 +73,8 @@ fun ThumbnailTrackItem(
     isCurrentTrack: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    echoTrace { "ThumbnailTrackItem" }
+
     val clipboard = LocalClipboardManager.current
     val confirmationWindow = LocalConfirmWindow.current
     val snackbar = LocalSnackbarHostState.current
@@ -151,6 +154,7 @@ private fun TrackItemBody(
     isSelected: Boolean,
     modifier: Modifier,
 ) {
+    echoTrace { "TrackItemBody" }
 
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()

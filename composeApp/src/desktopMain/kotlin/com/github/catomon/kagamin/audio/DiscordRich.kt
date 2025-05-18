@@ -6,9 +6,6 @@ import com.github.catomon.kagamin.data.AudioTrack
 import com.github.catomon.kagamin.data.loadSettings
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.denpa
-import kagamin.composeapp.generated.resources.higurashi
-import kagamin.composeapp.generated.resources.nanahira
-import kagamin.composeapp.generated.resources.toromi
 //import net.arikia.dev.drpc.DiscordEventHandlers
 //import net.arikia.dev.drpc.DiscordRPC
 //import net.arikia.dev.drpc.DiscordRichPresence
@@ -69,14 +66,14 @@ class Singer(
 
 @OptIn(ExperimentalResourceApi::class)
 val singers: Array<Singer> = arrayOf(
-    Singer(arrayOf("Nanahira", "ななひら")).res(Res.drawable.nanahira),
-    Singer(arrayOf("Toromi", "とろ美")).res(Res.drawable.toromi),
+    Singer(arrayOf("Nanahira", "ななひら")),//.res(Res.drawable.nanahira),
+    Singer(arrayOf("Toromi", "とろ美")),//.res(Res.drawable.toromi),
     Singer("ひぐらしのなく頃に", "Higurashi").icons(
         "higurashi",
         "higurashi_satoko",
         "higurashi_rena"
     )
-        .res(Res.drawable.higurashi),
+       ,// .res(Res.drawable.higurashi),
     Singer("33.turbo"),
     Singer("Choko"),
     Singer("doubleeleven UpperCut", "doubleeleven undercurrent"),

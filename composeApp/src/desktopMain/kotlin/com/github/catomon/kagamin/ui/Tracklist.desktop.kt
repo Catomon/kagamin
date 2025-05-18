@@ -48,6 +48,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.CompositingStrategy
@@ -60,13 +62,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import com.github.catomon.kagamin.LocalWindow
-import com.github.catomon.kagamin.audio.AudioPlayerService
 import com.github.catomon.kagamin.audio.PlaylistsManager
 import com.github.catomon.kagamin.data.AudioTrack
 import com.github.catomon.kagamin.ui.components.TrackProgressIndicator
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.formatTime
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
+import com.github.catomon.kagamin.util.echoTrace
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.search
 import kotlinx.coroutines.Dispatchers
@@ -79,6 +81,8 @@ import org.jetbrains.compose.resources.painterResource
 fun Tracklist(
     viewModel: KagaminViewModel, modifier: Modifier = Modifier
 ) {
+    echoTrace { "Tracklist" }
+
     val currentPlaylist by viewModel.currentPlaylist.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val tracklistManager = remember { TracklistManager(coroutineScope) }
@@ -233,6 +237,8 @@ fun TracklistHeader(
     filterTracks: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    echoTrace { "TracklistHeader" }
+
     val backgroundColor = KagaminTheme.backgroundTransparent
     var shownContent by remember { mutableStateOf(Content.TrackName) }
     var showSearchIcon by remember { mutableStateOf(false) }
@@ -255,8 +261,6 @@ fun TracklistHeader(
             }
         }
     }
-
-    val progressAnimated by animateFloatAsState(progress)
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -281,12 +285,16 @@ fun TracklistHeader(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 AnimatedVisibility(showSearchIcon) {
+//                    val focusRequester = remember { FocusRequester() }
+
+                    echoTrace { "Tracklist Search Button" }
+
                     IconButton(onClick = {
                         if (searchTextValue.isNotBlank()) {
                             shownContent = Content.TrackName
                             showSearchIcon = false
                         } else {
-                            //focus text field?
+//                            focusRequester.requestFocus()
                         }
                     }, modifier = Modifier.size(30.dp).padding(top = 4.dp)) {
                         Icon(
@@ -303,6 +311,9 @@ fun TracklistHeader(
                 AnimatedContent(shownContent, modifier.weight(1f)) { shownContent ->
                     when (shownContent) {
                         Content.Indicator -> {
+                            echoTrace { "Tracklist Indicator" }
+
+                            val progressAnimated by animateFloatAsState(progress)
                             var progressOnHover by remember { mutableStateOf(0f) }
 
                             TrackProgressIndicator(
@@ -310,7 +321,7 @@ fun TracklistHeader(
                                 seek = {
                                     viewModel.seek(it)
                                 },
-                                progress = if (isIndicatorHovered) progressOnHover else progressAnimated,
+                                progress = { if (isIndicatorHovered) progressOnHover else progressAnimated },
                                 modifier = Modifier.weight(1f).padding(end = 6.dp, start = 3.dp)
                                     .height(10.dp).onPointerEvent(
                                         PointerEventType.Move
@@ -321,6 +332,8 @@ fun TracklistHeader(
                         }
 
                         Content.SearchBar -> {
+                            echoTrace { "Tracklist SearchBar" }
+
                             LaunchedEffect(searchTextValue) {
                                 delay(300)
                                 filterTracks(searchTextValue)
@@ -345,7 +358,8 @@ fun TracklistHeader(
                                             start = Offset(0f, size.height),
                                             end = Offset(size.width, size.height)
                                         )
-                                    },
+                                    }//.focusRequester(focusRequester)
+                                ,
                                 textStyle = LocalTextStyle.current.copy(fontSize = 10.sp),
                                 cursorBrush = SolidColor(KagaminTheme.colors.buttonIcon),
                                 maxLines = 1
@@ -353,18 +367,7 @@ fun TracklistHeader(
                         }
 
                         Content.TrackName -> {
-                            @Suppress("NAME_SHADOWING") val interactionSource =
-                                remember { MutableInteractionSource() }
-                            val isHovered by interactionSource.collectIsHoveredAsState()
-
-                            Text(
-                                currentTrack?.title ?: "",
-                                fontSize = 10.sp,
-                                color = KagaminTheme.colors.buttonIcon,
-                                maxLines = 1,
-                                modifier = Modifier.weight(1f).hoverable(interactionSource)
-                                    .let { if (isHovered) it.basicMarquee(iterations = Int.MAX_VALUE) else it }
-                            )
+                            TrackName(currentTrack, Modifier.weight(1f))
                         }
                     }
                 }
@@ -375,6 +378,8 @@ fun TracklistHeader(
                     modifier = Modifier.onPointerEvent(PointerEventType.Enter) {
                         shownContent = Content.Indicator
                     }) {
+                    echoTrace { "Tracklist trackDurationText" }
+
                     val trackDurationText by remember(currentTrack) {
                         derivedStateOf {
                             if (currentTrack == null) "-:-/-:-"
@@ -395,4 +400,22 @@ fun TracklistHeader(
             }
         }
     }
+}
+
+@Composable
+private fun TrackName(currentTrack: AudioTrack?, modifier: Modifier = Modifier) {
+    echoTrace { "Tracklist TrackName" }
+
+    @Suppress("NAME_SHADOWING") val interactionSource =
+        remember { MutableInteractionSource() }
+    val isHovered by interactionSource.collectIsHoveredAsState()
+
+    Text(
+        currentTrack?.title ?: "",
+        fontSize = 10.sp,
+        color = KagaminTheme.colors.buttonIcon,
+        maxLines = 1,
+        modifier = modifier.hoverable(interactionSource)
+            .let { if (isHovered) it.basicMarquee(iterations = Int.MAX_VALUE) else it }
+    )
 }

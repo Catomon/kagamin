@@ -1,5 +1,9 @@
 package com.github.catomon.kagamin.util
 
+import com.github.catomon.kagamin.util.Rogga.log
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 private const val INFO = "[I]"
 private const val WARN = "[W]"
 
@@ -32,38 +36,33 @@ enum class LogLevel(val priority: Int) {
     FATAL(4)
 }
 
-var currentLogLevel = LogLevel.INFO
+object Rogga {
+    var logLevel = LogLevel.INFO
+    var timestamp: Boolean = false
 
-//private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
-//
-//inline fun log(
-//    level: LogLevel,
-//    tag: String = "",
-//    crossinline msg: () -> String
-//) {
-//    if (level.priority >= currentLogLevel.priority) {
-//        val timestamp = LocalDateTime.now().format(formatter)
-//        val thread = Thread.currentThread().name
-//        val message = "$timestamp [$thread] ${level.name} $tag${msg()}"
-//        if (level >= LogLevel.WARN) {
-//            System.err.println(message)
-//        } else {
-//            println(message)
-//        }
-//    }
-//}
+    val fullFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
+    val timeOnlyFormatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS")
+    var formatter = timeOnlyFormatter
 
-inline fun log(
-    level: LogLevel,
-    tag: String = "",
-    crossinline msg: () -> String
-) {
-    if (level.priority >= currentLogLevel.priority) {
-        val message = "${level.name} $tag${msg()}"
-        if (level >= LogLevel.WARN) {
-            System.err.println(message)
-        } else {
-            println(message)
+    inline fun log(
+        level: LogLevel,
+        tag: String = "",
+        crossinline msg: () -> String
+    ) {
+        if (level.priority >= Rogga.logLevel.priority) {
+            val message: String
+            if (Rogga.timestamp) {
+                val timestamp = LocalDateTime.now().format(Rogga.formatter)
+                val thread = Thread.currentThread().name
+                message = "$timestamp $thread ${level.name} $tag${msg()}"
+            } else {
+                message = "${level.name} $tag${msg()}"
+            }
+            if (level >= LogLevel.WARN) {
+                System.err.println(message)
+            } else {
+                println(message)
+            }
         }
     }
 }
@@ -129,5 +128,8 @@ inline fun echoErr(exception: Throwable, crossinline msg: () -> String) {
 }
 
 inline fun Any.logErr(exception: Throwable, crossinline msg: () -> String) {
-    log(LogLevel.ERROR, "[${this::class.simpleName}] ") { "${msg()}\n${exception.stackTraceToString()}" }
+    log(
+        LogLevel.ERROR,
+        "[${this::class.simpleName}] "
+    ) { "${msg()}\n${exception.stackTraceToString()}" }
 }

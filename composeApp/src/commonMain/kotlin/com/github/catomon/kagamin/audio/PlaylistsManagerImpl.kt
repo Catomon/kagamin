@@ -17,12 +17,21 @@ class PlaylistsManagerImpl(
     private val player: AudioPlayerService
 ) : PlaylistsManager {
 
-    private val defaultPlaylist = Playlist("default", "default", emptyList())
+    private fun defaultPlaylist(): Playlist =
+        _playlists.value.firstOrNull { it.id == "default" } ?: kotlin.run {
+            val pl = Playlist(
+                "default",
+                "default",
+                emptyList()
+            )
+            addPlaylist(pl)
+            pl
+        }
 
-    private val _playlists = MutableStateFlow<List<Playlist>>(listOf(defaultPlaylist))
+    private val _playlists = MutableStateFlow<List<Playlist>>(emptyList())
     override val playlists: StateFlow<List<Playlist>> = _playlists.asStateFlow()
 
-    private val _currentPlaylist = MutableStateFlow<Playlist>(defaultPlaylist)
+    private val _currentPlaylist = MutableStateFlow<Playlist>(defaultPlaylist())
     override val currentPlaylist: StateFlow<Playlist> = _currentPlaylist.asStateFlow()
 
     private val queue = ArrayDeque<AudioTrack>()
@@ -58,6 +67,9 @@ class PlaylistsManagerImpl(
 
     override fun removePlaylist(playlist: Playlist) {
         _playlists.value = _playlists.value.filter { it.id != playlist.id }
+
+        if (_currentPlaylist.value.id == playlist.id)
+            updateCurrentPlaylist(defaultPlaylist())
     }
 
     private fun updateQueueState() {

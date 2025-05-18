@@ -157,7 +157,7 @@ class KagaminViewModel(
     }
 
     fun removePlaylist(playlist: Playlist) {
-        if (playlist.id == "default") return
+//        if (playlist.id == "default") return
 
         viewModelScope.launch(ioDispatcher) {
             if (PlaylistsLoader.removePlaylist(playlist))
@@ -209,7 +209,7 @@ class KagaminViewModel(
         playlistsManager.setPlayMode(playMode)
     }
 
-    fun exitApp() {
+    fun saveSettings() {
         settings = settings.copy(
             repeat = playMode.value == PlaylistsManager.PlayMode.REPEAT_TRACK,
             volume = volume.value,
@@ -217,6 +217,5 @@ class KagaminViewModel(
             repeatPlaylist = playMode.value == PlaylistsManager.PlayMode.REPEAT_PLAYLIST
         )
         saveSettings(settings)
-        exitProcess(0)
     }
 }

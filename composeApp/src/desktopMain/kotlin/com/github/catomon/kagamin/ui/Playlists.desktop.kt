@@ -63,6 +63,7 @@ import com.github.catomon.kagamin.ui.components.TrackThumbnail
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
+import com.github.catomon.kagamin.util.echoTrace
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.search
 import kotlinx.coroutines.Dispatchers
@@ -74,6 +75,7 @@ import org.jetbrains.compose.resources.painterResource
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
+    echoTrace { "Playlists" }
     val currentPlaylist by viewModel.currentPlaylist.collectAsState()
     val playlists by viewModel.playlists.collectAsState()
     val index = remember(playlists) { playlists.mapIndexed { i, pl -> (pl to i) }.toMap() }

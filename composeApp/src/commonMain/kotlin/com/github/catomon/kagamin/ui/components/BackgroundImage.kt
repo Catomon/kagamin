@@ -11,13 +11,13 @@ import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import kagamin.composeapp.generated.resources.Res
-import kagamin.composeapp.generated.resources.bg
+import kagamin.composeapp.generated.resources.bg_yuki
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun BackgroundImage(alpha: Float = DefaultAlpha) {
     Image(
-        painterResource(Res.drawable.bg),
+        painterResource(Res.drawable.bg_yuki),
         "Background",
         modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(16.dp)).blur(5.dp),
         contentScale = ContentScale.Crop,

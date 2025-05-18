@@ -1,6 +1,5 @@
 package com.github.catomon.kagamin
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.draganddrop.dragAndDropTarget
 import androidx.compose.foundation.layout.padding
@@ -100,6 +99,11 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
 
     val confirmWindowState = remember { mutableStateOf(ConfirmWindowState()) }
 
+    val exitApp = {
+        kagaminViewModel.saveSettings()
+        onCloseRequest()
+    }
+
     val windowSize = remember(currentLayout) {
         when (currentLayout) {
             LayoutManager.Layout.Default -> DpSize(
@@ -138,7 +142,7 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
             LocalLayoutManager provides layoutManager,
             LocalConfirmWindow provides confirmWindowState
         ) {
-            AppWindow(windowState, kagaminViewModel, onCloseRequest)
+            AppWindow(windowState, kagaminViewModel, exitApp)
         }
     }
 
@@ -165,7 +169,7 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
                     kagaminViewModel.onPlayPause()
                 })
             Item("Exit", onClick = {
-                onCloseRequest()
+                exitApp()
             })
         }
     }
@@ -282,7 +286,6 @@ private fun AppWindow(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun WindowScope.AppFrame(kagaminViewModel: KagaminViewModel = get(KagaminViewModel::class.java)) {
     val settings = kagaminViewModel.settings //trigger recomposition

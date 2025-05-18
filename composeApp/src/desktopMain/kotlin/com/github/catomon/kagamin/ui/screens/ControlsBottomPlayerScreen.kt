@@ -38,6 +38,7 @@ import com.github.catomon.kagamin.ui.components.TrackThumbnail
 import com.github.catomon.kagamin.ui.components.VolumeOptions
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
+import com.github.catomon.kagamin.util.echoTrace
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.minimize_window
 import org.jetbrains.compose.resources.painterResource
@@ -48,6 +49,8 @@ fun ControlsBottomPlayerScreen(
     navController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
+    echoTrace { "ControlsBottomPlayerScreen" }
+
     val currentTrack by viewModel.currentTrack.collectAsState()
     val currentPlaylist by viewModel.currentPlaylist.collectAsState()
     val volume by viewModel.volume.collectAsState()

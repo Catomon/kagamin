@@ -116,13 +116,14 @@ fun SettingsScreen(
                     })
                 }
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Crossfade")
-
-                    Checkbox(settings.crossfade, {
-                        viewModel.settings = settings.copy(crossfade = it)
-                    })
-                }
+                //todo crossfade
+//                Row(verticalAlignment = Alignment.CenterVertically) {
+//                    Text("Crossfade")
+//
+//                    Checkbox(settings.crossfade, {
+//                        viewModel.settings = settings.copy(crossfade = it)
+//                    })
+//                }
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("Scroll to next track")
@@ -153,7 +154,7 @@ fun SettingsScreen(
                 currentLayout.value = prev
             }) {
                 Icon(
-                     painterResource(Res.drawable.arrow_left),
+                    painterResource(Res.drawable.arrow_left),
                     "Return",
                     tint = KagaminTheme.colors.buttonIcon
                 )
@@ -165,7 +166,8 @@ fun SettingsScreen(
         OutlinedTextButton(
             text = "Exit App",
             onClick = {
-                viewModel.exitApp()
+                viewModel.saveSettings()
+                exitProcess(0)
             },
             modifier = Modifier.align(Alignment.BottomEnd).padding(10.dp)
         )
@@ -218,7 +220,7 @@ private fun ThemeRadioButtons(
             RadioButton(
                 selected = theme == KagaminColors.Violet.name,
                 colors = RadioButtonDefaults.colors(
-                    KagaminColors.Violet.background, KagaminColors.Violet.disabled
+                    KagaminColors.Violet.background, KagaminColors.Violet.backgroundTransparent
                 ),
                 onClick = {
                     KagaminTheme.colors = KagaminColors.Violet
@@ -232,7 +234,7 @@ private fun ThemeRadioButtons(
             RadioButton(
                 selected = theme == KagaminColors.Pink.name,
                 colors = RadioButtonDefaults.colors(
-                    KagaminColors.Pink.background, KagaminColors.Pink.disabled
+                    KagaminColors.Pink.background, KagaminColors.Pink.backgroundTransparent
                 ),
                 onClick = {
                     KagaminTheme.colors = KagaminColors.Pink
@@ -246,7 +248,7 @@ private fun ThemeRadioButtons(
             RadioButton(
                 selected = theme == KagaminColors.Blue.name,
                 colors = RadioButtonDefaults.colors(
-                    KagaminColors.Blue.background, KagaminColors.Blue.disabled
+                    KagaminColors.Blue.background, KagaminColors.Blue.backgroundTransparent
                 ),
                 onClick = {
                     KagaminTheme.colors = KagaminColors.Blue

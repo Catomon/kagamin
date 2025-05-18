@@ -10,9 +10,9 @@ sealed class KagaminColors(
     open val background: Color,
     open val disabled: Color,
     open val listItem: Color,
-    open val buttonIconSmall: Color = disabled,
-    open val buttonIcon: Color = disabled,
-    open val onBars: Color = disabled,
+    open val buttonIcon: Color,
+    open val buttonIconSmall: Color = buttonIcon,
+    open val onBars: Color = buttonIcon,
     open val backgroundTransparent: Color = background.copy(0.9f),
     open val buttonIconTransparent: Color = buttonIcon.copy(0.5f),
     open val thumbnailProgressIndicator: Color = background.copy(0.5f),
@@ -30,10 +30,11 @@ sealed class KagaminColors(
         name = "white",
         behindBackground = Color(0xffc9c9c9),
         listItem = Color(0xff626262),
-        disabled = Color(0xffd9d9d9),
+        disabled = Color(0xff4d4d4d),
         text = Color(0xff111111),
         textSecondary = Color(0xff464646),
         background = Color(0xffffffff),
+        buttonIcon = Color(-3684409)
     ) {
         override val buttonIcon: Color = Color(0xffb6b6b6)
         override val disabled: Color = Color(0xcbeaeaea)
@@ -46,10 +47,11 @@ sealed class KagaminColors(
         name = "grey",
         behindBackground = Color(0xffc9c9c9),
         listItem = Color(0xff626262),
-        disabled = Color(0xffd9d9d9),
+        disabled = Color(0xff858585),
         text = Color(0xff111111),
         textSecondary = Color(0xff464646),
         background = Color(0xff3d3d3d),
+        buttonIcon = Color(0xffd9d9d9)
     ) {
         override val buttonIcon: Color = Color(0xffb6b6b6)
         override val disabled: Color = Color(0xcbcecece)
@@ -62,17 +64,17 @@ sealed class KagaminColors(
         behindBackground = Color(0xffffbecf),
 //        listItem = Color(0xcb753cc9),
         listItem = Color(0xcdffc3d2),
-        disabled = Color(0xfff799b4),
+        disabled = Color(0xcdc44a7c),
         text = Color(0xFFFFFFFF),
         textSecondary = Color(0xFFFFE1EA),
         background = Color(0xffec588c),
+        buttonIcon = Color(0xcdff84a6)
     ) {
         override val buttonIconSmall: Color = Color(0xffffffff)
         override val buttonIcon: Color = Color(0xffffc3d2)
         override val onBars: Color = Color(0xfff58a9e)
-        override val disabled: Color = Color(0xcdff84a6)
         override val backgroundTransparent: Color = background.copy(0.8f)
-        override val thinBorder: Color = Color(0xffea417c)
+        override val thinBorder: Color = Color(0xffc44a7c)
         override val buttonIconSmallSelected: Color = listItem
     }
 
@@ -111,27 +113,27 @@ sealed class KagaminColors(
         name = "gami-kasa",
         behindBackground = Color(0xffc09dff),
         listItem = Color(0xcd9775d5), // Color(0xcb6c4141)
-        disabled = Color(0xcb753cc9),
+        disabled = Color(0xff5e2ba9),
         text = Color(0xFFFFFFFF),
         textSecondary = Color(0xFFDECCFF),
         background = Color(0xff6232a9),
+        buttonIcon = Color(0xff9775d5),
     ) {
         override val buttonIconSmall: Color = Color(0xff916dd6)
-        override val buttonIcon: Color = Color(0xff9775d5)
-        override val thinBorder: Color = Color(0xff5522a2)
+        override val thinBorder: Color = Color(0xff5e2ba9)
     }
 
     object VioletKasa : KagaminColors(
         name = "gami-kasa",
         behindBackground = Color(0xffc09dff),
         listItem = Color(0xcba28a06),
-        disabled = Color(0xcb753cc9),
+        disabled = Color(0xff551fa6),
         text = Color(0xFFFFFFFF),
         textSecondary = Color(0xFFDECCFF),
         background = Color(0xff6232a9),
+        buttonIcon = Color(0xff9775d5),
     ) {
         override val buttonIconSmall: Color = Color(0xff916dd6)
-        override val buttonIcon: Color = Color(0xff9775d5)
         override val thinBorder: Color = Color(0xff5522a2)
     }
 
@@ -139,14 +141,14 @@ sealed class KagaminColors(
         name = "nata",
         behindBackground = Color(0xffadcfff),
         listItem =  Color(0xcd6197de), //Color(0xcc0c3719)
-        disabled = Color(0xff6197de),
+        disabled = Color(0xff0f2e93),
         text = Color(0xFFFFFFFF),
         textSecondary = Color(0xffd2e6ff),
         background = Color(0xff0f2e93),
+        buttonIcon = Color(0xff6197de)
     ) {
         //        override val playerButtonIcon: Color = Color(0xff9775d5)
-        override val disabled: Color = Color(0xcc1840c5)
-        override val thinBorder: Color = Color(0xff042386)
+        override val thinBorder: Color = Color(0xff0f2e93)
     }
 
     //    object YukiLight : KagaminColors(
@@ -170,15 +172,14 @@ sealed class KagaminColors(
         name = "kagamin-dark",
         behindBackground = Color(0xffffffff),
         listItem = Color(0xff8a8a8a),
-        disabled = Color(0xffb2b2b2),
+        disabled = Color(0xff525252),
         text = Color(0xffffffff), //Color(0xffff4d7c)
         textSecondary = Color(0xffffabda),
         background = Color(0xff000000),
+        buttonIcon = Color(0xffd51e82)
     ) {
         override val buttonIconSmall: Color = Color(0xffd51e82)
-        override val buttonIcon: Color = Color(0xffd51e82)
         override val onBars: Color = Color(0xfffd72bb)
-        override val disabled: Color = Color(0xcdde2d8d)
         override val listItem: Color = Color(0xcbd51e82)
         override val backgroundTransparent: Color = background.copy(0.95f)
         override val thumbnailProgressIndicator: Color = background.copy(0.4f)

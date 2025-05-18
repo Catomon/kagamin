@@ -6,9 +6,11 @@ import coil3.compose.setSingletonImageLoaderFactory
 import coil3.disk.DiskCache
 import coil3.request.crossfade
 import com.github.catomon.kagamin.data.cacheFolder
+import com.github.catomon.kagamin.di.appModule
+import com.github.catomon.kagamin.util.LogLevel
+import com.github.catomon.kagamin.util.Rogga
 import com.github.catomon.kagamin.util.echoMsg
 import com.github.catomon.kagamin.util.echoWarn
-import com.github.catomon.kagamin.di.appModule
 import io.github.vinceglb.filekit.FileKit
 import okio.Path.Companion.toOkioPath
 import org.jaudiotagger.tag.id3.AbstractID3Tag
@@ -20,8 +22,10 @@ fun main() {
     setDefaultExceptionHandler()
 
     FileKit.init(appId = "Kagamin")
-    System.setProperty("jna.nosys", "true");
     AbstractID3Tag.logger.level = Level.OFF
+
+    Rogga.logLevel = LogLevel.TRACE
+    Rogga.timestamp = true
 
     application {
         setComposeExceptionHandler()
@@ -45,6 +49,7 @@ fun main() {
                 }
                 .build()
         }
+
         AppContainer(::exitApplication)
     }
 }

@@ -29,9 +29,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.github.catomon.kagamin.data.cache.ThumbnailCacheManager
-import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.data.userDataFolder
+import com.github.catomon.kagamin.ui.theme.KagaminTheme
+import com.github.catomon.kagamin.util.echoTrace
 import kagamin.composeapp.generated.resources.Res
+import kagamin.composeapp.generated.resources.bg_yuki
 import kagamin.composeapp.generated.resources.def_thumb
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -51,6 +53,8 @@ fun TrackThumbnail(
     shape: Shape = TrackThumbnailDefaults.shape,
     height: Int = ThumbnailCacheManager.SIZE.ORIGINAL
 ) {
+    echoTrace { "TrackThumbnail" }
+
     var cachedThumbnailFile by remember { mutableStateOf<File?>(null) }
     val defaultPainter = painterResource(Res.drawable.def_thumb)
 
@@ -97,35 +101,36 @@ fun TrackThumbnailProgressOverlay(
     progressColor: Color = KagaminTheme.colors.thumbnailProgressIndicator,
     controlProgress: Boolean = false,
 ) {
-    Box(modifier
-            .drawBehind {
-                drawRoundRect(
-                    color = KagaminTheme.colors.thinBorder,
-                    topLeft = Offset(0f, with(density) { 1.dp.toPx() }),
-                    size = this.size.copy(height = this.size.height + 2.dp.toPx()),
-                    cornerRadius = CornerRadius(if (shape is RoundedCornerShape) 12f else 0f)
-                )
-            }.let {
-        if (controlProgress) {
-            it.pointerInput(trackUri) {
-                if (trackUri == null) return@pointerInput
+    Box(
+        modifier
+        .drawBehind {
+            drawRoundRect(
+                color = KagaminTheme.colors.thinBorder,
+                topLeft = Offset(0f, with(density) { 1.dp.toPx() }),
+                size = this.size.copy(height = this.size.height + 2.dp.toPx()),
+                cornerRadius = CornerRadius(if (shape is RoundedCornerShape) 12f else 0f)
+            )
+        }.let {
+            if (controlProgress) {
+                it.pointerInput(trackUri) {
+                    if (trackUri == null) return@pointerInput
 
-                val width = this.size.width
-                detectTapGestures { offset ->
-                    onSetProgress(offset.x / width)
+                    val width = this.size.width
+                    detectTapGestures { offset ->
+                        onSetProgress(offset.x / width)
+                    }
+                }
+            } else {
+                it.pointerInput(trackUri) {
+                    if (trackUri == null) return@pointerInput
+
+                    val width = this.size.width
+                    detectTapGestures { offset ->
+                        onSetProgress(offset.x / width)
+                    }
                 }
             }
-        } else {
-            it.pointerInput(trackUri) {
-                if (trackUri == null) return@pointerInput
-
-                val width = this.size.width
-                detectTapGestures { offset ->
-                    onSetProgress(offset.x / width)
-                }
-            }
-        }
-    }) {
+        }) {
 
         TrackThumbnail(trackUri, Modifier.fillMaxSize(), contentScale, blur, shape, height)
 

@@ -82,12 +82,12 @@ import com.github.catomon.kagamin.ui.theme.KagaminTheme
 fun TrackProgressIndicator(
     currentTrack: AudioTrack?,
     seek: (Long) -> Unit,
-    progress: Float,
+    progress: () -> Float,
     color: Color = KagaminTheme.colors.buttonIcon,
     modifier: Modifier = Modifier,
 ) {
     LinearProgressIndicator(
-        progress = { progress },
+        progress = progress,
         modifier = modifier.fillMaxWidth().padding().pointerHoverIcon(
             PointerIcon.Hand
         ).pointerInput(currentTrack) {

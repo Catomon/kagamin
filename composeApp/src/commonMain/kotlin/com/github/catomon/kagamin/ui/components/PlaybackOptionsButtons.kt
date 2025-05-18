@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.github.catomon.kagamin.audio.PlaylistsManager
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
+import com.github.catomon.kagamin.util.echoTrace
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.random
 import kagamin.composeapp.generated.resources.repeat_playlist
@@ -57,6 +58,8 @@ fun RepeatTrackPlaybackButton(
     viewModel: KagaminViewModel,
     buttonsSize: Dp = 32.dp,
 ) {
+    echoTrace { "RepeatTrackPlaybackButton" }
+
     val playMode by viewModel.playMode.collectAsState()
 
     IconButton({
@@ -71,7 +74,7 @@ fun RepeatTrackPlaybackButton(
             colorFilter = if (playMode == PlaylistsManager.PlayMode.REPEAT_TRACK) ColorFilter.tint(
                 KagaminTheme.colors.buttonIcon
             )
-            else ColorFilter.tint(KagaminTheme.colors.buttonIconTransparent)
+            else ColorFilter.tint(KagaminTheme.colors.disabled)
         )
     }
 }
@@ -81,6 +84,8 @@ fun RepeatPlaylistPlaybackButton(
     viewModel: KagaminViewModel,
     buttonsSize: Dp = 32.dp,
 ) {
+    echoTrace { "RepeatPlaylistPlaybackButton" }
+
     val playMode by viewModel.playMode.collectAsState()
 
     IconButton({
@@ -95,7 +100,7 @@ fun RepeatPlaylistPlaybackButton(
             colorFilter = if (playMode == PlaylistsManager.PlayMode.REPEAT_PLAYLIST) ColorFilter.tint(
                 KagaminTheme.colors.buttonIcon
             )
-            else ColorFilter.tint(KagaminTheme.colors.buttonIconTransparent)
+            else ColorFilter.tint(KagaminTheme.colors.disabled)
         )
     }
 }
@@ -105,6 +110,8 @@ fun RandomPlaybackButton(
     viewModel: KagaminViewModel,
     buttonsSize: Dp = 32.dp
 ) {
+    echoTrace { "RandomPlaybackButton" }
+
     val playMode by viewModel.playMode.collectAsState()
 
     IconButton({
@@ -119,7 +126,7 @@ fun RandomPlaybackButton(
             colorFilter = if (playMode == PlaylistsManager.PlayMode.RANDOM) ColorFilter.tint(
                 KagaminTheme.colors.buttonIcon
             )
-            else ColorFilter.tint(KagaminTheme.colors.buttonIconTransparent)
+            else ColorFilter.tint(KagaminTheme.colors.disabled)
         )
     }
 }
@@ -131,6 +138,8 @@ fun VolumeOptions(
     modifier: Modifier = Modifier,
     buttonsSize: Dp = 32.dp,
 ) {
+    echoTrace { "VolumeOptions" }
+
     var oldVolume by remember { mutableStateOf(volume) }
     Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {
         IconButton({
@@ -140,7 +149,7 @@ fun VolumeOptions(
                 painterResource(Res.drawable.volume),
                 "volume",
                 colorFilter = if (volume > 0f) ColorFilter.tint(KagaminTheme.colors.buttonIcon)
-                else ColorFilter.tint(KagaminTheme.colors.buttonIconTransparent)
+                else ColorFilter.tint(KagaminTheme.colors.disabled)
             )
         }
 

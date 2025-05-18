@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.github.catomon.kagamin.audio.AudioPlayerService
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
+import com.github.catomon.kagamin.util.echoTrace
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.next
 import kagamin.composeapp.generated.resources.pause
@@ -30,6 +31,8 @@ fun PlaybackButtons(
     modifier: Modifier = Modifier,
     buttonsSize: Dp = 32.dp
 ) {
+    echoTrace { "PlaybackButtons" }
+
     val playState by viewModel.playState.collectAsState()
 
     Row(

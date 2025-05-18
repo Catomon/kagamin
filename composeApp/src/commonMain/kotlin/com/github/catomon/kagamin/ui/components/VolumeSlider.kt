@@ -17,13 +17,13 @@ fun VolumeSlider(volume: Float, onVolumeChange: (Float) -> Unit, modifier: Modif
         thumbColor = KagaminTheme.colors.buttonIcon,
         activeTrackColor =   KagaminTheme.colors.buttonIcon,
         activeTickColor = KagaminTheme.colors.buttonIcon,
-        inactiveTrackColor = KagaminTheme.colors.buttonIconTransparent,
-        inactiveTickColor = KagaminTheme.colors.buttonIconTransparent,
-        disabledThumbColor = KagaminTheme.colors.buttonIconTransparent,
-        disabledActiveTrackColor = KagaminTheme.colors.buttonIconTransparent,
-        disabledActiveTickColor = KagaminTheme.colors.buttonIconTransparent,
-        disabledInactiveTrackColor = KagaminTheme.colors.buttonIconTransparent,
-        disabledInactiveTickColor = KagaminTheme.colors.buttonIconTransparent
+        inactiveTrackColor = KagaminTheme.colors.disabled,
+        inactiveTickColor = KagaminTheme.colors.disabled,
+        disabledThumbColor = KagaminTheme.colors.disabled,
+        disabledActiveTrackColor = KagaminTheme.colors.disabled,
+        disabledActiveTickColor = KagaminTheme.colors.disabled,
+        disabledInactiveTrackColor = KagaminTheme.colors.disabled,
+        disabledInactiveTickColor = KagaminTheme.colors.disabled
     )
 
     val shadowColors = SliderDefaults.colors(
@@ -40,7 +40,7 @@ fun VolumeSlider(volume: Float, onVolumeChange: (Float) -> Unit, modifier: Modif
     )
 
     Box(contentAlignment = Alignment.Center, modifier = modifier) {
-        NormalSlider(volume, onVolumeChange, shadowColors, interactionSource, modifier = Modifier.graphicsLayer(translationY = 1.5f))
+//        NormalSlider(volume, onVolumeChange, shadowColors, interactionSource, modifier = Modifier.graphicsLayer(translationY = 1.5f))
 
         NormalSlider(
             volume,

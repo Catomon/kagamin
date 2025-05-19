@@ -19,5 +19,6 @@ data class AppSettings(
     val repeatPlaylist: Boolean = false,
     val lastPlaylistName: String = "default",
     val autoScrollNextTrack: Boolean = false,
+    val useTrackImageAsBackground: Boolean = true,
     val extra: Map<String, String> = emptyMap()
 )

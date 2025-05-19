@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,12 +30,13 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.github.catomon.kagamin.data.AudioTrack
 import com.github.catomon.kagamin.data.cache.ThumbnailCacheManager
 import com.github.catomon.kagamin.data.userDataFolder
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
+import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.util.echoTrace
 import kagamin.composeapp.generated.resources.Res
-import kagamin.composeapp.generated.resources.bg_yuki
 import kagamin.composeapp.generated.resources.def_thumb
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -46,7 +49,7 @@ object TrackThumbnailDefaults {
 
 @Composable
 fun TrackThumbnail(
-    trackUri: String?,
+    currentTrack: AudioTrack?,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
     blur: Boolean = false,
@@ -58,9 +61,9 @@ fun TrackThumbnail(
     var cachedThumbnailFile by remember { mutableStateOf<File?>(null) }
     val defaultPainter = painterResource(Res.drawable.def_thumb)
 
-    LaunchedEffect(trackUri) {
-        cachedThumbnailFile = if (trackUri != null) withContext(Dispatchers.Default) {
-            ThumbnailCacheManager.cacheThumbnail(trackUri, size = height)
+    LaunchedEffect(currentTrack) {
+        cachedThumbnailFile = if (currentTrack != null) withContext(Dispatchers.Default) {
+            ThumbnailCacheManager.cacheThumbnail(currentTrack.uri, size = height)
         } else null
     }
 
@@ -90,7 +93,7 @@ fun TrackThumbnail(
 
 @Composable
 fun TrackThumbnailProgressOverlay(
-    trackUri: String?,
+    currentTrack: AudioTrack?,
     progress: Float,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
@@ -101,6 +104,8 @@ fun TrackThumbnailProgressOverlay(
     progressColor: Color = KagaminTheme.colors.thumbnailProgressIndicator,
     controlProgress: Boolean = false,
 ) {
+    echoTrace { "TrackThumbnailProgressOverlay" }
+    
     Box(
         modifier
         .drawBehind {
@@ -112,8 +117,8 @@ fun TrackThumbnailProgressOverlay(
             )
         }.let {
             if (controlProgress) {
-                it.pointerInput(trackUri) {
-                    if (trackUri == null) return@pointerInput
+                it.pointerInput(currentTrack) {
+                    if (currentTrack == null) return@pointerInput
 
                     val width = this.size.width
                     detectTapGestures { offset ->
@@ -121,8 +126,8 @@ fun TrackThumbnailProgressOverlay(
                     }
                 }
             } else {
-                it.pointerInput(trackUri) {
-                    if (trackUri == null) return@pointerInput
+                it.pointerInput(currentTrack) {
+                    if (currentTrack == null) return@pointerInput
 
                     val width = this.size.width
                     detectTapGestures { offset ->
@@ -132,7 +137,7 @@ fun TrackThumbnailProgressOverlay(
             }
         }) {
 
-        TrackThumbnail(trackUri, Modifier.fillMaxSize(), contentScale, blur, shape, height)
+        TrackThumbnail(currentTrack, Modifier.fillMaxSize(), contentScale, blur, shape, height)
 
         Row(Modifier.fillMaxSize()) {
             Box(

@@ -24,19 +24,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.github.catomon.kagamin.LocalLayoutManager
-import com.github.catomon.kagamin.audio.AudioPlayerService
 import com.github.catomon.kagamin.data.AppSettings
 import com.github.catomon.kagamin.openInBrowser
-import com.github.catomon.kagamin.data.saveSettings
 import com.github.catomon.kagamin.ui.components.AppIcon
 import com.github.catomon.kagamin.ui.components.OutlinedTextButton
-import com.github.catomon.kagamin.ui.components.TrackThumbnail
 import com.github.catomon.kagamin.ui.theme.KagaminColors
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.LayoutManager
@@ -71,12 +67,7 @@ fun SettingsScreen(
     Box(
         modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center
     ) {
-        TrackThumbnail(
-            viewModel.currentTrack.value?.uri,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop,
-            blur = true,
-        )
+        Background(currentTrack = viewModel.currentTrack.value)
 
         Box(Modifier.fillMaxSize().background(color = KagaminTheme.backgroundTransparent))
 
@@ -108,12 +99,12 @@ fun SettingsScreen(
                     currentLayout.value = it
                 })
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Always on top")
+                CheckboxOption("Always on top", settings.alwaysOnTop) {
+                    viewModel.settings = settings.copy(alwaysOnTop = it)
+                }
 
-                    Checkbox(settings.alwaysOnTop, {
-                        viewModel.settings = settings.copy(alwaysOnTop = it)
-                    })
+                CheckboxOption("Track image as background", settings.useTrackImageAsBackground) {
+                    viewModel.settings = settings.copy(useTrackImageAsBackground = it)
                 }
 
                 //todo crossfade
@@ -171,6 +162,14 @@ fun SettingsScreen(
             },
             modifier = Modifier.align(Alignment.BottomEnd).padding(10.dp)
         )
+    }
+}
+
+@Composable
+fun CheckboxOption(text: String, checked: Boolean,  onChange: (Boolean) -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(text)
+        Checkbox(checked, onChange)
     }
 }
 

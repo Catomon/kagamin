@@ -48,8 +48,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.CompositingStrategy
@@ -66,7 +64,7 @@ import com.github.catomon.kagamin.audio.PlaylistsManager
 import com.github.catomon.kagamin.data.AudioTrack
 import com.github.catomon.kagamin.ui.components.TrackProgressIndicator
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
-import com.github.catomon.kagamin.ui.util.formatTime
+import com.github.catomon.kagamin.ui.util.formatMillisToMinutesSeconds
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.util.echoTrace
 import kagamin.composeapp.generated.resources.Res
@@ -385,9 +383,9 @@ fun TracklistHeader(
                             if (currentTrack == null) "-:-/-:-"
                             else
                                 "${
-                                    if (isIndicatorHovered) formatTime((currentTrack.duration * progress).toLong())
-                                    else formatTime(currentTrack.let { position })
-                                }/${formatTime(currentTrack.duration)}"
+                                    if (isIndicatorHovered) formatMillisToMinutesSeconds((currentTrack.duration * progress).toLong())
+                                    else formatMillisToMinutesSeconds(currentTrack.let { position })
+                                }/${formatMillisToMinutesSeconds(currentTrack.duration)}"
                         }
                     }
 

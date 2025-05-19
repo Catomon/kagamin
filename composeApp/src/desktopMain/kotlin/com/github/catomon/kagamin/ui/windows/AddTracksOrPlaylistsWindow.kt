@@ -18,6 +18,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ApplicationScope
@@ -36,6 +38,7 @@ import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.arrow_left
+import kagamin.composeapp.generated.resources.kagamin_icon64
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -46,11 +49,13 @@ fun ApplicationScope.AddTracksOrPlaylistsWindow(
 
     val tabTransition: (Tabs) -> ContentTransform = { tab ->
         when (tab) {
-            Tabs.ADD_TRACKS -> slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
-            Tabs.CREATE_PLAYLIST -> slideInHorizontally { -it } togetherWith slideOutHorizontally { it }
+            Tabs.ADD_TRACKS -> slideInHorizontally { -it } togetherWith slideOutHorizontally { it }
+            Tabs.CREATE_PLAYLIST -> slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
             else -> slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
         }
     }
+
+    val currentTab = viewModel.currentTab
 
     Window(
         state = rememberWindowState(
@@ -58,7 +63,9 @@ fun ApplicationScope.AddTracksOrPlaylistsWindow(
         ),
         onCloseRequest = { viewModel.createPlaylistWindow = false },
         undecorated = true,
-        transparent = true
+        transparent = true,
+        title = if (currentTab == Tabs.CREATE_PLAYLIST) "Add/Create playlist" else "Add tracks",
+        icon = painterResource(Res.drawable.kagamin_icon64)
     ) {
         KagaminTheme {
             val snackbar = LocalSnackbarHostState.current
@@ -66,11 +73,20 @@ fun ApplicationScope.AddTracksOrPlaylistsWindow(
             WindowDraggableArea {
                 Scaffold(
                     snackbarHost = { SnackbarHost(snackbar) },
-                    modifier = modifier.kagaminWindowDecoration()
+                    modifier = modifier.kagaminWindowDecoration().let { m ->
+                        if (viewModel.currentTab == Tabs.ADD_TRACKS) m.dragAndDropTarget(
+                            { true }, remember {
+                                createTrackDragAndDropTarget(
+                                    kagaminViewModel = viewModel,
+                                    snackbar = snackbar
+                                )
+                            }
+                        ) else m
+                    }
                 ) {
                     Box {
                         TrackThumbnail(
-                            currentTrack?.uri,
+                            currentTrack,
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop,
                             blur = true,
@@ -94,14 +110,7 @@ fun ApplicationScope.AddTracksOrPlaylistsWindow(
                                         AddTracksTab(
                                             viewModel,
                                             Modifier.fillMaxSize().align(Alignment.Center)
-                                                .dragAndDropTarget(
-                                                    { true }, remember {
-                                                        createTrackDragAndDropTarget(
-                                                            kagaminViewModel = viewModel,
-                                                            snackbar = snackbar
-                                                        )
-                                                    }
-                                                )
+
                                         )
                                     }
 
@@ -134,7 +143,8 @@ fun ApplicationScope.AddTracksOrPlaylistsWindow(
                                 Icon(
                                     painterResource(Res.drawable.arrow_left),
                                     contentDescription = null,
-                                    tint = KagaminTheme.colors.buttonIcon
+                                    tint = KagaminTheme.colors.buttonIcon,
+                                    modifier = Modifier.scale(-1f, 1f)
                                 )
                             }
                         }

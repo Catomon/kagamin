@@ -2,8 +2,6 @@ package com.github.catomon.kagamin.ui
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.ContextMenuArea
-import androidx.compose.foundation.ContextMenuItem
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -45,23 +43,19 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.StrokeJoin
-import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.catomon.kagamin.data.Playlist
-import com.github.catomon.kagamin.ui.components.OutlinedText
-import com.github.catomon.kagamin.data.cache.ThumbnailCacheManager
-import com.github.catomon.kagamin.ui.components.TrackThumbnail
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
-import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.util.echoTrace
 import kagamin.composeapp.generated.resources.Res
@@ -213,20 +207,39 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
 
                     LazyColumn(
                         state = listState, horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.background(KagaminTheme.backgroundTransparent),
+                        modifier = Modifier.graphicsLayer {
+                            compositingStrategy = CompositingStrategy.Offscreen
+                        }
+                            .drawWithContent {
+                                drawContent()
+                                drawRect(
+                                    color = KagaminTheme.backgroundTransparent,
+                                    size = size,
+                                    blendMode = BlendMode.SrcOut
+                                )
+                                drawContent()
+                            },
                         contentPadding = PaddingValues(2.dp)
                     ) {
                         items(displayedPlaylists.size, key = {
                             displayedPlaylists.elementAt(it)
                         }) { i ->
                             val playlist = displayedPlaylists.elementAt(i)
-                            PlaylistItem(playlist, viewModel, displayedPlaylists, currentPlaylist == playlist, i, remove = {
-                                viewModel.removePlaylist(playlist)
-                            }, clear = {
-                                viewModel.clearPlaylist(playlist)
-                            }, shuffle = {
-                                viewModel.shufflePlaylist(playlist)
-                            })
+                            PlaylistItem(
+                                playlist,
+                                viewModel,
+                                displayedPlaylists,
+                                currentPlaylist == playlist,
+                                i,
+                                remove = {
+                                    viewModel.removePlaylist(playlist)
+                                },
+                                clear = {
+                                    viewModel.clearPlaylist(playlist)
+                                },
+                                shuffle = {
+                                    viewModel.shufflePlaylist(playlist)
+                                })
                         }
                     }
 
@@ -241,101 +254,6 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                         adapter = rememberScrollbarAdapter(listState)
                     )
                 }
-            }
-        }
-    }
-}
-
-@Composable
-fun PlaylistItem(
-    playlist: Playlist,
-    viewModel: KagaminViewModel,
-    playlists: List<Playlist>,
-    isCurrent: Boolean,
-    i: Int,
-    remove: () -> Unit,
-    clear: () -> Unit,
-    shuffle: () -> Unit
-) {
-    val backColor = KagaminTheme.colors.listItem
-    val height = 64.dp
-    val randomTrackUri = remember { playlist.tracks.randomOrNull()?.uri }
-
-    ContextMenuArea(items = {
-        listOf(
-            ContextMenuItem("Shuffle") {
-                shuffle()
-            },
-            ContextMenuItem("Clear") {
-                clear()
-            },
-            ContextMenuItem("Remove") {
-                remove()
-            },
-        )
-    }) {
-        Row(Modifier.height(height).padding(2.dp)) {
-            AnimatedVisibility(isCurrent) {
-                PlaybackStateButton(height, backColor, viewModel)
-            }
-
-            Box(Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp))) {
-                TrackThumbnail(
-                    randomTrackUri,
-                    modifier = Modifier.fillMaxWidth().height(height),
-                    shape = RectangleShape,
-                    height = ThumbnailCacheManager.SIZE.H250
-                )
-
-                PlaylistItemContent(viewModel, playlist, backColor)
-            }
-        }
-    }
-}
-
-@Composable
-private fun PlaylistItemContent(
-    viewModel: KagaminViewModel, playlist: Playlist, backColor: Color
-) {
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-        Column(
-            Modifier.fillMaxHeight()
-                //.background(color = backColor)
-                .clickable {
-                    viewModel.updateCurrentPlaylist(playlist)
-                    viewModel.currentTab = Tabs.TRACKLIST
-                }.padding(4.dp)
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
-            ) {
-                OutlinedText(
-                    playlist.name, fontSize = 10.sp, fillColor = KagaminTheme.text, maxLines = 1,
-                    outlineColor = Color.Black.copy(alpha = 0.25f),
-                    outlineDrawStyle = Stroke(
-                        width = 3f,
-                        join = StrokeJoin.Round
-                    )
-                )
-            }
-
-            Row(Modifier.fillMaxWidth()) {
-                OutlinedText(
-                    "Tracks: ${playlist.tracks.size}",
-                    fontSize = 10.sp,
-                    fillColor = KagaminTheme.text,
-                    outlineColor = Color.Black.copy(alpha = 0.25f),
-                    outlineDrawStyle = Stroke(
-                        width = 3f,
-                        join = StrokeJoin.Round
-                    )
-                )
-//                    Text(
-//                        "Duration: ???",
-//                        modifier = Modifier.weight(0.5f),
-//                        fontSize = 10.sp,
-//                        color = Colors.text2
-//                    )
             }
         }
     }

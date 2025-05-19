@@ -48,14 +48,13 @@ fun CurrentTrackFrame(
         }
     }
 
-
     Box(modifier) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             TrackThumbnailProgressOverlay(
-                currentTrack?.uri,
+                currentTrack,
                 onSetProgress = {
                     if (currentTrack != null) {
                         viewModel.seek((currentTrack.duration * it).toLong())
@@ -129,7 +128,7 @@ fun CompactCurrentTrackFrame(
         val aniColor = animateColorAsState(targetProgressColor)
 
         TrackThumbnailProgressOverlay(
-            currentTrack?.uri,
+            currentTrack,
             onSetProgress = {
                 if (currentTrack != null) {
                     viewModel.seek((currentTrack.duration * it).toLong())

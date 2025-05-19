@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -52,6 +53,7 @@ import com.github.catomon.kagamin.ui.components.LikeSongButton
 import com.github.catomon.kagamin.data.cache.ThumbnailCacheManager
 import com.github.catomon.kagamin.ui.components.TrackThumbnail
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
+import com.github.catomon.kagamin.ui.util.formatMillisToMinutesSeconds
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.ui.windows.ConfirmWindowState
 import com.github.catomon.kagamin.ui.windows.LocalConfirmWindow
@@ -128,7 +130,7 @@ fun ThumbnailTrackItem(
 //                        )
 //                    } else {
                     TrackThumbnail(
-                        track.uri,
+                        track,
                         modifier = Modifier.width(64.dp),
                         shape = RoundedCornerShape(8.dp),
                         height = ThumbnailCacheManager.SIZE.H64
@@ -187,13 +189,25 @@ private fun TrackItemBody(
                 modifier = Modifier.let { if (isHovered) it.basicMarquee(iterations = Int.MAX_VALUE) else it }
             )
 
-            Text(
-                track.artist,
-                fontSize = 8.sp,
-                color = KagaminTheme.textSecondary,
-                maxLines = 1,
-                modifier = Modifier.let { if (isHovered) it.basicMarquee(iterations = Int.MAX_VALUE) else it }
-            )
+            if (track.artist.isNotBlank())
+                Text(
+                    track.artist,
+                    fontSize = 8.sp,
+                    color = KagaminTheme.textSecondary,
+                    maxLines = 1,
+                    modifier = Modifier.let { if (isHovered) it.basicMarquee(iterations = Int.MAX_VALUE) else it },
+                    lineHeight = 16.sp
+                )
+
+            if (track.duration >= 0)
+                Text(
+                    remember { formatMillisToMinutesSeconds(track.duration) },
+                    fontSize = 8.sp,
+                    color = KagaminTheme.textSecondary,
+                    maxLines = 1,
+                    modifier = Modifier.let { if (isHovered) it.basicMarquee(iterations = Int.MAX_VALUE) else it },
+                    lineHeight = 16.sp
+                )
         }
 
         AnimatedVisibility(

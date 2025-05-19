@@ -24,7 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -33,9 +32,8 @@ import com.github.catomon.kagamin.ui.CreatePlaylistTab
 import com.github.catomon.kagamin.ui.Playlists
 import com.github.catomon.kagamin.ui.Tracklist
 import com.github.catomon.kagamin.ui.components.CurrentTrackFrame
-import com.github.catomon.kagamin.ui.components.LuckyStarLogo
+import com.github.catomon.kagamin.ui.components.AppLogo
 import com.github.catomon.kagamin.ui.components.Sidebar
-import com.github.catomon.kagamin.ui.components.TrackThumbnail
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
@@ -71,12 +69,7 @@ fun PlayerScreen(
     Box(
         modifier
     ) {
-        TrackThumbnail(
-            currentTrack?.uri,
-            modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp)),
-            contentScale = ContentScale.Crop,
-            blur = true,
-        )
+        Background(currentTrack)
 
         Row() {
             Column(
@@ -92,7 +85,7 @@ fun PlayerScreen(
 //                            if (navController.currentDestination?.route != SettingsDestination.toString())
 //                                navController.navigate(SettingsDestination.toString())
 //                        })
-                LuckyStarLogo(  Modifier.padding(horizontal = 12.dp).height(30.dp)
+                AppLogo(  Modifier.padding(horizontal = 12.dp).height(30.dp)
                     .graphicsLayer(translationY = 2f)
                     .clip(RoundedCornerShape(8.dp))
                     .clickable {

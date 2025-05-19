@@ -54,7 +54,7 @@ object KagaminTheme {
         @Composable get() = with(MaterialTheme.colorScheme) {
             copy(
                 primary = colors.buttonIcon,
-                primaryContainer = colors.buttonIconTransparent,
+                primaryContainer = colors.buttonIconInactive,
                 secondary = colors.buttonIconSmall,
                 secondaryContainer = colors.buttonIconSmallSelected,
                 background = background,

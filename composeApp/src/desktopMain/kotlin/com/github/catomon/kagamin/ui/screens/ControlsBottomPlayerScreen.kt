@@ -21,7 +21,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -29,12 +28,11 @@ import com.github.catomon.kagamin.LocalWindow
 import com.github.catomon.kagamin.ui.Playlists
 import com.github.catomon.kagamin.ui.Tracklist
 import com.github.catomon.kagamin.ui.components.AddTrackOrPlaylistButton
-import com.github.catomon.kagamin.ui.components.LuckyStarLogo
+import com.github.catomon.kagamin.ui.components.AppLogo
 import com.github.catomon.kagamin.ui.components.PlaybackButtons
 import com.github.catomon.kagamin.ui.components.RandomPlaybackButton
 import com.github.catomon.kagamin.ui.components.RepeatPlaylistPlaybackButton
 import com.github.catomon.kagamin.ui.components.RepeatTrackPlaybackButton
-import com.github.catomon.kagamin.ui.components.TrackThumbnail
 import com.github.catomon.kagamin.ui.components.VolumeOptions
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
@@ -60,12 +58,7 @@ fun ControlsBottomPlayerScreen(
             color = KagaminTheme.background
         )
     ) {
-        TrackThumbnail(
-            currentTrack?.uri,
-            modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp)),
-            contentScale = ContentScale.Crop,
-            blur = true,
-        )
+         Background(currentTrack)
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -147,7 +140,7 @@ fun ControlsBottomPlayerScreen(
 //                        }
 //                        .align(Alignment.CenterStart)
 //                )
-                LuckyStarLogo(
+                AppLogo(
                     Modifier
                         .padding(horizontal = 12.dp)
                         .height(40.dp)

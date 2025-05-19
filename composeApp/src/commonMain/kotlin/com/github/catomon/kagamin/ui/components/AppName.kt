@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import kagamin.composeapp.generated.resources.Res
+import kagamin.composeapp.generated.resources.kagamin_text_small
 import kagamin.composeapp.generated.resources.raki_sta_small
 import kagamin.composeapp.generated.resources.star64
 import org.jetbrains.compose.resources.painterResource
@@ -80,21 +81,31 @@ fun AppIcon(modifier: Modifier = Modifier, height: Dp = 32.dp) {
 }
 
 @Composable
+fun KagaminLogo(modifier: Modifier = Modifier, height: Dp = 32.dp) {
+    Box(contentAlignment = Alignment.Center, modifier = modifier) {
+        Image(
+            painterResource(Res.drawable.kagamin_text_small),
+            "LuckyStarLogo",
+            colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon),
+            modifier = Modifier.height(height)
+        )
+    }
+}
+
+@Composable
+fun AppLogo(modifier: Modifier = Modifier, height: Dp = 32.dp) {
+    KagaminLogo(modifier, height)
+}
+
+@Composable
 fun LuckyStarLogo(modifier: Modifier = Modifier, height: Dp = 32.dp) {
     Box(contentAlignment = Alignment.Center, modifier = modifier) {
-            Image(
-                painterResource(Res.drawable.raki_sta_small),
-                null,
-                colorFilter = ColorFilter.tint(KagaminTheme.colors.thinBorder),
-                modifier = Modifier.height(height)
-            )
-
-            Image(
-                painterResource(Res.drawable.raki_sta_small),
-                "LuckyStarLogo",
-                colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon),
-                modifier = Modifier.height(height)
-            )
+        Image(
+            painterResource(Res.drawable.raki_sta_small),
+            "LuckyStarLogo",
+            colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon),
+            modifier = Modifier.height(height)
+        )
     }
 }
 

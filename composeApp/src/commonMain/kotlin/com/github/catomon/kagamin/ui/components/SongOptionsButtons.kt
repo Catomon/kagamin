@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import com.github.catomon.kagamin.data.Playlist
-import com.github.catomon.kagamin.data.PlaylistsLoader
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import kagamin.composeapp.generated.resources.Res
@@ -61,7 +60,7 @@ fun SongOptionsButtons(
                 colorFilter = if (false) ColorFilter.tint( //
                     KagaminTheme.colors.buttonIcon
                 )
-                else ColorFilter.tint(KagaminTheme.colors.buttonIconTransparent)
+                else ColorFilter.tint(KagaminTheme.colors.buttonIconInactive)
             )
         }
 
@@ -74,7 +73,7 @@ fun SongOptionsButtons(
                 colorFilter = if (false) ColorFilter.tint( //if rated
                     KagaminTheme.colors.buttonIcon
                 )
-                else ColorFilter.tint(KagaminTheme.colors.buttonIconTransparent)
+                else ColorFilter.tint(KagaminTheme.colors.buttonIconInactive)
             )
         }
 
@@ -129,7 +128,7 @@ fun LikeSongButton(
         Icon(
             painter = painterResource(Res.drawable.like_song),
             contentDescription = "like song",
-            tint = if (isLoved) KagaminTheme.colors.disabled else KagaminTheme.colors.buttonIconTransparent
+            tint = if (isLoved) KagaminTheme.colors.buttonIcon else KagaminTheme.colors.buttonIconInactive
         )
     }
 }

@@ -16,24 +16,23 @@ import com.github.catomon.kagamin.ui.theme.KagaminTheme
 @Composable
 fun ImageWithShadow(
     painterResource: Painter,
-    s: String,
+    contentDescription: String,
     modifier: Modifier = Modifier,
     colorFilter: ColorFilter
 ) {
-
-    val pad = with(LocalDensity.current) { 0.dp.toPx() } //2
+    val pad = with(LocalDensity.current) { 2.dp.toPx() }
 
     Box(contentAlignment = Alignment.Center, modifier = modifier) {
 //        Image(
 //            painterResource,
-//            contentDescription = s,
-//            colorFilter = ColorFilter.tint(KagaminTheme.colors.thinBorder),
+//            contentDescription = contentDescription,
+//            colorFilter = ColorFilter.tint(KagaminTheme.colors.shadow),
 //            modifier = Modifier.graphicsLayer(translationY = pad).fillMaxSize()
 //        )
 
         Image(
             painterResource,
-            contentDescription = s,
+            contentDescription = contentDescription,
             colorFilter = colorFilter,
             modifier = Modifier.fillMaxSize()
         )

@@ -1,6 +1,6 @@
 package com.github.catomon.kagamin.ui.util
 
-fun formatTime(milliseconds: Long?): String {
+fun formatMillisToMinutesSeconds(milliseconds: Long?): String {
     return if (milliseconds == null) {
         "-:-"
     } else {

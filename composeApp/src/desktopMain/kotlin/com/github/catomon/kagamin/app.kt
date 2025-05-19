@@ -47,6 +47,7 @@ import com.github.catomon.kagamin.data.PlaylistsLoader
 import com.github.catomon.kagamin.data.cache.ThumbnailCacheManager
 import com.github.catomon.kagamin.data.loadSettings
 import com.github.catomon.kagamin.ui.KagaminApp
+import com.github.catomon.kagamin.ui.compositionlocals.LocalAppSettings
 import com.github.catomon.kagamin.ui.customShadow
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.LayoutManager
@@ -140,7 +141,8 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
 
         CompositionLocalProvider(
             LocalLayoutManager provides layoutManager,
-            LocalConfirmWindow provides confirmWindowState
+            LocalConfirmWindow provides confirmWindowState,
+            LocalAppSettings provides kagaminViewModel.settings
         ) {
             AppWindow(windowState, kagaminViewModel, exitApp)
         }

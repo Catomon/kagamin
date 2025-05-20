@@ -94,3 +94,80 @@ fun PlaybackButtons(
         }
     }
 }
+
+@Composable
+fun PrevNextTrackButtons(
+    viewModel: KagaminViewModel,
+    modifier: Modifier = Modifier,
+    buttonsSize: Dp = 32.dp
+) {
+    echoTrace { "PlaybackButtonsVariant" }
+
+    Row(
+        modifier = modifier.height(buttonsSize * 1.5f),//.background(Colors.noteBackground.copy(alpha = 0.75f)),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(
+            modifier = Modifier.size(buttonsSize),
+            onClick = {
+                viewModel.prevTrack()
+            }
+        ) {
+            ImageWithShadow(
+                painterResource(Res.drawable.prev),
+                "Previous",
+                modifier = Modifier.size(buttonsSize),
+                colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon)
+            )
+        }
+
+        IconButton(
+            modifier = Modifier.size(buttonsSize),
+            onClick = {
+                viewModel.nextTrack()
+            }
+        ) {
+            ImageWithShadow(
+                painterResource(Res.drawable.next),
+                "Next",
+                modifier = Modifier.size(buttonsSize),
+                colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon)
+            )
+        }
+    }
+}
+
+@Composable
+fun PlayPauseButton(
+    viewModel: KagaminViewModel,
+    buttonsSize: Dp = 32.dp,
+    modifier: Modifier = Modifier
+) {
+    val playState by viewModel.playState.collectAsState()
+
+    IconButton(
+        modifier = modifier.size(buttonsSize * 1.25f),
+        onClick = {
+            viewModel.onPlayPause()
+        }
+    ) {
+        AnimatedContent(playState) { playState ->
+            if (playState != AudioPlayerService.PlayState.PLAYING) {
+                ImageWithShadow(
+                    painterResource(Res.drawable.play),
+                    "Play",
+                    modifier = Modifier.size(buttonsSize * 1.25f),
+                    colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon)
+                )
+            } else {
+                ImageWithShadow(
+                    painterResource(Res.drawable.pause),
+                    "Pause",
+                    modifier = Modifier.size(buttonsSize * 1.25f),
+                    colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon)
+                )
+            }
+        }
+    }
+}

@@ -5,12 +5,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -21,6 +25,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -29,7 +38,8 @@ import com.github.catomon.kagamin.ui.Playlists
 import com.github.catomon.kagamin.ui.Tracklist
 import com.github.catomon.kagamin.ui.components.AddTrackOrPlaylistButton
 import com.github.catomon.kagamin.ui.components.AppLogo
-import com.github.catomon.kagamin.ui.components.PlaybackButtons
+import com.github.catomon.kagamin.ui.components.PlayPauseButton
+import com.github.catomon.kagamin.ui.components.PrevNextTrackButtons
 import com.github.catomon.kagamin.ui.components.RandomPlaybackButton
 import com.github.catomon.kagamin.ui.components.RepeatPlaylistPlaybackButton
 import com.github.catomon.kagamin.ui.components.RepeatTrackPlaybackButton
@@ -58,7 +68,7 @@ fun ControlsBottomPlayerScreen(
             color = KagaminTheme.background
         )
     ) {
-         Background(currentTrack)
+        Background(currentTrack)
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -126,20 +136,27 @@ fun ControlsBottomPlayerScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(40.dp)
-                    .background(color = KagaminTheme.backgroundTransparent),
+                       .background(color = KagaminTheme.backgroundTransparent)
+//                    .graphicsLayer {
+//                        compositingStrategy = CompositingStrategy.Offscreen
+//                    }
+//                    .drawWithContent {
+//                        drawRect(
+//                            color = KagaminTheme.backgroundTransparent,
+//                            size = size,
+//
+//                            )
+//                        drawCircle(
+//                            color = KagaminTheme.colors.backgroundTransparent,
+//                            //blendMode = BlendMode.SrcOut,
+//                            center = Offset(size.width, size.height),
+//                            radius = 64.dp.toPx()
+//                        )
+//                        drawContent()
+//                    },
+                        ,
                 contentAlignment = Alignment.Center
             ) {
-//                AppName(
-//                    Modifier
-//                        .padding(horizontal = 12.dp)
-//                        .height(25.dp)
-//                        .clip(RoundedCornerShape(8.dp))
-//                        .clickable {
-//                            if (navController.currentDestination?.route != SettingsDestination.toString())
-//                                navController.navigate(SettingsDestination.toString())
-//                        }
-//                        .align(Alignment.CenterStart)
-//                )
                 AppLogo(
                     Modifier
                         .padding(horizontal = 12.dp)
@@ -156,13 +173,7 @@ fun ControlsBottomPlayerScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.align(Alignment.CenterEnd)
                 ) {
-                    RepeatPlaylistPlaybackButton(viewModel)
-
-                    RepeatTrackPlaybackButton(viewModel)
-
-                    PlaybackButtons(viewModel)
-
-                    RandomPlaybackButton(viewModel)
+                    AddTrackOrPlaylistButton(viewModel, Modifier.padding(end = 6.dp))
 
                     VolumeOptions(
                         volume = volume,
@@ -172,9 +183,21 @@ fun ControlsBottomPlayerScreen(
                         modifier = Modifier.width(133.dp)
                     )
 
-                    AddTrackOrPlaylistButton(viewModel, Modifier.padding(end = 6.dp))
+                    RepeatPlaylistPlaybackButton(viewModel)
+
+                    RepeatTrackPlaybackButton(viewModel)
+
+                    RandomPlaybackButton(viewModel)
+
+                    PrevNextTrackButtons(viewModel)
+
+//                    Spacer(Modifier.width(64.dp))
+
+                    PlayPauseButton(viewModel, modifier = Modifier.padding(end = 6.dp))
                 }
             }
         }
+
+        //PlayPauseButton(viewModel)//, modifier = Modifier.size(64.dp).align(Alignment.BottomEnd).background(KagaminTheme.backgroundTransparent, shape = CircleShape).offset())
     }
 }

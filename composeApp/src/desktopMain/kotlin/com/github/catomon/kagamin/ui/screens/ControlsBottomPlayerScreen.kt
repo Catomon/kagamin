@@ -2,6 +2,7 @@ package com.github.catomon.kagamin.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,6 +39,7 @@ import com.github.catomon.kagamin.ui.Playlists
 import com.github.catomon.kagamin.ui.Tracklist
 import com.github.catomon.kagamin.ui.components.AddTrackOrPlaylistButton
 import com.github.catomon.kagamin.ui.components.AppLogo
+import com.github.catomon.kagamin.ui.components.CurrentTrackFrameHorizontal
 import com.github.catomon.kagamin.ui.components.PlayPauseButton
 import com.github.catomon.kagamin.ui.components.PrevNextTrackButtons
 import com.github.catomon.kagamin.ui.components.RandomPlaybackButton
@@ -62,6 +64,7 @@ fun ControlsBottomPlayerScreen(
     val currentTrack by viewModel.currentTrack.collectAsState()
     val currentPlaylist by viewModel.currentPlaylist.collectAsState()
     val volume by viewModel.volume.collectAsState()
+    val window = LocalWindow.current
 
     Box(
         modifier.background(
@@ -74,21 +77,25 @@ fun ControlsBottomPlayerScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize()
         ) {
-            Box(
-                Modifier.fillMaxWidth().height(8.dp)
-                    .background(color = KagaminTheme.backgroundTransparent)
-            ) {
-                val window = LocalWindow.current
+            Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.background(KagaminTheme.backgroundTransparent)) {
+                CurrentTrackFrameHorizontal(currentTrack, Modifier.weight(1f).padding(4.dp))
+
                 IconButton({
                     window.isMinimized = true
-                }, modifier = Modifier.align(Alignment.Center)) {
+                }, modifier = Modifier.height(16.dp)) { //, modifier = Modifier.align(Alignment.TopEnd))
                     Icon(
                         painterResource(Res.drawable.minimize_window),
                         contentDescription = null,
                         tint = KagaminTheme.colors.buttonIcon
                     )
                 }
+            }
 
+
+            Box(
+                Modifier.fillMaxWidth().height(8.dp)
+                    .background(color = KagaminTheme.backgroundTransparent)
+            ) {
 //                AppName(modifier = Modifier.align(Alignment.CenterStart).padding(horizontal = 8.dp), height = 26.dp)
 //
 //                IconButton({

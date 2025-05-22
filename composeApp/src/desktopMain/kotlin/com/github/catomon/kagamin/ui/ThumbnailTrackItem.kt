@@ -257,11 +257,11 @@ private fun TrackItemBody(
         }
 
         Row(
-            Modifier.align(Alignment.CenterEnd),
-            verticalAlignment = Alignment.CenterVertically
+            Modifier.align(Alignment.CenterEnd).padding(end = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             if (isSelected)
-                Icon(painterResource(Res.drawable.selected), null)
+                Icon(painterResource(Res.drawable.selected), null, modifier = Modifier.size(20.dp), tint = Color.White)
         }
     }
 }

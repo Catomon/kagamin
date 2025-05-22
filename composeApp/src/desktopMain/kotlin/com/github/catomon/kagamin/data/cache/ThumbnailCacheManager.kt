@@ -4,10 +4,16 @@ import androidx.compose.ui.graphics.toAwtImage
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import com.github.catomon.kagamin.data.cacheFolder
 import com.github.catomon.kagamin.ui.util.removeBlackBars
+import com.github.catomon.kagamin.util.logDbg
+import com.github.catomon.kagamin.util.logErr
+import com.github.catomon.kagamin.util.logTrace
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -37,6 +43,24 @@ object ThumbnailCacheManager {
 
     private val thumbnailCacheFolder = cacheFolder.resolve("thumbnails/")
 
+    private var timeoutJob: Job? = null
+
+    private val coroutineScope = CoroutineScope(Dispatchers.Default)
+
+    fun startTimeoutJob() {
+        timeoutJob?.cancel()
+        timeoutJob = coroutineScope.launch {
+            delay(3000)
+            try {
+                ongoingCacheJobs.forEach { it.value.cancel() }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
+            logErr { "ongoingCacheJobs wa canceled by timeoutJob after 3 sec." }
+        }
+    }
+
     suspend fun cacheThumbnail(
         trackUri: String,
         size: Int = SIZE.ORIGINAL,
@@ -44,9 +68,11 @@ object ThumbnailCacheManager {
     ): File? {
         return mutex.withLock {
             ongoingCacheJobs[trackUri]?.let { existingJob ->
+                logTrace { "existing job retrieved for track uri: $trackUri" }
                 return@withLock existingJob
             }
 
+            logTrace { "job created for track uri: $trackUri" }
             val newJob = CoroutineScope(Dispatchers.IO).async {
                 try {
                     thumbnailCacheFolder.resolve("512/${trackUri.hashCode()}").let {
@@ -69,16 +95,34 @@ object ThumbnailCacheManager {
                 }
             }
 
+            newJob.start()
+
             ongoingCacheJobs[trackUri] = newJob
-            newJob.invokeOnCompletion {
+            newJob.invokeOnCompletion { error ->
+                logTrace { "job completed for track uri: $trackUri" }
+
+                error?.printStackTrace()
+
                 runBlocking {
                     mutex.withLock {
                         ongoingCacheJobs.remove(trackUri)
                     }
                 }
             }
+
+            startTimeoutJob()
+
             newJob
         }.await().let { file ->
+            logTrace { "job result is ${file?.path} for size $size for track uri: $trackUri" }
+
+            try {
+                if (ongoingCacheJobs.isEmpty())
+                    timeoutJob?.cancel()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
             if (size > 0) {
                 file?.let {
                     thumbnailCacheFolder.resolve("$size/${file.name}")

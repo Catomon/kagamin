@@ -58,13 +58,17 @@ fun TrackThumbnail(
 ) {
     echoTrace { "TrackThumbnail" }
 
-    var cachedThumbnailFile by remember { mutableStateOf<File?>(null) }
+    var cachedThumbnailFile by remember { mutableStateOf<File>(userDataFolder.resolve("definitely_not_existing_file")) }
     val defaultPainter = painterResource(Res.drawable.def_thumb)
 
     LaunchedEffect(currentTrack) {
-        cachedThumbnailFile = if (currentTrack != null) withContext(Dispatchers.Default) {
-            ThumbnailCacheManager.cacheThumbnail(currentTrack.uri, size = height)
-        } else null
+        if (currentTrack != null) {
+            withContext(Dispatchers.Default) {
+                ThumbnailCacheManager.cacheThumbnail(currentTrack.uri, size = height)?.let { file ->
+                    cachedThumbnailFile = file
+                }
+            }
+        }
     }
 
     Box(
@@ -76,8 +80,7 @@ fun TrackThumbnail(
             modifier = Modifier.fillMaxSize().clip(shape)
         ) { cachedThumbnailFile ->
             AsyncImage(
-                cachedThumbnailFile
-                    ?: userDataFolder.resolve("definitely_not_existing_file"),
+                cachedThumbnailFile,
                 "Track thumbnail",
                 contentScale = contentScale,
                 modifier = Modifier.fillMaxSize().let { if (blur) it.blur(5.dp) else it }

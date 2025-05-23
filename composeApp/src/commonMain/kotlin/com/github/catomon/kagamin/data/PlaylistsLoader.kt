@@ -1,8 +1,10 @@
 package com.github.catomon.kagamin.data
 
 import com.github.catomon.kagamin.util.echoMsg
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import java.io.File
 
@@ -30,43 +32,47 @@ object PlaylistsLoader {
     }
 
     suspend fun savePlaylist(playlist: Playlist) = mutex.withLock {
-        val name = playlist.name
+        withContext(Dispatchers.IO) {
+            try {
+                val name = playlist.name
 
-        try {
-            val playlistsFolder = File(userDataFolder.path + "/playlists")
-            if (!playlistsFolder.exists())
-                playlistsFolder.mkdirs()
+                val playlistsFolder = File(userDataFolder.path + "/playlists")
+                if (!playlistsFolder.exists())
+                    playlistsFolder.mkdirs()
 
-            val file = File(userDataFolder.path + "/playlists/$name.pl")
-            if (!file.exists()) {
-                file.createNewFile()
+                val file = File(userDataFolder.path + "/playlists/$name.pl")
+                if (!file.exists()) {
+                    file.createNewFile()
+                }
+                file.writeText(json.encodeToString(playlist))
+
+                echoMsg("Playlist saved: $name")
+
+                true
+            } catch (e: Exception) {
+                e.printStackTrace()
+                false
             }
-            file.writeText(json.encodeToString(playlist))
-
-            echoMsg("Playlist saved: $name")
-
-            return@withLock true
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
-
-        return@withLock false
     }
 
     suspend fun loadPlaylists(): List<Playlist> = mutex.withLock {
-        val playlists = mutableListOf<Playlist>()
-        val playlistsFolder = File(playlistsFolder)
+        withContext(Dispatchers.IO) {
+            val playlists = mutableListOf<Playlist>()
 
-        for (file in playlistsFolder.listFiles() ?: return playlists) {
-            if (file.isFile) {
-                val playlist: Playlist = json.decodeFromString(file.readText())
-                playlists.add(playlist)
+            val playlistsFolder = File(playlistsFolder)
+
+            for (file in playlistsFolder.listFiles() ?: emptyArray<File>()) {
+                if (file.isFile) {
+                    val playlist: Playlist = json.decodeFromString(file.readText())
+                    playlists.add(playlist)
+                }
             }
+
+            echoMsg("Playlists loaded.")
+
+            playlists
         }
-
-        echoMsg("Playlists loaded.")
-
-        return playlists
     }
 
     suspend fun loadPlaylist(playlist: Playlist): Playlist? = mutex.withLock {

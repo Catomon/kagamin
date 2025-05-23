@@ -239,7 +239,9 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                                 },
                                 shuffle = {
                                     viewModel.shufflePlaylist(playlist)
-                                })
+                                },
+                                modifier = Modifier.padding(2.dp)
+                            )
                         }
                     }
 

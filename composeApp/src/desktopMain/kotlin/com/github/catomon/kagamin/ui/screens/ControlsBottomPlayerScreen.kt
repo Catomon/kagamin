@@ -77,38 +77,20 @@ fun ControlsBottomPlayerScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize()
         ) {
-            Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.background(KagaminTheme.backgroundTransparent)) {
-                CurrentTrackFrameHorizontal(currentTrack, Modifier.weight(1f).padding(4.dp))
+            Box(contentAlignment = Alignment.TopStart, modifier = Modifier.background(KagaminTheme.backgroundTransparent).fillMaxWidth()) {
+                CurrentTrackFrameHorizontal(currentTrack, Modifier.padding(4.dp))
 
                 IconButton({
                     window.isMinimized = true
-                }, modifier = Modifier.height(16.dp)) { //, modifier = Modifier.align(Alignment.TopEnd))
+                }, modifier = Modifier.height(16.dp).align(Alignment.TopEnd)) {
                     Icon(
                         painterResource(Res.drawable.minimize_window),
                         contentDescription = null,
                         tint = KagaminTheme.colors.buttonIcon
                     )
                 }
-            }
 
-
-            Box(
-                Modifier.fillMaxWidth().height(8.dp)
-                    .background(color = KagaminTheme.backgroundTransparent)
-            ) {
-//                AppName(modifier = Modifier.align(Alignment.CenterStart).padding(horizontal = 8.dp), height = 26.dp)
-//
-//                IconButton({
-//                    val player = viewModel.audioPlayer
-//                    saveSettings(viewModel.settings.copy(
-//                        repeat = player.playMode.value == AudioPlayerService.PlayMode.REPEAT_TRACK,
-//                        volume = player.volume.value,
-//                        random = player.playMode.value == AudioPlayerService.PlayMode.RANDOM,
-//                    ))
-//                    exitProcess(0)
-//                }, modifier = Modifier.align(Alignment.CenterEnd)) {
-//                    Icon(Icons.Default.Close, contentDescription = null, tint = KagaminTheme.colors.buttonIcon)
-//                }
+                PlayPauseButton(viewModel, buttonsSize = 48.dp, modifier = Modifier.align(Alignment.CenterEnd).padding(end = 24.dp))
             }
 
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
@@ -200,7 +182,7 @@ fun ControlsBottomPlayerScreen(
 
 //                    Spacer(Modifier.width(64.dp))
 
-                    PlayPauseButton(viewModel, modifier = Modifier.padding(end = 6.dp))
+//                    PlayPauseButton(viewModel, modifier = Modifier.padding(end = 6.dp))
                 }
             }
         }

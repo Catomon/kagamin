@@ -1,13 +1,13 @@
 package com.github.catomon.kagamin.audio
 
 import com.github.catomon.kagamin.data.AudioTrack
-import com.github.catomon.kagamin.data.loadSettings
 import com.github.catomon.kagamin.util.logMsg
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,6 +15,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist as LavaAudioPlaylist
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack as LavaAudioTrack
 
@@ -41,7 +43,8 @@ class AudioPlayerServiceImpl(
 
     override val playlistsManager: PlaylistsManager = PlaylistsManagerImpl(this)
 
-    val audioLoader = LavaAudioLoader(LavaLoaderListener())
+    val loaderListener = LavaLoaderListener()
+    val audioLoader = LavaAudioLoader(loaderListener)
 
     private val job = SupervisorJob()
     private val coroutineScope = CoroutineScope(dispatcherDefault + job)
@@ -63,18 +66,16 @@ class AudioPlayerServiceImpl(
         positionUpdateJob = null
     }
 
-    init {
-        //todo move away
-        val settings = loadSettings()
-        when {
-            settings.random -> playlistsManager.setPlayMode(PlaylistsManager.PlayMode.RANDOM)
-            settings.repeat -> playlistsManager.setPlayMode(PlaylistsManager.PlayMode.REPEAT_TRACK)
-            settings.repeatPlaylist -> playlistsManager.setPlayMode(PlaylistsManager.PlayMode.REPEAT_PLAYLIST)
+    override suspend fun loadTracks(uris: List<String>): List<AudioTrack> {
+        loaderListener.collectNextTracks = true
+        val collected = withContext(Dispatchers.IO) {
+            audioLoader.load(uris)
+            loaderListener.collectedTracks.toList()
         }
 
-        _crossfade.value = settings.crossfade
+        loaderListener.collectNextTracks = false
 
-        setVolume(settings.volume)
+        return collected
     }
 
     override suspend fun play(track: AudioTrack): Result<Boolean> {
@@ -129,8 +130,38 @@ class AudioPlayerServiceImpl(
         _volume.value = volume
     }
 
+    override fun setCrossfade(enabled: Boolean) {
+        _crossfade.value = enabled
+    }
+
     inner class LavaLoaderListener : LavaAudioLoader.LoaderListener {
+
+        val collectedTracks = mutableListOf<AudioTrack>()
+        var collectNextTracks = false
+            set(value) {
+                collectedTracks.clear()
+                field = value
+            }
+
+        @OptIn(ExperimentalUuidApi::class)
         override fun onTrackLoaded(track: LavaAudioTrack) {
+            if (collectNextTracks) {
+                val info = track.info
+                collectedTracks.add(
+                    AudioTrack(
+                        id = Uuid.random().toString(),
+                        uri = info.uri,
+                        title = info.title,
+                        artist = info.title,
+                        album = "",
+                        duration = track.duration,
+                        artworkUri = track.info.artworkUrl
+                    )
+                )
+
+                return
+            }
+
             val currentTrack = currentTrack.value ?: return
 
             if (currentTrack.uri == track.info.uri) {
@@ -139,8 +170,26 @@ class AudioPlayerServiceImpl(
             }
         }
 
+        @OptIn(ExperimentalUuidApi::class)
         override fun onPlaylistLoaded(playlist: LavaAudioPlaylist) {
-            stop()
+            if (collectNextTracks) {
+                playlist.tracks.forEach { track ->
+                    val info = track.info
+                    collectedTracks.add(
+                        AudioTrack(
+                            id = Uuid.random().toString(),
+                            uri = info.uri,
+                            title = info.title,
+                            artist = info.title,
+                            album = "",
+                            duration = track.duration,
+                            artworkUri = track.info.artworkUrl
+                        )
+                    )
+                }
+
+                return
+            }
         }
 
         override fun onLoadFailed() {
@@ -158,21 +207,32 @@ class AudioPlayerServiceImpl(
         }
 
         override fun onTrackPlaybackEndedLoadFailed(track: LavaAudioTrack) {
-            coroutineScope.launch(dispatcherMain) {
-                playlistsManager.nextTrack()
-            }
+            logMsg { "onTrackPlaybackEndedLoadFailed: ${track.info.uri}" }
+
+            tryPlayNextTrack()
         }
 
         override fun onTrackPlaybackStuck(track: LavaAudioTrack) {
-            coroutineScope.launch(dispatcherMain) {
-                playlistsManager.nextTrack()
+            logMsg { "onTrackPlaybackStuck: ${track.info.uri}" }
 
-            }
+            tryPlayNextTrack()
         }
 
         override fun onTrackPlaybackError(track: LavaAudioTrack) {
-            coroutineScope.launch(dispatcherMain) {
-                playlistsManager.nextTrack()
+            logMsg { "onTrackPlaybackError: ${track.info.uri}" }
+
+            tryPlayNextTrack()
+        }
+
+        private var nextOnErrorJob: Job? = null
+        private fun tryPlayNextTrack() {
+            if (nextOnErrorJob == null) {
+                nextOnErrorJob = coroutineScope.launch(dispatcherMain) {
+                    delay(1000)
+                    if (playState.value == AudioPlayerService.PlayState.PLAYING)
+                        playlistsManager.nextTrack()
+                    nextOnErrorJob = null
+                }
             }
         }
     }

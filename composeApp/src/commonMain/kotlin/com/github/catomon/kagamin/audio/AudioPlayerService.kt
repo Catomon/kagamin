@@ -15,6 +15,8 @@ interface AudioPlayerService {
 
     val playlistsManager: PlaylistsManager
 
+    suspend fun loadTracks(uris: List<String>): List<AudioTrack>
+
     suspend fun play(track: AudioTrack): Result<Boolean>
 
     fun pause()
@@ -25,6 +27,7 @@ interface AudioPlayerService {
 
     suspend fun seek(position: Long)
     fun setVolume(volume: Float)
+    fun setCrossfade(enabled: Boolean)
 }
 
 expect fun getAudioPlayerServiceImpl(): AudioPlayerService

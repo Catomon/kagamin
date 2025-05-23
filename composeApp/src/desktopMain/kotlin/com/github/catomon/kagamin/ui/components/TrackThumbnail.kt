@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,7 +32,6 @@ import com.github.catomon.kagamin.data.AudioTrack
 import com.github.catomon.kagamin.data.cache.ThumbnailCacheManager
 import com.github.catomon.kagamin.data.userDataFolder
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
-import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.util.echoTrace
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.def_thumb
@@ -58,17 +55,21 @@ fun TrackThumbnail(
 ) {
     echoTrace { "TrackThumbnail" }
 
-    var cachedThumbnailFile by remember { mutableStateOf<File>(userDataFolder.resolve("definitely_not_existing_file")) }
+    var thumbnailModel by remember { mutableStateOf<Any?>(userDataFolder.resolve("definitely_not_existing_file")) }
     val defaultPainter = painterResource(Res.drawable.def_thumb)
 
     LaunchedEffect(currentTrack) {
-        if (currentTrack != null) {
-            withContext(Dispatchers.Default) {
-                ThumbnailCacheManager.cacheThumbnail(currentTrack.uri, size = height)?.let { file ->
-                    cachedThumbnailFile = file
+        thumbnailModel = if (currentTrack != null) {
+            if (currentTrack.artworkUri?.startsWith("https") == true) {
+                currentTrack.artworkUri
+            } else {
+                withContext(Dispatchers.Default) {
+                    ThumbnailCacheManager.cacheThumbnail(currentTrack.uri, size = height)?.let { file ->
+                        file as Any
+                    }
                 }
             }
-        }
+        } else return@LaunchedEffect
     }
 
     Box(
@@ -76,7 +77,7 @@ fun TrackThumbnail(
         modifier = modifier
     ) {
         AnimatedContent(
-            cachedThumbnailFile,
+            thumbnailModel,
             modifier = Modifier.fillMaxSize().clip(shape)
         ) { cachedThumbnailFile ->
             AsyncImage(

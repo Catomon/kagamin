@@ -24,8 +24,6 @@ class LavaAudioLoader(
     val playingTrack get() = loader.player.playingTrack
     val position: Long get() = playingTrack?.position ?: 0L
 
-    private var loadingTrack: AudioTrack? = null
-
     init {
         startDiscordRich()
         discordRich(Rich.IDLE, null)
@@ -36,7 +34,7 @@ class LavaAudioLoader(
         loader.player.playTrack(track)
     }
 
-    fun load(uris: List<String>) {
+    suspend fun load(uris: List<String>) {
         uris.forEach {
             loader.loadItem(it)
         }

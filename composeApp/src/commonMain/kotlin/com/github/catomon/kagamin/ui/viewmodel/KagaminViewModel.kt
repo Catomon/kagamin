@@ -15,15 +15,12 @@ import com.github.catomon.kagamin.data.loadSettings
 import com.github.catomon.kagamin.data.saveSettings
 import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.util.echoErr
-import com.github.catomon.kagamin.util.echoWarn
 import com.github.catomon.kagamin.util.logErr
-import com.github.catomon.kagamin.util.logWarn
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.system.exitProcess
 
 class KagaminViewModel(
     private val audioPlayerService: AudioPlayerService,
@@ -64,6 +61,15 @@ class KagaminViewModel(
             reloadPlaylists()
             loadLastPlaylist()
         }
+
+        // set preferences
+        when {
+            settings.random -> playlistsManager.setPlayMode(PlaylistsManager.PlayMode.RANDOM)
+            settings.repeat -> playlistsManager.setPlayMode(PlaylistsManager.PlayMode.REPEAT_TRACK)
+            settings.repeatPlaylist -> playlistsManager.setPlayMode(PlaylistsManager.PlayMode.REPEAT_PLAYLIST)
+        }
+        audioPlayerService.setCrossfade(settings.crossfade)
+        setVolume(settings.volume)
     }
 
     private fun loadLastPlaylist() {
@@ -104,7 +110,7 @@ class KagaminViewModel(
         super.onCleared()
     }
 
-    suspend fun reloadPlaylists() = withContext(ioDispatcher) {
+    suspend fun reloadPlaylists() {
         val loadedPlaylists = PlaylistsLoader.loadPlaylists()
         if (loadedPlaylists.isNotEmpty())
             playlistsManager.updatePlaylists(loadedPlaylists)
@@ -140,11 +146,19 @@ class KagaminViewModel(
     }
 
     fun createPlaylist(playlist: Playlist) {
-        viewModelScope.launch {
+        viewModelScope.launch(ioDispatcher) {
             if (PlaylistsLoader.exists(playlist.name)) {
                 logErr { "Playlist with such name already exist: ${playlist.name}" }
                 return@launch
             }
+
+            val playlist = if (playlist.isOnline) {
+                val url = playlist.url
+                if (url.isNotEmpty()) {
+                    val tracks = audioPlayerService.loadTracks(listOf(url))
+                    playlist.copy(tracks = playlist.tracks + tracks)
+                } else playlist
+            } else playlist
 
             if (PlaylistsLoader.savePlaylist(playlist)) {
                 withContext(mainDispatcher) {
@@ -155,6 +169,9 @@ class KagaminViewModel(
             }
         }
     }
+
+    suspend fun loadTracks(url: String): List<AudioTrack> =
+        audioPlayerService.loadTracks(listOf(url))
 
     fun removePlaylist(playlist: Playlist) {
 //        if (playlist.id == "default") return

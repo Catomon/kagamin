@@ -38,8 +38,8 @@ import kotlin.uuid.Uuid
 fun CreatePlaylistTab(viewModel: KagaminViewModel, modifier: Modifier) {
     var name by remember { mutableStateOf("") }
     var isError by remember { mutableStateOf(false) }
-    var isLink by remember { mutableStateOf(false) }
-    var link by remember(isLink) { mutableStateOf("") }
+    var isOnline by remember { mutableStateOf(false) }
+    var link by remember(isOnline) { mutableStateOf("") }
     val currentPlaylist by viewModel.currentPlaylist.collectAsState()
 
     Column(
@@ -62,33 +62,42 @@ fun CreatePlaylistTab(viewModel: KagaminViewModel, modifier: Modifier) {
                 isError = isError,
                 singleLine = true,
                 label = { Text("New playlist") },
-                modifier = Modifier.padding(horizontal = 8.dp)
+                modifier = Modifier.padding(horizontal = 8.dp),
+                maxLines = 1
             )
 
-            if (isLink) {
-                TextField(
+            if (isOnline) {
+                OutlinedTextField(
                     link,
                     onValueChange = {
                         link = it
                     },
                     isError = isError,
                     singleLine = true,
-                    label = { Text("Link") },
-                    modifier = Modifier.padding(horizontal = 8.dp)
+                    label = { Text("URL (optional)") },
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    maxLines = 1
                 )
             }
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Image(painterResource(Res.drawable.yt_ic), "Youtube icon")
-                Checkbox(isLink, onCheckedChange = {
-                    isLink = !isLink
+                Image(painterResource(Res.drawable.yt_ic), null, modifier = Modifier.padding(4.dp))
+                Text("Online")
+                Checkbox(isOnline, onCheckedChange = {
+                    isOnline = !isOnline
                 })
 
                 OutlinedTextButton(
-                    text = if (isLink) "Add" else "Create",
+                    text = "Create",
                     onClick = {
                         if (isValidFileName(name)) {
-                            val newPlaylist = Playlist(Uuid.random().toString(), name, emptyList())
+                            val newPlaylist = Playlist(
+                                id = Uuid.random().toString(),
+                                name = name,
+                                tracks = emptyList(),
+                                isOnline = isOnline,
+                                url = link
+                            )
                             viewModel.createPlaylist(newPlaylist)
                             viewModel.updateCurrentPlaylist(newPlaylist)
 

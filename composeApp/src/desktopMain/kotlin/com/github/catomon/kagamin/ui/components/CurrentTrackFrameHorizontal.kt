@@ -39,9 +39,9 @@ fun CurrentTrackFrameHorizontal(track: AudioTrack?, modifier: Modifier = Modifie
     Row(modifier) {
         TrackThumbnail(
             track,
-            modifier = Modifier.size(64.dp),
+            modifier = Modifier.size(100.dp),
             shape = RoundedCornerShape(8.dp),
-            height = ThumbnailCacheManager.SIZE.H64
+            height = ThumbnailCacheManager.SIZE.H150
         )
 
         if (track != null)

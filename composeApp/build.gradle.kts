@@ -75,7 +75,7 @@ kotlin {
             implementation("org.slf4j:slf4j-api:2.0.7")
             implementation("org.slf4j:slf4j-simple:2.0.7")
 //            implementation("dev.lavalink.youtube:common:1.11.4")
-            implementation("dev.lavalink.youtube:v2:1.12.0")
+            implementation("dev.lavalink.youtube:v2:1.13.2")
 
             implementation("net.coobird:thumbnailator:0.4.20")
 

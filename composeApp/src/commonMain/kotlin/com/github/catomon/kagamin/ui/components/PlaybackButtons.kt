@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -154,18 +155,18 @@ fun PlayPauseButton(
     ) {
         AnimatedContent(playState) { playState ->
             if (playState != AudioPlayerService.PlayState.PLAYING) {
-                ImageWithShadow(
+                Icon(
                     painterResource(Res.drawable.play),
                     "Play",
                     modifier = Modifier.size(buttonsSize * 1.25f),
-                    colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon)
+                    tint = KagaminTheme.colors.buttonIcon
                 )
             } else {
-                ImageWithShadow(
+                Icon(
                     painterResource(Res.drawable.pause),
                     "Pause",
                     modifier = Modifier.size(buttonsSize * 1.25f),
-                    colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon)
+                    tint = KagaminTheme.colors.buttonIcon
                 )
             }
         }

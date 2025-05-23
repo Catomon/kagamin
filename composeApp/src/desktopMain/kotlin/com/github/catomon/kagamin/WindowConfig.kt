@@ -10,8 +10,8 @@ object WindowConfig {
     const val TINY_WIDTH = 208
     const val TINY_HEIGHT = 208
 
-    const val BOTTOM_CONTROLS_WIDTH = 500
-    const val BOTTOM_CONTROLS_HEIGHT = 400
+    const val BOTTOM_CONTROLS_WIDTH = 600
+    const val BOTTOM_CONTROLS_HEIGHT = 500
 
     var isTransparent = false
 

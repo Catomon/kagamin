@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,7 +34,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -49,8 +47,8 @@ import com.github.catomon.kagamin.audio.AudioPlayerService
 import com.github.catomon.kagamin.data.AudioTrack
 import com.github.catomon.kagamin.data.Playlist
 import com.github.catomon.kagamin.data.PlaylistsLoader
-import com.github.catomon.kagamin.ui.components.LikeSongButton
 import com.github.catomon.kagamin.data.cache.ThumbnailCacheManager
+import com.github.catomon.kagamin.ui.components.LikeSongButton
 import com.github.catomon.kagamin.ui.components.TrackThumbnail
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.formatMillisToMinutesSeconds
@@ -62,6 +60,7 @@ import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.pause
 import kagamin.composeapp.generated.resources.play
 import kagamin.composeapp.generated.resources.selected
+import kagamin.composeapp.generated.resources.yt_ic
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 
@@ -110,7 +109,7 @@ fun ThumbnailTrackItem(
     }) {
         Row(modifier.height(height)) {
             AnimatedVisibility(index > -1 && isCurrentTrack) {
-                PlaybackStateButton(height, backgroundColor, viewModel)
+                PlaybackStateButton(height, viewModel)
             }
 
             Column(
@@ -210,58 +209,73 @@ private fun TrackItemBody(
                 )
         }
 
-        AnimatedVisibility(
-            isHovered || isLoved,
-            modifier = Modifier.align(Alignment.CenterEnd)
-        ) {
-
-            LikeSongButton(isLoved, {
-                viewModel.viewModelScope.launch {
-                    if (updatingLike) return@launch
-                    updatingLike = true
-                    if (!isLoved) {
-                        track?.let addToLoved@{ track ->
-                            //get loved playlist or create new and then add the track to it and finally save playlist
-                            viewModel.playlists.value
-                                .firstOrNull { playlist -> playlist.id == "loved" }
-                                ?.let { playlist ->
-                                    if (playlist.tracks.any { it.id == track.id }) return@addToLoved
-                                    viewModel.updatePlaylist(playlist.copy(tracks = playlist.tracks + track)); playlist
-                                } ?: Playlist("loved", "loved", listOf(track))
-                                .also { playlist ->
-                                    viewModel.createPlaylist(
-                                        playlist
-                                    )
-                                }.also {
-                                    PlaylistsLoader.savePlaylist(it)
-                                }
-
-                        }
-                    } else {
-                        //remove the track from the loved playlist and then save playlist
-                        track?.let { track ->
-                            viewModel.playlists.value
-                                .firstOrNull { playlist -> playlist.id == "loved" }
-                                ?.let { playlist ->
-                                    viewModel.updatePlaylist(playlist.copy(tracks = playlist.tracks - track))
-                                    PlaylistsLoader.savePlaylist(playlist)
-                                }
-                        }
-                    }
-                    isLoved = viewModel.playlists.value
-                        .firstOrNull { playlist -> playlist.id == "loved" }?.tracks?.any { it.id == track.id }
-                        ?: false
-                    updatingLike = false
-                }
-            }, 32.dp)
-        }
-
         Row(
             Modifier.align(Alignment.CenterEnd).padding(end = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            AnimatedVisibility(
+                isHovered || isLoved
+            ) {
+                LikeSongButton(
+                    isLoved = isLoved,
+                    onClick = {
+                        viewModel.viewModelScope.launch {
+                            if (updatingLike) return@launch
+                            updatingLike = true
+                            if (!isLoved) {
+                                track?.let addToLoved@{ track ->
+                                    //get loved playlist or create new and then add the track to it and finally save playlist
+                                    viewModel.playlists.value
+                                        .firstOrNull { playlist -> playlist.id == "loved" }
+                                        ?.let { playlist ->
+                                            if (playlist.tracks.any { it.id == track.id }) return@addToLoved
+                                            viewModel.updatePlaylist(playlist.copy(tracks = playlist.tracks + track)); playlist
+                                        } ?: Playlist("loved", "loved", listOf(track))
+                                        .also { playlist ->
+                                            viewModel.createPlaylist(
+                                                playlist
+                                            )
+                                        }.also {
+                                            PlaylistsLoader.savePlaylist(it)
+                                        }
+
+                                }
+                            } else {
+                                //remove the track from the loved playlist and then save playlist
+                                track?.let { track ->
+                                    viewModel.playlists.value
+                                        .firstOrNull { playlist -> playlist.id == "loved" }
+                                        ?.let { playlist ->
+                                            viewModel.updatePlaylist(playlist.copy(tracks = playlist.tracks - track))
+                                            PlaylistsLoader.savePlaylist(playlist)
+                                        }
+                                }
+                            }
+                            isLoved = viewModel.playlists.value
+                                .firstOrNull { playlist -> playlist.id == "loved" }?.tracks?.any { it.id == track.id }
+                                ?: false
+                            updatingLike = false
+                        }
+                    },
+                    buttonsSize = 32.dp
+                )
+            }
+
+            if (remember { track.uri.startsWith("https") }) {
+                Icon(
+                    painterResource(Res.drawable.yt_ic),
+                    null,
+                    tint = KagaminTheme.colors.backgroundTransparent
+                )
+            }
+
             if (isSelected)
-                Icon(painterResource(Res.drawable.selected), null, modifier = Modifier.size(20.dp), tint = Color.White)
+                Icon(
+                    painterResource(Res.drawable.selected),
+                    null,
+                    modifier = Modifier.size(20.dp).padding(start = 4.dp),
+                    tint = KagaminTheme.backgroundTransparent
+                )
         }
     }
 }
@@ -269,7 +283,6 @@ private fun TrackItemBody(
 @Composable
 fun PlaybackStateButton(
     height: Dp,
-    backColor: Color,
     viewModel: KagaminViewModel
 ) {
     val playSate by viewModel.playState.collectAsState()
@@ -277,12 +290,6 @@ fun PlaybackStateButton(
     Box(
         Modifier
             .height(height)
-//            .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
-//            .drawWithContent {
-//                drawContent()
-//                drawRect(color = backColor, size = size, blendMode = BlendMode.SrcOut)
-//                drawContent()
-//            }
             .clip(RoundedCornerShape(6.dp))
             .clickable { viewModel.onPlayPause() },
         contentAlignment = Alignment.Center
@@ -290,10 +297,6 @@ fun PlaybackStateButton(
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier.height(height)
-//                .background(
-//                KagaminTheme.backgroundTransparent,
-//                RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp)
-//            )
         ) {
             Image(
                 painterResource(if (playSate == AudioPlayerService.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),

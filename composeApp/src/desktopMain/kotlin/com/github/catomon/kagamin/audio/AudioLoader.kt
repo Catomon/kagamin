@@ -7,7 +7,12 @@ import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventListener
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
 import dev.lavalink.youtube.YoutubeAudioSourceManager
+import dev.lavalink.youtube.clients.MusicWithThumbnail
+import dev.lavalink.youtube.clients.WebWithThumbnail
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.sound.sampled.AudioInputStream
+
 
 class AudioLoader(
     var resultHandler: AudioLoadResultHandler
@@ -16,7 +21,11 @@ class AudioLoader(
     val playerManager = DefaultAudioPlayerManager()
     val player = playerManager.createPlayer()
 
-    val ytManager = YoutubeAudioSourceManager()
+    var ytManager: YoutubeAudioSourceManager = YoutubeAudioSourceManager(
+//        true,
+//        MusicWithThumbnail(),
+//        WebWithThumbnail()
+    )
 
     var remoteSourcesRegistered = false
 
@@ -43,7 +52,7 @@ class AudioLoader(
         player.addListener(listener)
     }
 
-    fun loadItem(identifier: String) {
+    suspend fun loadItem(identifier: String) = withContext(Dispatchers.IO) {
         playerManager.loadItemSync(identifier, resultHandler)
     }
 

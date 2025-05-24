@@ -77,7 +77,8 @@ fun AddTracksTab(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                 OnlinePlaylistOptions(currentPlaylist, onAddTracks = { link ->
                     viewModel.viewModelScope.launch {
                         val loadedTracks = viewModel.loadTracks(link)
-                        viewModel.updatePlaylist(currentPlaylist.copy(tracks = currentPlaylist.tracks + loadedTracks))
+                        val loadedUris = loadedTracks.map { it.uri }
+                        viewModel.updatePlaylist(currentPlaylist.copy(tracks = currentPlaylist.tracks.filter { it.uri !in loadedUris } + loadedTracks))
                     }
                 })
             else

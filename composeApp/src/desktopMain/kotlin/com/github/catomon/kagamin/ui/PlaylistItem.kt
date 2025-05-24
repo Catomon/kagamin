@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.catomon.kagamin.data.Playlist
@@ -110,15 +111,17 @@ private fun PlaylistItemContent(
 
             Text(
                 playlist.name, fontSize = 10.sp, color = KagaminTheme.text, maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         }
 
 
         Text(
             "Tracks: ${playlist.tracks.size}",
-            fontSize = 10.sp,
-            color = KagaminTheme.text,
+            fontSize = 8.sp,
+            color = KagaminTheme.textSecondary,
             maxLines = 1,
+            lineHeight = 16.sp
         )
     }
 }

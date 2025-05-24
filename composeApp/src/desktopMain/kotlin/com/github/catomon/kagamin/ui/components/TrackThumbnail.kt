@@ -38,7 +38,6 @@ import kagamin.composeapp.generated.resources.def_thumb
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.painterResource
-import java.io.File
 
 object TrackThumbnailDefaults {
     val shape = RoundedCornerShape(12.dp)
@@ -64,9 +63,13 @@ fun TrackThumbnail(
                 currentTrack.artworkUri
             } else {
                 withContext(Dispatchers.Default) {
-                    ThumbnailCacheManager.cacheThumbnail(currentTrack.uri, size = height)?.let { file ->
-                        file as Any
-                    }
+                    if (currentTrack.uri.startsWith("https"))
+                        null
+                    else
+                        ThumbnailCacheManager.cacheThumbnail(currentTrack.uri, size = height)
+                            ?.let { file ->
+                                file as Any
+                            }
                 }
             }
         } else return@LaunchedEffect
@@ -109,37 +112,37 @@ fun TrackThumbnailProgressOverlay(
     controlProgress: Boolean = false,
 ) {
     echoTrace { "TrackThumbnailProgressOverlay" }
-    
+
     Box(
         modifier
-        .drawBehind {
-            drawRoundRect(
-                color = KagaminTheme.colors.thinBorder,
-                topLeft = Offset(0f, with(density) { 1.dp.toPx() }),
-                size = this.size.copy(height = this.size.height + 2.dp.toPx()),
-                cornerRadius = CornerRadius(if (shape is RoundedCornerShape) 12f else 0f)
-            )
-        }.let {
-            if (controlProgress) {
-                it.pointerInput(currentTrack) {
-                    if (currentTrack == null) return@pointerInput
+            .drawBehind {
+                drawRoundRect(
+                    color = KagaminTheme.colors.thinBorder,
+                    topLeft = Offset(0f, with(density) { 1.dp.toPx() }),
+                    size = this.size.copy(height = this.size.height + 2.dp.toPx()),
+                    cornerRadius = CornerRadius(if (shape is RoundedCornerShape) 12f else 0f)
+                )
+            }.let {
+                if (controlProgress) {
+                    it.pointerInput(currentTrack) {
+                        if (currentTrack == null) return@pointerInput
 
-                    val width = this.size.width
-                    detectTapGestures { offset ->
-                        onSetProgress(offset.x / width)
+                        val width = this.size.width
+                        detectTapGestures { offset ->
+                            onSetProgress(offset.x / width)
+                        }
+                    }
+                } else {
+                    it.pointerInput(currentTrack) {
+                        if (currentTrack == null) return@pointerInput
+
+                        val width = this.size.width
+                        detectTapGestures { offset ->
+                            onSetProgress(offset.x / width)
+                        }
                     }
                 }
-            } else {
-                it.pointerInput(currentTrack) {
-                    if (currentTrack == null) return@pointerInput
-
-                    val width = this.size.width
-                    detectTapGestures { offset ->
-                        onSetProgress(offset.x / width)
-                    }
-                }
-            }
-        }) {
+            }) {
 
         TrackThumbnail(currentTrack, Modifier.fillMaxSize(), contentScale, blur, shape, height)
 

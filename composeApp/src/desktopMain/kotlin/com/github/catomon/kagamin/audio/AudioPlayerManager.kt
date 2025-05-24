@@ -15,11 +15,11 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason
 
-class LavaAudioLoader(
+class AudioPlayerManager(
     val loaderListener: LoaderListener
 ) {
-    private val loader = AudioLoader(AudioLoadResulHandlerImpl())
-    private val stream = AudioStream(loader.createAudioInputStream())
+    private val loader = AudioPlayer(AudioLoadResulHandlerImpl())
+    private val playback = AudioPlayback(loader.createAudioInputStream())
     private val eventListener = AudioEventListenerImpl()
     val playingTrack get() = loader.player.playingTrack
     val position: Long get() = playingTrack?.position ?: 0L
@@ -49,11 +49,15 @@ class LavaAudioLoader(
     fun resume() {
         logMsg("Resume.")
 
+        playback.start()
+
         loader.player.isPaused = false
     }
 
     fun stop() {
         loader.player.stopTrack()
+
+        playback.stop()
     }
 
     fun setVolume(volume: Float) {
@@ -72,7 +76,7 @@ class LavaAudioLoader(
         stopDiscordRich()
         loader.player.stopTrack()
         loader.playerManager.shutdown()
-        stream.stop()
+        playback.stop()
     }
 
     interface LoaderListener {
@@ -107,7 +111,7 @@ class LavaAudioLoader(
         }
 
         override fun playlistLoaded(playlist: AudioPlaylist) {
-            logMsg("Playlist loaded: ${playlist.name}")
+            logMsg("Remote playlist loaded: ${playlist.name}, ${playlist.tracks.size} tracks")
 
             loaderListener.onPlaylistLoaded(playlist)
         }

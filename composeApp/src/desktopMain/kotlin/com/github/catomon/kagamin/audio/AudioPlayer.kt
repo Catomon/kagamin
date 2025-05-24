@@ -7,14 +7,23 @@ import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventListener
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
 import dev.lavalink.youtube.YoutubeAudioSourceManager
+import dev.lavalink.youtube.clients.AndroidMusicWithThumbnail
+import dev.lavalink.youtube.clients.AndroidVr
+import dev.lavalink.youtube.clients.AndroidVrWithThumbnail
+import dev.lavalink.youtube.clients.AndroidWithThumbnail
+import dev.lavalink.youtube.clients.MWebWithThumbnail
+import dev.lavalink.youtube.clients.Music
 import dev.lavalink.youtube.clients.MusicWithThumbnail
+import dev.lavalink.youtube.clients.Web
+import dev.lavalink.youtube.clients.WebEmbedded
+import dev.lavalink.youtube.clients.WebEmbeddedWithThumbnail
 import dev.lavalink.youtube.clients.WebWithThumbnail
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.sound.sampled.AudioInputStream
 
 
-class AudioLoader(
+class AudioPlayer(
     var resultHandler: AudioLoadResultHandler
 ) {
     var outputFormat = StandardAudioDataFormats.COMMON_PCM_S16_BE
@@ -23,8 +32,17 @@ class AudioLoader(
 
     var ytManager: YoutubeAudioSourceManager = YoutubeAudioSourceManager(
 //        true,
+//        Music(),
+//        AndroidVr(),
+//        Web(),
+//        WebEmbedded(),
 //        MusicWithThumbnail(),
-//        WebWithThumbnail()
+//        WebWithThumbnail(),
+//        WebEmbeddedWithThumbnail(),
+//        MWebWithThumbnail(),
+//        AndroidMusicWithThumbnail(),
+//        AndroidVrWithThumbnail(),
+//        AndroidWithThumbnail(),
     )
 
     var remoteSourcesRegistered = false
@@ -32,8 +50,7 @@ class AudioLoader(
     init {
         playerManager.configuration.outputFormat = outputFormat
 
-        //100 tracks per page
-        ytManager.setPlaylistPageCount(20)
+        ytManager.setPlaylistPageCount(400)
         playerManager.registerSourceManager(ytManager)
         AudioSourceManagers.registerLocalSource(playerManager)
         registerRemoteSources()

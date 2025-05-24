@@ -7,7 +7,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -44,7 +43,7 @@ class AudioPlayerServiceImpl(
     override val playlistsManager: PlaylistsManager = PlaylistsManagerImpl(this)
 
     val loaderListener = LavaLoaderListener()
-    val audioLoader = LavaAudioLoader(loaderListener)
+    val audioLoader = AudioPlayerManager(loaderListener)
 
     private val job = SupervisorJob()
     private val coroutineScope = CoroutineScope(dispatcherDefault + job)
@@ -134,7 +133,7 @@ class AudioPlayerServiceImpl(
         _crossfade.value = enabled
     }
 
-    inner class LavaLoaderListener : LavaAudioLoader.LoaderListener {
+    inner class LavaLoaderListener : AudioPlayerManager.LoaderListener {
 
         val collectedTracks = mutableListOf<AudioTrack>()
         var collectNextTracks = false
@@ -142,6 +141,13 @@ class AudioPlayerServiceImpl(
                 collectedTracks.clear()
                 field = value
             }
+
+        private fun getYoutubeThumbnailUrl(youtubeUrl: String, size: String = "mqdefault"): String? {
+            val regex = Regex("(?:v=|be/|embed/|v/|youtu.be/|/v/|/embed/|watch\\?v=|&v=)([\\w-]{11})")
+            val match = regex.find(youtubeUrl)
+            val videoId = match?.groups?.get(1)?.value
+            return videoId?.let { "https://i.ytimg.com/vi/$it/$size.jpg" }
+        }
 
         @OptIn(ExperimentalUuidApi::class)
         override fun onTrackLoaded(track: LavaAudioTrack) {
@@ -155,7 +161,7 @@ class AudioPlayerServiceImpl(
                         artist = info.title,
                         album = "",
                         duration = track.duration,
-                        artworkUri = track.info.artworkUrl
+                        artworkUri = getYoutubeThumbnailUrl(info.uri) //track.info.artworkUrl
                     )
                 )
 
@@ -166,7 +172,9 @@ class AudioPlayerServiceImpl(
 
             if (currentTrack.uri == track.info.uri) {
                 audioLoader.play(track)
-                resume()
+
+                if (_playState.value != AudioPlayerService.PlayState.PLAYING)
+                    resume()
             }
         }
 
@@ -183,7 +191,7 @@ class AudioPlayerServiceImpl(
                             artist = info.title,
                             album = "",
                             duration = track.duration,
-                            artworkUri = track.info.artworkUrl
+                            artworkUri = getYoutubeThumbnailUrl(info.uri) //track.info.artworkUrl
                         )
                     )
                 }

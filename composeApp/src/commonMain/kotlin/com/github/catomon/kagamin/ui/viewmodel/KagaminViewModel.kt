@@ -46,6 +46,8 @@ class KagaminViewModel(
     var isLoadingPlaylistFile by mutableStateOf(false)
     var isLoadingSong by mutableStateOf<AudioTrack?>(null)
 
+    var isLoading by mutableStateOf<AudioTrack?>(null)
+
     //todo move to player screen state
     var currentTab by mutableStateOf(Tabs.TRACKLIST)
 
@@ -156,7 +158,8 @@ class KagaminViewModel(
                 val url = playlist.url
                 if (url.isNotEmpty()) {
                     val tracks = audioPlayerService.loadTracks(listOf(url))
-                    playlist.copy(tracks = playlist.tracks + tracks)
+                    val tracksUris = tracks.map { it.uri }
+                    playlist.copy(tracks = playlist.tracks.filter { it.uri !in tracksUris } + tracks)
                 } else playlist
             } else playlist
 

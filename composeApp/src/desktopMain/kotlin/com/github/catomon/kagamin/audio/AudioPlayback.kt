@@ -1,14 +1,18 @@
 package com.github.catomon.kagamin.audio
 
 import com.github.catomon.kagamin.util.logMsg
+import kotlinx.coroutines.channels.Channel
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import javax.sound.sampled.AudioFormat
 import javax.sound.sampled.AudioInputStream
 import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.DataLine
 import javax.sound.sampled.SourceDataLine
 import kotlin.concurrent.thread
+import kotlin.math.sqrt
 
-class AudioStream(
+class AudioPlayback(
     private val audioInputStream: AudioInputStream,
     private val audioFormat: AudioFormat = audioInputStream.format
 ) {
@@ -23,13 +27,52 @@ class AudioStream(
     var isActive = true
         private set
 
-    private var playbackThread = newPlaybackThread(start = true)
+    private var playbackThread: Thread? = null
 
     private fun newPlaybackThread(start: Boolean = false) = thread(start) {
         playbackLoop()
     }.apply {
         name = "AudioStream-PlaybackThread"
     }
+
+    // ---v
+
+    private val amplitudeChannel = Channel<Float>(Channel.UNLIMITED)
+//    private var amplitudeListener: ((Float) -> Unit)? = null
+//
+//    fun interface AmplitudeListener {
+//        fun onAmplitude(rms: Float)
+//    }
+
+//    fun setAmplitudeListener(listener: AmplitudeListener) {
+//        amplitudeListener = { rms ->
+//            CoroutineScope(Dispatchers.Main).launch {
+//                listener.onAmplitude(rms)
+//            }
+//        }
+//    }
+
+    private fun processAmplitude(buffer: ByteArray, bytesRead: Int) {
+        val samples = ByteBuffer.wrap(buffer, 0, bytesRead)
+            .order(
+                if (audioFormat.isBigEndian) ByteOrder.BIG_ENDIAN
+                else ByteOrder.LITTLE_ENDIAN
+            )
+            .asShortBuffer()
+
+        val floatSamples = FloatArray(samples.remaining())
+        for (i in 0 until samples.remaining()) {
+            floatSamples[i] = samples.get(i) / 32768f
+        }
+
+        val sumSquares = floatSamples.fold(0f) { acc, sample -> acc + sample * sample }
+        val rms = sqrt(sumSquares / floatSamples.size)
+
+//        amplitudeListener?.invoke(rms)
+        amplitudeChannel.trySend(rms)
+    }
+
+    // ---^
 
     private fun playbackLoop() {
         while (true) {
@@ -44,7 +87,7 @@ class AudioStream(
             sourceDataLine.open(audioFormat)
             sourceDataLine.start()
 
-            this@AudioStream.logMsg("DataLine is open, started.")
+            this@AudioPlayback.logMsg { "DataLine is running." }
 
             var size: Int
             val buffer = ByteArray(audioFormat.channels * 960 * 2)
@@ -52,25 +95,28 @@ class AudioStream(
                 size = audioInputStream.read(buffer)
                 if (size >= 0) {
                     sourceDataLine.write(buffer, 0, size)
+
+                    processAmplitude(buffer, size)
                 }
 
                 if (!isActive) return
             }
 
-            this@AudioStream.logMsg("DataLine is closed.")
+            this@AudioPlayback.logMsg { "DataLine is closed." }
         }
     }
 
 
     fun stop() {
-        if (playbackThread.isAlive) {
+        val playbackThread = playbackThread
+        if (playbackThread?.isAlive == true) {
             isActive = false
             playbackThread.join()
         }
     }
 
-    private fun start() {
-        if (playbackThread.isAlive) return
+    fun start() {
+        if (playbackThread?.isAlive == true) return
 
         playbackThread = newPlaybackThread(start = true)
     }

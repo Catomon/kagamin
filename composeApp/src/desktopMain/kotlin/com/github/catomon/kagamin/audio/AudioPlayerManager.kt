@@ -14,6 +14,7 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason
+import kotlinx.coroutines.channels.Channel
 
 class AudioPlayerManager(
     val loaderListener: LoaderListener
@@ -24,10 +25,17 @@ class AudioPlayerManager(
     val playingTrack get() = loader.player.playingTrack
     val position: Long get() = playingTrack?.position ?: 0L
 
+    companion object {
+        lateinit var amplitudeChannel: Channel<Float>
+            private set
+    }
+
     init {
         startDiscordRich()
         discordRich(Rich.IDLE, null)
         loader.addAudioEventListener(eventListener)
+
+        amplitudeChannel = playback.amplitudeChannel
     }
 
     fun play(track: AudioTrack) {
@@ -49,7 +57,7 @@ class AudioPlayerManager(
     fun resume() {
         logMsg("Resume.")
 
-        playback.start()
+//        playback.start()
 
         loader.player.isPaused = false
     }
@@ -57,7 +65,7 @@ class AudioPlayerManager(
     fun stop() {
         loader.player.stopTrack()
 
-        playback.stop()
+//        playback.stop()
     }
 
     fun setVolume(volume: Float) {
@@ -103,7 +111,7 @@ class AudioPlayerManager(
 //            if (loadingTrack != null && loadingTrack.info.uri == track.info.uri) {
 //                this@LavaAudioLoader.loadingTrack = track
 
-                loaderListener.onTrackLoaded(track)
+            loaderListener.onTrackLoaded(track)
 
 //                this@LavaAudioLoader.loadingTrack = null
 //                return

@@ -1,5 +1,6 @@
 package com.github.catomon.kagamin.ui.screens
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,12 +22,18 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.CompositingStrategy
@@ -35,6 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.github.catomon.kagamin.LocalWindow
+import com.github.catomon.kagamin.audio.AudioPlayerManager
 import com.github.catomon.kagamin.ui.Playlists
 import com.github.catomon.kagamin.ui.Tracklist
 import com.github.catomon.kagamin.ui.components.AddTrackOrPlaylistButton
@@ -51,6 +59,10 @@ import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.util.echoTrace
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.minimize_window
+import kotlinx.coroutines.channels.consume
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -65,6 +77,7 @@ fun ControlsBottomPlayerScreen(
     val currentPlaylist by viewModel.currentPlaylist.collectAsState()
     val volume by viewModel.volume.collectAsState()
     val window = LocalWindow.current
+    val coroutineScope = rememberCoroutineScope()
 
     Box(
         modifier.background(
@@ -77,7 +90,10 @@ fun ControlsBottomPlayerScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize()
         ) {
-            Box(contentAlignment = Alignment.TopStart, modifier = Modifier.background(KagaminTheme.backgroundTransparent).fillMaxWidth()) {
+            Box(
+                contentAlignment = Alignment.TopStart,
+                modifier = Modifier.background(KagaminTheme.backgroundTransparent).fillMaxWidth()
+            ) {
                 CurrentTrackFrameHorizontal(currentTrack, Modifier.padding(4.dp))
 
                 IconButton({
@@ -90,7 +106,24 @@ fun ControlsBottomPlayerScreen(
                     )
                 }
 
-                PlayPauseButton(viewModel, buttonsSize = 48.dp, modifier = Modifier.align(Alignment.CenterEnd).padding(end = 24.dp))
+
+//                var ampChannel by remember { mutableStateOf(1f) }
+//                val scaleStar by animateFloatAsState(ampChannel)
+//
+//                LaunchedEffect(Unit) {
+//                    coroutineScope.launch {
+//                        AudioPlayerManager.amplitudeChannel.consumeEach {
+//                            ampChannel = 1f + it * 10
+//                        }
+//                    }
+//                }
+
+                PlayPauseButton(
+                    viewModel,
+                    buttonsSize = 48.dp,
+                    modifier = Modifier.align(Alignment.CenterEnd).padding(end = 24.dp)
+                        //.scale(scaleStar)
+                )
             }
 
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
@@ -125,7 +158,7 @@ fun ControlsBottomPlayerScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(40.dp)
-                       .background(color = KagaminTheme.backgroundTransparent)
+                    .background(color = KagaminTheme.backgroundTransparent)
 //                    .graphicsLayer {
 //                        compositingStrategy = CompositingStrategy.Offscreen
 //                    }
@@ -143,7 +176,7 @@ fun ControlsBottomPlayerScreen(
 //                        )
 //                        drawContent()
 //                    },
-                        ,
+                ,
                 contentAlignment = Alignment.Center
             ) {
                 AppLogo(

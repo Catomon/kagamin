@@ -1,6 +1,7 @@
 package com.github.catomon.kagamin.audio
 
 import com.github.catomon.kagamin.util.logMsg
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -27,7 +28,7 @@ class AudioPlayback(
     var isActive = true
         private set
 
-    private var playbackThread: Thread? = null
+    private var playbackThread: Thread? = newPlaybackThread(start = true)
 
     private fun newPlaybackThread(start: Boolean = false) = thread(start) {
         playbackLoop()
@@ -37,7 +38,7 @@ class AudioPlayback(
 
     // ---v
 
-    private val amplitudeChannel = Channel<Float>(Channel.UNLIMITED)
+    val amplitudeChannel = Channel<Float>(10, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 //    private var amplitudeListener: ((Float) -> Unit)? = null
 //
 //    fun interface AmplitudeListener {

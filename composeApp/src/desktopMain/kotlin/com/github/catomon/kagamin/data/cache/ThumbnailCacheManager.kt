@@ -12,6 +12,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -57,9 +58,13 @@ object ThumbnailCacheManager {
                 e.printStackTrace()
             }
 
+            coroutineScope2.cancel()
+
             logErr { "ongoingCacheJobs wa canceled by timeoutJob after 3 sec." }
         }
     }
+
+    private val coroutineScope2 = CoroutineScope(Dispatchers.IO)
 
     suspend fun cacheThumbnail(
         trackUri: String,
@@ -73,7 +78,7 @@ object ThumbnailCacheManager {
             }
 
             logTrace { "job created for track uri: $trackUri" }
-            val newJob = CoroutineScope(Dispatchers.IO).async {
+            val newJob = coroutineScope2.async {
                 try {
                     thumbnailCacheFolder.resolve("512/${trackUri.hashCode()}").let {
                         if (it.exists()) it else {

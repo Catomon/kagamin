@@ -1,45 +1,38 @@
 package com.github.catomon.kagamin.ui.screens
 
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toIntSize
 import androidx.navigation.NavHostController
 import com.github.catomon.kagamin.LocalWindow
 import com.github.catomon.kagamin.audio.AudioPlayerManager
@@ -57,13 +50,15 @@ import com.github.catomon.kagamin.ui.components.VolumeOptions
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.util.echoTrace
+import com.github.catomon.kagamin.util.echoTraceFiltered
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.minimize_window
-import kotlinx.coroutines.channels.consume
-import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.launch
+import kagamin.composeapp.generated.resources.star_angled
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.receiveAsFlow
+import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.painterResource
+import kotlin.math.roundToInt
 
 @Composable
 fun ControlsBottomPlayerScreen(
@@ -106,23 +101,10 @@ fun ControlsBottomPlayerScreen(
                     )
                 }
 
-
-//                var ampChannel by remember { mutableStateOf(1f) }
-//                val scaleStar by animateFloatAsState(ampChannel)
-//
-//                LaunchedEffect(Unit) {
-//                    coroutineScope.launch {
-//                        AudioPlayerManager.amplitudeChannel.consumeEach {
-//                            ampChannel = 1f + it * 10
-//                        }
-//                    }
-//                }
-
-                PlayPauseButton(
+                AnimatedPlayPauseButton(
+                    coroutineScope,
                     viewModel,
-                    buttonsSize = 48.dp,
-                    modifier = Modifier.align(Alignment.CenterEnd).padding(end = 24.dp)
-                        //.scale(scaleStar)
+                    Modifier.align(Alignment.CenterEnd).padding(end = 24.dp)
                 )
             }
 
@@ -158,25 +140,7 @@ fun ControlsBottomPlayerScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(40.dp)
-                    .background(color = KagaminTheme.backgroundTransparent)
-//                    .graphicsLayer {
-//                        compositingStrategy = CompositingStrategy.Offscreen
-//                    }
-//                    .drawWithContent {
-//                        drawRect(
-//                            color = KagaminTheme.backgroundTransparent,
-//                            size = size,
-//
-//                            )
-//                        drawCircle(
-//                            color = KagaminTheme.colors.backgroundTransparent,
-//                            //blendMode = BlendMode.SrcOut,
-//                            center = Offset(size.width, size.height),
-//                            radius = 64.dp.toPx()
-//                        )
-//                        drawContent()
-//                    },
-                ,
+                    .background(color = KagaminTheme.backgroundTransparent),
                 contentAlignment = Alignment.Center
             ) {
                 AppLogo(
@@ -212,14 +176,55 @@ fun ControlsBottomPlayerScreen(
                     RandomPlaybackButton(viewModel)
 
                     PrevNextTrackButtons(viewModel)
-
-//                    Spacer(Modifier.width(64.dp))
-
-//                    PlayPauseButton(viewModel, modifier = Modifier.padding(end = 6.dp))
                 }
             }
         }
+    }
+}
 
-        //PlayPauseButton(viewModel)//, modifier = Modifier.size(64.dp).align(Alignment.BottomEnd).background(KagaminTheme.backgroundTransparent, shape = CircleShape).offset())
+@Composable
+private fun AnimatedPlayPauseButton(
+    coroutineScope: CoroutineScope,
+    viewModel: KagaminViewModel,
+    modifier: Modifier = Modifier
+) {
+    echoTraceFiltered { "AnimatedPlayPauseButton" }
+
+    val flow by AudioPlayerManager.amplitudeChannel.receiveAsFlow().collectAsState(1f)
+    val targetScaleAnimated by animateFloatAsState(
+        1f + flow, animationSpec = tween(
+            durationMillis = 100,
+            easing = LinearEasing
+        )
+    )
+
+    val starImage = imageResource(Res.drawable.star_angled)
+
+    Box(
+        modifier = modifier
+            .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+            .drawWithContent {
+                drawContent()
+
+                val targetScaleAnimated = targetScaleAnimated / 2
+                val scaledWidth = starImage.width * targetScaleAnimated
+                val scaledHeight = starImage.height * targetScaleAnimated
+
+                val offsetX = (size.width - scaledWidth) / 2f
+                val offsetY = (size.height - scaledHeight) / 2f
+
+                drawImage(
+                    image = starImage,
+                    dstOffset = IntOffset(offsetX.roundToInt(), offsetY.roundToInt()),
+                    dstSize = androidx.compose.ui.geometry.Size(scaledWidth, scaledHeight)
+                        .toIntSize(),
+                    blendMode = BlendMode.DstOut
+                )
+            }
+    ) {
+        PlayPauseButton(
+            viewModel,
+            buttonsSize = 48.dp,
+        )
     }
 }

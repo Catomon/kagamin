@@ -3,6 +3,8 @@ package com.github.catomon.kagamin.util
 import com.github.catomon.kagamin.util.Rogga.log
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
 
 private const val INFO = "[I]"
 private const val WARN = "[W]"
@@ -132,4 +134,26 @@ inline fun Any.logErr(exception: Throwable, crossinline msg: () -> String) {
         LogLevel.ERROR,
         "[${this::class.simpleName}] "
     ) { "${msg()}\n${exception.stackTraceToString()}" }
+}
+
+val lastSentMap = ConcurrentHashMap<String, Long>()
+val skippedCountMap = ConcurrentHashMap<String, AtomicInteger>()
+
+inline fun echoTraceFiltered(crossinline msg: () -> String) {
+    val message = msg()
+    val now = System.currentTimeMillis()
+
+    val lastSent = lastSentMap[message] ?: 0L
+    if (now - lastSent >= 1000) {
+        lastSentMap[message] = now
+
+        val skipped = skippedCountMap[message]?.getAndSet(0) ?: 0
+        if (skipped > 0) {
+            log(LogLevel.TRACE, "", { "$message (skipped $skipped similar messages)" })
+        } else {
+            log(LogLevel.TRACE, "", { message })
+        }
+    } else {
+        skippedCountMap.computeIfAbsent(message) { AtomicInteger(0) }.incrementAndGet()
+    }
 }

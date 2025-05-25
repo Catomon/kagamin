@@ -38,7 +38,7 @@ class AudioPlayback(
 
     // ---v
 
-    val amplitudeChannel = Channel<Float>(10, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val amplitudeChannel = Channel<Float>(5, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 //    private var amplitudeListener: ((Float) -> Unit)? = null
 //
 //    fun interface AmplitudeListener {
@@ -70,7 +70,7 @@ class AudioPlayback(
         val rms = sqrt(sumSquares / floatSamples.size)
 
 //        amplitudeListener?.invoke(rms)
-        amplitudeChannel.trySend(rms)
+        amplitudeChannel.trySend(rms * 10)
     }
 
     // ---^

@@ -5,7 +5,7 @@ import com.github.catomon.kagamin.appNameEng
 import com.github.catomon.kagamin.data.AudioTrack
 import com.github.catomon.kagamin.data.loadSettings
 import kagamin.composeapp.generated.resources.Res
-import kagamin.composeapp.generated.resources.denpa
+import kagamin.composeapp.generated.resources.star
 //import net.arikia.dev.drpc.DiscordEventHandlers
 //import net.arikia.dev.drpc.DiscordRPC
 //import net.arikia.dev.drpc.DiscordRichPresence
@@ -40,7 +40,7 @@ enum class Rich {
 }
 
 @OptIn(ExperimentalResourceApi::class)
-val defSingerDrawableRes = Res.drawable.denpa
+val defSingerDrawableRes = Res.drawable.star
 
 @OptIn(ExperimentalResourceApi::class)
 class Singer(
@@ -96,7 +96,7 @@ val singers: Array<Singer> = arrayOf(
 private const val defaultSingerName: String = appNameEng
 
 @OptIn(ExperimentalResourceApi::class)
-val denpaSinger = Singer(defaultSingerName).icons("denpa").res(Res.drawable.denpa)
+val denpaSinger = Singer(defaultSingerName).icons("denpa").res(Res.drawable.star)
 
 private val AudioTrack.trackInfoString: String get() = "$artist - $title - $uri"
 

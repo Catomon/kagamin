@@ -1,8 +1,12 @@
 package com.github.catomon.kagamin.ui
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
@@ -247,6 +251,8 @@ fun TracklistHeader(
     val isIndicatorHovered by interactionSource.collectIsHoveredAsState()
     val position by viewModel.position.collectAsState()
 
+    var progressOnHover by remember { mutableStateOf(0f) }
+
     val progress by remember(currentTrack) {
         derivedStateOf {
             if (!isIndicatorHovered) {
@@ -255,10 +261,12 @@ fun TracklistHeader(
                     else -> if (currentTrack.duration > 0 && currentTrack.duration < Long.MAX_VALUE) position.toFloat() / currentTrack.duration else -1f
                 }
             } else {
-                0f
+                progressOnHover
             }
         }
     }
+
+    val progressAnimated by animateFloatAsState(if (isIndicatorHovered) progressOnHover else progress)
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -306,20 +314,21 @@ fun TracklistHeader(
                     }
                 }
 
-                AnimatedContent(shownContent, modifier.weight(1f)) { shownContent ->
+                AnimatedContent(shownContent, modifier.weight(1f), transitionSpec = {
+                    fadeIn() + slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.End) togetherWith fadeOut() + slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Start
+                    )
+                }) { shownContent ->
                     when (shownContent) {
                         Content.Indicator -> {
                             echoTrace { "Tracklist Indicator" }
-
-                            val progressAnimated by animateFloatAsState(progress)
-                            var progressOnHover by remember { mutableStateOf(0f) }
 
                             TrackProgressIndicator(
                                 currentTrack = currentTrack,
                                 seek = {
                                     viewModel.seek(it)
                                 },
-                                progress = { if (isIndicatorHovered) progressOnHover else progressAnimated },
+                                progress = { progressAnimated },
                                 modifier = Modifier.weight(1f).padding(end = 6.dp, start = 3.dp)
                                     .height(10.dp).onPointerEvent(
                                         PointerEventType.Move

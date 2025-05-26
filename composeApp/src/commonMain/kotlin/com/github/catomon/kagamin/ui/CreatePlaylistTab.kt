@@ -11,9 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,7 +38,6 @@ fun CreatePlaylistTab(viewModel: KagaminViewModel, modifier: Modifier) {
     var isError by remember { mutableStateOf(false) }
     var isOnline by remember { mutableStateOf(false) }
     var link by remember(isOnline) { mutableStateOf("") }
-    val currentPlaylist by viewModel.currentPlaylist.collectAsState()
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -57,7 +54,7 @@ fun CreatePlaylistTab(viewModel: KagaminViewModel, modifier: Modifier) {
             OutlinedTextField(
                 name,
                 onValueChange = {
-                    name = it
+                    name = it.take(64)
                 },
                 isError = isError,
                 singleLine = true,

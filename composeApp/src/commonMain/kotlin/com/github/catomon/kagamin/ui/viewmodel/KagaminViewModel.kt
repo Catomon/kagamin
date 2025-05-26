@@ -16,6 +16,8 @@ import com.github.catomon.kagamin.data.saveSettings
 import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.util.echoErr
 import com.github.catomon.kagamin.util.logErr
+import kagamin.composeapp.generated.resources.Res
+import kagamin.composeapp.generated.resources.single
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
@@ -198,10 +200,11 @@ class KagaminViewModel(
     }
 
     fun clearPlaylist(playlist: Playlist) {
-        playlistsManager.updatePlaylist(playlist.copy(tracks = emptyList()))
+        val emptyPlaylist = playlist.copy(tracks = emptyList())
+        playlistsManager.updatePlaylist(emptyPlaylist)
 
         viewModelScope.launch(ioDispatcher) {
-            PlaylistsLoader.savePlaylist(playlist)
+            PlaylistsLoader.savePlaylist(emptyPlaylist)
         }
     }
 
@@ -226,6 +229,17 @@ class KagaminViewModel(
     }
 
     fun setPlayMode(playMode: PlaylistsManager.PlayMode) {
+        playlistsManager.setPlayMode(playMode)
+    }
+
+    fun togglePlayMode() {
+        val playMode = when (playMode.value) {
+            PlaylistsManager.PlayMode.PLAYLIST -> PlaylistsManager.PlayMode.REPEAT_PLAYLIST
+            PlaylistsManager.PlayMode.REPEAT_PLAYLIST -> PlaylistsManager.PlayMode.RANDOM
+            PlaylistsManager.PlayMode.REPEAT_TRACK -> PlaylistsManager.PlayMode.REPEAT_TRACK
+            PlaylistsManager.PlayMode.RANDOM -> PlaylistsManager.PlayMode.PLAYLIST
+            PlaylistsManager.PlayMode.ONCE -> error("not planned")
+        }
         playlistsManager.setPlayMode(playMode)
     }
 

@@ -42,10 +42,8 @@ import com.github.catomon.kagamin.ui.components.AddTrackOrPlaylistButton
 import com.github.catomon.kagamin.ui.components.AppLogo
 import com.github.catomon.kagamin.ui.components.CurrentTrackFrameHorizontal
 import com.github.catomon.kagamin.ui.components.PlayPauseButton
+import com.github.catomon.kagamin.ui.components.PlaybackModeToggleButton
 import com.github.catomon.kagamin.ui.components.PrevNextTrackButtons
-import com.github.catomon.kagamin.ui.components.RandomPlaybackButton
-import com.github.catomon.kagamin.ui.components.RepeatPlaylistPlaybackButton
-import com.github.catomon.kagamin.ui.components.RepeatTrackPlaybackButton
 import com.github.catomon.kagamin.ui.components.VolumeOptions
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
@@ -73,6 +71,7 @@ fun ControlsBottomPlayerScreen(
     val volume by viewModel.volume.collectAsState()
     val window = LocalWindow.current
     val coroutineScope = rememberCoroutineScope()
+    val playMode by viewModel.playMode.collectAsState()
 
     Box(
         modifier.background(
@@ -165,15 +164,12 @@ fun ControlsBottomPlayerScreen(
                         volume = volume,
                         onVolumeChange = { newVolume ->
                             viewModel.setVolume(newVolume)
-                        },
-                        modifier = Modifier.width(133.dp)
+                        }
                     )
 
-                    RepeatPlaylistPlaybackButton(viewModel)
-
-                    RepeatTrackPlaybackButton(viewModel)
-
-                    RandomPlaybackButton(viewModel)
+                    PlaybackModeToggleButton(playMode, {
+                        viewModel.togglePlayMode()
+                    })
 
                     PrevNextTrackButtons(viewModel)
                 }

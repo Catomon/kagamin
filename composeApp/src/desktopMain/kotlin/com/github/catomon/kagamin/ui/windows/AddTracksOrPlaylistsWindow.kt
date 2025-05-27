@@ -19,7 +19,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ApplicationScope
@@ -59,7 +58,7 @@ fun ApplicationScope.AddTracksOrPlaylistsWindow(
 
     Window(
         state = rememberWindowState(
-            width = WindowConfig.WIDTH.dp, height = WindowConfig.HEIGHT.dp
+            width = WindowConfig.HEIGHT.dp, height = WindowConfig.HEIGHT.dp
         ),
         onCloseRequest = { viewModel.createPlaylistWindow = false },
         undecorated = true,

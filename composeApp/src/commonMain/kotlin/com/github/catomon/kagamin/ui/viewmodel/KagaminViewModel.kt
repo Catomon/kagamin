@@ -236,8 +236,8 @@ class KagaminViewModel(
         val playMode = when (playMode.value) {
             PlaylistsManager.PlayMode.PLAYLIST -> PlaylistsManager.PlayMode.REPEAT_PLAYLIST
             PlaylistsManager.PlayMode.REPEAT_PLAYLIST -> PlaylistsManager.PlayMode.RANDOM
-            PlaylistsManager.PlayMode.REPEAT_TRACK -> PlaylistsManager.PlayMode.REPEAT_TRACK
-            PlaylistsManager.PlayMode.RANDOM -> PlaylistsManager.PlayMode.PLAYLIST
+            PlaylistsManager.PlayMode.REPEAT_TRACK -> PlaylistsManager.PlayMode.PLAYLIST
+            PlaylistsManager.PlayMode.RANDOM -> PlaylistsManager.PlayMode.REPEAT_TRACK
             PlaylistsManager.PlayMode.ONCE -> error("not planned")
         }
         playlistsManager.setPlayMode(playMode)

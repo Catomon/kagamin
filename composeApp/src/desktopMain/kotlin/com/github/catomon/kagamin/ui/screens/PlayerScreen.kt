@@ -69,7 +69,7 @@ fun PlayerScreen(
     Box(
         modifier
     ) {
-        Background(currentTrack)
+        Background(currentTrack, Modifier.fillMaxSize())
 
         Row() {
             Column(

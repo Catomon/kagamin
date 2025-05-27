@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -33,7 +34,6 @@ import com.github.catomon.kagamin.ui.Playlists
 import com.github.catomon.kagamin.ui.Tracklist
 import com.github.catomon.kagamin.ui.components.AppLogo
 import com.github.catomon.kagamin.ui.components.CurrentTrackFrame
-import com.github.catomon.kagamin.ui.components.KagaminLogo
 import com.github.catomon.kagamin.ui.components.Sidebar
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.Tabs
@@ -60,7 +60,7 @@ fun CompactPlayerScreen(
     }
 
     Box(modifier) {
-        Background(currentTrack)
+        Background(currentTrack, Modifier.fillMaxSize())
 
         Row {
             Column(

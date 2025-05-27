@@ -96,7 +96,6 @@ fun ThumbnailTrackItem(
 
     ContextMenuArea(items = {
         ThumbnailTrackItemDefaults.contextMenuItems(
-            isCurrentTrack,
             tracklistManager,
             index,
             track,
@@ -118,23 +117,12 @@ fun ThumbnailTrackItem(
                         onClick()
                     }) {
                 Row(Modifier.weight(1f)) {
-//                    if (isCurrentTrack) {
-//                        TrackThumbnailProgressOverlay(
-//                            track.uri,
-//                            modifier = Modifier.width(64.dp),
-//                            shape = RoundedCornerShape(8.dp),
-//                            progress = progress,
-//                            controlProgress = false,
-//                            height = ThumbnailCacheManager.SIZE.H64
-//                        )
-//                    } else {
                     TrackThumbnail(
                         track,
                         modifier = Modifier.width(64.dp),
                         shape = RoundedCornerShape(8.dp),
                         height = ThumbnailCacheManager.SIZE.H64
                     )
-//                    }
 
                     TrackItemBody(
                         viewModel = viewModel,
@@ -310,7 +298,6 @@ fun PlaybackStateButton(
 
 object ThumbnailTrackItemDefaults {
     fun contextMenuItems(
-        isHeader: Boolean,
         tracklistManager: TracklistManager,
         index: Int,
         track: AudioTrack,
@@ -321,8 +308,7 @@ object ThumbnailTrackItemDefaults {
         isCurrentTrack: Boolean
     ) = listOf(
         ContextMenuItem("Select") {
-            if (!isHeader)
-                tracklistManager.select(index, track)
+            tracklistManager.select(index, track)
         },
         if (tracklistManager.isAnySelected) {
             ContextMenuItem("Deselect All") {

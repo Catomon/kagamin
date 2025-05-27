@@ -67,7 +67,7 @@ fun SettingsScreen(
     Box(
         modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center
     ) {
-        Background(currentTrack = viewModel.currentTrack.value)
+        Background(currentTrack = viewModel.currentTrack.value, modifier = Modifier.fillMaxSize())
 
         Box(Modifier.fillMaxSize().background(color = KagaminTheme.backgroundTransparent))
 

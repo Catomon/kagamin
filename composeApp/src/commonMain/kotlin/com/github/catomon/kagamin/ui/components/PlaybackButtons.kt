@@ -23,6 +23,8 @@ import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.next
 import kagamin.composeapp.generated.resources.pause
 import kagamin.composeapp.generated.resources.play
+import kagamin.composeapp.generated.resources.pause_star
+import kagamin.composeapp.generated.resources.play_star
 import kagamin.composeapp.generated.resources.prev
 import org.jetbrains.compose.resources.painterResource
 
@@ -64,14 +66,14 @@ fun PlaybackButtons(
             AnimatedContent(playState) { playState ->
                 if (playState != AudioPlayerService.PlayState.PLAYING) {
                     ImageWithShadow(
-                        painterResource(Res.drawable.play),
+                        painterResource(Res.drawable.play_star),
                         "Play",
                         modifier = Modifier.size(buttonsSize * 1.25f),
                         colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon)
                     )
                 } else {
                     ImageWithShadow(
-                        painterResource(Res.drawable.pause),
+                        painterResource(Res.drawable.pause_star),
                         "Pause",
                         modifier = Modifier.size(buttonsSize * 1.25f),
                         colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon)
@@ -105,7 +107,7 @@ fun PrevNextTrackButtons(
     echoTrace { "PlaybackButtonsVariant" }
 
     Row(
-        modifier = modifier.height(buttonsSize * 1.5f),//.background(Colors.noteBackground.copy(alpha = 0.75f)),
+        modifier = modifier.height(buttonsSize * 1.5f),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {

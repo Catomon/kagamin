@@ -158,7 +158,7 @@ class AudioPlayerServiceImpl(
                         id = Uuid.random().toString(),
                         uri = info.uri,
                         title = info.title,
-                        artist = info.title,
+                        artist = info.author,
                         album = "",
                         duration = track.duration,
                         artworkUri = getYoutubeThumbnailUrl(info.uri) //track.info.artworkUrl
@@ -188,7 +188,7 @@ class AudioPlayerServiceImpl(
                             id = Uuid.random().toString(),
                             uri = info.uri,
                             title = info.title,
-                            artist = info.title,
+                            artist = info.author,
                             album = "",
                             duration = track.duration,
                             artworkUri = getYoutubeThumbnailUrl(info.uri) //track.info.artworkUrl
@@ -201,7 +201,7 @@ class AudioPlayerServiceImpl(
         }
 
         override fun onLoadFailed() {
-            stop()
+//            stop()
         }
 
         override fun onTrackPlaybackEnded(track: LavaAudioTrack) {

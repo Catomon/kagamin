@@ -18,7 +18,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -46,7 +48,6 @@ import com.github.catomon.kagamin.audio.AudioPlayerManager
 import com.github.catomon.kagamin.ui.Menu
 import com.github.catomon.kagamin.ui.Playlists
 import com.github.catomon.kagamin.ui.Tracklist
-import com.github.catomon.kagamin.ui.components.AddTrackOrPlaylistButton
 import com.github.catomon.kagamin.ui.components.AppLogo
 import com.github.catomon.kagamin.ui.components.CurrentTrackFrameHorizontal
 import com.github.catomon.kagamin.ui.components.PlayPauseButton
@@ -81,7 +82,7 @@ fun ControlsBottomPlayerScreen(
     val coroutineScope = rememberCoroutineScope()
     val playMode by viewModel.playMode.collectAsState()
 
-    var openMenu by remember { mutableStateOf(false) }
+    var isMenuOpen by remember { mutableStateOf(false) }
 
     Box(
         modifier.background(
@@ -158,7 +159,7 @@ fun ControlsBottomPlayerScreen(
                         .height(40.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .clickable {
-                            openMenu = !openMenu
+                            isMenuOpen = !isMenuOpen
                         }
                         .align(Alignment.CenterStart)
                 )
@@ -183,9 +184,13 @@ fun ControlsBottomPlayerScreen(
             }
         }
 
-        AnimatedVisibility(openMenu, enter = fadeIn() + slideInHorizontally(), exit = fadeOut() + slideOutHorizontally()) {
+        AnimatedVisibility(
+            isMenuOpen,
+            enter = fadeIn() + slideInHorizontally(),
+            exit = fadeOut() + slideOutHorizontally()
+        ) {
             Box(Modifier.fillMaxSize().clickable(null, null) {
-                openMenu = false
+                isMenuOpen = false
             }) {
                 Menu(
                     currentTrack,
@@ -193,10 +198,21 @@ fun ControlsBottomPlayerScreen(
                         if (navController.currentDestination?.route != SettingsDestination.toString())
                             navController.navigate(SettingsDestination.toString())
                     },
-                    modifier = Modifier.align(Alignment.BottomStart)
+                    onClose = {
+                        isMenuOpen = false
+                    },
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
                         .padding(top = 12.dp, start = 12.dp, end = 12.dp, bottom = 40.dp)
                 )
             }
+        }
+
+        AnimatedVisibility(
+            viewModel.isLoading,
+            modifier = Modifier.align(Alignment.BottomCenter).padding(4.dp)
+        ) {
+            CircularProgressIndicator(Modifier.size(32.dp))
         }
     }
 }

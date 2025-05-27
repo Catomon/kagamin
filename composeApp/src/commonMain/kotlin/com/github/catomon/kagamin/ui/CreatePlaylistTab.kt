@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,7 +27,8 @@ import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import kagamin.composeapp.generated.resources.Res
-import kagamin.composeapp.generated.resources.yt_ic
+import kagamin.composeapp.generated.resources.online
+import kagamin.composeapp.generated.resources.online
 import org.jetbrains.compose.resources.painterResource
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -78,7 +80,7 @@ fun CreatePlaylistTab(viewModel: KagaminViewModel, modifier: Modifier) {
             }
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Image(painterResource(Res.drawable.yt_ic), null, modifier = Modifier.padding(4.dp))
+                Icon(painterResource(Res.drawable.online), null, modifier = Modifier.padding(4.dp), tint = KagaminTheme.colors.buttonIcon)
                 Text("Online")
                 Checkbox(isOnline, onCheckedChange = {
                     isOnline = !isOnline

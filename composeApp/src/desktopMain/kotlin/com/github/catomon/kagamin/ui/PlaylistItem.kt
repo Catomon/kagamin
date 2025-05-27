@@ -32,7 +32,7 @@ import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import kagamin.composeapp.generated.resources.Res
-import kagamin.composeapp.generated.resources.yt_ic
+import kagamin.composeapp.generated.resources.online
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -103,7 +103,7 @@ private fun PlaylistItemContent(
         Row {
             if (playlist.isOnline)
                 Icon(
-                    painterResource(Res.drawable.yt_ic),
+                    painterResource(Res.drawable.online),
                     null,
                     tint = KagaminTheme.colors.backgroundTransparent,
                     modifier = Modifier.align(Alignment.CenterVertically).padding(end = 4.dp)

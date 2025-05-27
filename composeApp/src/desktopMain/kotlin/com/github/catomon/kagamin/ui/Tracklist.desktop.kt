@@ -131,21 +131,14 @@ fun Tracklist(
     }
 
     Column(modifier) {
-        if (currentTrack != null) {
-            TracklistHeader(currentTrack, viewModel = viewModel, onClick = onClick@{
-                val curTrackIndex = currentTrack?.let { index[it.uri] } ?: return@onClick
-                coroutineScope.launch {
-                    listState.animateScrollToItem(curTrackIndex)
-                }
-            }, filterTracks = {
-                filterName = it
-            })
-        } else {
-            Box(
-                modifier = Modifier.background(KagaminTheme.backgroundTransparent).height(32.dp)
-                    .fillMaxWidth()
-            )
-        }
+        TracklistHeader(currentTrack, viewModel = viewModel, onClick = onClick@{
+            val curTrackIndex = currentTrack?.let { index[it.uri] } ?: return@onClick
+            coroutineScope.launch {
+                listState.animateScrollToItem(curTrackIndex)
+            }
+        }, filterTracks = {
+            filterName = it
+        })
 
         val interactionSource = remember { MutableInteractionSource() }
         val isHovered by interactionSource.collectIsHoveredAsState()

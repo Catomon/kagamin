@@ -8,6 +8,7 @@ import com.github.catomon.kagamin.util.logDbg
 import com.github.catomon.kagamin.util.logErr
 import com.github.catomon.kagamin.util.logTrace
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -78,7 +79,7 @@ object ThumbnailCacheManager {
             }
 
             logTrace { "job created for track uri: $trackUri" }
-            val newJob = coroutineScope2.async {
+            val newJob = coroutineScope2.async(start = CoroutineStart.LAZY) {
                 try {
                     thumbnailCacheFolder.resolve("512/${trackUri.hashCode()}").let {
                         if (it.exists()) it else {
@@ -100,8 +101,6 @@ object ThumbnailCacheManager {
                 }
             }
 
-            newJob.start()
-
             ongoingCacheJobs[trackUri] = newJob
             newJob.invokeOnCompletion { error ->
                 logTrace { "job completed for track uri: $trackUri" }
@@ -116,6 +115,8 @@ object ThumbnailCacheManager {
             }
 
             startTimeoutJob()
+
+            newJob.start()
 
             newJob
         }.await().let { file ->

@@ -16,8 +16,6 @@ import com.github.catomon.kagamin.data.saveSettings
 import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.util.echoErr
 import com.github.catomon.kagamin.util.logErr
-import kagamin.composeapp.generated.resources.Res
-import kagamin.composeapp.generated.resources.single
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
@@ -48,7 +46,7 @@ class KagaminViewModel(
     var isLoadingPlaylistFile by mutableStateOf(false)
     var isLoadingSong by mutableStateOf<AudioTrack?>(null)
 
-    var isLoading by mutableStateOf<AudioTrack?>(null)
+    var isLoading by mutableStateOf<Boolean>(false)
 
     //todo move to player screen state
     var currentTab by mutableStateOf(Tabs.TRACKLIST)
@@ -62,18 +60,22 @@ class KagaminViewModel(
 
     init {
         viewModelScope.launch {
+            isLoading = true
+
             reloadPlaylists()
             loadLastPlaylist()
-        }
 
-        // set preferences
-        when {
-            settings.random -> playlistsManager.setPlayMode(PlaylistsManager.PlayMode.RANDOM)
-            settings.repeat -> playlistsManager.setPlayMode(PlaylistsManager.PlayMode.REPEAT_TRACK)
-            settings.repeatPlaylist -> playlistsManager.setPlayMode(PlaylistsManager.PlayMode.REPEAT_PLAYLIST)
+            // set preferences
+            when {
+                settings.random -> playlistsManager.setPlayMode(PlaylistsManager.PlayMode.RANDOM)
+                settings.repeat -> playlistsManager.setPlayMode(PlaylistsManager.PlayMode.REPEAT_TRACK)
+                settings.repeatPlaylist -> playlistsManager.setPlayMode(PlaylistsManager.PlayMode.REPEAT_PLAYLIST)
+            }
+            audioPlayerService.setCrossfade(settings.crossfade)
+            setVolume(settings.volume)
+
+            isLoading = false
         }
-        audioPlayerService.setCrossfade(settings.crossfade)
-        setVolume(settings.volume)
     }
 
     private fun loadLastPlaylist() {
@@ -151,6 +153,8 @@ class KagaminViewModel(
 
     fun createPlaylist(playlist: Playlist) {
         viewModelScope.launch(ioDispatcher) {
+            isLoading = true
+
             if (PlaylistsLoader.exists(playlist.name)) {
                 logErr { "Playlist with such name already exist: ${playlist.name}" }
                 return@launch
@@ -172,6 +176,9 @@ class KagaminViewModel(
             } else {
                 logErr { "Failed to create playlist: ${playlist.name}" }
             }
+
+        }.invokeOnCompletion {
+            isLoading = false
         }
     }
 
@@ -188,6 +195,21 @@ class KagaminViewModel(
                 }
             else
                 echoErr { "Failed to remove playlist: ${playlist.name}" }
+        }
+    }
+
+    fun loadRemoteTracksToPlaylist(
+        link: String,
+        currentPlaylist: Playlist
+    ) {
+        viewModelScope.launch {
+            isLoading = true
+
+            val loadedTracks = loadTracks(link)
+            val loadedUris = loadedTracks.map { it.uri }
+            updatePlaylist(currentPlaylist.copy(tracks = currentPlaylist.tracks.filter { it.uri !in loadedUris } + loadedTracks))
+
+            isLoading = false
         }
     }
 

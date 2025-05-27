@@ -60,7 +60,7 @@ import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.pause
 import kagamin.composeapp.generated.resources.play
 import kagamin.composeapp.generated.resources.selected
-import kagamin.composeapp.generated.resources.yt_ic
+import kagamin.composeapp.generated.resources.online
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 
@@ -251,7 +251,7 @@ private fun TrackItemBody(
 
             if (remember { track.uri.startsWith("https") }) {
                 Icon(
-                    painterResource(Res.drawable.yt_ic),
+                    painterResource(Res.drawable.online),
                     null,
                     tint = KagaminTheme.colors.backgroundTransparent
                 )

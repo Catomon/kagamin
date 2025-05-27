@@ -20,12 +20,14 @@ import com.github.catomon.kagamin.ui.screens.Background
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
+import kotlin.system.exitProcess
 
 @Composable
 fun Menu(
     currentTrack: AudioTrack?,
     viewModel: KagaminViewModel,
     navigateToSettings: () -> Unit,
+    onClose: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier.kagaminWindowDecoration().background(color = KagaminTheme.background)) {
@@ -40,6 +42,7 @@ fun Menu(
                 {
                     viewModel.currentTab = Tabs.ADD_TRACKS
                     viewModel.createPlaylistWindow = !viewModel.createPlaylistWindow
+                    onClose()
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -55,6 +58,7 @@ fun Menu(
                 {
                     viewModel.currentTab = Tabs.CREATE_PLAYLIST
                     viewModel.createPlaylistWindow = !viewModel.createPlaylistWindow
+                    onClose()
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -68,7 +72,7 @@ fun Menu(
 
             TextButton(
                 {
-
+                    onClose()
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -83,11 +87,28 @@ fun Menu(
             TextButton(
                 {
                     navigateToSettings()
+                    onClose()
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
                     "Settings",
+                    color = KagaminTheme.colors.textSecondary,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Start
+                )
+            }
+
+            TextButton(
+                {
+                    viewModel.saveSettings()
+                    onClose()
+                    exitProcess(0)
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    "Exit App",
                     color = KagaminTheme.colors.textSecondary,
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Start

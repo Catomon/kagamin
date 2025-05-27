@@ -75,11 +75,7 @@ fun AddTracksTab(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
         ) {
             if (currentPlaylist.isOnline)
                 OnlinePlaylistOptions(currentPlaylist, onAddTracks = { link ->
-                    viewModel.viewModelScope.launch {
-                        val loadedTracks = viewModel.loadTracks(link)
-                        val loadedUris = loadedTracks.map { it.uri }
-                        viewModel.updatePlaylist(currentPlaylist.copy(tracks = currentPlaylist.tracks.filter { it.uri !in loadedUris } + loadedTracks))
-                    }
+                    viewModel.loadRemoteTracksToPlaylist(link, currentPlaylist)
                 })
             else
                 OfflinePlaylistOptions(currentPlaylist, filePicker)

@@ -124,10 +124,10 @@ fun ControlsBottomPlayerScreen(
 
                 val tracklistWeight = if (viewModel.settings.showMediaFolderPane) 0.40f else 60f
 
-                //todo fix animation , enter = slideInHorizontally(), exit = slideOutHorizontally()
-                AnimatedVisibility(isMediaFolderPaneVisible, modifier = Modifier.weight(plWeight)) {
-                    MediaFolder(viewModel)
-                }
+                //todo fix animation enter = fadeIn() + slideInHorizontally(), exit = fadeOut() + slideOutHorizontally()
+                if (isMediaFolderPaneVisible)
+                    MediaFolder(viewModel, Modifier.fillMaxHeight().weight(plWeight))
+
 
                 Playlists(
                     viewModel,

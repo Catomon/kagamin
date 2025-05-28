@@ -142,8 +142,12 @@ class AudioPlayerServiceImpl(
                 field = value
             }
 
-        private fun getYoutubeThumbnailUrl(youtubeUrl: String, size: String = "mqdefault"): String? {
-            val regex = Regex("(?:v=|be/|embed/|v/|youtu.be/|/v/|/embed/|watch\\?v=|&v=)([\\w-]{11})")
+        private fun getYoutubeThumbnailUrl(
+            youtubeUrl: String,
+            size: String = "mqdefault"
+        ): String? {
+            val regex =
+                Regex("(?:v=|be/|embed/|v/|youtu.be/|/v/|/embed/|watch\\?v=|&v=)([\\w-]{11})")
             val match = regex.find(youtubeUrl)
             val videoId = match?.groups?.get(1)?.value
             return videoId?.let { "https://i.ytimg.com/vi/$it/$size.jpg" }
@@ -152,19 +156,7 @@ class AudioPlayerServiceImpl(
         @OptIn(ExperimentalUuidApi::class)
         override fun onTrackLoaded(track: LavaAudioTrack) {
             if (collectNextTracks) {
-                val info = track.info
-                collectedTracks.add(
-                    AudioTrack(
-                        id = Uuid.random().toString(),
-                        uri = info.uri,
-                        title = info.title,
-                        artist = info.author,
-                        album = "",
-                        duration = track.duration,
-                        artworkUri = getYoutubeThumbnailUrl(info.uri) //track.info.artworkUrl
-                    )
-                )
-
+                collectedTracks.add(track.toAudioTrack())
                 return
             }
 
@@ -179,23 +171,27 @@ class AudioPlayerServiceImpl(
         }
 
         @OptIn(ExperimentalUuidApi::class)
+        fun LavaAudioTrack.toAudioTrack(): AudioTrack {
+            val title = info.title
+            val author = info.author
+            return AudioTrack(
+                id = Uuid.random().toString(),
+                uri = info.uri,
+                title = if (title == "Unknown title") info.uri.substringAfterLast("/") else title,
+                artist = if (author == "Unknown artist") "" else author,
+                album = "",
+                duration = duration,
+                artworkUri = getYoutubeThumbnailUrl(info.uri)
+            )
+        }
+
+
+        @OptIn(ExperimentalUuidApi::class)
         override fun onPlaylistLoaded(playlist: LavaAudioPlaylist) {
             if (collectNextTracks) {
                 playlist.tracks.forEach { track ->
-                    val info = track.info
-                    collectedTracks.add(
-                        AudioTrack(
-                            id = Uuid.random().toString(),
-                            uri = info.uri,
-                            title = info.title,
-                            artist = info.author,
-                            album = "",
-                            duration = track.duration,
-                            artworkUri = getYoutubeThumbnailUrl(info.uri) //track.info.artworkUrl
-                        )
-                    )
+                    collectedTracks.add(track.toAudioTrack())
                 }
-
                 return
             }
         }

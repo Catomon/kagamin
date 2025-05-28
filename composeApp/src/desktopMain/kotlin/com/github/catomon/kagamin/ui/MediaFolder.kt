@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,6 +35,7 @@ import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.folder
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import java.awt.Desktop
 import java.io.File
@@ -102,9 +104,10 @@ fun MediaFolder(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
 
     var currentFolder by remember { mutableStateOf(folder) }
 
+    val coroutineScope = rememberCoroutineScope()
+
     Column(
         modifier
-            .fillMaxSize()
             .background(color = KagaminTheme.colors.backgroundTransparent)
             .padding(start = 4.dp)
     ) {
@@ -117,6 +120,7 @@ fun MediaFolder(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
         ) {
             Text(
                 currentFolder.nameWithoutExtension,
+                fontSize = 10.sp,
                 color = KagaminTheme.colors.buttonIcon,
                 modifier = Modifier,
                 maxLines = 1,
@@ -128,7 +132,7 @@ fun MediaFolder(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
             Text(
                 "< back", Modifier.clickable {
                     currentFolder = currentFolder.parentFile ?: return@clickable
-                }.fillMaxWidth(), color = KagaminTheme.colors.buttonIcon,
+                }.fillMaxWidth().height(32.dp), color = KagaminTheme.colors.buttonIcon,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -139,7 +143,12 @@ fun MediaFolder(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                 currentFolder = it
             },
             openFile = { file ->
-                viewModel.play(AudioTrack(uri = file.absolutePath, title = file.nameWithoutExtension, artist = "", album = ""))
+                coroutineScope.launch {
+                    val track = viewModel.loadTracks(file.absolutePath)
+                    track.firstOrNull()?.let { track ->
+                        viewModel.play(track)
+                    }
+                }
             }
         )
     }

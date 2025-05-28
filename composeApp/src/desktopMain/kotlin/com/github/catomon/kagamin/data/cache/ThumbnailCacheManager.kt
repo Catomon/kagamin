@@ -90,7 +90,7 @@ object ThumbnailCacheManager {
                                     trackUri,
                                     AudioFileIO.read(File(trackUri))
                                         .let {
-                                            it.tag?.firstArtwork?.image as BufferedImage
+                                            it.tag?.firstArtwork?.image as BufferedImage? ?: return@async null
                                         }
                                 )
                         }

@@ -66,15 +66,15 @@ fun ConfirmWindow(
                     Text("Are you sure?", modifier = Modifier.padding(bottom = 30.dp))
 
                     OutlinedTextButton(
-                        text = "No", {
-                            confirmWindowState.onCancel()
+                        text = "Yea", {
+                            confirmWindowState.onConfirm()
                             confirmWindowState.onClose()
                         }, modifier = Modifier.align(Alignment.BottomStart).padding(10.dp)
                     )
 
                     OutlinedTextButton(
-                        text = "Yea", {
-                            confirmWindowState.onConfirm()
+                        text = "No", {
+                            confirmWindowState.onCancel()
                             confirmWindowState.onClose()
                         }, modifier = Modifier.align(Alignment.BottomEnd).padding(10.dp)
                     )

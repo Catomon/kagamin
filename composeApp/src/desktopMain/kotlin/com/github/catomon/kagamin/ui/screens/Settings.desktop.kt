@@ -143,7 +143,7 @@ fun SettingsScreen(
                 ) { folder ->
                     viewModel.settings = settings.copy(
                         mediaFolderPath = folder?.absolutePath()
-                            ?: defaultMediaFolder.absolutePath
+                            ?: return@rememberDirectoryPickerLauncher
                     )
                 }
                 Column(
@@ -151,7 +151,7 @@ fun SettingsScreen(
                         directoryPicker.launch()
                     }
                 ) {
-                    Text("Media Folder:")
+                    Text("Media Folder location:")
 
                     Text(
                         settings.mediaFolderPath,

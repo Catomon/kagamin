@@ -10,3 +10,5 @@ actual val userDataFolder: File =
     )
 
 val cacheFolder = File(System.getenv("LOCALAPPDATA"), "Kagamin/cache/")
+
+val defaultMediaFolder = File("${System.getProperty("user.home")}\\Music")

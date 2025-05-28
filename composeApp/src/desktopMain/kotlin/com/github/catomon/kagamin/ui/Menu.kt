@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.github.catomon.kagamin.LocalWindow
 import com.github.catomon.kagamin.data.AudioTrack
 import com.github.catomon.kagamin.kagaminWindowDecoration
+import com.github.catomon.kagamin.openInBrowser
 import com.github.catomon.kagamin.ui.screens.Background
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.Tabs
@@ -73,12 +74,13 @@ fun Menu(
 
             TextButton(
                 {
+                    openInBrowser("https://github.com/Catomon")
                     onClose()
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    "About",
+                    "GitHub",
                     color = KagaminTheme.colors.textSecondary,
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Start

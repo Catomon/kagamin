@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
@@ -22,14 +23,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.github.catomon.kagamin.LocalLayoutManager
 import com.github.catomon.kagamin.data.AppSettings
+import com.github.catomon.kagamin.data.defaultMediaFolder
 import com.github.catomon.kagamin.openInBrowser
 import com.github.catomon.kagamin.ui.components.AppIcon
 import com.github.catomon.kagamin.ui.components.OutlinedTextButton
@@ -37,8 +41,11 @@ import com.github.catomon.kagamin.ui.theme.KagaminColors
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.LayoutManager
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
+import io.github.vinceglb.filekit.absolutePath
+import io.github.vinceglb.filekit.dialogs.compose.rememberDirectoryPickerLauncher
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.arrow_left
+import kagamin.composeapp.generated.resources.folder
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.painterResource
 import kotlin.system.exitProcess
@@ -123,16 +130,38 @@ fun SettingsScreen(
                         viewModel.settings = settings.copy(autoScrollNextTrack = it)
                     })
                 }
+
+                CheckboxOption("Show Media Folder Pane", settings.showMediaFolderPane) {
+                    viewModel.settings = settings.copy(showMediaFolderPane = it)
+                }
+
+                val directoryPicker = rememberDirectoryPickerLauncher(
+                    "Pick Media Folder",
+                    directory = _root_ide_package_.io.github.vinceglb.filekit.PlatformFile(
+                        defaultMediaFolder
+                    )
+                ) { folder ->
+                    viewModel.settings = settings.copy(
+                        mediaFolderPath = folder?.absolutePath()
+                            ?: defaultMediaFolder.absolutePath
+                    )
+                }
+                Column(
+                    modifier = Modifier.clip(RoundedCornerShape(8.dp)).clickable {
+                        directoryPicker.launch()
+                    }
+                ) {
+                    Text("Media Folder:")
+
+                    Text(
+                        settings.mediaFolderPath,
+                        color = KagaminTheme.colors.textSecondary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
             }
         }
-
-        OutlinedTextButton(
-            text = "GitHub",
-            onClick = {
-                openInBrowser("https://github.com/Catomon")
-            },
-            modifier = Modifier.align(Alignment.BottomStart).padding(10.dp)
-        )
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -153,20 +182,11 @@ fun SettingsScreen(
 
             AppIcon()
         }
-
-        OutlinedTextButton(
-            text = "Exit App",
-            onClick = {
-                viewModel.saveSettings()
-                exitProcess(0)
-            },
-            modifier = Modifier.align(Alignment.BottomEnd).padding(10.dp)
-        )
     }
 }
 
 @Composable
-fun CheckboxOption(text: String, checked: Boolean,  onChange: (Boolean) -> Unit) {
+fun CheckboxOption(text: String, checked: Boolean, onChange: (Boolean) -> Unit) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(text)
         Checkbox(checked, onChange)

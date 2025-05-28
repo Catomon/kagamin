@@ -2,7 +2,6 @@ package com.github.catomon.kagamin.data
 
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import kotlinx.serialization.Serializable
-import java.awt.LayoutManager
 
 @Serializable
 data class AppSettings(
@@ -20,5 +19,7 @@ data class AppSettings(
     val lastPlaylistName: String = "default",
     val autoScrollNextTrack: Boolean = false,
     val useTrackImageAsBackground: Boolean = true,
+    val showMediaFolderPane: Boolean = false,
+    val mediaFolderPath: String = "${System.getProperty("user.home")}\\Music",
     val extra: Map<String, String> = emptyMap()
 )

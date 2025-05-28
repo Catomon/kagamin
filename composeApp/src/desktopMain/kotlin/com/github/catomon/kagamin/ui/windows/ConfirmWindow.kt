@@ -52,6 +52,7 @@ fun ConfirmWindow(
         undecorated = true,
         transparent = true,
         state = rememberDialogState(
+            position = WindowPosition.PlatformDefault,
             size = DpSize(300.dp, 170.dp)
         ),
         icon = painterResource(Res.drawable.kagamin_icon64)

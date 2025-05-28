@@ -1,5 +1,7 @@
 package com.github.catomon.kagamin
 
+import java.awt.Dimension
+
 object WindowConfig {
     const val WIDTH = 470
     const val HEIGHT = 340
@@ -16,4 +18,7 @@ object WindowConfig {
     var isTransparent = false
 
     val isTraySupported = androidx.compose.ui.window.isTraySupported
+
+    val minSize = Dimension(TINY_WIDTH, TINY_HEIGHT)
+    val maxSize = Dimension(770, 770)
 }

@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 
 @Composable
+@Deprecated("Not needed anymore. Delete later.", replaceWith = ReplaceWith("Icon"), level = DeprecationLevel.WARNING)
 fun ImageWithShadow(
     painterResource: Painter,
     contentDescription: String,

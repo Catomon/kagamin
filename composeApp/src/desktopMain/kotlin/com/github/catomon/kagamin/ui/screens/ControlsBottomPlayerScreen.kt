@@ -19,9 +19,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,8 +43,8 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toIntSize
 import androidx.navigation.NavHostController
-import com.github.catomon.kagamin.LocalWindow
 import com.github.catomon.kagamin.audio.AudioPlayerManager
+import com.github.catomon.kagamin.ui.MediaFolder
 import com.github.catomon.kagamin.ui.Menu
 import com.github.catomon.kagamin.ui.Playlists
 import com.github.catomon.kagamin.ui.Tracklist
@@ -59,10 +59,12 @@ import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.util.echoTrace
 import com.github.catomon.kagamin.util.echoTraceFiltered
 import kagamin.composeapp.generated.resources.Res
+import kagamin.composeapp.generated.resources.media_folder
 import kagamin.composeapp.generated.resources.star_angled
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.receiveAsFlow
 import org.jetbrains.compose.resources.imageResource
+import org.jetbrains.compose.resources.painterResource
 import kotlin.math.roundToInt
 
 @Composable
@@ -80,6 +82,8 @@ fun ControlsBottomPlayerScreen(
     val playMode by viewModel.playMode.collectAsState()
 
     var isMenuOpen by remember { mutableStateOf(false) }
+
+    var isMediaFolderPaneVisible by remember(viewModel.settings) { mutableStateOf(viewModel.settings.showMediaFolderPane) }
 
     Box(
         modifier.background(
@@ -116,15 +120,24 @@ fun ControlsBottomPlayerScreen(
             }
 
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                val plWeight = if (viewModel.settings.showMediaFolderPane) 0.30f else 40f
+
+                val tracklistWeight = if (viewModel.settings.showMediaFolderPane) 0.40f else 60f
+
+                //todo fix animation , enter = slideInHorizontally(), exit = slideOutHorizontally()
+                AnimatedVisibility(isMediaFolderPaneVisible, modifier = Modifier.weight(plWeight)) {
+                    MediaFolder(viewModel)
+                }
+
                 Playlists(
                     viewModel,
-                    Modifier.weight(0.35f).fillMaxHeight()
+                    Modifier.weight(plWeight).fillMaxHeight()
                 )
 
                 if (currentPlaylist.tracks.isEmpty()) {
                     Box(
                         Modifier
-                            .weight(0.65f)
+                            .weight(tracklistWeight)
                             .fillMaxHeight()
                             .background(KagaminTheme.backgroundTransparent),
                         contentAlignment = Alignment.Center
@@ -138,7 +151,7 @@ fun ControlsBottomPlayerScreen(
                 } else {
                     Tracklist(
                         viewModel,
-                        Modifier.weight(0.65f)
+                        Modifier.weight(tracklistWeight)
                     )
                 }
             }
@@ -165,6 +178,16 @@ fun ControlsBottomPlayerScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.align(Alignment.CenterEnd)
                 ) {
+                    IconButton({
+                        isMediaFolderPaneVisible = !isMediaFolderPaneVisible
+                    }) {
+                        Icon(
+                            painterResource(Res.drawable.media_folder),
+                            if (isMediaFolderPaneVisible) "Hide Media Folder Pane" else "Show Media Folder Pane",
+                            tint = if (isMediaFolderPaneVisible) KagaminTheme.colors.buttonIcon else KagaminTheme.colors.disabled
+                        )
+                    }
+
                     VolumeOptions(
                         volume = volume,
                         onVolumeChange = { newVolume ->

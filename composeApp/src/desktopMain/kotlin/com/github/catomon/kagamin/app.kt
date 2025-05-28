@@ -74,6 +74,7 @@ import org.jaudiotagger.tag.FieldKey
 import org.jaudiotagger.tag.Tag
 import org.jetbrains.compose.resources.painterResource
 import org.koin.java.KoinJavaComponent.get
+import java.awt.Dimension
 import java.awt.datatransfer.DataFlavor
 import java.awt.image.BufferedImage
 import java.io.File
@@ -278,6 +279,9 @@ private fun AppWindow(
                 false
             }
         }) {
+        window.minimumSize = WindowConfig.minSize
+        window.maximumSize = WindowConfig.maxSize
+
         CompositionLocalProvider(
             LocalWindow provides this.window,
             LocalConfirmWindow provides confirmWindowState,

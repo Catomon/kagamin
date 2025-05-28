@@ -62,6 +62,7 @@ fun ToolWindow(
         undecorated = true,
         transparent = true,
         state = rememberDialogState(
+            position = WindowPosition.PlatformDefault,
             size = DpSize(WindowConfig.HEIGHT.dp, WindowConfig.HEIGHT.dp)
         ),
         icon = painterResource(Res.drawable.kagamin_icon64)

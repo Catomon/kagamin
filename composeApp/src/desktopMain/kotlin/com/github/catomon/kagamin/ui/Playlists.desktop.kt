@@ -57,6 +57,9 @@ import androidx.compose.ui.unit.sp
 import com.github.catomon.kagamin.data.Playlist
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
+import com.github.catomon.kagamin.ui.windows.LocalToolWindow
+import com.github.catomon.kagamin.ui.windows.ToolScreenState
+import com.github.catomon.kagamin.ui.windows.ToolWindowState
 import com.github.catomon.kagamin.util.echoTrace
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.search
@@ -83,6 +86,8 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
 
     var filterName by remember { mutableStateOf("") }
     var filteredPlaylists by remember { mutableStateOf<List<Playlist>?>(null) }
+
+    val toolWindow = LocalToolWindow.current
 
     LaunchedEffect(playlists, filterName) {
         withContext(Dispatchers.Default) {
@@ -239,6 +244,22 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                                 },
                                 shuffle = {
                                     viewModel.shufflePlaylist(playlist)
+                                },
+                                edit = {
+                                    toolWindow.value = ToolWindowState(
+                                        currentScreenState = ToolScreenState.EditPlaylist(
+                                            playlist = playlist,
+                                            onRename = { viewModel.renamePlaylist(playlist, it) },
+                                            onClose = {
+                                                toolWindow.value =
+                                                    ToolWindowState(isVisible = false)
+                                            }),
+                                        isVisible = true,
+                                        onClose = {
+                                            toolWindow.value =
+                                                ToolWindowState(isVisible = false)
+                                        }
+                                    )
                                 },
                                 modifier = Modifier.padding(2.dp)
                             )

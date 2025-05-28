@@ -45,6 +45,7 @@ fun PlaylistItem(
     remove: () -> Unit,
     clear: () -> Unit,
     shuffle: () -> Unit,
+    edit: () -> Unit,
     modifier: Modifier
 ) {
     val backColor = KagaminTheme.colors.listItem
@@ -53,6 +54,9 @@ fun PlaylistItem(
 
     ContextMenuArea(items = {
         listOf(
+            ContextMenuItem("Edit") {
+                edit()
+            },
             ContextMenuItem("Shuffle") {
                 shuffle()
             },

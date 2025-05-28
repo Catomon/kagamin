@@ -83,17 +83,6 @@ fun ThumbnailTrackItem(
 
     val height = 64.dp
 
-//    val position by viewModel.position.collectAsState()
-//
-//    val progress by remember {
-//        derivedStateOf {
-//            when (currentTrack) {
-//                null -> 0f
-//                else -> if (currentTrack.duration > 0 && currentTrack.duration < Long.MAX_VALUE) position.toFloat() / currentTrack.duration else -1f
-//            }
-//        }
-//    }
-
     ContextMenuArea(items = {
         ThumbnailTrackItemDefaults.contextMenuItems(
             tracklistManager,

@@ -86,7 +86,16 @@ class KagaminViewModel(
 
     fun play(track: AudioTrack) {
         viewModelScope.launch {
+            var loading = false
+            if (playState.value == AudioPlayerService.PlayState.IDLE) {
+                loading = true
+                isLoading = true
+            }
+
             audioPlayerService.play(track)
+
+            if (loading)
+                isLoading = false
         }
     }
 
@@ -221,6 +230,18 @@ class KagaminViewModel(
         }
     }
 
+    fun renamePlaylist(playlist: Playlist, newName: String) {
+        check(newName.isNotBlank())
+
+        val renamedPlaylist = playlist.copy(name = newName)
+        playlistsManager.updatePlaylist(renamedPlaylist)
+
+        viewModelScope.launch(ioDispatcher) {
+            PlaylistsLoader.removePlaylist(playlist)
+            PlaylistsLoader.savePlaylist(renamedPlaylist)
+        }
+    }
+
     fun clearPlaylist(playlist: Playlist) {
         val emptyPlaylist = playlist.copy(tracks = emptyList())
         playlistsManager.updatePlaylist(emptyPlaylist)
@@ -240,7 +261,16 @@ class KagaminViewModel(
 
     fun nextTrack() {
         viewModelScope.launch {
+            var loading = false
+            if (playState.value == AudioPlayerService.PlayState.IDLE) {
+                loading = true
+                isLoading = true
+            }
+
             playlistsManager.nextTrack()
+
+            if (loading)
+                isLoading = false
         }
     }
 

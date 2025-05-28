@@ -56,6 +56,9 @@ import com.github.catomon.kagamin.ui.windows.AddTracksOrPlaylistsWindow
 import com.github.catomon.kagamin.ui.windows.ConfirmWindow
 import com.github.catomon.kagamin.ui.windows.ConfirmWindowState
 import com.github.catomon.kagamin.ui.windows.LocalConfirmWindow
+import com.github.catomon.kagamin.ui.windows.LocalToolWindow
+import com.github.catomon.kagamin.ui.windows.ToolWindow
+import com.github.catomon.kagamin.ui.windows.ToolWindowState
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.kagamin_icon64
 import kagamin.composeapp.generated.resources.pause_icon
@@ -98,8 +101,6 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
     }
     val currentLayout by layoutManager.currentLayout
 
-    val confirmWindowState = remember { mutableStateOf(ConfirmWindowState()) }
-
     val exitApp = {
         kagaminViewModel.saveSettings()
         onCloseRequest()
@@ -141,8 +142,7 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
 
         CompositionLocalProvider(
             LocalLayoutManager provides layoutManager,
-            LocalConfirmWindow provides confirmWindowState,
-            LocalAppSettings provides kagaminViewModel.settings
+            LocalAppSettings provides kagaminViewModel.settings,
         ) {
             AppWindow(windowState, kagaminViewModel, exitApp)
         }
@@ -174,10 +174,6 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
                 exitApp()
             })
         }
-    }
-
-    if (confirmWindowState.value.isVisible) {
-        ConfirmWindow(confirmWindowState.value)
     }
 }
 
@@ -247,6 +243,10 @@ private fun AppWindow(
         }
     }
 
+    val confirmWindowState = remember { mutableStateOf(ConfirmWindowState()) }
+
+    val toolWindowState = remember { mutableStateOf(ToolWindowState()) }
+
     Window(
         onCloseRequest = onCloseRequest,
         title = "Kagamin",
@@ -280,10 +280,20 @@ private fun AppWindow(
         }) {
         CompositionLocalProvider(
             LocalWindow provides this.window,
+            LocalConfirmWindow provides confirmWindowState,
+            LocalToolWindow provides toolWindowState
         ) {
             KagaminTheme {
                 AppFrame(kagaminViewModel)
             }
+        }
+
+        if (confirmWindowState.value.isVisible) {
+            ConfirmWindow(confirmWindowState.value)
+        }
+
+        if (toolWindowState.value.isVisible) {
+            ToolWindow(toolWindowState.value)
         }
     }
 }

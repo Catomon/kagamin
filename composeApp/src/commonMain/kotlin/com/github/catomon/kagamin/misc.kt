@@ -41,7 +41,7 @@ fun openInBrowser(uri: URI) {
 }
 
 fun isValidFileName(name: String): Boolean {
-    if (name.isEmpty()) return false
+    if (name.isBlank()) return false
 
     val forbiddenNames = listOf(
         "CON", "PRN", "AUX", "NUL",

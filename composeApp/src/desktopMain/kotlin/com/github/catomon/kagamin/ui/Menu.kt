@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.github.catomon.kagamin.LocalWindow
 import com.github.catomon.kagamin.data.AudioTrack
 import com.github.catomon.kagamin.kagaminWindowDecoration
 import com.github.catomon.kagamin.ui.screens.Background
@@ -109,6 +110,21 @@ fun Menu(
             ) {
                 Text(
                     "Exit App",
+                    color = KagaminTheme.colors.textSecondary,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Start
+                )
+            }
+
+            val window = LocalWindow.current
+            TextButton(
+                {
+                    window.isMinimized = true
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    "Minimize",
                     color = KagaminTheme.colors.textSecondary,
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Start

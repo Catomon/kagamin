@@ -1,5 +1,6 @@
 package com.github.catomon.kagamin.ui.windows
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -11,8 +12,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogWindow
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
+import androidx.compose.ui.window.rememberDialogState
 import androidx.compose.ui.window.rememberWindowState
 import com.github.catomon.kagamin.WindowDraggableArea
 import com.github.catomon.kagamin.kagaminWindowDecoration
@@ -37,7 +40,7 @@ data class ConfirmWindowState(
 fun ConfirmWindow(
     confirmWindowState: ConfirmWindowState
 ) {
-    Window(
+    DialogWindow(
         visible = confirmWindowState.isVisible,
         onCloseRequest = {
             confirmWindowState.onCancel()
@@ -48,8 +51,7 @@ fun ConfirmWindow(
         resizable = false,
         undecorated = true,
         transparent = true,
-        state = rememberWindowState(
-            position = WindowPosition(Alignment.Center),
+        state = rememberDialogState(
             size = DpSize(300.dp, 170.dp)
         ),
         icon = painterResource(Res.drawable.kagamin_icon64)
@@ -58,7 +60,7 @@ fun ConfirmWindow(
             KagaminTheme {
                 Box(
                     contentAlignment = Alignment.Center,
-                    modifier = Modifier.fillMaxSize().kagaminWindowDecoration()
+                    modifier = Modifier.fillMaxSize().kagaminWindowDecoration().background(color = KagaminTheme.background)
                 ) {
                     Text("Are you sure?", modifier = Modifier.padding(bottom = 30.dp))
 

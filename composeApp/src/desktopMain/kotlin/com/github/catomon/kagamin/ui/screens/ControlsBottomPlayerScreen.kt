@@ -19,9 +19,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -59,12 +59,10 @@ import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.util.echoTrace
 import com.github.catomon.kagamin.util.echoTraceFiltered
 import kagamin.composeapp.generated.resources.Res
-import kagamin.composeapp.generated.resources.minimize_window
 import kagamin.composeapp.generated.resources.star_angled
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.receiveAsFlow
 import org.jetbrains.compose.resources.imageResource
-import org.jetbrains.compose.resources.painterResource
 import kotlin.math.roundToInt
 
 @Composable
@@ -78,7 +76,6 @@ fun ControlsBottomPlayerScreen(
     val currentTrack by viewModel.currentTrack.collectAsState()
     val currentPlaylist by viewModel.currentPlaylist.collectAsState()
     val volume by viewModel.volume.collectAsState()
-    val window = LocalWindow.current
     val coroutineScope = rememberCoroutineScope()
     val playMode by viewModel.playMode.collectAsState()
 
@@ -101,15 +98,15 @@ fun ControlsBottomPlayerScreen(
             ) {
                 CurrentTrackFrameHorizontal(currentTrack, Modifier.padding(4.dp))
 
-                IconButton({
-                    window.isMinimized = true
-                }, modifier = Modifier.height(16.dp).align(Alignment.TopEnd)) {
-                    Icon(
-                        painterResource(Res.drawable.minimize_window),
-                        contentDescription = null,
-                        tint = KagaminTheme.colors.buttonIcon
-                    )
-                }
+//                val window = LocalWindow.current
+//                IconButton({
+//                    window.isMinimized = true
+//                }, modifier = Modifier.size(24.dp).align(Alignment.TopEnd)) {
+//                    Box(
+//                        Modifier.size(9.dp)
+//                            .background(color = KagaminTheme.colors.thinBorder, shape = CircleShape)
+//                    )
+//                }
 
                 AnimatedPlayPauseButton(
                     coroutineScope,

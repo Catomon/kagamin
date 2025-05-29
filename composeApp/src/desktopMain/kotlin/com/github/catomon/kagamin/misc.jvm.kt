@@ -33,39 +33,47 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.event.MouseMotionAdapter
 import java.io.File
+import kotlin.concurrent.thread
 
 val osName = System.getProperty("os.name").lowercase()
 
 fun ApplicationScope.setComposeExceptionHandler() {
     Thread.setDefaultUncaughtExceptionHandler { _, e ->
-        File("last_error.txt").writeText(e.stackTraceToString())
         e.printStackTrace()
 
-        exitApplication()
+        try {
+            File("last_error.txt").writeText(e.stackTraceToString())
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
 
-        application {
-            Window(
-                onCloseRequest = ::exitApplication,
-                state = rememberWindowState(width = 300.dp, height = 250.dp),
-                visible = true,
-                title = "Error",
-            ) {
-                val clipboard = LocalClipboardManager.current
+        thread {
+            application {
+                Window(
+                    onCloseRequest = ::exitApplication,
+                    state = rememberWindowState(width = 300.dp, height = 250.dp),
+                    visible = true,
+                    title = "Error",
+                ) {
+                    val clipboard = LocalClipboardManager.current
 
-                Box(contentAlignment = Alignment.Center) {
-                    SelectionContainer {
-                        Text(e.stackTraceToString(), Modifier.fillMaxSize().verticalScroll(
-                            rememberScrollState()
-                        ))
-                    }
-                    Button({
-                        clipboard.setText(AnnotatedString(e.stackTraceToString()))
-                    }, Modifier.align(Alignment.BottomCenter)) {
-                        Text("Copy")
+                    Box(contentAlignment = Alignment.Center) {
+                        SelectionContainer {
+                            Text(e.stackTraceToString(), Modifier.fillMaxSize().verticalScroll(
+                                rememberScrollState()
+                            ))
+                        }
+                        Button({
+                            clipboard.setText(AnnotatedString(e.stackTraceToString()))
+                        }, Modifier.align(Alignment.BottomCenter)) {
+                            Text("Copy")
+                        }
                     }
                 }
             }
         }
+
+        exitApplication()
     }
 }
 

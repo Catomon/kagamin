@@ -125,3 +125,9 @@
 -keep class * extends coil3.util.FetcherServiceLoaderTarget { *; }
 
 #-dontobfuscate
+
+# Keep all classes in com.sun.jna package and subpackages
+-keep class com.sun.jna.** { *; }
+
+# Keep all class members in classes that extend JNA classes
+-keepclassmembers class * extends com.sun.jna.* { public *; }

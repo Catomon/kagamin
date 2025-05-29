@@ -10,6 +10,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.draganddrop.dragAndDropTarget
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -42,12 +43,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toIntSize
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.github.catomon.kagamin.audio.AudioPlayerManager
 import com.github.catomon.kagamin.ui.MediaFolder
 import com.github.catomon.kagamin.ui.Menu
 import com.github.catomon.kagamin.ui.Playlists
 import com.github.catomon.kagamin.ui.Tracklist
+import com.github.catomon.kagamin.ui.TracksDropTarget
 import com.github.catomon.kagamin.ui.components.AppLogo
 import com.github.catomon.kagamin.ui.components.CurrentTrackFrameHorizontal
 import com.github.catomon.kagamin.ui.components.PlayPauseButton
@@ -55,6 +58,7 @@ import com.github.catomon.kagamin.ui.components.PlaybackModeToggleButton
 import com.github.catomon.kagamin.ui.components.PrevNextTrackButtons
 import com.github.catomon.kagamin.ui.components.VolumeOptions
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
+import com.github.catomon.kagamin.ui.trackDropTargetBorder
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.util.echoTrace
 import com.github.catomon.kagamin.util.echoTraceFiltered
@@ -63,6 +67,7 @@ import kagamin.composeapp.generated.resources.media_folder
 import kagamin.composeapp.generated.resources.star_angled
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.painterResource
 import kotlin.math.roundToInt
@@ -134,12 +139,23 @@ fun ControlsBottomPlayerScreen(
                     Modifier.weight(plWeight).fillMaxHeight()
                 )
 
+                val tracksDropTarget = remember {
+                    TracksDropTarget { tracksUris ->
+                        viewModel.viewModelScope.launch {
+                            val track = viewModel.loadTracks(tracksUris)
+                            viewModel.updatePlaylist(currentPlaylist.copy(tracks = currentPlaylist.tracks + track))
+                        }
+                    }
+                }
+
                 if (currentPlaylist.tracks.isEmpty()) {
                     Box(
                         Modifier
                             .weight(tracklistWeight)
                             .fillMaxHeight()
-                            .background(KagaminTheme.backgroundTransparent),
+                            .background(KagaminTheme.backgroundTransparent)
+                            .dragAndDropTarget({ true }, tracksDropTarget)
+                            .trackDropTargetBorder(tracksDropTarget.isTarget),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
@@ -152,6 +168,8 @@ fun ControlsBottomPlayerScreen(
                     Tracklist(
                         viewModel,
                         Modifier.weight(tracklistWeight)
+                            .dragAndDropTarget({ true }, tracksDropTarget)
+                            .trackDropTargetBorder(tracksDropTarget.isTarget)
                     )
                 }
             }

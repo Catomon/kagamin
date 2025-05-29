@@ -4,7 +4,9 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.draganddrop.dragAndDropTarget
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
@@ -41,6 +43,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draganddrop.DragAndDropEvent
+import androidx.compose.ui.draganddrop.DragAndDropTarget
+import androidx.compose.ui.draganddrop.awtTransferable
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
@@ -54,6 +59,7 @@ import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import com.github.catomon.kagamin.data.Playlist
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
@@ -68,6 +74,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.painterResource
+import java.awt.datatransfer.DataFlavor
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -230,6 +237,16 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                             displayedPlaylists.elementAt(it)
                         }) { i ->
                             val playlist = displayedPlaylists.elementAt(i)
+
+                            val tracksDropTarget = remember {
+                                TracksDropTarget { tracksUris ->
+                                    viewModel.viewModelScope.launch {
+                                        val track = viewModel.loadTracks(tracksUris)
+                                        viewModel.updatePlaylist(playlist.copy(tracks = playlist.tracks + track))
+                                    }
+                                }
+                            }
+
                             PlaylistItem(
                                 playlist,
                                 viewModel,
@@ -261,7 +278,12 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                                         }
                                     )
                                 },
-                                modifier = Modifier.padding(2.dp)
+                                modifier = Modifier.padding(2.dp).dragAndDropTarget(
+                                    {
+                                        true
+                                    },
+                                    tracksDropTarget
+                                ).trackDropTargetBorder(tracksDropTarget.isTarget)
                             )
                         }
                     }
@@ -279,5 +301,39 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                 }
             }
         }
+    }
+}
+
+fun Modifier.trackDropTargetBorder(isTarget: Boolean): Modifier = then(
+    if (isTarget) Modifier.border(
+        color = KagaminTheme.colors.text,
+        width = 2.dp,
+        shape = RoundedCornerShape(8.dp)
+    ) else Modifier
+)
+
+class TracksDropTarget(val onTracksDrop: (List<String>) -> Unit) : DragAndDropTarget {
+    var isTarget by mutableStateOf(false)
+
+    override fun onExited(event: DragAndDropEvent) {
+        isTarget = false
+    }
+
+    override fun onEntered(event: DragAndDropEvent) {
+        isTarget = true
+    }
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    override fun onDrop(event: DragAndDropEvent): Boolean {
+        val data = event.awtTransferable.let {
+            if (it.isDataFlavorSupported(DataFlavor.stringFlavor))
+                it.getTransferData(DataFlavor.stringFlavor) as String
+            else
+                it.transferDataFlavors.first().humanPresentableName
+        }.split("/")
+
+        onTracksDrop(data)
+
+        return true
     }
 }

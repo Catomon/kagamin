@@ -1,6 +1,8 @@
 package com.github.catomon.kagamin.audio
 
 import com.github.catomon.kagamin.data.AudioTrack
+import com.github.catomon.kagamin.data.cache.ThumbnailCacheManager
+import com.github.catomon.kagamin.filterAudioFiles
 import com.github.catomon.kagamin.util.logMsg
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -14,6 +16,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jaudiotagger.audio.AudioFileIO
+import org.jaudiotagger.audio.AudioHeader
+import org.jaudiotagger.tag.FieldKey
+import org.jaudiotagger.tag.Tag
+import java.awt.image.BufferedImage
+import java.io.File
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist as LavaAudioPlaylist
@@ -43,7 +51,7 @@ class AudioPlayerServiceImpl(
     override val playlistsManager: PlaylistsManager = PlaylistsManagerImpl(this)
 
     val loaderListener = LavaLoaderListener()
-    val audioLoader = AudioPlayerManager(loaderListener)
+    val audioPlayerManager = AudioPlayerManager(loaderListener)
 
     private val job = SupervisorJob()
     private val coroutineScope = CoroutineScope(dispatcherDefault + job)
@@ -54,7 +62,7 @@ class AudioPlayerServiceImpl(
         if (positionUpdateJob?.isActive == true) return
         positionUpdateJob = coroutineScope.launch {
             while (isActive && _playState.value == AudioPlayerService.PlayState.PLAYING) {
-                _position.value = audioLoader.position
+                _position.value = audioPlayerManager.position
                 delay(300)
             }
         }
@@ -68,8 +76,14 @@ class AudioPlayerServiceImpl(
     override suspend fun loadTracks(uris: List<String>): List<AudioTrack> {
         loaderListener.collectNextTracks = true
         val collected = withContext(Dispatchers.IO) {
-            audioLoader.load(uris)
-            loaderListener.collectedTracks.toList()
+            val (remoteList, localList) = uris.groupBy { it.startsWith("http") }
+                .let { (it[true] ?: emptyList()) to (it[false] ?: emptyList()) }
+
+            audioPlayerManager.load(remoteList)
+
+            val localTracksLoaded = loadLocalTracks(localList)
+
+            loaderListener.collectedTracks.toList() + localTracksLoaded
         }
 
         loaderListener.collectNextTracks = false
@@ -77,20 +91,82 @@ class AudioPlayerServiceImpl(
         return collected
     }
 
+    @OptIn(ExperimentalUuidApi::class)
+    private suspend fun loadLocalTracks(files: List<String>): List<AudioTrack> {
+        val files = files.map { File(it) }
+        val cachingScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
+        try {
+            val trackFiles = mutableListOf<File>()
+
+            withContext(Dispatchers.IO) {
+                filterAudioFiles(files, trackFiles)
+            }
+
+            val loadedTracks = withContext(Dispatchers.IO) {
+                trackFiles.map { audioFile ->
+                    val path = audioFile.path
+                    val (tag: Tag?, audioHeader: AudioHeader?) = try {
+                        if (audioFile.extension == "m4a") //TODO
+                            null to null
+                        else
+                            AudioFileIO.read(audioFile)
+                                .let {
+                                    it.tag to it.audioHeader
+                                }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        null to null
+                    }
+
+                    cachingScope.launch {
+                        ThumbnailCacheManager.cacheThumbnail(trackUri = path, retrieveImage = {
+                            tag?.firstArtwork?.image as BufferedImage?
+                        })
+                    }
+
+                    fun Tag.getOrNull(key: FieldKey): String? =
+                        if (tag?.hasField(key) == true) getFirst(key) else null
+
+                    val preciseLengthInSeconds: Double = audioHeader?.preciseTrackLength ?: 0.0
+                    val preciseLengthInMilliseconds = (preciseLengthInSeconds * 1000).toLong()
+
+                    AudioTrack(
+                        id = Uuid.random().toString(),
+                        uri = path,
+                        title = tag?.getOrNull(FieldKey.TITLE)?.ifBlank { null }
+                            ?: audioFile.nameWithoutExtension,
+                        artist = tag?.getOrNull(FieldKey.ARTIST) ?: "",
+                        album = tag?.getOrNull(FieldKey.ALBUM) ?: "",
+                        duration = preciseLengthInMilliseconds,
+                        artworkUri = null
+                    )
+                }
+            }
+
+            return loadedTracks
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+
+            return emptyList()
+        }
+    }
+
     override suspend fun play(track: AudioTrack): Result<Boolean> {
         logMsg("Play track: ${track.uri}")
 
         _currentTrack.value = track
 
+        /** if loaded track uri == [_currentTrack].uri it'll be started by [loaderListener] */
         withContext(dispatcherIO) {
-            audioLoader.load(listOf(track.uri))
+            audioPlayerManager.load(listOf(track.uri))
         }
 
         return Result.success(true)
     }
 
     override fun pause() {
-        audioLoader.pause()
+        audioPlayerManager.pause()
 
         if (currentTrack.value != null)
             _playState.value = AudioPlayerService.PlayState.PAUSED
@@ -101,7 +177,7 @@ class AudioPlayerServiceImpl(
     }
 
     override fun resume() {
-        audioLoader.resume()
+        audioPlayerManager.resume()
 
         if (currentTrack.value != null)
             _playState.value = AudioPlayerService.PlayState.PLAYING
@@ -112,7 +188,7 @@ class AudioPlayerServiceImpl(
     }
 
     override fun stop() {
-        audioLoader.stop()
+        audioPlayerManager.stop()
 
         _currentTrack.value = null
         _playState.value = AudioPlayerService.PlayState.IDLE
@@ -121,11 +197,11 @@ class AudioPlayerServiceImpl(
     }
 
     override suspend fun seek(position: Long) {
-        audioLoader.seek(position)
+        audioPlayerManager.seek(position)
     }
 
     override fun setVolume(volume: Float) {
-        audioLoader.setVolume(volume)
+        audioPlayerManager.setVolume(volume)
         _volume.value = volume
     }
 
@@ -163,7 +239,7 @@ class AudioPlayerServiceImpl(
             val currentTrack = currentTrack.value ?: return
 
             if (currentTrack.uri == track.info.uri) {
-                audioLoader.play(track)
+                audioPlayerManager.play(track)
 
                 if (_playState.value != AudioPlayerService.PlayState.PLAYING)
                     resume()

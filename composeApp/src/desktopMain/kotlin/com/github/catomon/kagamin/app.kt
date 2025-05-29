@@ -47,6 +47,7 @@ import com.github.catomon.kagamin.data.PlaylistsLoader
 import com.github.catomon.kagamin.data.cache.ThumbnailCacheManager
 import com.github.catomon.kagamin.data.loadSettings
 import com.github.catomon.kagamin.ui.KagaminApp
+import com.github.catomon.kagamin.ui.audioExtensions
 import com.github.catomon.kagamin.ui.compositionlocals.LocalAppSettings
 import com.github.catomon.kagamin.ui.customShadow
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
@@ -74,7 +75,6 @@ import org.jaudiotagger.tag.FieldKey
 import org.jaudiotagger.tag.Tag
 import org.jetbrains.compose.resources.painterResource
 import org.koin.java.KoinJavaComponent.get
-import java.awt.Dimension
 import java.awt.datatransfer.DataFlavor
 import java.awt.image.BufferedImage
 import java.io.File
@@ -392,19 +392,7 @@ suspend fun loadTrackFilesToCurrentPlaylist(
             }
 
         withContext(Dispatchers.IO) {
-            fun filterMusicFiles(files: List<File>) {
-                for (file in files) {
-                    if (file.isDirectory) {
-                        file.listFiles()?.let { filterMusicFiles(it.toList()) }
-                    } else {
-                        if (file.extension == "mp3" || file.extension == "wav") {
-                            trackFiles.add(file)
-                        }
-                    }
-                }
-            }
-
-            filterMusicFiles(files)
+            filterAudioFiles(files, trackFiles)
         }
 
         println("Reading metadata...")
@@ -424,10 +412,13 @@ suspend fun loadTrackFilesToCurrentPlaylist(
                 val path = audioFile.path
 
                 val (tag: Tag?, audioHeader: AudioHeader?) = try {
-                    AudioFileIO.read(audioFile)
-                        .let {
-                            it.tag to it.audioHeader
-                        }
+                    if (audioFile.extension == "m4a") //TODO
+                        null to null
+                    else
+                        AudioFileIO.read(audioFile)
+                            .let {
+                                it.tag to it.audioHeader
+                            }
                 } catch (e: Exception) {
                     e.printStackTrace()
                     null to null
@@ -506,5 +497,17 @@ suspend fun loadTrackFilesToCurrentPlaylist(
                 snackbar.showSnackbar(ex.message ?: "null")
             }
         return false
+    }
+}
+
+fun filterAudioFiles(files: List<File>, filteredFiles: MutableList<File>) {
+    for (file in files) {
+        if (file.isDirectory) {
+            file.listFiles()?.let { filterAudioFiles(it.toList(), filteredFiles) }
+        } else {
+            if (file.extension in audioExtensions) {
+                filteredFiles.add(file)
+            }
+        }
     }
 }

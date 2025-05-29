@@ -191,8 +191,19 @@ class KagaminViewModel(
         }
     }
 
-    suspend fun loadTracks(url: String): List<AudioTrack> =
-        audioPlayerService.loadTracks(listOf(url))
+    suspend fun loadTracks(uri: String): List<AudioTrack> {
+        isLoading = true
+        val tracks = audioPlayerService.loadTracks(listOf(uri))
+        isLoading = false
+        return tracks
+    }
+
+    suspend fun loadTracks(uris: List<String>): List<AudioTrack> {
+        isLoading = true
+        val tracks = audioPlayerService.loadTracks(uris)
+        isLoading = false
+        return tracks
+    }
 
     fun removePlaylist(playlist: Playlist) {
 //        if (playlist.id == "default") return

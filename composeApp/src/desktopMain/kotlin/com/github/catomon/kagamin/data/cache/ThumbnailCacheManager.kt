@@ -4,7 +4,6 @@ import androidx.compose.ui.graphics.toAwtImage
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import com.github.catomon.kagamin.data.cacheFolder
 import com.github.catomon.kagamin.ui.util.removeBlackBars
-import com.github.catomon.kagamin.util.logDbg
 import com.github.catomon.kagamin.util.logErr
 import com.github.catomon.kagamin.util.logTrace
 import kotlinx.coroutines.CoroutineScope
@@ -88,9 +87,13 @@ object ThumbnailCacheManager {
                             else
                                 cacheThumbnail(
                                     trackUri,
-                                    AudioFileIO.read(File(trackUri))
+                                    (if (trackUri.endsWith("m4a")) //TODO
+                                        null
+                                    else
+                                        AudioFileIO.read(File(trackUri)))
                                         .let {
-                                            it.tag?.firstArtwork?.image as BufferedImage? ?: return@async null
+                                            it?.tag?.firstArtwork?.image as BufferedImage?
+                                                ?: return@async null
                                         }
                                 )
                         }

@@ -46,64 +46,10 @@ import kagamin.composeapp.generated.resources.note_icon
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.painterResource
 import java.awt.Desktop
 import java.awt.datatransfer.StringSelection
 import java.io.File
-
-@Preview
-@Composable
-fun MediaFolderPreview() {
-    KagaminTheme {
-        Surface {
-            val folder = remember {
-                defaultMediaFolder.also { it.mkdirs() }
-            }
-
-            var currentFolder by remember { mutableStateOf(folder) }
-
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .background(color = KagaminTheme.colors.backgroundTransparent)
-                    .padding(start = 4.dp)
-            ) {
-                Box(
-                    contentAlignment = Alignment.CenterStart,
-                    modifier = Modifier.height(32.dp).fillMaxWidth()
-                ) {
-                    Text(
-                        currentFolder.nameWithoutExtension,
-                        color = KagaminTheme.colors.buttonIcon,
-                        modifier = Modifier,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-
-                if (currentFolder != folder)
-                    Text(
-                        "< back", Modifier.clickable {
-                            currentFolder = currentFolder.parentFile ?: return@clickable
-                        }, color = KagaminTheme.colors.buttonIcon,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-
-//                Folder(
-//                    folder = currentFolder,
-//                    goToFolder = {
-//                        currentFolder = it
-//                    },
-//                    openFile = { file ->
-////                        viewModel.play(AudioTrack(uri = file.absolutePath, title = file.nameWithoutExtension, artist = "", album = ""))
-//                    }
-//                )
-            }
-        }
-    }
-}
 
 @Composable
 fun MediaFolder(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {

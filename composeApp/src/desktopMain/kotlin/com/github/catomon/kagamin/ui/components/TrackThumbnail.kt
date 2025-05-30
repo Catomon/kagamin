@@ -35,6 +35,9 @@ import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.util.echoTrace
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.def_thumb
+import kagamin.composeapp.generated.resources.def_thumb_150
+import kagamin.composeapp.generated.resources.def_thumb_512
+import kagamin.composeapp.generated.resources.def_thumb_64
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.painterResource
@@ -42,6 +45,13 @@ import org.jetbrains.compose.resources.painterResource
 object TrackThumbnailDefaults {
     val shape = RoundedCornerShape(12.dp)
 }
+
+val defaultThumbnail = mapOf(
+    ThumbnailCacheManager.SIZE.ORIGINAL to Res.drawable.def_thumb,
+    ThumbnailCacheManager.SIZE.H64 to Res.drawable.def_thumb_64,
+    ThumbnailCacheManager.SIZE.H150 to Res.drawable.def_thumb_150,
+    ThumbnailCacheManager.SIZE.H512 to Res.drawable.def_thumb_512,
+)
 
 @Composable
 fun TrackThumbnail(
@@ -55,7 +65,7 @@ fun TrackThumbnail(
     echoTrace { "TrackThumbnail" }
 
     var thumbnailModel by remember { mutableStateOf<Any?>(userDataFolder.resolve("definitely_not_existing_file")) }
-    val defaultPainter = painterResource(Res.drawable.def_thumb)
+    val defaultPainter = painterResource(defaultThumbnail[height] ?: Res.drawable.def_thumb)
 
     LaunchedEffect(currentTrack) {
         thumbnailModel = if (currentTrack != null) {

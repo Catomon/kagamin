@@ -301,7 +301,7 @@ class AudioPlayerServiceImpl(
         override fun onTrackPlaybackError(track: LavaAudioTrack) {
             logMsg { "onTrackPlaybackError: ${track.info.uri}" }
 
-            tryPlayNextTrack()
+//            tryPlayNextTrack()
         }
 
         private var nextOnErrorJob: Job? = null

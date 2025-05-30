@@ -1,5 +1,6 @@
 package com.github.catomon.kagamin.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -9,6 +10,9 @@ import androidx.compose.ui.unit.dp
 import com.github.catomon.kagamin.data.AudioTrack
 import com.github.catomon.kagamin.ui.components.TrackThumbnail
 import com.github.catomon.kagamin.ui.compositionlocals.LocalAppSettings
+import kagamin.composeapp.generated.resources.Res
+import kagamin.composeapp.generated.resources.lucky_background
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun Background(currentTrack: AudioTrack?, modifier: Modifier) {
@@ -16,11 +20,18 @@ fun Background(currentTrack: AudioTrack?, modifier: Modifier) {
 
     val settings = LocalAppSettings.current
 
-    if (settings.useTrackImageAsBackground)
+    if (settings.useTrackImageAsBackground && currentTrack != null)
         TrackThumbnail(
             currentTrack,
             modifier = modifier.clip(RoundedCornerShape(14.dp)),
             contentScale = ContentScale.Crop,
             blur = true,
+        )
+    else
+        Image(
+            painter = painterResource(Res.drawable.lucky_background),
+            contentScale = ContentScale.Crop,
+            modifier = modifier.clip(RoundedCornerShape(14.dp)),
+            contentDescription = null
         )
 }

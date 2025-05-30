@@ -166,8 +166,8 @@ fun Folder(
                     if (file.isDirectory) goToFolder(file)
                     else openFile(file)
                 }.dragAndDropSource { _ ->
-                    val data = if (file.isDirectory) file.listFiles()
-                        .joinToString("/") { it.absolutePath } else file.absolutePath
+                    val data = "tracks:" + (if (file.isDirectory) file.listFiles()
+                        .joinToString("/") { it.absolutePath } else file.absolutePath)
 
                     DragAndDropTransferData(
                         transferable = DragAndDropTransferable(StringSelection(data)),

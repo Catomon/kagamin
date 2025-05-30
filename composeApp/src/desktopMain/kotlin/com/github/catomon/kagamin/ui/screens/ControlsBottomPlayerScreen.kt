@@ -142,8 +142,9 @@ fun ControlsBottomPlayerScreen(
                 val tracksDropTarget = remember {
                     TracksDropTarget { tracksUris ->
                         viewModel.viewModelScope.launch {
-                            val track = viewModel.loadTracks(tracksUris)
-                            viewModel.updatePlaylist(currentPlaylist.copy(tracks = currentPlaylist.tracks + track))
+                            val tracks = viewModel.loadTracks(tracksUris)
+                            val uris = tracks.map { it.uri }
+                            viewModel.updatePlaylist(currentPlaylist.copy(tracks = currentPlaylist.tracks.filter { it.uri !in uris } + tracks))
                         }
                     }
                 }
@@ -154,7 +155,10 @@ fun ControlsBottomPlayerScreen(
                             .weight(tracklistWeight)
                             .fillMaxHeight()
                             .background(KagaminTheme.backgroundTransparent)
-                            .dragAndDropTarget({ true }, tracksDropTarget)
+                            .dragAndDropTarget(
+                                { tracksDropTarget.shouldStartDaD(it) },
+                                tracksDropTarget
+                            )
                             .trackDropTargetBorder(tracksDropTarget.isTarget),
                         contentAlignment = Alignment.Center
                     ) {
@@ -168,7 +172,10 @@ fun ControlsBottomPlayerScreen(
                     Tracklist(
                         viewModel,
                         Modifier.weight(tracklistWeight)
-                            .dragAndDropTarget({ true }, tracksDropTarget)
+                            .dragAndDropTarget(
+                                { tracksDropTarget.shouldStartDaD(it) },
+                                tracksDropTarget
+                            )
                             .trackDropTargetBorder(tracksDropTarget.isTarget)
                     )
                 }

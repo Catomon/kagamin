@@ -15,7 +15,7 @@ data class AppSettings(
     val random: Boolean = false,
     val crossfade: Boolean = true,
     val repeat: Boolean = false,
-    val repeatPlaylist: Boolean = false,
+    val repeatPlaylist: Boolean = true,
     val lastPlaylistName: String = "default",
     val autoScrollNextTrack: Boolean = false,
     val useTrackImageAsBackground: Boolean = true,

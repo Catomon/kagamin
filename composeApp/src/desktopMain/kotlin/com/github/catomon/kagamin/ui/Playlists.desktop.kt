@@ -280,7 +280,7 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                                 },
                                 modifier = Modifier.padding(2.dp).dragAndDropTarget(
                                     {
-                                        true
+                                        tracksDropTarget.shouldStartDaD(it)
                                     },
                                     tracksDropTarget
                                 ).trackDropTargetBorder(tracksDropTarget.isTarget)
@@ -315,6 +315,9 @@ fun Modifier.trackDropTargetBorder(isTarget: Boolean): Modifier = then(
 class TracksDropTarget(val onTracksDrop: (List<String>) -> Unit) : DragAndDropTarget {
     var isTarget by mutableStateOf(false)
 
+
+    fun shouldStartDaD(event: DragAndDropEvent) = event.getString().startsWith("tracks:")
+
     override fun onExited(event: DragAndDropEvent) {
         isTarget = false
     }
@@ -324,16 +327,24 @@ class TracksDropTarget(val onTracksDrop: (List<String>) -> Unit) : DragAndDropTa
     }
 
     @OptIn(ExperimentalComposeUiApi::class)
+    fun DragAndDropEvent.getTracks() =
+        getString().replaceFirst("tracks:", "").split("/")
+
+    @OptIn(ExperimentalComposeUiApi::class)
     override fun onDrop(event: DragAndDropEvent): Boolean {
-        val data = event.awtTransferable.let {
-            if (it.isDataFlavorSupported(DataFlavor.stringFlavor))
-                it.getTransferData(DataFlavor.stringFlavor) as String
-            else
-                it.transferDataFlavors.first().humanPresentableName
-        }.split("/")
+        val data = event.getTracks()
 
         onTracksDrop(data)
 
         return true
     }
 }
+
+@OptIn(ExperimentalComposeUiApi::class)
+fun DragAndDropEvent.getString(): String =
+    awtTransferable.let {
+        if (it.isDataFlavorSupported(DataFlavor.stringFlavor))
+            it.getTransferData(DataFlavor.stringFlavor) as String
+        else
+            it.transferDataFlavors.first().humanPresentableName
+    }

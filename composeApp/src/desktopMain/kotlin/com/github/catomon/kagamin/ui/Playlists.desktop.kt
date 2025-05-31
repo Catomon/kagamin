@@ -336,6 +336,7 @@ class TracksDropTarget(val onTracksDrop: (List<String>) -> Unit) : DragAndDropTa
 
         onTracksDrop(data)
 
+        isTarget = false
         return true
     }
 }

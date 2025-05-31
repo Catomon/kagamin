@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
@@ -46,6 +47,8 @@ import androidx.compose.ui.unit.toIntSize
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.github.catomon.kagamin.audio.AudioPlayerManager
+import com.github.catomon.kagamin.data.Playlist
+import com.github.catomon.kagamin.data.SortType
 import com.github.catomon.kagamin.ui.MediaFolder
 import com.github.catomon.kagamin.ui.Menu
 import com.github.catomon.kagamin.ui.Playlists
@@ -64,6 +67,10 @@ import com.github.catomon.kagamin.util.echoTrace
 import com.github.catomon.kagamin.util.echoTraceFiltered
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.media_folder
+import kagamin.composeapp.generated.resources.sorting_artist
+import kagamin.composeapp.generated.resources.sorting_default
+import kagamin.composeapp.generated.resources.sorting_duration
+import kagamin.composeapp.generated.resources.sorting_title
 import kagamin.composeapp.generated.resources.star_angled
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -129,10 +136,8 @@ fun ControlsBottomPlayerScreen(
 
                 val tracklistWeight = if (viewModel.settings.showMediaFolderPane) 0.40f else 60f
 
-                //todo fix animation enter = fadeIn() + slideInHorizontally(), exit = fadeOut() + slideOutHorizontally()
                 if (isMediaFolderPaneVisible)
                     MediaFolder(viewModel, Modifier.fillMaxHeight().weight(plWeight))
-
 
                 Playlists(
                     viewModel,
@@ -213,6 +218,8 @@ fun ControlsBottomPlayerScreen(
                         )
                     }
 
+                    SortingToggleButton(currentPlaylist, viewModel)
+
                     VolumeOptions(
                         volume = volume,
                         onVolumeChange = { newVolume ->
@@ -263,6 +270,31 @@ fun ControlsBottomPlayerScreen(
 }
 
 @Composable
+fun SortingToggleButton(
+    currentPlaylist: Playlist,
+    viewModel: KagaminViewModel
+) {
+    IconButton({
+        val sortEntries = SortType.entries
+        val next = sortEntries.indexOf(currentPlaylist.sortType) + 1
+        viewModel.updatePlaylist(currentPlaylist.copy(sortType = sortEntries[if (next < sortEntries.size) next else 0]))
+    }) {
+        Icon(
+            painterResource(
+                when (currentPlaylist.sortType) {
+                    SortType.ORDER -> Res.drawable.sorting_default
+                    SortType.TITLE -> Res.drawable.sorting_title
+                    SortType.ARTIST -> Res.drawable.sorting_artist
+                    SortType.DURATION -> Res.drawable.sorting_duration
+                }
+            ),
+            contentDescription = null,
+            tint = KagaminTheme.colors.buttonIcon,
+        )
+    }
+}
+
+@Composable
 private fun AnimatedPlayPauseButton(
     coroutineScope: CoroutineScope,
     viewModel: KagaminViewModel,
@@ -296,7 +328,7 @@ private fun AnimatedPlayPauseButton(
                 drawImage(
                     image = starImage,
                     dstOffset = IntOffset(offsetX.roundToInt(), offsetY.roundToInt()),
-                    dstSize = androidx.compose.ui.geometry.Size(scaledWidth, scaledHeight)
+                    dstSize = Size(scaledWidth, scaledHeight)
                         .toIntSize(),
                     blendMode = BlendMode.DstOut
                 )

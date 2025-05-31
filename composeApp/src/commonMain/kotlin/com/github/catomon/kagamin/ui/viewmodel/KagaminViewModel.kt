@@ -11,6 +11,7 @@ import com.github.catomon.kagamin.audio.PlaylistsManager
 import com.github.catomon.kagamin.data.AudioTrack
 import com.github.catomon.kagamin.data.Playlist
 import com.github.catomon.kagamin.data.PlaylistsLoader
+import com.github.catomon.kagamin.data.SortType
 import com.github.catomon.kagamin.data.loadSettings
 import com.github.catomon.kagamin.data.saveSettings
 import com.github.catomon.kagamin.ui.util.Tabs
@@ -265,7 +266,8 @@ class KagaminViewModel(
     fun shufflePlaylist(playlist: Playlist) {
         updatePlaylist(
             playlist.copy(
-                tracks = playlist.tracks.shuffled()
+                tracks = playlist.tracks.shuffled(),
+                sortType = SortType.ORDER
             )
         )
     }

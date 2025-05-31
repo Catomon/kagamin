@@ -1,5 +1,6 @@
 package com.github.catomon.kagamin.audio
 
+import com.github.catomon.kagamin.AudioTagsReader
 import com.github.catomon.kagamin.data.AudioTrack
 import com.github.catomon.kagamin.data.cache.ThumbnailCacheManager
 import com.github.catomon.kagamin.filterAudioFiles
@@ -106,17 +107,11 @@ class AudioPlayerServiceImpl(
             val loadedTracks = withContext(Dispatchers.IO) {
                 trackFiles.map { audioFile ->
                     val path = audioFile.path
-                    val (tag: Tag?, audioHeader: AudioHeader?) = try {
-                        if (audioFile.extension == "m4a") //TODO
-                            null to null
-                        else
-                            AudioFileIO.read(audioFile)
-                                .let {
-                                    it.tag to it.audioHeader
-                                }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        null to null
+                    val audioHeader: AudioHeader?
+                    val tag: Tag?
+                    AudioTagsReader.read(audioFile).let {
+                        audioHeader = it?.header
+                        tag = it?.tag
                     }
 
                     cachingScope.launch {

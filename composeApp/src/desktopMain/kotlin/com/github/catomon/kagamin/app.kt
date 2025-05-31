@@ -367,6 +367,44 @@ fun createTrackDragAndDropTarget(
     }
 }
 
+class AudioTagsReader private constructor(
+    val header: AudioHeader?,
+    val tag: Tag?,
+) {
+    companion object {
+        val supportedExtensions = listOf(
+            "mp3",
+            "flac",
+            "ogg",
+            "mp4",
+            "aiff",
+            "wav",
+            "wma",
+            "dsf",
+            "opus",
+        )
+
+        fun isFormatSupported(ext: String) =
+            ext.lowercase() in supportedExtensions
+
+        fun read(file: File): AudioTagsReader? =
+            try {
+                if (isFormatSupported(file.extension)) {
+                    val audioFile = AudioFileIO.read(file)
+                    AudioTagsReader(audioFile.audioHeader, audioFile.tag)
+                } else {
+                    null
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+    }
+
+    operator fun component1() = header
+    operator fun component2() = tag
+}
+
 @OptIn(ExperimentalUuidApi::class)
 suspend fun loadTrackFilesToCurrentPlaylist(
     files: List<File>,
@@ -411,17 +449,11 @@ suspend fun loadTrackFilesToCurrentPlaylist(
             trackFiles.map { audioFile ->
                 val path = audioFile.path
 
-                val (tag: Tag?, audioHeader: AudioHeader?) = try {
-                    if (audioFile.extension == "m4a") //TODO
-                        null to null
-                    else
-                        AudioFileIO.read(audioFile)
-                            .let {
-                                it.tag to it.audioHeader
-                            }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    null to null
+                val audioHeader: AudioHeader?
+                val tag: Tag?
+                AudioTagsReader.read(audioFile).let {
+                    audioHeader = it?.header
+                    tag = it?.tag
                 }
 
                 cachingScope.launch {

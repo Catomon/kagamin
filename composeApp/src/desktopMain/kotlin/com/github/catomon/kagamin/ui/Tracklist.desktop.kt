@@ -66,6 +66,7 @@ import androidx.lifecycle.viewModelScope
 import com.github.catomon.kagamin.LocalWindow
 import com.github.catomon.kagamin.audio.PlaylistsManager
 import com.github.catomon.kagamin.data.AudioTrack
+import com.github.catomon.kagamin.data.SortType
 import com.github.catomon.kagamin.ui.components.TrackProgressIndicator
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.formatMillisToMinutesSeconds
@@ -78,6 +79,16 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.painterResource
+
+private fun List<AudioTrack>.sorted(sortType: SortType): List<AudioTrack> {
+    val tracks = this
+    return when (sortType) {
+        SortType.ORDER -> tracks
+        SortType.TITLE -> tracks.sortedBy { it.title }
+        SortType.ARTIST -> tracks.sortedBy { it.artist }
+        SortType.DURATION -> tracks.sortedByDescending { it.duration }
+    }
+}
 
 @Composable
 fun Tracklist(
@@ -99,9 +110,9 @@ fun Tracklist(
     var filteredTracks by remember { mutableStateOf<List<AudioTrack>?>(null) }
 
     LaunchedEffect(currentPlaylist, filterName) {
-        withContext(Dispatchers.Default) {
-            filteredTracks = if (filterName.isNotBlank()) {
-                currentPlaylist.tracks.filter {
+        filteredTracks = withContext(Dispatchers.Default) {
+            if (filterName.isNotBlank()) {
+                currentPlaylist.tracks.sorted(currentPlaylist.sortType).filter {
                     it.title.lowercase().contains(filterName.lowercase())
                 }
             } else {
@@ -115,7 +126,7 @@ fun Tracklist(
         allowAutoScroll = true
     }
 
-    LaunchedEffect(currentPlaylist.id) {
+    LaunchedEffect(currentPlaylist.id, currentPlaylist.sortType) {
         listState.scrollToItem(index[currentTrack?.uri] ?: 0)
     }
 
@@ -150,7 +161,7 @@ fun Tracklist(
             Column(Modifier.fillMaxSize()) {
                 val tracks by remember {
                     derivedStateOf {
-                        filteredTracks ?: currentPlaylist.tracks //todo sorting
+                        filteredTracks ?: currentPlaylist.tracks.sorted(currentPlaylist.sortType)
                     }
                 }
 

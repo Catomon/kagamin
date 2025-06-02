@@ -1,5 +1,6 @@
 package com.github.catomon.kagamin.ui.screens
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -8,6 +9,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.draganddrop.dragAndDropTarget
@@ -30,16 +32,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.CompositingStrategy
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -47,6 +46,7 @@ import androidx.compose.ui.unit.toIntSize
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.github.catomon.kagamin.audio.AudioPlayerManager
+import com.github.catomon.kagamin.audio.AudioPlayerService
 import com.github.catomon.kagamin.data.Playlist
 import com.github.catomon.kagamin.data.SortType
 import com.github.catomon.kagamin.ui.MediaFolder
@@ -56,7 +56,6 @@ import com.github.catomon.kagamin.ui.Tracklist
 import com.github.catomon.kagamin.ui.TracksDropTarget
 import com.github.catomon.kagamin.ui.components.AppLogo
 import com.github.catomon.kagamin.ui.components.CurrentTrackFrameHorizontal
-import com.github.catomon.kagamin.ui.components.PlayPauseButton
 import com.github.catomon.kagamin.ui.components.PlaybackModeToggleButton
 import com.github.catomon.kagamin.ui.components.PrevNextTrackButtons
 import com.github.catomon.kagamin.ui.components.VolumeOptions
@@ -67,12 +66,13 @@ import com.github.catomon.kagamin.util.echoTrace
 import com.github.catomon.kagamin.util.echoTraceFiltered
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.media_folder
+import kagamin.composeapp.generated.resources.pause
+import kagamin.composeapp.generated.resources.play
 import kagamin.composeapp.generated.resources.sorting_artist
 import kagamin.composeapp.generated.resources.sorting_default
 import kagamin.composeapp.generated.resources.sorting_duration
 import kagamin.composeapp.generated.resources.sorting_title
 import kagamin.composeapp.generated.resources.star_angled
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.imageResource
@@ -90,7 +90,6 @@ fun ControlsBottomPlayerScreen(
     val currentTrack by viewModel.currentTrack.collectAsState()
     val currentPlaylist by viewModel.currentPlaylist.collectAsState()
     val volume by viewModel.volume.collectAsState()
-    val coroutineScope = rememberCoroutineScope()
     val playMode by viewModel.playMode.collectAsState()
 
     var isMenuOpen by remember { mutableStateOf(false) }
@@ -125,7 +124,6 @@ fun ControlsBottomPlayerScreen(
 //                }
 
                 AnimatedPlayPauseButton(
-                    coroutineScope,
                     viewModel,
                     Modifier.align(Alignment.CenterEnd).padding(end = 24.dp)
                 )
@@ -296,7 +294,6 @@ fun SortingToggleButton(
 
 @Composable
 private fun AnimatedPlayPauseButton(
-    coroutineScope: CoroutineScope,
     viewModel: KagaminViewModel,
     modifier: Modifier = Modifier
 ) {
@@ -304,17 +301,21 @@ private fun AnimatedPlayPauseButton(
 
     val flow by AudioPlayerManager.amplitudeChannel.receiveAsFlow().collectAsState(1f)
     val targetScaleAnimated by animateFloatAsState(
-        1f + flow, animationSpec = tween(
+        1f + flow * 1.25f, animationSpec = tween(
             durationMillis = 100,
             easing = LinearEasing
         )
     )
 
+    val playState by viewModel.playState.collectAsState()
+
     val starImage = imageResource(Res.drawable.star_angled)
+
+    val buttonsSize = 48.dp
 
     Box(
         modifier = modifier
-            .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+            //.graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
             .drawWithContent {
                 drawContent()
 
@@ -330,13 +331,31 @@ private fun AnimatedPlayPauseButton(
                     dstOffset = IntOffset(offsetX.roundToInt(), offsetY.roundToInt()),
                     dstSize = Size(scaledWidth, scaledHeight)
                         .toIntSize(),
-                    blendMode = BlendMode.DstOut
+                    //blendMode = BlendMode.DstOut
                 )
             }
     ) {
-        PlayPauseButton(
-            viewModel,
-            buttonsSize = 48.dp,
-        )
+        IconButton(
+            modifier = Modifier.size(buttonsSize * 1.25f),
+            onClick = viewModel::onPlayPause
+        ) {
+            AnimatedContent(playState, transitionSpec = { fadeIn() togetherWith fadeOut() }) { playState ->
+                if (playState != AudioPlayerService.PlayState.PLAYING) {
+                    Icon(
+                        painterResource(Res.drawable.play),
+                        "Play",
+                        modifier = Modifier.size(buttonsSize * 1.25f),
+                        tint = KagaminTheme.colors.buttonIcon
+                    )
+                } else {
+                    Icon(
+                        painterResource(Res.drawable.pause),
+                        "Pause",
+                        modifier = Modifier.size(buttonsSize * 1.25f),
+                        tint = if (playState != AudioPlayerService.PlayState.PLAYING) KagaminTheme.colors.buttonIcon else Color.Transparent
+                    )
+                }
+            }
+        }
     }
 }

@@ -140,37 +140,3 @@ fun PrevNextTrackButtons(
         }
     }
 }
-
-@Composable
-fun PlayPauseButton(
-    viewModel: KagaminViewModel,
-    buttonsSize: Dp = 32.dp,
-    modifier: Modifier = Modifier
-) {
-    val playState by viewModel.playState.collectAsState()
-
-    IconButton(
-        modifier = modifier.size(buttonsSize * 1.25f),
-        onClick = {
-            viewModel.onPlayPause()
-        }
-    ) {
-        AnimatedContent(playState) { playState ->
-            if (playState != AudioPlayerService.PlayState.PLAYING) {
-                Icon(
-                    painterResource(Res.drawable.play),
-                    "Play",
-                    modifier = Modifier.size(buttonsSize * 1.25f),
-                    tint = KagaminTheme.colors.buttonIcon
-                )
-            } else {
-                Icon(
-                    painterResource(Res.drawable.pause),
-                    "Pause",
-                    modifier = Modifier.size(buttonsSize * 1.25f),
-                    tint = KagaminTheme.colors.buttonIcon
-                )
-            }
-        }
-    }
-}

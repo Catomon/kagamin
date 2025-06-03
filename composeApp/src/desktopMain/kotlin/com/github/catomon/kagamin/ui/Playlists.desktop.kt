@@ -241,8 +241,9 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                             val tracksDropTarget = remember {
                                 TracksDropTarget { tracksUris ->
                                     viewModel.viewModelScope.launch {
-                                        val track = viewModel.loadTracks(tracksUris)
-                                        viewModel.updatePlaylist(playlist.copy(tracks = playlist.tracks + track))
+                                        val tracks = viewModel.loadTracks(tracksUris)
+                                        val uris = tracks.map { it.uri }
+                                        viewModel.updatePlaylist(currentPlaylist.copy(tracks = currentPlaylist.tracks.filter { it.uri !in uris } + tracks))
                                     }
                                 }
                             }
@@ -316,7 +317,9 @@ class TracksDropTarget(val onTracksDrop: (List<String>) -> Unit) : DragAndDropTa
     var isTarget by mutableStateOf(false)
 
 
-    fun shouldStartDaD(event: DragAndDropEvent) = event.getString().startsWith("tracks:")
+    fun shouldStartDaD(event: DragAndDropEvent) = event.getString().run {
+        startsWith("tracks:") || startsWith("https")
+    }
 
     override fun onExited(event: DragAndDropEvent) {
         isTarget = false
@@ -327,8 +330,14 @@ class TracksDropTarget(val onTracksDrop: (List<String>) -> Unit) : DragAndDropTa
     }
 
     @OptIn(ExperimentalComposeUiApi::class)
-    fun DragAndDropEvent.getTracks() =
-        getString().replaceFirst("tracks:", "").split("/")
+    fun DragAndDropEvent.getTracks(): List<String> {
+        val data = getString()
+        return if (data.startsWith("tracks:")) {
+            data.replaceFirst("tracks:", "").split("/")
+        } else {
+            listOf(data)
+        }
+    }
 
     @OptIn(ExperimentalComposeUiApi::class)
     override fun onDrop(event: DragAndDropEvent): Boolean {

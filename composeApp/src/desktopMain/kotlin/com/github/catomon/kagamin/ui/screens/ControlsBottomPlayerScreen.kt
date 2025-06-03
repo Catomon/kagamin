@@ -301,7 +301,7 @@ private fun AnimatedPlayPauseButton(
 
     val flow by AudioPlayerManager.amplitudeChannel.receiveAsFlow().collectAsState(1f)
     val targetScaleAnimated by animateFloatAsState(
-        1f + flow * 1.25f, animationSpec = tween(
+        1f + flow * 1.20f, animationSpec = tween(
             durationMillis = 100,
             easing = LinearEasing
         )

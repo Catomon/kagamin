@@ -14,6 +14,7 @@ import com.github.catomon.kagamin.util.echoWarn
 import io.github.vinceglb.filekit.FileKit
 import okio.Path.Companion.toOkioPath
 import org.jaudiotagger.tag.id3.AbstractID3Tag
+import org.jetbrains.skiko.GraphicsApi
 import org.koin.core.context.GlobalContext.startKoin
 import java.util.logging.Level
 import javax.swing.JOptionPane
@@ -68,15 +69,16 @@ private fun setDefaultExceptionHandler() {
 private fun setRenderApi() {
     try {
         if (osName.contains("win")) {
-            System.setProperty("skiko.renderApi", "OPENGL")
-            echoMsg("skiko.renderApi = OPENGL")
+            val renderApi = GraphicsApi.OPENGL.name
+            System.setProperty("skiko.renderApi", renderApi)
+            echoMsg { "skiko.renderApi = $renderApi" }
         } else {
-            System.setProperty("skiko.renderApi", "SOFTWARE_FAST")
-            echoMsg("skiko.renderApi = SOFTWARE_FAST")
+            System.setProperty("skiko.renderApi", GraphicsApi.SOFTWARE_FAST.name)
+            echoMsg { "skiko.renderApi = ${GraphicsApi.SOFTWARE_FAST.name}" }
         }
         WindowConfig.isTransparent = true
     } catch (e: Exception) {
-        echoWarn("Could not set render api. The window may not have transparency.")
+        echoWarn { "Could not set desired render api. The window may not have transparency." }
         e.printStackTrace()
     }
 }

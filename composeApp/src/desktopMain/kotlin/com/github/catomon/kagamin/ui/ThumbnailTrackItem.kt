@@ -83,7 +83,7 @@ fun ThumbnailTrackItem(
     val snackbar = LocalSnackbarHostState.current
     val backgroundColor = KagaminTheme.colors.listItem
 
-    val height = 48.dp
+    val height = 64.dp
 
     ContextMenuArea(items = {
         ThumbnailTrackItemDefaults.contextMenuItems(
@@ -110,7 +110,7 @@ fun ThumbnailTrackItem(
                 Row(Modifier.weight(1f)) {
                     TrackThumbnail(
                         track,
-                        modifier = Modifier.width(48.dp),
+                        modifier = Modifier.width(height),
                         shape = RoundedCornerShape(8.dp),
                         height = ThumbnailCacheManager.SIZE.H64
                     )
@@ -167,8 +167,8 @@ private fun TrackItemBody(
                 modifier = Modifier.let { if (isHovered) it.basicMarquee(iterations = Int.MAX_VALUE) else it }
             )
 
-            //TODO if (size == 48)
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            //if (size < 64)
+//            Row(verticalAlignment = Alignment.CenterVertically) {
                 if (track.artist.isNotBlank())
                     Text(
                         track.artist,
@@ -179,7 +179,7 @@ private fun TrackItemBody(
                         lineHeight = 16.sp
                     )
 
-                Spacer(Modifier.width(4.dp))
+//                Spacer(Modifier.width(4.dp))
 
                 if (track.duration >= 0)
                     Text(
@@ -190,7 +190,7 @@ private fun TrackItemBody(
                         modifier = Modifier.let { if (isHovered) it.basicMarquee(iterations = Int.MAX_VALUE) else it },
                         lineHeight = 16.sp
                     )
-            }
+//            }
         }
 
         Row(

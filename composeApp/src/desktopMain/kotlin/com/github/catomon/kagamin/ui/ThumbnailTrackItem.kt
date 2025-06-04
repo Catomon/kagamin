@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,6 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -81,7 +83,7 @@ fun ThumbnailTrackItem(
     val snackbar = LocalSnackbarHostState.current
     val backgroundColor = KagaminTheme.colors.listItem
 
-    val height = 64.dp
+    val height = 48.dp
 
     ContextMenuArea(items = {
         ThumbnailTrackItemDefaults.contextMenuItems(
@@ -108,7 +110,7 @@ fun ThumbnailTrackItem(
                 Row(Modifier.weight(1f)) {
                     TrackThumbnail(
                         track,
-                        modifier = Modifier.width(64.dp),
+                        modifier = Modifier.width(48.dp),
                         shape = RoundedCornerShape(8.dp),
                         height = ThumbnailCacheManager.SIZE.H64
                     )
@@ -165,25 +167,30 @@ private fun TrackItemBody(
                 modifier = Modifier.let { if (isHovered) it.basicMarquee(iterations = Int.MAX_VALUE) else it }
             )
 
-            if (track.artist.isNotBlank())
-                Text(
-                    track.artist,
-                    fontSize = 8.sp,
-                    color = KagaminTheme.textSecondary,
-                    maxLines = 1,
-                    modifier = Modifier.let { if (isHovered) it.basicMarquee(iterations = Int.MAX_VALUE) else it },
-                    lineHeight = 16.sp
-                )
+            //TODO if (size == 48)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (track.artist.isNotBlank())
+                    Text(
+                        track.artist,
+                        fontSize = 8.sp,
+                        color = KagaminTheme.textSecondary,
+                        maxLines = 1,
+                        modifier = Modifier.let { if (isHovered) it.basicMarquee(iterations = Int.MAX_VALUE) else it },
+                        lineHeight = 16.sp
+                    )
 
-            if (track.duration >= 0)
-                Text(
-                    remember { formatMillisToMinutesSeconds(track.duration) },
-                    fontSize = 8.sp,
-                    color = KagaminTheme.textSecondary,
-                    maxLines = 1,
-                    modifier = Modifier.let { if (isHovered) it.basicMarquee(iterations = Int.MAX_VALUE) else it },
-                    lineHeight = 16.sp
-                )
+                Spacer(Modifier.width(4.dp))
+
+                if (track.duration >= 0)
+                    Text(
+                        remember { formatMillisToMinutesSeconds(track.duration) },
+                        fontSize = 8.sp,
+                        color = KagaminTheme.textSecondary,
+                        maxLines = 1,
+                        modifier = Modifier.let { if (isHovered) it.basicMarquee(iterations = Int.MAX_VALUE) else it },
+                        lineHeight = 16.sp
+                    )
+            }
         }
 
         Row(

@@ -71,7 +71,7 @@ fun CurrentTrackFrameHorizontal(track: AudioTrack?, modifier: Modifier = Modifie
 
                 if (track.duration >= 0)
                     Text(
-                        remember { formatMillisToMinutesSeconds(track.duration) },
+                        remember(track) { formatMillisToMinutesSeconds(track.duration) },
                         fontSize = 10.sp,
                         color = KagaminTheme.textSecondary,
                         maxLines = 1,

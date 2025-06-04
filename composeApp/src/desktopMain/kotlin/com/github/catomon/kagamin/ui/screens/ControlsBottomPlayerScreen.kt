@@ -62,6 +62,7 @@ import com.github.catomon.kagamin.ui.components.VolumeOptions
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.trackDropTargetBorder
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
+import com.github.catomon.kagamin.util.alsoPrintIt
 import com.github.catomon.kagamin.util.echoTrace
 import com.github.catomon.kagamin.util.echoTraceFiltered
 import kagamin.composeapp.generated.resources.Res
@@ -301,7 +302,7 @@ private fun AnimatedPlayPauseButton(
 
     val flow by AudioPlayerManager.amplitudeChannel.receiveAsFlow().collectAsState(1f)
     val targetScaleAnimated by animateFloatAsState(
-        1f + flow * 1.20f, animationSpec = tween(
+        1f + flow / Math.clamp(viewModel.volume.value.alsoPrintIt(), 0.025f, 1f) * 0.8f, animationSpec = tween(
             durationMillis = 100,
             easing = LinearEasing
         )

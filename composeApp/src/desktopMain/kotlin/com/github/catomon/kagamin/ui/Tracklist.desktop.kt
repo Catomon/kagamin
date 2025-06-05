@@ -88,8 +88,8 @@ fun Tracklist(
     val currentPlaylist by viewModel.currentPlaylist.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val tracklistManager = remember { TracklistManager(coroutineScope) }
-    var indexed by remember(currentPlaylist) {
-        mutableStateOf(emptyMap<String, Int>())
+    var indexed = remember(currentPlaylist) {
+        currentPlaylist.tracks.mapIndexed { i, track -> (track.uri to i) }.toMap()
     }
     val currentTrack by viewModel.currentTrack.collectAsState()
     val listState = rememberLazyListState()
@@ -110,10 +110,10 @@ fun Tracklist(
             }
         }
 
-        indexed = withContext(Dispatchers.Default) {
-            filteredTracks?.mapIndexed { i, track -> (track.uri to i) }?.toMap()
-                ?: currentPlaylist.tracks.mapIndexed { i, track -> (track.uri to i) }.toMap()
-        }
+//        indexed = withContext(Dispatchers.Default) {
+//            filteredTracks?.mapIndexed { i, track -> (track.uri to i) }?.toMap()
+//                ?: currentPlaylist.tracks.mapIndexed { i, track -> (track.uri to i) }.toMap()
+//        }
     }
 
     LaunchedEffect(allowAutoScroll) {

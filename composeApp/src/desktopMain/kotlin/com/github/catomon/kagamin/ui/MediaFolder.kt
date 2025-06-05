@@ -192,7 +192,7 @@ fun FolderItem(file: File, modifier: Modifier = Modifier) {
         )
 
         Text(
-            file.nameWithoutExtension,
+            if (file.isDirectory) file.name else file.nameWithoutExtension,
             fontSize = 10.sp,
             //color = KagaminTheme.colors.buttonIcon,
             maxLines = 1,

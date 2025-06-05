@@ -64,7 +64,7 @@ sealed class KagaminColors(
         name = "yuki",
         behindBackground = Color(0xffffbecf),
 //        listItem = Color(0xcb753cc9),
-        listItem = Color(0xcdffc3d2),
+        listItem = Color(0xcdff98b3),
         disabled = Color(0xcdc44a7c),
         text = Color(0xFFFFFFFF),
         textSecondary = Color(0xFFFFE1EA),

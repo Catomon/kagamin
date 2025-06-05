@@ -62,7 +62,6 @@ import com.github.catomon.kagamin.ui.components.VolumeOptions
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.trackDropTargetBorder
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
-import com.github.catomon.kagamin.util.alsoPrintIt
 import com.github.catomon.kagamin.util.echoTrace
 import com.github.catomon.kagamin.util.echoTraceFiltered
 import kagamin.composeapp.generated.resources.Res
@@ -70,6 +69,7 @@ import kagamin.composeapp.generated.resources.media_folder
 import kagamin.composeapp.generated.resources.pause
 import kagamin.composeapp.generated.resources.play
 import kagamin.composeapp.generated.resources.sorting_artist
+import kagamin.composeapp.generated.resources.sorting_date_time
 import kagamin.composeapp.generated.resources.sorting_default
 import kagamin.composeapp.generated.resources.sorting_duration
 import kagamin.composeapp.generated.resources.sorting_title
@@ -146,9 +146,9 @@ fun ControlsBottomPlayerScreen(
                 val tracksDropTarget = remember {
                     TracksDropTarget { tracksUris ->
                         viewModel.viewModelScope.launch {
-                            val tracks = viewModel.loadTracks(tracksUris)
-                            val uris = tracks.map { it.uri }
-                            viewModel.updatePlaylist(currentPlaylist.copy(tracks = currentPlaylist.tracks.filter { it.uri !in uris } + tracks))
+                            val loadedTracks = viewModel.loadTracks(tracksUris)
+                            val loadedUris = loadedTracks.map { it.uri }
+                            viewModel.updatePlaylist(currentPlaylist.copy(tracks = loadedTracks + currentPlaylist.tracks.filter { it.uri !in loadedUris }))
                         }
                     }
                 }
@@ -274,9 +274,7 @@ fun SortingToggleButton(
     viewModel: KagaminViewModel
 ) {
     IconButton({
-        val sortEntries = SortType.entries
-        val next = sortEntries.indexOf(currentPlaylist.sortType) + 1
-        viewModel.updatePlaylist(currentPlaylist.copy(sortType = sortEntries[if (next < sortEntries.size) next else 0]))
+        viewModel.toggleSorting()
     }) {
         Icon(
             painterResource(
@@ -285,6 +283,7 @@ fun SortingToggleButton(
                     SortType.TITLE -> Res.drawable.sorting_title
                     SortType.ARTIST -> Res.drawable.sorting_artist
                     SortType.DURATION -> Res.drawable.sorting_duration
+                    SortType.DATE_TIME -> Res.drawable.sorting_date_time
                 }
             ),
             contentDescription = null,
@@ -302,7 +301,7 @@ private fun AnimatedPlayPauseButton(
 
     val flow by AudioPlayerManager.amplitudeChannel.receiveAsFlow().collectAsState(1f)
     val targetScaleAnimated by animateFloatAsState(
-        1f + flow / Math.clamp(viewModel.volume.value.alsoPrintIt(), 0.025f, 1f) * 0.8f, animationSpec = tween(
+        Math.clamp(1f + flow / Math.clamp(viewModel.volume.value, 0.01f, 1f) * 0.6f, 1f, 3f), animationSpec = tween(
             durationMillis = 100,
             easing = LinearEasing
         )

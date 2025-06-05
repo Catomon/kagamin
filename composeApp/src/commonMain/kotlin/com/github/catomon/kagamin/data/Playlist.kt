@@ -17,4 +17,5 @@ enum class SortType {
     TITLE,
     ARTIST,
     DURATION,
+    DATE_TIME,
 }

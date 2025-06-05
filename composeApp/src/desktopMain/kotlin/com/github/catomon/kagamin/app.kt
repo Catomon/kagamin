@@ -499,7 +499,7 @@ suspend fun loadTrackFilesToCurrentPlaylist(
 
         if (uniqueTracks.isNotEmpty()) {
             val updatedPlaylist =
-                kagaminViewModel.currentPlaylist.value.copy(tracks = currentTracks + uniqueTracks)
+                kagaminViewModel.currentPlaylist.value.copy(tracks = uniqueTracks + currentTracks)
 
             withContext(Dispatchers.IO) {
                 PlaylistsLoader.savePlaylist(updatedPlaylist)

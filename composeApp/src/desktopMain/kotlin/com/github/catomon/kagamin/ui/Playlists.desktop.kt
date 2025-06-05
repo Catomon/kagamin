@@ -243,7 +243,7 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                                     viewModel.viewModelScope.launch {
                                         val tracks = viewModel.loadTracks(tracksUris)
                                         val uris = tracks.map { it.uri }
-                                        viewModel.updatePlaylist(currentPlaylist.copy(tracks = currentPlaylist.tracks.filter { it.uri !in uris } + tracks))
+                                        viewModel.updatePlaylist(currentPlaylist.copy(tracks = tracks + currentPlaylist.tracks.filter { it.uri !in uris }))
                                     }
                                 }
                             }

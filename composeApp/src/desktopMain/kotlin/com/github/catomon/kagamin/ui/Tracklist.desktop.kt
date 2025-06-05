@@ -66,7 +66,6 @@ import androidx.lifecycle.viewModelScope
 import com.github.catomon.kagamin.LocalWindow
 import com.github.catomon.kagamin.audio.PlaylistsManager
 import com.github.catomon.kagamin.data.AudioTrack
-import com.github.catomon.kagamin.data.SortType
 import com.github.catomon.kagamin.ui.components.TrackProgressIndicator
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.formatMillisToMinutesSeconds
@@ -80,16 +79,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.painterResource
 
-private fun List<AudioTrack>.sorted(sortType: SortType): List<AudioTrack> {
-    val tracks = this
-    return when (sortType) {
-        SortType.ORDER -> tracks
-        SortType.TITLE -> tracks.sortedBy { it.title }
-        SortType.ARTIST -> tracks.sortedBy { it.artist }
-        SortType.DURATION -> tracks.sortedByDescending { it.duration }
-    }
-}
-
 @Composable
 fun Tracklist(
     viewModel: KagaminViewModel, modifier: Modifier = Modifier
@@ -99,8 +88,8 @@ fun Tracklist(
     val currentPlaylist by viewModel.currentPlaylist.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val tracklistManager = remember { TracklistManager(coroutineScope) }
-    val index = remember(currentPlaylist) {
-        currentPlaylist.tracks.mapIndexed { i, track -> (track.uri to i) }.toMap()
+    var indexed by remember(currentPlaylist) {
+        mutableStateOf(emptyMap<String, Int>())
     }
     val currentTrack by viewModel.currentTrack.collectAsState()
     val listState = rememberLazyListState()
@@ -112,12 +101,18 @@ fun Tracklist(
     LaunchedEffect(currentPlaylist, filterName) {
         filteredTracks = withContext(Dispatchers.Default) {
             if (filterName.isNotBlank()) {
-                currentPlaylist.tracks.sorted(currentPlaylist.sortType).filter {
+                currentPlaylist.tracks.filter {
                     it.title.lowercase().contains(filterName.lowercase())
+                            || it.artist.lowercase().contains(filterName.lowercase())
                 }
             } else {
                 null
             }
+        }
+
+        indexed = withContext(Dispatchers.Default) {
+            filteredTracks?.mapIndexed { i, track -> (track.uri to i) }?.toMap()
+                ?: currentPlaylist.tracks.mapIndexed { i, track -> (track.uri to i) }.toMap()
         }
     }
 
@@ -127,13 +122,13 @@ fun Tracklist(
     }
 
     LaunchedEffect(currentPlaylist.id, currentPlaylist.sortType) {
-        listState.scrollToItem(index[currentTrack?.uri] ?: 0)
+        listState.scrollToItem(indexed[currentTrack?.uri] ?: 0)
     }
 
     LaunchedEffect(currentTrack) {
         if (!window.isMinimized && viewModel.settings.autoScrollNextTrack && allowAutoScroll) {
             val nextIndex =
-                index[currentTrack?.uri ?: return@LaunchedEffect] ?: return@LaunchedEffect
+                indexed[currentTrack?.uri ?: return@LaunchedEffect] ?: return@LaunchedEffect
             if (viewModel.playMode.value == PlaylistsManager.PlayMode.RANDOM) listState.scrollToItem(
                 nextIndex
             )
@@ -143,7 +138,7 @@ fun Tracklist(
 
     Column(modifier) {
         TracklistHeader(currentTrack, viewModel = viewModel, onClick = onClick@{
-            val curTrackIndex = currentTrack?.let { index[it.uri] } ?: return@onClick
+            val curTrackIndex = currentTrack?.let { indexed[it.uri] } ?: return@onClick
             coroutineScope.launch {
                 listState.animateScrollToItem(curTrackIndex)
             }
@@ -161,7 +156,7 @@ fun Tracklist(
             Column(Modifier.fillMaxSize()) {
                 val tracks by remember {
                     derivedStateOf {
-                        filteredTracks ?: currentPlaylist.tracks.sorted(currentPlaylist.sortType)
+                        filteredTracks ?: currentPlaylist.tracks
                     }
                 }
 

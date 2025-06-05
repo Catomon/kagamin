@@ -19,9 +19,12 @@ import com.github.catomon.kagamin.util.echoErr
 import com.github.catomon.kagamin.util.logErr
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 class KagaminViewModel(
     private val audioPlayerService: AudioPlayerService,
@@ -228,7 +231,7 @@ class KagaminViewModel(
 
             val loadedTracks = loadTracks(link)
             val loadedUris = loadedTracks.map { it.uri }
-            updatePlaylist(currentPlaylist.copy(tracks = currentPlaylist.tracks.filter { it.uri !in loadedUris } + loadedTracks))
+            updatePlaylist(currentPlaylist.copy(tracks = loadedTracks + currentPlaylist.tracks.filter { it.uri !in loadedUris }))
 
             isLoading = false
         }
@@ -306,6 +309,59 @@ class KagaminViewModel(
             PlaylistsManager.PlayMode.ONCE -> error("not planned")
         }
         playlistsManager.setPlayMode(playMode)
+    }
+
+    var isSorting by mutableStateOf(false)
+
+    fun toggleSorting() {
+        if (isSorting) return
+        viewModelScope.launch {
+            isSorting = true
+            val sortEntries = SortType.entries
+            val sort = (sortEntries.indexOf(currentPlaylist.value.sortType) + 1).let { nextIndex ->
+                sortEntries[if (nextIndex < sortEntries.size) nextIndex else 0]
+            }
+
+            val updatedPlaylist = currentPlaylist.value.copy(
+                sortType = sort,
+                tracks =
+                    withContext(Dispatchers.Default) {
+                        currentPlaylist.value.tracks.sorted(sort)
+                    }
+            )
+
+            updatePlaylist(updatedPlaylist)
+
+            isSorting = false
+        }
+    }
+
+    private suspend fun List<AudioTrack>.sorted(sortType: SortType): List<AudioTrack> {
+        val tracks = this
+        return when (sortType) {
+            SortType.ORDER -> tracks
+            SortType.TITLE -> tracks.sortedBy { it.title }
+            SortType.ARTIST -> tracks.sortedBy { it.artist }
+            SortType.DURATION -> tracks.sortedByDescending { it.duration }
+            SortType.DATE_TIME -> {
+                val trackTimestamps = withContext(Dispatchers.IO) {
+                    tracks.map { track ->
+                        async {
+                            val lastModified = try {
+                                File(track.uri).takeIf { it.exists() }?.lastModified() ?: 0L
+                            } catch (e: SecurityException) {
+                                0L
+                            }
+                            track to lastModified
+                        }
+                    }.awaitAll()
+                }
+
+                trackTimestamps
+                    .sortedByDescending { it.second }
+                    .map { it.first }
+            }
+        }
     }
 
     fun saveSettings() {

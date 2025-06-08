@@ -47,13 +47,13 @@ class AudioPlayerManager(
     val playingTrack: AudioTrack? get() = player.playingTrack
     val position: Long get() = playingTrack?.position ?: 0L
 
-    private var mVolume = 0.5f
+    private var _volume = 0.5f
 
     var crossfade = true
 
     companion object {
-        lateinit var amplitudeChannel: Channel<Float>
-            private set
+        private lateinit var _amplitudeChannel: () -> Channel<Float>
+        val  amplitudeChannel: Channel<Float> get() = _amplitudeChannel()
     }
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
@@ -66,7 +66,7 @@ class AudioPlayerManager(
 
         crossfadeJob?.cancel()
         players.first.player.volume = 0
-        players.second.player.volume = (50 * mVolume).toInt()
+        players.second.player.volume = (50 * _volume).toInt()
 
         crossfadeJob = coroutineScope.launch {
             val steps = 60
@@ -74,13 +74,13 @@ class AudioPlayerManager(
             for (step in 0..steps) {
                 val fraction = step / steps.toFloat()
 
-                players.first.player.volume = (50 * mVolume * fraction).toInt()
-                players.second.player.volume = (50 * mVolume).toInt() + (-50 * mVolume * fraction).toInt()
+                players.first.player.volume = (50 * _volume * fraction).toInt()
+                players.second.player.volume = (50 * _volume).toInt() + (-50 * _volume * fraction).toInt()
 
                 delay(delayPerStep)
             }
 
-            players.first.player.volume = (50 * mVolume).toInt()
+            players.first.player.volume = (50 * _volume).toInt()
             players.second.player.volume = 0
         }
     }
@@ -102,7 +102,7 @@ class AudioPlayerManager(
         startDiscordRich()
         discordRich(Rich.IDLE, null)
 
-        amplitudeChannel = playback.amplitudeChannel
+        _amplitudeChannel = playback::amplitudeChannel
     }
 
     fun play(track: AudioTrack) {
@@ -141,7 +141,7 @@ class AudioPlayerManager(
     }
 
     fun setVolume(volume: Float) {
-        mVolume = volume
+        _volume = volume
         player.volume = (50 * volume).toInt()
     }
 

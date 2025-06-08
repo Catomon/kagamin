@@ -1,12 +1,15 @@
 package com.github.catomon.kagamin.util
 
+import com.github.catomon.kagamin.util.Rogga.LogLevel
 import com.github.catomon.kagamin.util.Rogga.log
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 
+@Deprecated("lame", replaceWith = ReplaceWith(""))
 private const val INFO = "[I]"
+@Deprecated("lame", replaceWith = ReplaceWith(""))
 private const val WARN = "[W]"
 
 @Deprecated("lame", replaceWith = ReplaceWith("echoMsg { msg }"))
@@ -29,15 +32,6 @@ fun Any.logWarn(msg: String) {
     System.err.println(WARN + "[${this::class.simpleName}] $msg")
 }
 
-enum class LogLevel(val priority: Int) {
-    TRACE(-1),
-    DEBUG(0),
-    INFO(1),
-    WARN(2),
-    ERROR(3),
-    FATAL(4)
-}
-
 object Rogga {
     var logLevel = LogLevel.INFO
     var timestamp: Boolean = false
@@ -45,6 +39,15 @@ object Rogga {
     val fullFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
     val timeOnlyFormatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS")
     var formatter = timeOnlyFormatter
+
+    enum class LogLevel(val priority: Int) {
+        TRACE(-1),
+        DEBUG(0),
+        INFO(1),
+        WARN(2),
+        ERROR(3),
+        FATAL(4)
+    }
 
     inline fun log(
         level: LogLevel,

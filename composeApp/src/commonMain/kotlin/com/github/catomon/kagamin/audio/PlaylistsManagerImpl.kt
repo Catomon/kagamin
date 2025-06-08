@@ -45,7 +45,7 @@ class PlaylistsManagerImpl(
 
     private val mutex = Mutex()
 
-    override fun updateCurrentPlaylist(playlist: Playlist) {
+    override fun changeCurrentPlaylist(playlist: Playlist) {
         _currentPlaylist.value = playlist
     }
 
@@ -69,7 +69,7 @@ class PlaylistsManagerImpl(
         _playlists.value = _playlists.value.filter { it.id != playlist.id }
 
         if (_currentPlaylist.value.id == playlist.id)
-            updateCurrentPlaylist(defaultPlaylist())
+            changeCurrentPlaylist(defaultPlaylist())
     }
 
     private fun updateQueueState() {

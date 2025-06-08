@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jaudiotagger.audio.AudioFileIO
 import org.jaudiotagger.audio.AudioHeader
 import org.jaudiotagger.tag.FieldKey
 import org.jaudiotagger.tag.Tag
@@ -64,6 +63,11 @@ class AudioPlayerServiceImpl(
         positionUpdateJob = coroutineScope.launch {
             while (isActive && _playState.value == AudioPlayerService.PlayState.PLAYING) {
                 _position.value = audioPlayerManager.position
+
+                if (_crossfade.value)
+                    if ((_currentTrack.value?.duration ?: 0L) - _position.value < 3300L)
+                        playlistsManager.nextTrack()
+
                 delay(300)
             }
         }
@@ -201,6 +205,7 @@ class AudioPlayerServiceImpl(
     }
 
     override fun setCrossfade(enabled: Boolean) {
+        audioPlayerManager.crossfade = enabled
         _crossfade.value = enabled
     }
 

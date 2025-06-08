@@ -84,7 +84,7 @@ class KagaminViewModel(
 
     private fun loadLastPlaylist() {
         val lastPlaylistName = settings.lastPlaylistName.ifBlank { "default" }
-        playlistsManager.updateCurrentPlaylist(playlists.value.firstOrNull { it.name == lastPlaylistName }
+        playlistsManager.changeCurrentPlaylist(playlists.value.firstOrNull { it.name == lastPlaylistName }
             ?: return)
     }
 
@@ -145,9 +145,8 @@ class KagaminViewModel(
         }
     }
 
-    /** Sets [currentPlaylist] to [playlist] **/
-    fun updateCurrentPlaylist(playlist: Playlist) {
-        playlistsManager.updateCurrentPlaylist(playlist)
+    fun changeCurrentPlaylist(playlist: Playlist) {
+        playlistsManager.changeCurrentPlaylist(playlist)
         saveSettings(settings.copy(lastPlaylistName = playlist.name))
     }
 
@@ -362,6 +361,10 @@ class KagaminViewModel(
                     .map { it.first }
             }
         }
+    }
+
+    fun setCrossfade(enabled: Boolean) {
+        audioPlayerService.setCrossfade(enabled)
     }
 
     fun saveSettings() {

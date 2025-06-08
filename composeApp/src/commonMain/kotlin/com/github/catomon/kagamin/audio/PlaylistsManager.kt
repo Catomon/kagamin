@@ -14,7 +14,7 @@ interface PlaylistsManager {
     val currentTrack: StateFlow<AudioTrack?>
     val playMode: StateFlow<PlayMode>
 
-    fun updateCurrentPlaylist(playlist: Playlist)
+    fun changeCurrentPlaylist(playlist: Playlist)
 
     fun updatePlaylists(playlists: List<Playlist>)
     fun updatePlaylist(playlist: Playlist)

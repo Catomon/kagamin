@@ -114,14 +114,14 @@ fun SettingsScreen(
                     viewModel.settings = settings.copy(useTrackImageAsBackground = it)
                 }
 
-                //todo crossfade
-//                Row(verticalAlignment = Alignment.CenterVertically) {
-//                    Text("Crossfade")
-//
-//                    Checkbox(settings.crossfade, {
-//                        viewModel.settings = settings.copy(crossfade = it)
-//                    })
-//                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Crossfade")
+
+                    Checkbox(settings.crossfade, {
+                        viewModel.setCrossfade(it)
+                        viewModel.settings = settings.copy(crossfade = it)
+                    })
+                }
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("Scroll to next track")

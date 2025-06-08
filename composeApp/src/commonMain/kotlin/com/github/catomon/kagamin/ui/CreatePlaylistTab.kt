@@ -1,6 +1,5 @@
 package com.github.catomon.kagamin.ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,7 +26,6 @@ import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import kagamin.composeapp.generated.resources.Res
-import kagamin.composeapp.generated.resources.online
 import kagamin.composeapp.generated.resources.online
 import org.jetbrains.compose.resources.painterResource
 import kotlin.uuid.ExperimentalUuidApi
@@ -98,7 +96,7 @@ fun CreatePlaylistTab(viewModel: KagaminViewModel, modifier: Modifier) {
                                 url = link
                             )
                             viewModel.createPlaylist(newPlaylist)
-                            viewModel.updateCurrentPlaylist(newPlaylist)
+                            viewModel.changeCurrentPlaylist(newPlaylist)
 
                             viewModel.currentTab = Tabs.ADD_TRACKS
                         } else {

@@ -13,7 +13,7 @@ data class AppSettings(
     val showSingerIcons: Boolean = false,
     val volume: Float = 0.3f,
     val random: Boolean = false,
-    val crossfade: Boolean = true,
+    val crossfade: Boolean = false,
     val repeat: Boolean = false,
     val repeatPlaylist: Boolean = true,
     val lastPlaylistName: String = "default",

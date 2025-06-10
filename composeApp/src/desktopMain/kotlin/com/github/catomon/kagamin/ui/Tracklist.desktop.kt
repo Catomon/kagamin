@@ -322,6 +322,8 @@ fun TracklistHeader(
                 }) { shownContent ->
                     when (shownContent) {
                         Content.Indicator -> {
+                            error("Deprecated")
+
                             echoTrace { "Tracklist Indicator" }
 
                             TrackProgressIndicator(
@@ -380,33 +382,33 @@ fun TracklistHeader(
                     }
                 }
 
-                val layoutManage = LocalLayoutManager.current
-                if (layoutManage.currentLayout.value != LayoutManager.Layout.BottomControls)
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier.onPointerEvent(PointerEventType.Enter) {
-                            shownContent = Content.Indicator
-                        }) {
-                        echoTrace { "Tracklist trackDurationText" }
-
-                        val trackDurationText by remember(currentTrack) {
-                            derivedStateOf {
-                                if (currentTrack == null) "-:-/-:-"
-                                else
-                                    "${
-                                        if (isIndicatorHovered) formatMillisToMinutesSeconds((currentTrack.duration * progress).toLong())
-                                        else formatMillisToMinutesSeconds(currentTrack.let { position })
-                                    }/${formatMillisToMinutesSeconds(currentTrack.duration)}"
-                            }
-                        }
-
-                        Text(
-                            trackDurationText,
-                            fontSize = 10.sp,
-                            color = KagaminTheme.colors.buttonIcon
-                        )
-                    }
+//                val layoutManage = LocalLayoutManager.current
+//                if (layoutManage.currentLayout.value != LayoutManager.Layout.BottomControls)
+//                    Row(
+//                        verticalAlignment = Alignment.CenterVertically,
+//                        horizontalArrangement = Arrangement.SpaceBetween,
+//                        modifier = Modifier.onPointerEvent(PointerEventType.Enter) {
+//                            shownContent = Content.Indicator
+//                        }) {
+//                        echoTrace { "Tracklist trackDurationText" }
+//
+//                        val trackDurationText by remember(currentTrack) {
+//                            derivedStateOf {
+//                                if (currentTrack == null) "-:-/-:-"
+//                                else
+//                                    "${
+//                                        if (isIndicatorHovered) formatMillisToMinutesSeconds((currentTrack.duration * progress).toLong())
+//                                        else formatMillisToMinutesSeconds(currentTrack.let { position })
+//                                    }/${formatMillisToMinutesSeconds(currentTrack.duration)}"
+//                            }
+//                        }
+//
+//                        Text(
+//                            trackDurationText,
+//                            fontSize = 10.sp,
+//                            color = KagaminTheme.colors.buttonIcon
+//                        )
+//                    }
             }
         }
     }

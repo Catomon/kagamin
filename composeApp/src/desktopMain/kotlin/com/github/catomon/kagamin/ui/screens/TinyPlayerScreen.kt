@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.github.catomon.kagamin.LocalLayoutManager
 import com.github.catomon.kagamin.ui.AddTracksTab
 import com.github.catomon.kagamin.ui.CreatePlaylistTab
 import com.github.catomon.kagamin.ui.Playlists
@@ -36,6 +37,7 @@ import com.github.catomon.kagamin.ui.components.CompactCurrentTrackFrame
 import com.github.catomon.kagamin.ui.components.AppLogo
 import com.github.catomon.kagamin.ui.components.Sidebar
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
+import com.github.catomon.kagamin.ui.util.LayoutManager
 import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 
@@ -58,6 +60,8 @@ fun TinyPlayerScreen(
             else -> slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
         }
     }
+
+    val layoutManager = LocalLayoutManager.current
 
     Box(modifier) {
         Background(currentTrack, Modifier.fillMaxSize())
@@ -84,12 +88,13 @@ fun TinyPlayerScreen(
                             .graphicsLayer(translationY = 2f)
                             .clip(RoundedCornerShape(8.dp))
                             .clickable {
-                                if (navController.currentDestination?.route != SettingsDestination.toString())
-                                    navController.navigate(SettingsDestination.toString())
+                                layoutManager.currentLayout.value = LayoutManager.Layout.Default
+//                                if (navController.currentDestination?.route != SettingsDestination.toString())
+//                                    navController.navigate(SettingsDestination.toString())
                             })
                 }
 
-                Box(Modifier.weight(0.99f).fillMaxHeight()) {
+                Box(Modifier.weight(1f).fillMaxHeight()) {
                     AnimatedContent(targetState = viewModel.currentTab, transitionSpec = {
                         tabTransition(viewModel.currentTab)
                     }) {
@@ -98,7 +103,7 @@ fun TinyPlayerScreen(
                                 CompactCurrentTrackFrame(
                                     viewModel,
                                     currentTrack,
-                                    Modifier.width(160.dp).fillMaxHeight()
+                                    Modifier.fillMaxSize()
                                         .background(color = KagaminTheme.backgroundTransparent)
                                 )
                             }
@@ -151,7 +156,7 @@ fun TinyPlayerScreen(
                 }
             }
 
-            Sidebar(viewModel, navController)
+//            Sidebar(viewModel, navController)
         }
     }
 }

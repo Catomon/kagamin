@@ -23,14 +23,14 @@ fun ImageBitmap.removeBlackBars(): ImageBitmap {
     original.readPixels(pixels)
 
 //    val topColor = Color(pixels[width / 2 ])
-    val leftColor = Color(pixels[(height / 2) * width])
+    val leftColor = Color(pixels[((height / 2) * width) + 25])
 
     for (y in 0 until height) {
         for (x in 0 until width) {
             val pixel = pixels[y * width + x]
             val color = Color(pixel)
-            val isHorizontalBarsColor =
-                false //abs((color.red * 255 + color.green * 255 + color.blue * 255) - (leftColor.red * 255 + leftColor.green * 255 + leftColor.blue * 255)) < 25
+            val isHorizontalBarsColor = color.value == leftColor.value
+                //false //abs((color.red * 255 + color.green * 255 + color.blue * 255) - (leftColor.red * 255 + leftColor.green * 255 + leftColor.blue * 255)) < 25
             val isVerticalBarsColor = color.red * 255 + color.green * 255 + color.blue * 255 > 120
 
             if (isHorizontalBarsColor || isVerticalBarsColor) { //0.47f

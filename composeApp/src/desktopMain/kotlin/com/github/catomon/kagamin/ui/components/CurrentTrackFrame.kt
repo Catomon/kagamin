@@ -21,25 +21,33 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.unit.dp
 import com.github.catomon.kagamin.data.AudioTrack
 import com.github.catomon.kagamin.data.cache.ThumbnailCacheManager
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun CurrentTrackFrame(
     viewModel: KagaminViewModel,
     currentTrack: AudioTrack?, modifier: Modifier = Modifier
 ) {
-    val position by viewModel.position.collectAsState()
+    val interactionSource = remember { MutableInteractionSource() }
+    val isThumbnailHovered by interactionSource.collectIsHoveredAsState()
 
-    val progress by remember {
+    val position by viewModel.position.collectAsState()
+    val progress by remember(currentTrack) {
         derivedStateOf {
             when (currentTrack) {
                 null -> 0f
@@ -47,6 +55,17 @@ fun CurrentTrackFrame(
             }
         }
     }
+    var progressOnHover by remember { mutableStateOf(0f) }
+    val progressTargetValue by remember(progress) {
+        derivedStateOf {
+            if (isThumbnailHovered) progressOnHover else progress
+        }
+    }
+    val progressAnimated by animateFloatAsState(progressTargetValue)
+
+    val targetProgressColor: Color =
+        remember(isThumbnailHovered) { if (isThumbnailHovered) KagaminTheme.backgroundTransparent else KagaminTheme.colors.thumbnailProgressIndicator }
+    val aniColor = animateColorAsState(targetProgressColor)
 
     Box(modifier) {
         Column(
@@ -60,9 +79,14 @@ fun CurrentTrackFrame(
                         viewModel.seek((currentTrack.duration * it).toLong())
                     }
                 },
-                progress = progress,
-                modifier = Modifier.padding(8.dp).size(145.dp),
-                height = ThumbnailCacheManager.SIZE.H150
+                progress = progressAnimated,
+                progressColor = aniColor.value,
+                modifier = Modifier.padding(8.dp).size(145.dp).hoverable(interactionSource).onPointerEvent(
+                    PointerEventType.Move
+                ) {
+                    progressOnHover = it.changes.first().position.x / size.width
+                },
+                height = ThumbnailCacheManager.SIZE.H150,
             )
 
             PlaybackButtons(

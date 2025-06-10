@@ -112,7 +112,7 @@ fun ControlsBottomPlayerScreen(
                 contentAlignment = Alignment.TopStart,
                 modifier = Modifier.background(KagaminTheme.backgroundTransparent).fillMaxWidth()
             ) {
-                CurrentTrackFrameHorizontal(currentTrack, Modifier.padding(4.dp))
+                CurrentTrackFrameHorizontal(currentTrack, viewModel, Modifier.padding(4.dp))
 
 //                val window = LocalWindow.current
 //                IconButton({
@@ -301,7 +301,7 @@ private fun AnimatedPlayPauseButton(
 
     val flow by AudioPlayerManager.amplitudeChannel.receiveAsFlow().collectAsState(1f)
     val targetScaleAnimated by animateFloatAsState(
-        Math.clamp(1f + flow / Math.clamp(viewModel.volume.value, 0.01f, 1f) * 0.5f, 1f, 3f), animationSpec = tween(
+        1 + flow * 0.5f, animationSpec = tween(
             durationMillis = 100,
             easing = LinearEasing
         )

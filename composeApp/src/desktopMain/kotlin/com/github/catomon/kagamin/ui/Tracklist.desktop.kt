@@ -63,11 +63,13 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
+import com.github.catomon.kagamin.LocalLayoutManager
 import com.github.catomon.kagamin.LocalWindow
 import com.github.catomon.kagamin.audio.PlaylistsManager
 import com.github.catomon.kagamin.data.AudioTrack
 import com.github.catomon.kagamin.ui.components.TrackProgressIndicator
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
+import com.github.catomon.kagamin.ui.util.LayoutManager
 import com.github.catomon.kagamin.ui.util.formatMillisToMinutesSeconds
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.util.echoTrace
@@ -378,31 +380,33 @@ fun TracklistHeader(
                     }
                 }
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.onPointerEvent(PointerEventType.Enter) {
-                        shownContent = Content.Indicator
-                    }) {
-                    echoTrace { "Tracklist trackDurationText" }
+                val layoutManage = LocalLayoutManager.current
+                if (layoutManage.currentLayout.value != LayoutManager.Layout.BottomControls)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.onPointerEvent(PointerEventType.Enter) {
+                            shownContent = Content.Indicator
+                        }) {
+                        echoTrace { "Tracklist trackDurationText" }
 
-                    val trackDurationText by remember(currentTrack) {
-                        derivedStateOf {
-                            if (currentTrack == null) "-:-/-:-"
-                            else
-                                "${
-                                    if (isIndicatorHovered) formatMillisToMinutesSeconds((currentTrack.duration * progress).toLong())
-                                    else formatMillisToMinutesSeconds(currentTrack.let { position })
-                                }/${formatMillisToMinutesSeconds(currentTrack.duration)}"
+                        val trackDurationText by remember(currentTrack) {
+                            derivedStateOf {
+                                if (currentTrack == null) "-:-/-:-"
+                                else
+                                    "${
+                                        if (isIndicatorHovered) formatMillisToMinutesSeconds((currentTrack.duration * progress).toLong())
+                                        else formatMillisToMinutesSeconds(currentTrack.let { position })
+                                    }/${formatMillisToMinutesSeconds(currentTrack.duration)}"
+                            }
                         }
-                    }
 
-                    Text(
-                        trackDurationText,
-                        fontSize = 10.sp,
-                        color = KagaminTheme.colors.buttonIcon
-                    )
-                }
+                        Text(
+                            trackDurationText,
+                            fontSize = 10.sp,
+                            color = KagaminTheme.colors.buttonIcon
+                        )
+                    }
             }
         }
     }

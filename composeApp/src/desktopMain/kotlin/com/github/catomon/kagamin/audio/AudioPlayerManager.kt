@@ -35,8 +35,8 @@ class AudioPlayerManager(
     private var ytManager: YoutubeAudioSourceManager = YoutubeAudioSourceManager()
     private val loadResultHandler = AudioLoadResulHandlerImpl()
 
-    private var player1 = LocalPlayer(playerManager.createPlayer(), outputFormat)
-    private var player2 = LocalPlayer(playerManager.createPlayer(), outputFormat)
+    private var player1 = LocalPlayer(playerManager.createPlayer().also { it.volume = 50 }, outputFormat)
+    private var player2 = LocalPlayer(playerManager.createPlayer().also { it.volume = 50 }, outputFormat)
 
     private var players = player1 to player2
 
@@ -53,7 +53,7 @@ class AudioPlayerManager(
 
     companion object {
         private lateinit var _amplitudeChannel: () -> Channel<Float>
-        val  amplitudeChannel: Channel<Float> get() = _amplitudeChannel()
+        val amplitudeChannel: Channel<Float> get() = _amplitudeChannel()
     }
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
@@ -65,23 +65,25 @@ class AudioPlayerManager(
         player.addListener(eventListener)
 
         crossfadeJob?.cancel()
-        players.first.player.volume = 0
-        players.second.player.volume = (50 * _volume).toInt()
+        players.first.playback.volume = 0f
+        players.second.playback.volume = _volume
 
         crossfadeJob = coroutineScope.launch {
-            val steps = 60
-            val delayPerStep = 3000L / steps
-            for (step in 0..steps) {
-                val fraction = step / steps.toFloat()
+            if (!player.isPaused) {
+                val steps = 60
+                val delayPerStep = 5000L / steps
+                for (step in 0..steps) {
+                    val fraction = step / steps.toFloat()
 
-                players.first.player.volume = (50 * _volume * fraction).toInt()
-                players.second.player.volume = (50 * _volume).toInt() + (-50 * _volume * fraction).toInt()
+                    players.first.playback.volume = _volume * fraction
+                    players.second.playback.volume = _volume - _volume * fraction
 
-                delay(delayPerStep)
+                    delay(delayPerStep)
+                }
             }
 
-            players.first.player.volume = (50 * _volume).toInt()
-            players.second.player.volume = 0
+            players.first.playback.volume = _volume
+            players.second.playback.volume = 0f
         }
     }
 
@@ -102,13 +104,16 @@ class AudioPlayerManager(
         startDiscordRich()
         discordRich(Rich.IDLE, null)
 
-        _amplitudeChannel = playback::amplitudeChannel
+        _amplitudeChannel = {
+            playback.amplitudeChannel
+        }
     }
 
     fun play(track: AudioTrack) {
         if (crossfade)
             startCrossfade()
 
+        player.isPaused = false
         player.playTrack(track)
     }
 
@@ -142,7 +147,7 @@ class AudioPlayerManager(
 
     fun setVolume(volume: Float) {
         _volume = volume
-        player.volume = (50 * volume).toInt()
+        players.first.playback.volume = volume
     }
 
     fun seek(position: Long) {

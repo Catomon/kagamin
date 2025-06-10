@@ -9,8 +9,10 @@ import javax.sound.sampled.AudioFormat
 import javax.sound.sampled.AudioInputStream
 import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.DataLine
+import javax.sound.sampled.FloatControl
 import javax.sound.sampled.SourceDataLine
 import kotlin.concurrent.thread
+import kotlin.math.log10
 import kotlin.math.sqrt
 
 class AudioPlayback(
@@ -75,6 +77,21 @@ class AudioPlayback(
 
     // ---^
 
+
+    private var gainControl: FloatControl? = null
+    var volume =  0f
+        @Synchronized set(value) {
+            check(value in 0f..1f)
+
+            field = value
+            gainControl?.let {
+                val minGain = it.minimum
+                val maxGain = it.maximum
+                val dB = 20 * log10(value)
+                it.value = dB.coerceIn(minGain, maxGain)
+            }
+        }
+
     private fun playbackLoop() {
         while (true) {
             if (!isActive) return
@@ -90,11 +107,24 @@ class AudioPlayback(
 
             this@AudioPlayback.logMsg { "DataLine is running." }
 
+            gainControl = try {
+                sourceDataLine.getControl(FloatControl.Type.MASTER_GAIN) as FloatControl
+            } catch (e: Exception) {
+                this@AudioPlayback.logMsg { "Volume control not supported: ${e.message}" }
+                null
+            }
+
+            volume = volume
+
             var size: Int
             val buffer = ByteArray(audioFormat.channels * 960 * 2)
             while (sourceDataLine.isOpen) {
                 size = audioInputStream.read(buffer)
                 if (size >= 0) {
+                    if (gainControl == null) {
+                        applySoftwareVolume(buffer, size)
+                    }
+
                     sourceDataLine.write(buffer, 0, size)
 
                     processAmplitude(buffer, size)
@@ -107,6 +137,15 @@ class AudioPlayback(
         }
     }
 
+    private fun applySoftwareVolume(buffer: ByteArray, bytesRead: Int) {
+        val bufferView = ByteBuffer.wrap(buffer, 0, bytesRead)
+            .order(if (audioFormat.isBigEndian) ByteOrder.BIG_ENDIAN else ByteOrder.LITTLE_ENDIAN)
+            .asShortBuffer()
+
+        for (i in 0 until bufferView.remaining()) {
+            bufferView.put(i, (bufferView.get(i) * volume).toInt().toShort())
+        }
+    }
 
     fun stop() {
         val playbackThread = playbackThread

@@ -65,7 +65,7 @@ class AudioPlayerServiceImpl(
                 _position.value = audioPlayerManager.position
 
                 if (_crossfade.value)
-                    if ((_currentTrack.value?.duration ?: 0L) - _position.value < 3300L)
+                    if ((_currentTrack.value?.duration ?: 0L) - _position.value < 5300L)
                         playlistsManager.nextTrack()
 
                 delay(300)

@@ -120,19 +120,24 @@ fun TrackThumbnailProgressOverlay(
     onSetProgress: (Float) -> Unit = { },
     progressColor: Color = KagaminTheme.colors.thumbnailProgressIndicator,
     controlProgress: Boolean = false,
+    shadow: Boolean = true
 ) {
     echoTrace { "TrackThumbnailProgressOverlay" }
 
     Box(
-        modifier
-            .drawBehind {
-                drawRoundRect(
-                    color = KagaminTheme.colors.thinBorder,
-                    topLeft = Offset(0f, with(density) { 1.dp.toPx() }),
-                    size = this.size.copy(height = this.size.height + 2.dp.toPx()),
-                    cornerRadius = CornerRadius(if (shape is RoundedCornerShape) 12f else 0f)
-                )
-            }.let {
+        modifier.then(
+            if (shadow)
+                Modifier.drawBehind {
+                    drawRoundRect(
+                        color = KagaminTheme.colors.thinBorder,
+                        topLeft = Offset(0f, with(density) { 1.dp.toPx() }),
+                        size = this.size.copy(height = this.size.height + 2.dp.toPx()),
+                        cornerRadius = CornerRadius(if (shape is RoundedCornerShape) 12f else 0f)
+                    )
+                }
+            else Modifier
+        )
+            .let {
                 if (controlProgress) {
                     it.pointerInput(currentTrack) {
                         if (currentTrack == null) return@pointerInput
@@ -162,7 +167,7 @@ fun TrackThumbnailProgressOverlay(
                     if (progress > 0) it.weight(progress) else it
                 }.background(
                     progressColor,
-                    RoundedCornerShape(if (shape is RoundedCornerShape) 10f else 0f)
+                    shape as? RoundedCornerShape ?: RoundedCornerShape(0f)
                 )
             ) { }
 

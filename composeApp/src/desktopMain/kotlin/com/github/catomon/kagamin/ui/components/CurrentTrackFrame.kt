@@ -118,10 +118,10 @@ fun CompactCurrentTrackFrame(
 
     Box(modifier.hoverable(interactionSource), contentAlignment = Alignment.Center) {
 
-        val targetValue = remember(
+        val progressTargetValue = remember(
             currentTrack, isHovered, progress
         ) { if (isHovered) 1f else progress }
-        val floatAnimation by animateFloatAsState(targetValue)
+        val progressAnimated by animateFloatAsState(progressTargetValue)
 
         val targetProgressColor: Color =
             remember(isHovered) { if (isHovered) KagaminTheme.backgroundTransparent else KagaminTheme.colors.thumbnailProgressIndicator }
@@ -134,7 +134,7 @@ fun CompactCurrentTrackFrame(
                     viewModel.seek((currentTrack.duration * it).toLong())
                 }
             },
-            progress = floatAnimation,
+            progress = progressAnimated,
             progressColor = aniColor.value,
             modifier = Modifier.padding(8.dp).size(145.dp),
             height = ThumbnailCacheManager.SIZE.H150

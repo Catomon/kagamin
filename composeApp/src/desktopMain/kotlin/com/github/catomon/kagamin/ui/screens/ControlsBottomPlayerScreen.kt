@@ -207,17 +207,17 @@ fun ControlsBottomPlayerScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.align(Alignment.CenterEnd)
                 ) {
-                    IconButton({
-                        isMediaFolderPaneVisible = !isMediaFolderPaneVisible
-                    }) {
-                        Icon(
-                            painterResource(Res.drawable.media_folder),
-                            if (isMediaFolderPaneVisible) "Hide Media Folder Pane" else "Show Media Folder Pane",
-                            tint = if (isMediaFolderPaneVisible) KagaminTheme.colors.buttonIcon else KagaminTheme.colors.disabled
-                        )
-                    }
+//                    IconButton({
+//                        isMediaFolderPaneVisible = !isMediaFolderPaneVisible
+//                    }) {
+//                        Icon(
+//                            painterResource(Res.drawable.media_folder),
+//                            if (isMediaFolderPaneVisible) "Hide Media Folder Pane" else "Show Media Folder Pane",
+//                            tint = if (isMediaFolderPaneVisible) KagaminTheme.colors.buttonIcon else KagaminTheme.colors.disabled
+//                        )
+//                    }
 
-                    SortingToggleButton(currentPlaylist, viewModel)
+//                    SortingToggleButton(currentPlaylist, viewModel)
 
                     VolumeOptions(
                         volume = volume,
@@ -270,15 +270,13 @@ fun ControlsBottomPlayerScreen(
 
 @Composable
 fun SortingToggleButton(
-    currentPlaylist: Playlist,
-    viewModel: KagaminViewModel
+    sortType: SortType,
+    onClick: () -> Unit,
 ) {
-    IconButton({
-        viewModel.toggleSorting()
-    }) {
+    IconButton(onClick) {
         Icon(
             painterResource(
-                when (currentPlaylist.sortType) {
+                when (sortType) {
                     SortType.ORDER -> Res.drawable.sorting_default
                     SortType.TITLE -> Res.drawable.sorting_title
                     SortType.ARTIST -> Res.drawable.sorting_artist

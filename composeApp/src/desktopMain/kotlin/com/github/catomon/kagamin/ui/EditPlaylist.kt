@@ -2,6 +2,7 @@ package com.github.catomon.kagamin.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -18,18 +19,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import com.github.catomon.kagamin.data.Playlist
+import com.github.catomon.kagamin.data.SortType
 import com.github.catomon.kagamin.isValidFileName
 import com.github.catomon.kagamin.ui.components.OutlinedTextButton
+import com.github.catomon.kagamin.ui.screens.SortingToggleButton
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.arrow_left
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun EditPlaylist(playlist: Playlist, onRename: (String) -> Unit, onClose: () -> Unit) {
+fun EditPlaylist(playlist: Playlist, onSort: (SortType) -> Unit, onRename: (String) -> Unit, onClose: () -> Unit) {
     var playlistName by remember { mutableStateOf(playlist.name) }
 
     var isError by remember { mutableStateOf(false) }
+
+    var sortType by remember {mutableStateOf(playlist.sortType)}
 
     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
         Text("Edit playlist: ${playlist.name}", modifier = Modifier.align(Alignment.TopCenter))
@@ -48,12 +53,23 @@ fun EditPlaylist(playlist: Playlist, onRename: (String) -> Unit, onClose: () -> 
                 maxLines = 1
             )
 
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Sorting: ", color = KagaminTheme.colors.textSecondary)
+                SortingToggleButton(sortType, {
+                    val sortEntries = SortType.entries
+                    sortType = (sortEntries.indexOf(sortType) + 1).let { nextIndex ->
+                        sortEntries[if (nextIndex < sortEntries.size) nextIndex else 0]
+                    }
+
+                    onSort(sortType)
+                })
+            }
+
             OutlinedTextButton(text = "Save", {
                 if (playlistName.isBlank() || !isValidFileName(playlistName)) {
                     isError = true
                     return@OutlinedTextButton
                 }
-
                 onRename(playlistName)
                 onClose()
             })

@@ -312,20 +312,39 @@ class KagaminViewModel(
 
     var isSorting by mutableStateOf(false)
 
-    fun toggleSorting() {
+    fun sortPlaylist(playlist: Playlist, sortType: SortType) {
+        if (isSorting) return
+        viewModelScope.launch {
+            isSorting = true
+
+            val updatedPlaylist = playlist.copy(
+                sortType = sortType,
+                tracks =
+                    withContext(Dispatchers.Default) {
+                        playlist.tracks.sorted(sortType)
+                    }
+            )
+
+            updatePlaylist(updatedPlaylist)
+
+            isSorting = false
+        }
+    }
+
+    fun toggleSorting(playlist: Playlist) {
         if (isSorting) return
         viewModelScope.launch {
             isSorting = true
             val sortEntries = SortType.entries
-            val sort = (sortEntries.indexOf(currentPlaylist.value.sortType) + 1).let { nextIndex ->
+            val sort = (sortEntries.indexOf(playlist.sortType) + 1).let { nextIndex ->
                 sortEntries[if (nextIndex < sortEntries.size) nextIndex else 0]
             }
 
-            val updatedPlaylist = currentPlaylist.value.copy(
+            val updatedPlaylist = playlist.copy(
                 sortType = sort,
                 tracks =
                     withContext(Dispatchers.Default) {
-                        currentPlaylist.value.tracks.sorted(sort)
+                        playlist.tracks.sorted(sort)
                     }
             )
 

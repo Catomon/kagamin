@@ -20,6 +20,7 @@ import androidx.compose.ui.window.rememberWindowState
 import com.github.catomon.kagamin.WindowConfig
 import com.github.catomon.kagamin.WindowDraggableArea
 import com.github.catomon.kagamin.data.Playlist
+import com.github.catomon.kagamin.data.SortType
 import com.github.catomon.kagamin.kagaminWindowDecoration
 import com.github.catomon.kagamin.ui.EditPlaylist
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
@@ -43,7 +44,7 @@ sealed class ToolScreenState(
     object EmptyScreen : ToolScreenState("Empty screen")
 
     data class EditPlaylist(
-        val playlist: Playlist, val onRename: (String) -> Unit, val onClose: () -> Unit
+        val playlist: Playlist, val onSort: (SortType) -> Unit, val onRename: (String) -> Unit, val onClose: () -> Unit
     ) : ToolScreenState("Edit playlist")
 }
 
@@ -74,6 +75,7 @@ fun ToolWindow(
                         is ToolScreenState.EditPlaylist -> {
                             EditPlaylist(
                                 playlist = currentScreenState.playlist,
+                                onSort = currentScreenState.onSort,
                                 onRename = currentScreenState.onRename,
                                 onClose = {
                                     currentScreenState.onClose()

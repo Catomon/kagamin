@@ -267,6 +267,7 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                                     toolWindow.value = ToolWindowState(
                                         currentScreenState = ToolScreenState.EditPlaylist(
                                             playlist = playlist,
+                                            onSort = { viewModel.sortPlaylist(playlist, it) },
                                             onRename = { viewModel.renamePlaylist(playlist, it) },
                                             onClose = {
                                                 toolWindow.value =

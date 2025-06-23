@@ -63,10 +63,6 @@ fun CurrentTrackFrameHorizontal(track: AudioTrack?, viewModel: KagaminViewModel,
     }
     val progressAnimated by animateFloatAsState(progressTargetValue)
 
-    val targetProgressColor: Color =
-        remember(isThumbnailHovered) { if (isThumbnailHovered) KagaminTheme.backgroundTransparent else KagaminTheme.colors.thumbnailProgressIndicator }
-    val aniColor = animateColorAsState(targetProgressColor)
-
     Row(modifier.height(100.dp)) {
         TrackThumbnailProgressOverlay(
             track,
@@ -76,7 +72,7 @@ fun CurrentTrackFrameHorizontal(track: AudioTrack?, viewModel: KagaminViewModel,
                 }
             },
             progress = progressAnimated,
-            progressColor = aniColor.value,
+            progressColor = KagaminTheme.colors.thumbnailProgressIndicator,
             modifier = Modifier.size(100.dp).hoverable(interactionSource).onPointerEvent(
                 PointerEventType.Move
             ) {

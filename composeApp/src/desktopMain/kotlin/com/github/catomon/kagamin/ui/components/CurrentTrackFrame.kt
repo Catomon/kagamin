@@ -63,10 +63,6 @@ fun CurrentTrackFrame(
     }
     val progressAnimated by animateFloatAsState(progressTargetValue)
 
-    val targetProgressColor: Color =
-        remember(isThumbnailHovered) { if (isThumbnailHovered) KagaminTheme.backgroundTransparent else KagaminTheme.colors.thumbnailProgressIndicator }
-    val aniColor = animateColorAsState(targetProgressColor)
-
     Box(modifier) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -80,7 +76,7 @@ fun CurrentTrackFrame(
                     }
                 },
                 progress = progressAnimated,
-                progressColor = aniColor.value,
+                progressColor = KagaminTheme.colors.thumbnailProgressIndicator,
                 modifier = Modifier.padding(8.dp).size(145.dp).hoverable(interactionSource).onPointerEvent(
                     PointerEventType.Move
                 ) {
@@ -147,10 +143,6 @@ fun CompactCurrentTrackFrame(
         ) { if (isHovered) 1f else progress }
         val progressAnimated by animateFloatAsState(progressTargetValue)
 
-        val targetProgressColor: Color =
-            remember(isHovered) { if (isHovered) KagaminTheme.backgroundTransparent else KagaminTheme.colors.thumbnailProgressIndicator }
-        val aniColor = animateColorAsState(targetProgressColor)
-
         TrackThumbnailProgressOverlay(
             currentTrack,
             onSetProgress = {
@@ -159,7 +151,7 @@ fun CompactCurrentTrackFrame(
                 }
             },
             progress = progressAnimated,
-            progressColor = aniColor.value,
+            progressColor = KagaminTheme.colors.thumbnailProgressIndicator,
             modifier = Modifier.padding(8.dp).size(145.dp),
             height = ThumbnailCacheManager.SIZE.H150
         )

@@ -59,12 +59,21 @@ class AudioPlayerManager(
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
     private var crossfadeJob: Job? = null
 
+    private var quickFix = true
+
     fun startCrossfade() {
         player.removeListener(eventListener)
-        players = players.copy(players.second, players.first)
+
+        if (quickFix)
+            quickFix = false
+        else
+            players = players.copy(players.second, players.first)
+
         player.addListener(eventListener)
+        player.isPaused = false
 
         crossfadeJob?.cancel()
+
         players.first.playback.volume = 0f
         players.second.playback.volume = _volume
 

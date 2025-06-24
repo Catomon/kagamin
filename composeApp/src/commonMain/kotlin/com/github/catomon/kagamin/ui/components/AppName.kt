@@ -85,7 +85,7 @@ fun KagaminLogo(modifier: Modifier = Modifier, height: Dp = 32.dp) {
     Box(contentAlignment = Alignment.Center, modifier = modifier) {
         Image(
             painterResource(Res.drawable.kagamin_text_small),
-            "LuckyStarLogo",
+            null,
             colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon),
             modifier = Modifier.height(height)
         )
@@ -102,7 +102,7 @@ fun LuckyStarLogo(modifier: Modifier = Modifier, height: Dp = 32.dp) {
     Box(contentAlignment = Alignment.Center, modifier = modifier) {
         Image(
             painterResource(Res.drawable.raki_sta_small),
-            "LuckyStarLogo",
+            null,
             colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon),
             modifier = Modifier.height(height)
         )

@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -45,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toIntSize
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
+import com.github.catomon.kagamin.LocalWindow
 import com.github.catomon.kagamin.audio.AudioPlayerManager
 import com.github.catomon.kagamin.audio.AudioPlayerService
 import com.github.catomon.kagamin.data.Playlist
@@ -114,15 +116,15 @@ fun ControlsBottomPlayerScreen(
             ) {
                 CurrentTrackFrameHorizontal(currentTrack, viewModel, Modifier.padding(4.dp))
 
-//                val window = LocalWindow.current
-//                IconButton({
-//                    window.isMinimized = true
-//                }, modifier = Modifier.size(24.dp).align(Alignment.TopEnd)) {
-//                    Box(
-//                        Modifier.size(9.dp)
-//                            .background(color = KagaminTheme.colors.thinBorder, shape = CircleShape)
-//                    )
-//                }
+                val window = LocalWindow.current
+                IconButton({
+                    window.isMinimized = true
+                }, modifier = Modifier.size(24.dp).align(Alignment.TopEnd)) {
+                    Box(
+                        Modifier.size(9.dp)
+                            .background(color = KagaminTheme.colors.buttonIcon, shape = CircleShape)
+                    )
+                }
 
                 AnimatedPlayPauseButton(
                     viewModel,

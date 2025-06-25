@@ -124,11 +124,11 @@ fun CompactCurrentTrackFrame(
 ) {
     val position by viewModel.position.collectAsState()
 
-    val progress by remember {
+    val progress by remember(currentTrack) {
         derivedStateOf {
             when (currentTrack) {
                 null -> 0f
-                else -> if (currentTrack.duration > 0 && currentTrack.duration < Long.MAX_VALUE) position.toFloat() / currentTrack.duration else -1f
+                else -> if (currentTrack.duration > 0 && currentTrack.duration < Long.MAX_VALUE) position.toFloat() / currentTrack.duration else 0f
             }
         }
     }

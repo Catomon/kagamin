@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -147,23 +148,14 @@ fun TrackThumbnailProgressOverlay(
                             onSetProgress(offset.x / width)
                         }
                     }
-                } else {
-                    it.pointerInput(currentTrack) {
-                        if (currentTrack == null) return@pointerInput
-
-                        val width = this.size.width
-                        detectTapGestures { offset ->
-                            onSetProgress(offset.x / width)
-                        }
-                    }
-                }
+                } else it
             }) {
 
         TrackThumbnail(currentTrack, Modifier.fillMaxSize(), contentScale, blur, shape, height)
 
         Row(Modifier.fillMaxSize()) {
             Box(
-                modifier = Modifier.fillMaxHeight().let {
+                modifier = Modifier.fillMaxSize().let {
                     if (progress > 0) it.weight(progress) else it
                 }.background(
                     progressColor,
@@ -171,7 +163,7 @@ fun TrackThumbnailProgressOverlay(
                 )
             ) { }
 
-            Box(modifier = Modifier.fillMaxHeight().let {
+            Box(modifier = Modifier.let {
                 val weight = 1f - progress; if (weight > 0) it.weight(weight) else it
             }) { }
         }

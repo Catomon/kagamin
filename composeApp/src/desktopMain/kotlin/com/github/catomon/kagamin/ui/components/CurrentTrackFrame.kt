@@ -83,6 +83,7 @@ fun CurrentTrackFrame(
                     progressOnHover = it.changes.first().position.x / size.width
                 },
                 height = ThumbnailCacheManager.SIZE.H150,
+                controlProgress = true
             )
 
             PlaybackButtons(

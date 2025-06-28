@@ -80,7 +80,8 @@ fun CurrentTrackFrameHorizontal(track: AudioTrack?, viewModel: KagaminViewModel,
             },
             shape = RoundedCornerShape(8.dp),
             height = ThumbnailCacheManager.SIZE.H150,
-            shadow = false
+            shadow = false,
+            controlProgress = true
         )
 
         if (track != null)

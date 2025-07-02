@@ -29,5 +29,3 @@ interface AudioPlayerService {
     fun setVolume(volume: Float)
     fun setCrossfade(enabled: Boolean)
 }
-
-expect fun getAudioPlayerServiceImpl(): AudioPlayerService

@@ -18,7 +18,7 @@ class PlaylistsManagerImpl(
 ) : PlaylistsManager {
 
     private fun defaultPlaylist(): Playlist =
-        _playlists.value.firstOrNull { it.id == "default" } ?: kotlin.run {
+        _playlists.value.firstOrNull { it.id == "default" } ?: run {
             val pl = Playlist(
                 "default",
                 "default",

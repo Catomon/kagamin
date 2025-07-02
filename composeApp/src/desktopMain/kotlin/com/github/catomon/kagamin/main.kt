@@ -7,6 +7,7 @@ import coil3.disk.DiskCache
 import coil3.request.crossfade
 import com.github.catomon.kagamin.data.cacheFolder
 import com.github.catomon.kagamin.di.appModule
+import com.github.catomon.kagamin.di.desktopModule
 import com.github.catomon.kagamin.util.Rogga
 import com.github.catomon.kagamin.util.Rogga.LogLevel
 import com.github.catomon.kagamin.util.echoMsg
@@ -32,7 +33,7 @@ fun main() {
         setComposeExceptionHandler()
 
         startKoin {
-            modules(appModule)
+            modules(appModule, desktopModule)
         }
 
         setRenderApi()

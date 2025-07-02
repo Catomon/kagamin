@@ -28,9 +28,9 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist as LavaAudioPlaylist
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack as LavaAudioTrack
 
 class AudioPlayerServiceImpl(
-    val dispatcherDefault: CoroutineDispatcher = Dispatchers.Default,
-    val dispatcherIO: CoroutineDispatcher = Dispatchers.IO,
-    val dispatcherMain: CoroutineDispatcher = Dispatchers.Main
+    private val dispatcherDefault: CoroutineDispatcher = Dispatchers.Default,
+    private val dispatcherIO: CoroutineDispatcher = Dispatchers.IO,
+    private val dispatcherMain: CoroutineDispatcher = Dispatchers.Main
 ) : AudioPlayerService {
 
     private val _playState = MutableStateFlow(AudioPlayerService.PlayState.IDLE)

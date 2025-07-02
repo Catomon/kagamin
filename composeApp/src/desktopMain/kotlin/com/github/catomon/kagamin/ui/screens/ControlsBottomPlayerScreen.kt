@@ -49,7 +49,6 @@ import androidx.navigation.NavHostController
 import com.github.catomon.kagamin.LocalWindow
 import com.github.catomon.kagamin.audio.AudioPlayerManager
 import com.github.catomon.kagamin.audio.AudioPlayerService
-import com.github.catomon.kagamin.data.Playlist
 import com.github.catomon.kagamin.data.SortType
 import com.github.catomon.kagamin.ui.MediaFolder
 import com.github.catomon.kagamin.ui.Menu
@@ -67,7 +66,6 @@ import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.util.echoTrace
 import com.github.catomon.kagamin.util.echoTraceFiltered
 import kagamin.composeapp.generated.resources.Res
-import kagamin.composeapp.generated.resources.media_folder
 import kagamin.composeapp.generated.resources.pause
 import kagamin.composeapp.generated.resources.play
 import kagamin.composeapp.generated.resources.sorting_artist

@@ -27,6 +27,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
 
             implementation(libs.androidx.media3.exoplayer)
+            implementation(libs.koin.android)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -42,6 +43,9 @@ kotlin {
 //            runtimeOnly("androidx.sqlite:sqlite-bundled:2.5.0-alpha13")
             implementation(libs.navigation.compose)
             implementation(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+            implementation(libs.koin.compose.viewmodel.navigation)
             //implementation(libs.datastore)
             //implementation(libs.datastore.preferences)
             implementation(libs.kotlinx.serialization.json)

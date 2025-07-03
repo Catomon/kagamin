@@ -84,7 +84,7 @@ fun PlaylistItem(
                     randomTrack,
                     modifier = Modifier.size(height),
                     shape = RoundedCornerShape(8.dp),
-                    height = ThumbnailCacheManager.SIZE.H64
+                    size = ThumbnailCacheManager.SIZE.H64
                 )
 
                 PlaylistItemContent(viewModel, playlist, Modifier.weight(1f))

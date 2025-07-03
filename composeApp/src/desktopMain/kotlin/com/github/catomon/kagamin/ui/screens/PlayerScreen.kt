@@ -33,6 +33,7 @@ import com.github.catomon.kagamin.ui.Playlists
 import com.github.catomon.kagamin.ui.Tracklist
 import com.github.catomon.kagamin.ui.components.CurrentTrackFrame
 import com.github.catomon.kagamin.ui.components.AppLogo
+import com.github.catomon.kagamin.ui.components.Background
 import com.github.catomon.kagamin.ui.components.Sidebar
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.Tabs
@@ -154,7 +155,7 @@ fun PlayerScreen(
                 }
             }
 
-            Sidebar(viewModel, navController)
+            Sidebar(viewModel)
         }
     }
 }

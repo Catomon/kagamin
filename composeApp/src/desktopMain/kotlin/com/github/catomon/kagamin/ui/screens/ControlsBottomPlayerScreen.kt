@@ -56,6 +56,7 @@ import com.github.catomon.kagamin.ui.Playlists
 import com.github.catomon.kagamin.ui.Tracklist
 import com.github.catomon.kagamin.ui.TracksDropTarget
 import com.github.catomon.kagamin.ui.components.AppLogo
+import com.github.catomon.kagamin.ui.components.Background
 import com.github.catomon.kagamin.ui.components.CurrentTrackFrameHorizontal
 import com.github.catomon.kagamin.ui.components.PlaybackModeToggleButton
 import com.github.catomon.kagamin.ui.components.PrevNextTrackButtons

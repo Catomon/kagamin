@@ -52,7 +52,7 @@ fun MinimizeButton(modifier: Modifier = Modifier) {
 
 @Composable
 fun Sidebar(
-    viewModel: KagaminViewModel, navController: NavHostController, modifier: Modifier = Modifier
+    viewModel: KagaminViewModel, modifier: Modifier = Modifier
 ) {
     val layoutManager = LocalLayoutManager.current
 

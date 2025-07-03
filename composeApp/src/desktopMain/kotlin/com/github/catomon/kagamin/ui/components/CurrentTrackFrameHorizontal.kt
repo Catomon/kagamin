@@ -1,6 +1,5 @@
 package com.github.catomon.kagamin.ui.components
 
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.hoverable
@@ -26,7 +25,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.unit.dp
@@ -64,7 +62,7 @@ fun CurrentTrackFrameHorizontal(track: AudioTrack?, viewModel: KagaminViewModel,
     val progressAnimated by animateFloatAsState(progressTargetValue)
 
     Row(modifier.height(100.dp)) {
-        TrackThumbnailProgressOverlay(
+        TrackThumbnailWithProgressOverlay(
             track,
             onSetProgress = {
                 if (track != null) {
@@ -79,7 +77,7 @@ fun CurrentTrackFrameHorizontal(track: AudioTrack?, viewModel: KagaminViewModel,
                 progressOnHover = it.changes.first().position.x / size.width
             },
             shape = RoundedCornerShape(8.dp),
-            height = ThumbnailCacheManager.SIZE.H150,
+            size = ThumbnailCacheManager.SIZE.H150,
             shadow = false,
             controlProgress = true
         )

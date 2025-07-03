@@ -34,9 +34,8 @@ import androidx.navigation.NavHostController
 import com.github.catomon.kagamin.LocalLayoutManager
 import com.github.catomon.kagamin.data.AppSettings
 import com.github.catomon.kagamin.data.defaultMediaFolder
-import com.github.catomon.kagamin.openInBrowser
 import com.github.catomon.kagamin.ui.components.AppIcon
-import com.github.catomon.kagamin.ui.components.OutlinedTextButton
+import com.github.catomon.kagamin.ui.components.Background
 import com.github.catomon.kagamin.ui.theme.KagaminColors
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.LayoutManager
@@ -45,10 +44,8 @@ import io.github.vinceglb.filekit.absolutePath
 import io.github.vinceglb.filekit.dialogs.compose.rememberDirectoryPickerLauncher
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.arrow_left
-import kagamin.composeapp.generated.resources.folder
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.painterResource
-import kotlin.system.exitProcess
 
 @Serializable
 object SettingsDestination {

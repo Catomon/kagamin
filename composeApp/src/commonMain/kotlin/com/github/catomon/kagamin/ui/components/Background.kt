@@ -1,4 +1,4 @@
-package com.github.catomon.kagamin.ui.screens
+package com.github.catomon.kagamin.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -9,11 +9,9 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.github.catomon.kagamin.data.AudioTrack
-import com.github.catomon.kagamin.ui.components.TrackThumbnail
 import com.github.catomon.kagamin.ui.compositionlocals.LocalAppSettings
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import kagamin.composeapp.generated.resources.Res
-import kagamin.composeapp.generated.resources.lucky_background
 import kagamin.composeapp.generated.resources.lucky_background_stars
 import org.jetbrains.compose.resources.painterResource
 

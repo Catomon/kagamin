@@ -18,7 +18,7 @@ import com.github.catomon.kagamin.LocalWindow
 import com.github.catomon.kagamin.data.AudioTrack
 import com.github.catomon.kagamin.kagaminWindowDecoration
 import com.github.catomon.kagamin.openInBrowser
-import com.github.catomon.kagamin.ui.screens.Background
+import com.github.catomon.kagamin.ui.components.Background
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel

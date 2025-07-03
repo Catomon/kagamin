@@ -1,20 +1,14 @@
 package com.github.catomon.kagamin.ui.components
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -24,14 +18,12 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import com.github.catomon.kagamin.data.AudioTrack
-import com.github.catomon.kagamin.data.cache.ThumbnailCacheManager
-import com.github.catomon.kagamin.data.userDataFolder
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.util.echoTrace
 import kagamin.composeapp.generated.resources.Res
@@ -39,19 +31,20 @@ import kagamin.composeapp.generated.resources.def_thumb
 import kagamin.composeapp.generated.resources.def_thumb_150
 import kagamin.composeapp.generated.resources.def_thumb_512
 import kagamin.composeapp.generated.resources.def_thumb_64
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.imageResource
 
 object TrackThumbnailDefaults {
     val shape = RoundedCornerShape(12.dp)
 }
 
-val defaultThumbnail = mapOf(
-    ThumbnailCacheManager.SIZE.ORIGINAL to Res.drawable.def_thumb,
-    ThumbnailCacheManager.SIZE.H64 to Res.drawable.def_thumb_64,
-    ThumbnailCacheManager.SIZE.H150 to Res.drawable.def_thumb_150,
-    ThumbnailCacheManager.SIZE.H512 to Res.drawable.def_thumb_512,
+@Composable
+internal expect fun rememberTrackThumbnail(track: AudioTrack?, size: Int) : ImageBitmap?
+
+private val defaultThumbnail = mapOf(
+    0 to Res.drawable.def_thumb,
+    64 to Res.drawable.def_thumb_64,
+    150 to Res.drawable.def_thumb_150,
+    512 to Res.drawable.def_thumb_512,
 )
 
 @Composable
@@ -61,69 +54,47 @@ fun TrackThumbnail(
     contentScale: ContentScale = ContentScale.Crop,
     blur: Boolean = false,
     shape: Shape = TrackThumbnailDefaults.shape,
-    height: Int = ThumbnailCacheManager.SIZE.ORIGINAL
+    size: Int = 0,
 ) {
     echoTrace { "TrackThumbnail" }
 
-    var thumbnailModel by remember { mutableStateOf<Any?>(userDataFolder.resolve("definitely_not_existing_file")) }
-    val defaultPainter = painterResource(defaultThumbnail[height] ?: Res.drawable.def_thumb)
-
-    LaunchedEffect(currentTrack) {
-        thumbnailModel = if (currentTrack != null) {
-            if (currentTrack.artworkUri?.startsWith("https") == true) {
-                currentTrack.artworkUri
-            } else {
-                withContext(Dispatchers.Default) {
-                    if (currentTrack.uri.startsWith("https"))
-                        null
-                    else
-                        ThumbnailCacheManager.cacheThumbnail(currentTrack.uri, size = height)
-                            ?.let { file ->
-                                file as Any
-                            }
-                }
-            }
-        } else return@LaunchedEffect
-    }
+    val thumbnail = rememberTrackThumbnail(currentTrack, size)
 
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
     ) {
         AnimatedContent(
-            thumbnailModel,
+            thumbnail,
             modifier = Modifier.fillMaxSize().clip(shape)
-        ) { cachedThumbnailFile ->
-            AsyncImage(
-                cachedThumbnailFile,
-                "Track thumbnail",
+        ) { model ->
+            Image(
+                bitmap = thumbnail ?: imageResource(defaultThumbnail[size] ?: Res.drawable.def_thumb),
+                contentDescription = null,
                 contentScale = contentScale,
                 modifier = Modifier.fillMaxSize().let { if (blur) it.blur(5.dp) else it }
                     .clip(shape),
-                placeholder = null,
-                error = defaultPainter,
-                fallback = defaultPainter,
-                filterQuality = FilterQuality.High
+                filterQuality = FilterQuality.High,
             )
         }
     }
 }
 
 @Composable
-fun TrackThumbnailProgressOverlay(
+fun TrackThumbnailWithProgressOverlay(
     currentTrack: AudioTrack?,
     progress: Float,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
     blur: Boolean = false,
     shape: Shape = TrackThumbnailDefaults.shape,
-    height: Int = ThumbnailCacheManager.SIZE.ORIGINAL,
     onSetProgress: (Float) -> Unit = { },
     progressColor: Color = KagaminTheme.colors.thumbnailProgressIndicator,
     controlProgress: Boolean = false,
-    shadow: Boolean = true
+    shadow: Boolean = true,
+    size: Int = 0
 ) {
-    echoTrace { "TrackThumbnailProgressOverlay" }
+    echoTrace { "TrackThumbnailWithProgressOverlay" }
 
     Box(
         modifier.then(
@@ -151,7 +122,7 @@ fun TrackThumbnailProgressOverlay(
                 } else it
             }) {
 
-        TrackThumbnail(currentTrack, Modifier.fillMaxSize(), contentScale, blur, shape, height)
+        TrackThumbnail(currentTrack, Modifier.fillMaxSize(), contentScale, blur, shape, size)
 
         Row(Modifier.fillMaxSize()) {
             Box(

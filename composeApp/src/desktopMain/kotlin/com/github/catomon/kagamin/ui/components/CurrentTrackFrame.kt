@@ -66,7 +66,7 @@ fun CurrentTrackFrame(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            TrackThumbnailProgressOverlay(
+            TrackThumbnailWithProgressOverlay(
                 currentTrack,
                 onSetProgress = {
                     if (currentTrack != null) {
@@ -80,7 +80,7 @@ fun CurrentTrackFrame(
                 ) {
                     progressOnHover = it.changes.first().position.x / size.width
                 },
-                height = ThumbnailCacheManager.SIZE.H150,
+                size = ThumbnailCacheManager.SIZE.H150,
                 controlProgress = true
             )
 
@@ -142,7 +142,7 @@ fun CompactCurrentTrackFrame(
         ) { if (isHovered) 1f else progress }
         val progressAnimated by animateFloatAsState(progressTargetValue)
 
-        TrackThumbnailProgressOverlay(
+        TrackThumbnailWithProgressOverlay(
             currentTrack,
             onSetProgress = {
                 if (currentTrack != null) {
@@ -152,7 +152,7 @@ fun CompactCurrentTrackFrame(
             progress = progressAnimated,
             progressColor = KagaminTheme.colors.thumbnailProgressIndicator,
             modifier = Modifier.padding(8.dp).size(145.dp),
-            height = ThumbnailCacheManager.SIZE.H150
+            size = ThumbnailCacheManager.SIZE.H150
         )
 
         AnimatedVisibility(

@@ -34,6 +34,7 @@ import com.github.catomon.kagamin.ui.CreatePlaylistTab
 import com.github.catomon.kagamin.ui.Playlists
 import com.github.catomon.kagamin.ui.Tracklist
 import com.github.catomon.kagamin.ui.components.AppLogo
+import com.github.catomon.kagamin.ui.components.Background
 import com.github.catomon.kagamin.ui.components.CurrentTrackFrame
 import com.github.catomon.kagamin.ui.components.Sidebar
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
@@ -155,7 +156,7 @@ fun CompactPlayerScreen(
                 }
             }
 
-            Sidebar(viewModel, navController)
+            Sidebar(viewModel)
         }
     }
 }

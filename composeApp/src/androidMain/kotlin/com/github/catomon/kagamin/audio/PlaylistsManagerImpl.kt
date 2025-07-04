@@ -12,6 +12,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 class PlaylistsManagerImpl(
+    override val currentTrack: StateFlow<AudioTrack?>,
     private val exoPlayer: ExoPlayer
 ) : PlaylistsManager {
     private val mutex = Mutex()
@@ -36,22 +37,9 @@ class PlaylistsManagerImpl(
     private val _queueState = MutableStateFlow<List<AudioTrack>>(emptyList())
     override val queueState: StateFlow<List<AudioTrack>> = _queueState.asStateFlow()
 
-    private val _currentTrack = MutableStateFlow<AudioTrack?>(null)
-    override val currentTrack: StateFlow<AudioTrack?> = _currentTrack.asStateFlow()
 
     private val _playMode = MutableStateFlow(PlaylistsManager.PlayMode.PLAYLIST)
     override val playMode: StateFlow<PlaylistsManager.PlayMode> = _playMode.asStateFlow()
-
-    init {
-        exoPlayer.addListener(object : Player.Listener {
-            override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-                val index = exoPlayer.currentMediaItemIndex
-                _queueState.value.getOrNull(index)?.let {
-                    _currentTrack.value = it
-                }
-            }
-        })
-    }
 
     override fun changeCurrentPlaylist(playlist: Playlist) {
         _currentPlaylist.value = playlist
@@ -108,7 +96,6 @@ class PlaylistsManagerImpl(
 
     override fun clearQueue() {
         _queueState.value = emptyList()
-        _currentTrack.value = null
         exoPlayer.clearMediaItems()
     }
 
@@ -136,10 +123,5 @@ class PlaylistsManagerImpl(
         exoPlayer.clearMediaItems()
         tracks.forEach { exoPlayer.addMediaItem(MediaItem.fromUri(it.uri)) }
         exoPlayer.prepare()
-        if (tracks.isNotEmpty()) {
-            _currentTrack.value = tracks.first()
-        } else {
-            _currentTrack.value = null
-        }
     }
 }

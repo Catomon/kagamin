@@ -284,6 +284,9 @@ class KagaminViewModel(
 
             playlistsManager.nextTrack()
 
+            if (playState.value == AudioPlayerService.PlayState.IDLE)
+                audioPlayerService.resume()
+
             if (loading)
                 isLoading = false
         }

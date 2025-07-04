@@ -15,6 +15,8 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import com.github.catomon.kagamin.data.AudioTrack
+import com.github.catomon.kagamin.util.echoErr
+import com.github.catomon.kagamin.util.logErr
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.def_thumb
 import org.jetbrains.compose.resources.imageResource
@@ -35,7 +37,7 @@ internal actual fun rememberTrackThumbnail(track: AudioTrack?, size: Int): Image
                 null
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            echoErr { "Album art error: ${e.message}, uri: $artUri" }
 
             val mmr = MediaMetadataRetriever()
             try {
@@ -43,7 +45,7 @@ internal actual fun rememberTrackThumbnail(track: AudioTrack?, size: Int): Image
                 val artBytes = mmr.embeddedPicture
                 if (artBytes != null) BitmapFactory.decodeByteArray(artBytes, 0, artBytes.size).asImageBitmap() else null
             } catch (e: Exception) {
-                e.printStackTrace()
+                echoErr { "Album art error: ${e.message}, uri: $artUri" }
                 null
             } finally {
                 mmr.release()

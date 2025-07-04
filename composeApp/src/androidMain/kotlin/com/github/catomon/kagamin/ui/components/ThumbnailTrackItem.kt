@@ -30,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.unit.Dp
@@ -54,6 +55,14 @@ import kagamin.composeapp.generated.resources.selected
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 
+object ThumbnailTrackItemDefaults {
+    val colors = Colors()
+
+    data class Colors(
+        val background: Color = KagaminTheme.colors.listItem
+    )
+}
+
 @Composable
 fun ThumbnailTrackItem(
     index: Int,
@@ -63,10 +72,9 @@ fun ThumbnailTrackItem(
     isCurrentTrack: Boolean,
     onClick: () -> Unit = {},
     modifier: Modifier = Modifier,
+    colors: ThumbnailTrackItemDefaults.Colors = ThumbnailTrackItemDefaults.colors
 ) {
     echoTrace { "ThumbnailTrackItem" }
-
-    val backgroundColor = KagaminTheme.colors.listItem
 
     val height = 64.dp
 
@@ -79,7 +87,7 @@ fun ThumbnailTrackItem(
             Modifier
                 .fillMaxSize()
                 .clip(RoundedCornerShape(8.dp))
-                .background(backgroundColor)
+                .background(colors.background)
                 .clickable {
                     onClick()
                 }) {

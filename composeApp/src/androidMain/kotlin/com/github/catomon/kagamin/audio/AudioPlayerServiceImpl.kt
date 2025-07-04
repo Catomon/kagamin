@@ -33,12 +33,20 @@ class AudioPlayerServiceImpl(
     private val _crossfade = MutableStateFlow(false)
     override val crossfade: StateFlow<Boolean> = _crossfade.asStateFlow()
 
-
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
-    override val playlistsManager: PlaylistsManager = PlaylistsManagerImpl(player)
+    override val playlistsManager: PlaylistsManager = PlaylistsManagerImpl(currentTrack, player)
 
     init {
+        player.addListener(object : Player.Listener {
+            override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                val index = player.currentMediaItemIndex
+                playlistsManager.queueState.value.getOrNull(index)?.let {
+                    _currentTrack.value = it
+                }
+            }
+        })
+
         player.addListener(object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 _playState.value = when {
@@ -81,13 +89,15 @@ class AudioPlayerServiceImpl(
 
     override suspend fun play(track: AudioTrack): Result<Boolean> {
         return try {
-            val mediaItem = MediaItem.fromUri(track.uri)
-            player.setMediaItem(mediaItem)
-            player.prepare()
-            player.play()
+            val i = playlistsManager.currentPlaylist.value.tracks.indexOf(track)
+            if (i != -1) {
+                player.seekToDefaultPosition(i)
+            }
+            player.playWhenReady = true
             _currentTrack.value = track
             Result.success(true)
         } catch (e: Exception) {
+            e.printStackTrace()
             Result.failure(e)
         }
     }

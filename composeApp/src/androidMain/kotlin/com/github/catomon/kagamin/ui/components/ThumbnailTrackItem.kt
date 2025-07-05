@@ -33,6 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -76,7 +77,7 @@ fun ThumbnailTrackItem(
 ) {
     echoTrace { "ThumbnailTrackItem" }
 
-    val height = 64.dp
+    val height = 80.dp
 
     Row(modifier.height(height)) {
         AnimatedVisibility(index > -1 && isCurrentTrack) {
@@ -96,7 +97,7 @@ fun ThumbnailTrackItem(
                     track,
                     modifier = Modifier.width(height),
                     shape = RoundedCornerShape(8.dp),
-                    size = 64
+                    size = 150
                 )
 
                 TrackItemBody(
@@ -148,9 +149,10 @@ private fun TrackItemBody(
         ) {
             Text(
                 track.title,
-                fontSize = 10.sp,
+                fontSize = 14.sp,
                 color = KagaminTheme.text,
                 maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.let { if (isHovered) it.basicMarquee(iterations = Int.MAX_VALUE) else it }
             )
 
@@ -159,24 +161,25 @@ private fun TrackItemBody(
             if (track.artist.isNotBlank())
                 Text(
                     track.artist,
-                    fontSize = 8.sp,
+                    fontSize = 12.sp,
                     color = KagaminTheme.textSecondary,
                     maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.let { if (isHovered) it.basicMarquee(iterations = Int.MAX_VALUE) else it },
                     lineHeight = 16.sp
                 )
 
 //                Spacer(Modifier.width(4.dp))
 
-            if (track.duration >= 0)
-                Text(
-                    remember { formatMillisToMinutesSeconds(track.duration) },
-                    fontSize = 8.sp,
-                    color = KagaminTheme.textSecondary,
-                    maxLines = 1,
-                    modifier = Modifier.let { if (isHovered) it.basicMarquee(iterations = Int.MAX_VALUE) else it },
-                    lineHeight = 16.sp
-                )
+//            if (track.duration >= 0)
+//                Text(
+//                    remember { formatMillisToMinutesSeconds(track.duration) },
+//                    fontSize = 12.sp,
+//                    color = KagaminTheme.textSecondary,
+//                    maxLines = 1,
+//                    modifier = Modifier.let { if (isHovered) it.basicMarquee(iterations = Int.MAX_VALUE) else it },
+//                    lineHeight = 16.sp
+//                )
 //            }
         }
 

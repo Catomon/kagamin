@@ -127,7 +127,7 @@ fun TrackThumbnailWithProgressOverlay(
         Row(Modifier.fillMaxSize()) {
             Box(
                 modifier = Modifier.fillMaxSize().let {
-                    if (progress > 0) it.weight(progress) else it
+                    if (progress > 0) it.weight(progress) else it.weight(0.001f)
                 }.background(
                     progressColor,
                     shape as? RoundedCornerShape ?: RoundedCornerShape(0f)

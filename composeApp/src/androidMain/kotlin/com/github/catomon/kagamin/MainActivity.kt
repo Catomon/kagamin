@@ -7,11 +7,16 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -19,22 +24,29 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import coil3.ImageLoader
 import coil3.compose.setSingletonImageLoaderFactory
 import coil3.request.crossfade
-import com.github.catomon.kagamin.ui.PlaybackTabButton
-import com.github.catomon.kagamin.ui.PlaylistsTabButton
-import com.github.catomon.kagamin.ui.TracklistTabButton
-import com.github.catomon.kagamin.ui.components.AddButton
 import com.github.catomon.kagamin.ui.compositionlocals.LocalAppSettings
 import com.github.catomon.kagamin.ui.screens.PlayerScreen
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
+import kagamin.composeapp.generated.resources.Res
+import kagamin.composeapp.generated.resources.add
+import kagamin.composeapp.generated.resources.music_note
+import kagamin.composeapp.generated.resources.playlists
+import kagamin.composeapp.generated.resources.tiny_star_icon
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
 private const val REQUEST_READ_STORAGE: Int = 100
@@ -233,14 +245,13 @@ fun Sidebar(
     Column(
         modifier
             .fillMaxHeight()
-            .width(32.dp)
+            .width(48.dp)
             .background(color = KagaminTheme.backgroundTransparent),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Column(
             Modifier
-                .width(32.dp)
                 .weight(1f),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly
@@ -296,5 +307,82 @@ fun Sidebar(
                 color = if (viewModel.currentTab == Tabs.ADD_TRACKS || viewModel.currentTab == Tabs.CREATE_PLAYLIST) KagaminTheme.colors.buttonIconSmallSelected else KagaminTheme.colors.buttonIconSmall
             )
         }
+    }
+}
+
+@Composable
+fun AddButton(
+    painterResource: Painter = painterResource(Res.drawable.add),
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    color: Color = KagaminTheme.colors.buttonIconSmall,
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier.clip(RoundedCornerShape(8.dp)).clickable { onClick() }
+    ) {
+        Icon(
+            painterResource,
+            "Add button",
+            modifier = Modifier.size(32.dp),
+            tint = color
+        )
+    }
+}
+
+@Composable
+fun TracklistTabButton(
+    onClick: () -> Unit,
+    color: Color = KagaminTheme.colors.buttonIconSmall,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier.clip(RoundedCornerShape(8.dp)).clickable { onClick() }
+    ) {
+        Icon(
+            painterResource(Res.drawable.music_note),
+            "Tracklist tab",
+            modifier = Modifier.size(32.dp),
+            tint = color
+        )
+    }
+}
+
+@Composable
+fun PlaylistsTabButton(
+    onClick: () -> Unit,
+    color: Color = KagaminTheme.colors.buttonIconSmall,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier.clip(RoundedCornerShape(8.dp)).clickable { onClick() }
+    ) {
+        Icon(
+            painterResource(Res.drawable.playlists),
+            "Tracklist tab",
+            tint = color,
+            modifier = Modifier.size(32.dp)
+        )
+    }
+}
+
+@Composable
+fun PlaybackTabButton(
+    onClick: () -> Unit,
+    color: Color = KagaminTheme.colors.buttonIconSmall,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier.clip(RoundedCornerShape(8.dp)).clickable { onClick() }
+    ) {
+        Icon(
+            painterResource(Res.drawable.tiny_star_icon),
+            "Tracklist tab",
+            modifier = Modifier.size(32.dp),
+            tint = color
+        )
     }
 }

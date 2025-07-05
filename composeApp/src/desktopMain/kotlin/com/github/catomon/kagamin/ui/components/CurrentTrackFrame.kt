@@ -97,20 +97,6 @@ fun CurrentTrackFrame(
                 },
                 modifier = Modifier.width(133.dp)
             )
-
-//            TrackProgressIndicator(
-//                currentTrack,
-//                player,
-//                updateProgress,
-//                progress,
-//                modifier = Modifier.padding(horizontal = 20.dp)
-//            )
-
-            //todo
-//            SongOptionsButtons(
-//                modifier = Modifier.width(133.dp),
-//                viewModel = viewModel,
-//            )
         }
     }
 }

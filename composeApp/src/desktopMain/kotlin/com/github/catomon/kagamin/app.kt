@@ -136,10 +136,10 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
             windowState.size = windowSize
         }
 
-        LaunchedEffect(windowState.isMinimized) {
-            if (windowState.isMinimized)
-                openPlayerWindow = false
-        }
+//        LaunchedEffect(windowState.isMinimized) {
+//            if (windowState.isMinimized)
+//                openPlayerWindow = false
+//        }
 
         CompositionLocalProvider(
             LocalLayoutManager provides layoutManager,

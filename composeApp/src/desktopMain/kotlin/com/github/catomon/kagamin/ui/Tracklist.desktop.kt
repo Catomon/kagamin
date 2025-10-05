@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -60,17 +61,15 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
-import com.github.catomon.kagamin.LocalLayoutManager
 import com.github.catomon.kagamin.LocalWindow
 import com.github.catomon.kagamin.audio.PlaylistsManager
 import com.github.catomon.kagamin.data.AudioTrack
 import com.github.catomon.kagamin.ui.components.TrackProgressIndicator
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
-import com.github.catomon.kagamin.ui.util.LayoutManager
-import com.github.catomon.kagamin.ui.util.formatMillisToMinutesSeconds
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.util.echoTrace
 import kagamin.composeapp.generated.resources.Res
@@ -100,6 +99,12 @@ fun Tracklist(
     var filterName by remember { mutableStateOf("") }
     var filteredTracks by remember { mutableStateOf<List<AudioTrack>?>(null) }
 
+    val displayedTracks by remember {
+        derivedStateOf {
+            filteredTracks ?: currentPlaylist.tracks
+        }
+    }
+
     LaunchedEffect(currentPlaylist, filterName) {
         filteredTracks = withContext(Dispatchers.Default) {
             if (filterName.isNotBlank()) {
@@ -123,8 +128,8 @@ fun Tracklist(
         allowAutoScroll = true
     }
 
-    LaunchedEffect(currentPlaylist.id, currentPlaylist.sortType) {
-        listState.scrollToItem(indexed[currentTrack?.uri] ?: 0)
+    LaunchedEffect(displayedTracks) {
+        scrollToCurrentPlaylistOrTop(indexed, currentTrack, listState)
     }
 
     LaunchedEffect(currentTrack) {
@@ -151,17 +156,28 @@ fun Tracklist(
         val interactionSource = remember { MutableInteractionSource() }
         val isHovered by interactionSource.collectIsHoveredAsState()
 
+        var scrollBackTrigger by remember { mutableStateOf(0) }
+
+        LaunchedEffect(scrollBackTrigger) {
+            delay(3_000)
+            if (listState.firstVisibleItemIndex == 0)
+                listState.animateScrollToItem(1)
+        }
+
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxSize().weight(2f).hoverable(interactionSource)
-        ) {
-            Column(Modifier.fillMaxSize()) {
-                val tracks by remember {
-                    derivedStateOf {
-                        filteredTracks ?: currentPlaylist.tracks
+            modifier = Modifier.fillMaxSize().weight(2f).hoverable(interactionSource).pointerInput(filteredTracks) {
+                awaitPointerEventScope {
+                    while (true) {
+                        val event = awaitPointerEvent()
+                        if (event.type == PointerEventType.Scroll) {
+                            scrollBackTrigger++
+                        }
                     }
                 }
-
+            }
+        ) {
+            Column(Modifier.fillMaxSize()) {
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth()
                         .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
@@ -179,10 +195,26 @@ fun Tracklist(
                             allowAutoScroll = false
                         }, state = listState, contentPadding = PaddingValues(2.dp)
                 ) {
-                    items(tracks.size, key = {
-                        tracks[it].id
+                    item {
+                        Box(
+                            Modifier.padding(2.dp).height(64.dp).fillMaxSize().clip(RoundedCornerShape(8.dp))
+                                .background(KagaminTheme.colors.listItem)
+                                .clickable {
+
+                                }, contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                "Drop files or folders here into tracklist",
+                                textAlign = TextAlign.Center,
+                                color = KagaminTheme.textSecondary
+                            )
+                        }
+                    }
+
+                    items(displayedTracks.size, key = {
+                        displayedTracks[it].id
                     }) { index ->
-                        val track = tracks[index]
+                        val track = displayedTracks[index]
 
                         ThumbnailTrackItem(
                             index,
@@ -225,6 +257,15 @@ fun Tracklist(
             }
         }
     }
+}
+
+private suspend fun scrollToCurrentPlaylistOrTop(
+    indexed: Map<String, Int>,
+    currentTrack: AudioTrack?,
+    listState: LazyListState
+) {
+    val curIndex = indexed[currentTrack?.uri]
+    listState.animateScrollToItem(curIndex ?: 1, if (curIndex != null) 68 else 0)
 }
 
 private enum class Content {

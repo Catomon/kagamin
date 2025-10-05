@@ -57,7 +57,7 @@ fun AddTracksTab(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                 }
             }
 
-            snackbar.showSnackbar("${files?.size ?: 0} tracks were added.")
+            snackbar.showSnackbar("${files?.size ?: 0} tracks were added.", withDismissAction = true)
         }
     }
 

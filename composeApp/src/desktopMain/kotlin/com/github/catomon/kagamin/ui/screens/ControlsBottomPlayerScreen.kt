@@ -27,7 +27,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -40,7 +39,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toIntSize
@@ -154,36 +152,15 @@ fun ControlsBottomPlayerScreen(
                     }
                 }
 
-                if (currentPlaylist.tracks.isEmpty()) {
-                    Box(
-                        Modifier
-                            .weight(tracklistWeight)
-                            .fillMaxHeight()
-                            .background(KagaminTheme.backgroundTransparent)
-                            .dragAndDropTarget(
-                                { tracksDropTarget.shouldStartDaD(it) },
-                                tracksDropTarget
-                            )
-                            .trackDropTargetBorder(tracksDropTarget.isTarget),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            "Drop files or folders here",
-                            textAlign = TextAlign.Center,
-                            color = KagaminTheme.textSecondary
+                Tracklist(
+                    viewModel,
+                    Modifier.weight(tracklistWeight)
+                        .dragAndDropTarget(
+                            { tracksDropTarget.shouldStartDaD(it) },
+                            tracksDropTarget
                         )
-                    }
-                } else {
-                    Tracklist(
-                        viewModel,
-                        Modifier.weight(tracklistWeight)
-                            .dragAndDropTarget(
-                                { tracksDropTarget.shouldStartDaD(it) },
-                                tracksDropTarget
-                            )
-                            .trackDropTargetBorder(tracksDropTarget.isTarget)
-                    )
-                }
+                        .trackDropTargetBorder(tracksDropTarget.isTarget)
+                )
             }
 
             Box(

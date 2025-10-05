@@ -72,6 +72,14 @@ object ThumbnailCacheManager {
         size: Int = SIZE.ORIGINAL,
         retrieveImage: (() -> BufferedImage?)? = null,
     ): File? {
+        // I'd like it to work as intended - several coroutines waiting for the result
+        // But at some point everything breaks and no one retrieves thumbnails anymore
+        // Idk why so now only single request will get the result
+        if (mutex.isLocked) {
+            logTrace { "cache mutex is already locked for track uri: $trackUri" }
+            return null
+        }
+
         return mutex.withLock {
             ongoingCacheJobs[trackUri]?.let { existingJob ->
                 logTrace { "existing job retrieved for track uri: $trackUri" }

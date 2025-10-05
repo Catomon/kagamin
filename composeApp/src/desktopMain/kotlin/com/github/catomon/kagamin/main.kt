@@ -20,13 +20,17 @@ import org.koin.core.context.GlobalContext.startKoin
 import java.util.logging.Level
 import javax.swing.JOptionPane
 
-fun main() {
+fun main(args: Array<String>) {
     setDefaultExceptionHandler()
 
     FileKit.init(appId = "Kagamin")
     AbstractID3Tag.logger.level = Level.OFF
 
-    Rogga.logLevel = LogLevel.TRACE
+    val logLevelArg =
+        args.find { it.startsWith("--logLevel") }?.substringAfter("=")?.uppercase() ?: System.getenv("logLevel")
+            ?.uppercase() ?: LogLevel.ERROR.name
+    Rogga.logLevel = LogLevel.entries.find { it.name == logLevelArg } ?: LogLevel.ERROR
+    echoMsg { "LogLevel: ${Rogga.logLevel.name}" }
     Rogga.timestamp = true
 
     application {

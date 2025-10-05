@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -56,12 +57,14 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import com.github.catomon.kagamin.data.Playlist
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
+import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.ui.windows.LocalToolWindow
 import com.github.catomon.kagamin.ui.windows.ToolScreenState
@@ -96,6 +99,10 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
 
     val toolWindow = LocalToolWindow.current
 
+    val displayedPlaylists = remember(filteredPlaylists, playlists) {
+        (filteredPlaylists ?: playlists).sortedBy { it.name.lowercase() }
+    }
+
     LaunchedEffect(playlists, filterName) {
         withContext(Dispatchers.Default) {
             filteredPlaylists = if (filterName.isNotBlank()) {
@@ -106,204 +113,231 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
         }
     }
 
-    LaunchedEffect(Unit) {
-        listState.scrollToItem(index[currentPlaylist] ?: 0)
+    LaunchedEffect(displayedPlaylists) {
+        scrollToItemOrTop(index, currentPlaylist, listState)
     }
 
-    if (playlists.isEmpty()) {
-        Box(
-            modifier.background(KagaminTheme.backgroundTransparent),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                "No playlists.",
-                textAlign = TextAlign.Center,
-                color = KagaminTheme.textSecondary
-            )
-        }
-    } else {
-        val interactionSource = remember { MutableInteractionSource() }
-        val isHovered by interactionSource.collectIsHoveredAsState()
 
-        Column(modifier) {
-            Box(
-                modifier = Modifier.background(KagaminTheme.backgroundTransparent).height(32.dp)
-                    .fillMaxWidth().padding(4.dp).clip(RoundedCornerShape(8.dp)).clickable {
-                        val curTrackIndex = index[currentPlaylist] ?: return@clickable
-                        coroutineScope.launch {
-                            listState.animateScrollToItem(curTrackIndex)
-                        }
-                    }.onPointerEvent(PointerEventType.Exit) {
-                        if (searchTextValue.isBlank()) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isHovered by interactionSource.collectIsHoveredAsState()
+
+    var scrollBackTrigger by remember { mutableStateOf(0) }
+
+    LaunchedEffect(scrollBackTrigger) {
+        delay(3_000)
+        if (listState.firstVisibleItemIndex == 0)
+            listState.animateScrollToItem(1)
+    }
+
+    Column(modifier.pointerInput(playlists) {
+        awaitPointerEventScope {
+            while (true) {
+                val event = awaitPointerEvent()
+                if (event.type == PointerEventType.Scroll) {
+                    scrollBackTrigger++
+                }
+            }
+        }
+    }) {
+        Box(
+            modifier = Modifier.background(KagaminTheme.backgroundTransparent).height(32.dp)
+                .fillMaxWidth().padding(4.dp).clip(RoundedCornerShape(8.dp)).clickable {
+                    val curTrackIndex = index[currentPlaylist] ?: return@clickable
+                    coroutineScope.launch {
+                        listState.animateScrollToItem(curTrackIndex)
+                    }
+                }.onPointerEvent(PointerEventType.Exit) {
+                    if (searchTextValue.isBlank()) {
+                        showSearchBar = false
+                        showSearchIcon = false
+                    }
+                }.onPointerEvent(PointerEventType.Enter) {
+                    showSearchIcon = true
+                }, contentAlignment = Alignment.CenterStart
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                AnimatedVisibility(showSearchIcon) {
+                    IconButton(onClick = {
+                        if (searchTextValue.isNotBlank()) {
                             showSearchBar = false
                             showSearchIcon = false
-                        }
-                    }.onPointerEvent(PointerEventType.Enter) {
-                        showSearchIcon = true
-                    }, contentAlignment = Alignment.CenterStart
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    AnimatedVisibility(showSearchIcon) {
-                        IconButton(onClick = {
-                            if (searchTextValue.isNotBlank()) {
-                                showSearchBar = false
-                                showSearchIcon = false
-                            } else {
-                                //focus text field?
-                            }
-                        }, modifier = Modifier.size(30.dp).padding(top = 4.dp)) {
-                            Icon(
-                                painterResource(Res.drawable.search),
-                                "Search",
-                                modifier = Modifier.size(20.dp)
-                                    .onPointerEvent(PointerEventType.Enter) {
-                                        showSearchBar = true
-                                    },
-                                tint = KagaminTheme.colors.buttonIcon
-                            )
-                        }
-                    }
-
-                    AnimatedContent(showSearchBar) {
-                        if (showSearchBar) {
-                            LaunchedEffect(searchTextValue) {
-                                delay(300)
-                                filterName = searchTextValue
-                            }
-
-                            DisposableEffect(Unit) {
-                                onDispose {
-                                    searchTextValue = ""
-                                    filterName = ""
-                                }
-                            }
-
-                            BasicTextField(
-                                searchTextValue,
-                                onValueChange = {
-                                    searchTextValue = it
-                                },
-                                modifier = Modifier.weight(1f).fillMaxWidth().height(20.dp)
-                                    .padding(end = 6.dp)
-                                    .offset(y = 2.dp).drawBehind {
-                                        drawLine(
-                                            KagaminTheme.colors.buttonIcon,
-                                            start = Offset(0f, size.height),
-                                            end = Offset(size.width, size.height)
-                                        )
-                                    },
-                                textStyle = LocalTextStyle.current.copy(fontSize = 10.sp),
-                                cursorBrush = SolidColor(KagaminTheme.colors.buttonIcon),
-                                maxLines = 1
-                            )
                         } else {
-                            Text(
-                                currentPlaylist.name,
-                                fontSize = 10.sp,
-                                color = KagaminTheme.colors.buttonIcon,
-                                modifier = Modifier.weight(1f)
-                            )
+                            //focus text field?
                         }
+                    }, modifier = Modifier.size(30.dp).padding(top = 4.dp)) {
+                        Icon(
+                            painterResource(Res.drawable.search),
+                            "Search",
+                            modifier = Modifier.size(20.dp)
+                                .onPointerEvent(PointerEventType.Enter) {
+                                    showSearchBar = true
+                                },
+                            tint = KagaminTheme.colors.buttonIcon
+                        )
+                    }
+                }
+
+                AnimatedContent(showSearchBar) {
+                    if (showSearchBar) {
+                        LaunchedEffect(searchTextValue) {
+                            delay(300)
+                            filterName = searchTextValue
+                        }
+
+                        DisposableEffect(Unit) {
+                            onDispose {
+                                searchTextValue = ""
+                                filterName = ""
+                            }
+                        }
+
+                        BasicTextField(
+                            searchTextValue,
+                            onValueChange = {
+                                searchTextValue = it
+                            },
+                            modifier = Modifier.weight(1f).fillMaxWidth().height(20.dp)
+                                .padding(end = 6.dp)
+                                .offset(y = 2.dp).drawBehind {
+                                    drawLine(
+                                        KagaminTheme.colors.buttonIcon,
+                                        start = Offset(0f, size.height),
+                                        end = Offset(size.width, size.height)
+                                    )
+                                },
+                            textStyle = LocalTextStyle.current.copy(fontSize = 10.sp),
+                            cursorBrush = SolidColor(KagaminTheme.colors.buttonIcon),
+                            maxLines = 1
+                        )
+                    } else {
+                        Text(
+                            currentPlaylist.name,
+                            fontSize = 10.sp,
+                            color = KagaminTheme.colors.buttonIcon,
+                            modifier = Modifier.weight(1f)
+                        )
                     }
                 }
             }
+        }
 
-            Box(Modifier.fillMaxSize().hoverable(interactionSource)) {
-                Column {
-                    val displayedPlaylists = remember(filteredPlaylists, playlists) {
-                        (filteredPlaylists ?: playlists).sortedBy { it.name.lowercase() }
+        Box(Modifier.fillMaxSize().hoverable(interactionSource)) {
+            Column {
+                LazyColumn(
+                    state = listState, horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.graphicsLayer {
+                        compositingStrategy = CompositingStrategy.Offscreen
+                    }
+                        .drawWithContent {
+                            drawContent()
+                            drawRect(
+                                color = KagaminTheme.backgroundTransparent,
+                                size = size,
+                                blendMode = BlendMode.SrcOut
+                            )
+                            drawContent()
+                        },
+                    contentPadding = PaddingValues(2.dp)
+                ) {
+                    item {
+                        Box(
+                            Modifier.padding(2.dp).height(64.dp).fillMaxSize().clip(RoundedCornerShape(8.dp))
+                                .background(KagaminTheme.colors.listItem)
+                                .clickable {
+                                    viewModel.currentTab = Tabs.CREATE_PLAYLIST
+                                    viewModel.createPlaylistWindow = !viewModel.createPlaylistWindow
+                                }, contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                "Create New Playlist",
+                                textAlign = TextAlign.Center,
+                                color = KagaminTheme.textSecondary
+                            )
+                        }
                     }
 
-                    LazyColumn(
-                        state = listState, horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.graphicsLayer {
-                            compositingStrategy = CompositingStrategy.Offscreen
-                        }
-                            .drawWithContent {
-                                drawContent()
-                                drawRect(
-                                    color = KagaminTheme.backgroundTransparent,
-                                    size = size,
-                                    blendMode = BlendMode.SrcOut
-                                )
-                                drawContent()
-                            },
-                        contentPadding = PaddingValues(2.dp)
-                    ) {
-                        items(displayedPlaylists.size, key = {
-                            displayedPlaylists.elementAt(it)
-                        }) { i ->
-                            val playlist = displayedPlaylists.elementAt(i)
+                    items(displayedPlaylists.size, key = {
+                        displayedPlaylists.elementAt(it)
+                    }) { i ->
+                        val playlist = displayedPlaylists.elementAt(i)
 
-                            val tracksDropTarget = remember {
-                                TracksDropTarget { tracksUris ->
-                                    viewModel.viewModelScope.launch {
-                                        val tracks = viewModel.loadTracks(tracksUris)
-                                        val uris = tracks.map { it.uri }
-                                        viewModel.updatePlaylist(currentPlaylist.copy(tracks = tracks + currentPlaylist.tracks.filter { it.uri !in uris }))
-                                    }
+                        val tracksDropTarget = remember {
+                            TracksDropTarget { tracksUris ->
+                                viewModel.viewModelScope.launch {
+                                    val tracks = viewModel.loadTracks(tracksUris)
+                                    val uris = tracks.map { it.uri }
+                                    viewModel.updatePlaylist(currentPlaylist.copy(tracks = tracks + currentPlaylist.tracks.filter { it.uri !in uris }))
                                 }
                             }
+                        }
 
-                            PlaylistItem(
-                                playlist,
-                                viewModel,
-                                displayedPlaylists,
-                                currentPlaylist == playlist,
-                                i,
-                                remove = {
-                                    viewModel.removePlaylist(playlist)
-                                },
-                                clear = {
-                                    viewModel.clearPlaylist(playlist)
-                                },
-                                shuffle = {
-                                    viewModel.shufflePlaylist(playlist)
-                                },
-                                edit = {
-                                    toolWindow.value = ToolWindowState(
-                                        currentScreenState = ToolScreenState.EditPlaylist(
-                                            playlist = playlist,
-                                            onSort = { viewModel.sortPlaylist(playlist, it) },
-                                            onRename = { viewModel.renamePlaylist(playlist, it) },
-                                            onClose = {
-                                                toolWindow.value =
-                                                    ToolWindowState(isVisible = false)
-                                            }),
-                                        isVisible = true,
+                        PlaylistItem(
+                            playlist,
+                            viewModel,
+                            displayedPlaylists,
+                            currentPlaylist == playlist,
+                            i,
+                            remove = {
+                                viewModel.removePlaylist(playlist)
+                            },
+                            clear = {
+                                viewModel.clearPlaylist(playlist)
+                            },
+                            shuffle = {
+                                viewModel.shufflePlaylist(playlist)
+                            },
+                            edit = {
+                                toolWindow.value = ToolWindowState(
+                                    currentScreenState = ToolScreenState.EditPlaylist(
+                                        playlist = playlist,
+                                        onSort = { viewModel.sortPlaylist(playlist, it) },
+                                        onRename = { viewModel.renamePlaylist(playlist, it) },
                                         onClose = {
                                             toolWindow.value =
                                                 ToolWindowState(isVisible = false)
-                                        }
-                                    )
+                                        }),
+                                    isVisible = true,
+                                    onClose = {
+                                        toolWindow.value =
+                                            ToolWindowState(isVisible = false)
+                                    }
+                                )
+                            },
+                            modifier = Modifier.padding(2.dp).dragAndDropTarget(
+                                {
+                                    tracksDropTarget.shouldStartDaD(it)
                                 },
-                                modifier = Modifier.padding(2.dp).dragAndDropTarget(
-                                    {
-                                        tracksDropTarget.shouldStartDaD(it)
-                                    },
-                                    tracksDropTarget
-                                ).trackDropTargetBorder(tracksDropTarget.isTarget)
-                            )
-                        }
+                                tracksDropTarget
+                            ).trackDropTargetBorder(tracksDropTarget.isTarget)
+                        )
                     }
-
-                    Box(Modifier.fillMaxSize().background(KagaminTheme.backgroundTransparent))
                 }
 
-                androidx.compose.animation.AnimatedVisibility(
-                    isHovered, modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight()
-                ) {
-                    VerticalScrollbar(
-                        modifier = Modifier.fillMaxHeight().clickable { },
-                        adapter = rememberScrollbarAdapter(listState)
-                    )
-                }
+                Box(Modifier.fillMaxSize().background(KagaminTheme.backgroundTransparent))
+            }
+
+            androidx.compose.animation.AnimatedVisibility(
+                isHovered, modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight()
+            ) {
+                VerticalScrollbar(
+                    modifier = Modifier.fillMaxHeight().clickable { },
+                    adapter = rememberScrollbarAdapter(listState)
+                )
             }
         }
     }
+}
+
+private suspend fun scrollToItemOrTop(
+    index: Map<Playlist, Int>,
+    currentPlaylist: Playlist,
+    listState: LazyListState
+) {
+    val curIndex = index[currentPlaylist]
+    listState.animateScrollToItem(curIndex ?: 1, if (curIndex != null) 68 else 68)
 }
 
 fun Modifier.trackDropTargetBorder(isTarget: Boolean): Modifier = then(

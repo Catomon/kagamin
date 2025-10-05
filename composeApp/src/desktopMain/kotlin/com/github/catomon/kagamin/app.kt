@@ -515,7 +515,7 @@ suspend fun loadTrackFilesToCurrentPlaylist(
             snackbarScope.launch {
                 launch {
                     snackbar.currentSnackbarData?.dismiss()
-                    snackbar.showSnackbar("${uniqueTracks.size} tracks were added.")
+                    snackbar.showSnackbar("${uniqueTracks.size} tracks were added.", withDismissAction = true)
                 }
             }
 
@@ -526,7 +526,7 @@ suspend fun loadTrackFilesToCurrentPlaylist(
         if (snackbar != null)
             snackbarScope.launch {
                 snackbar.currentSnackbarData?.dismiss()
-                snackbar.showSnackbar(ex.message ?: "null")
+                snackbar.showSnackbar(ex.message ?: "null", withDismissAction = true)
             }
         return false
     }

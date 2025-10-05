@@ -23,7 +23,6 @@ import kotlinx.io.IOException
 import net.coobird.thumbnailator.Thumbnails
 import net.coobird.thumbnailator.resizers.configurations.Antialiasing
 import net.coobird.thumbnailator.resizers.configurations.Rendering
-import org.jaudiotagger.audio.AudioFileIO
 import java.awt.image.BufferedImage
 import java.io.File
 import java.nio.file.Files
@@ -74,10 +73,9 @@ object ThumbnailCacheManager {
     ): File? {
         // I'd like it to work as intended - several coroutines waiting for the result
         // But at some point everything breaks and no one retrieves thumbnails anymore
-        // Idk why so now only single request will get the result
-        if (mutex.isLocked) {
-            logTrace { "cache mutex is already locked for track uri: $trackUri" }
-            return null
+        // Idk why so here is a little fix
+        while (mutex.isLocked || ongoingCacheJobs[trackUri] != null) {
+            delay(50)
         }
 
         return mutex.withLock {

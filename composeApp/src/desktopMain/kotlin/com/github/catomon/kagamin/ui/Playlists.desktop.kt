@@ -252,7 +252,7 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                                 }, contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                "Create New Playlist",
+                                "New playlist",
                                 textAlign = TextAlign.Center,
                                 color = KagaminTheme.textSecondary
                             )

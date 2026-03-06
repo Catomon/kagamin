@@ -62,6 +62,9 @@ class KagaminViewModel(
 
     var createPlaylistWindow by mutableStateOf(false)
 
+    var hideInTray by mutableStateOf(false)
+        private set
+
     init {
         viewModelScope.launch {
             isLoading = true
@@ -397,5 +400,9 @@ class KagaminViewModel(
             repeatPlaylist = playMode.value == PlaylistsManager.PlayMode.REPEAT_PLAYLIST
         )
         saveSettings(settings)
+    }
+
+    fun hideInTray(hide: Boolean = true) {
+        hideInTray = hide
     }
 }

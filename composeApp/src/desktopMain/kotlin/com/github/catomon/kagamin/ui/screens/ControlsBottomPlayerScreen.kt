@@ -24,9 +24,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Text
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -251,21 +253,25 @@ fun SortingToggleButton(
     sortType: SortType,
     onClick: () -> Unit,
 ) {
-    IconButton(onClick) {
-        Icon(
-            painterResource(
-                when (sortType) {
-                    SortType.ORDER -> Res.drawable.sorting_default
-                    SortType.TITLE -> Res.drawable.sorting_title
-                    SortType.ARTIST -> Res.drawable.sorting_artist
-                    SortType.DURATION -> Res.drawable.sorting_duration
-                    SortType.DATE_TIME -> Res.drawable.sorting_date_time
-                }
-            ),
-            contentDescription = null,
-            tint = KagaminTheme.colors.buttonIcon,
-        )
+    TextButton(onClick) {
+        Text(text = sortType.name, color = KagaminTheme.colors.textSecondary)
     }
+
+//    IconButton(onClick) {
+//        Icon(
+//            painterResource(
+//                when (sortType) {
+//                    SortType.ORDER -> Res.drawable.sorting_default
+//                    SortType.TITLE -> Res.drawable.sorting_title
+//                    SortType.ARTIST -> Res.drawable.sorting_artist
+//                    SortType.DURATION -> Res.drawable.sorting_duration
+//                    SortType.DATE_TIME -> Res.drawable.sorting_date_time
+//                }
+//            ),
+//            contentDescription = null,
+//            tint = KagaminTheme.colors.buttonIcon,
+//        )
+//    }
 }
 
 @Composable

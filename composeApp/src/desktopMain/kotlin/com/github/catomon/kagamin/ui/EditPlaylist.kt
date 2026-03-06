@@ -1,5 +1,6 @@
 package com.github.catomon.kagamin.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,15 +18,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.github.catomon.kagamin.data.Playlist
 import com.github.catomon.kagamin.data.SortType
 import com.github.catomon.kagamin.isValidFileName
 import com.github.catomon.kagamin.ui.components.OutlinedTextButton
+import com.github.catomon.kagamin.ui.components.TrackThumbnail
 import com.github.catomon.kagamin.ui.screens.SortingToggleButton
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.arrow_left
+import kagamin.composeapp.generated.resources.close_white
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -37,6 +41,15 @@ fun EditPlaylist(playlist: Playlist, onSort: (SortType) -> Unit, onRename: (Stri
     var sortType by remember {mutableStateOf(playlist.sortType)}
 
     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+        TrackThumbnail(
+            null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
+            blur = true,
+        )
+
+        Box(Modifier.matchParentSize().background(KagaminTheme.colors.backgroundTransparent))
+
         Text("Edit playlist: ${playlist.name}", modifier = Modifier.align(Alignment.TopCenter))
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -79,7 +92,7 @@ fun EditPlaylist(playlist: Playlist, onSort: (SortType) -> Unit, onRename: (Stri
             onClose()
         }, modifier = Modifier.align(Alignment.BottomEnd)) {
             Icon(
-                painterResource(Res.drawable.arrow_left),
+                painterResource(Res.drawable.close_white),
                 contentDescription = null,
                 tint = KagaminTheme.colors.buttonIcon,
                 modifier = Modifier.scale(-1f, 1f)

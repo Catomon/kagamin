@@ -85,7 +85,6 @@ import kotlin.uuid.Uuid
 @Composable
 fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
     val kagaminViewModel: KagaminViewModel = remember { get(KagaminViewModel::class.java) }
-    var openPlayerWindow by remember { mutableStateOf(true) }
 
     val layoutManager = remember {
         LayoutManager(
@@ -128,7 +127,7 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
         }
     }
 
-    if (openPlayerWindow) {
+    if (!kagaminViewModel.hideInTray) {
         val windowState =
             rememberWindowState(size = windowSize, position = WindowPosition(Alignment.Center))
 
@@ -159,12 +158,13 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
             painterResource(if (kagaminViewModel.playState.value == AudioPlayerService.PlayState.PLAYING) Res.drawable.pause_icon else Res.drawable.play_icon),
             tooltip = kagaminViewModel.currentTrack.value?.title,
             onAction = {
-                openPlayerWindow = !openPlayerWindow
+                kagaminViewModel.hideInTray(!kagaminViewModel.hideInTray)
+//                openPlayerWindow = !openPlayerWindow
             },
             state = trayState
         ) {
             Item("Kagamin", onClick = {
-                openPlayerWindow = true
+                kagaminViewModel.hideInTray(false)
             })
             Item(
                 if (kagaminViewModel.playState.value == AudioPlayerService.PlayState.PLAYING) "Pause" else "Play",

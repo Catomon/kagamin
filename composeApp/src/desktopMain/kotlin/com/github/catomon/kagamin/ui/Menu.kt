@@ -121,12 +121,13 @@ fun Menu(
             val window = LocalWindow.current
             TextButton(
                 {
-                    window.isMinimized = true
+//                    window.isMinimized = true
+                    viewModel.hideInTray()
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    "Minimize",
+                    "Hide in tray",
                     color = KagaminTheme.colors.textSecondary,
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Start

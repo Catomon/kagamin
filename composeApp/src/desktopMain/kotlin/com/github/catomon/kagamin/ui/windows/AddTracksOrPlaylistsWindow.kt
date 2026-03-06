@@ -37,6 +37,7 @@ import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.arrow_left
+import kagamin.composeapp.generated.resources.close_white
 import kagamin.composeapp.generated.resources.kagamin_icon64
 import org.jetbrains.compose.resources.painterResource
 
@@ -140,7 +141,7 @@ fun ApplicationScope.AddTracksOrPlaylistsWindow(
                                 viewModel.currentTab = Tabs.TRACKLIST
                             }, modifier = Modifier.align(Alignment.BottomEnd)) {
                                 Icon(
-                                    painterResource(Res.drawable.arrow_left),
+                                    painterResource(Res.drawable.close_white),
                                     contentDescription = null,
                                     tint = KagaminTheme.colors.buttonIcon,
                                     modifier = Modifier.scale(-1f, 1f)

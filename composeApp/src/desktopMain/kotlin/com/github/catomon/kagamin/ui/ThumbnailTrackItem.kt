@@ -63,6 +63,8 @@ import kagamin.composeapp.generated.resources.pause
 import kagamin.composeapp.generated.resources.play
 import kagamin.composeapp.generated.resources.selected
 import kagamin.composeapp.generated.resources.online
+import kagamin.composeapp.generated.resources.pause16
+import kagamin.composeapp.generated.resources.play16
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 
@@ -283,7 +285,7 @@ fun PlaybackStateButton(
             modifier = Modifier.height(height)
         ) {
             Image(
-                painterResource(if (playSate == AudioPlayerService.PlayState.PAUSED) Res.drawable.pause else Res.drawable.play),
+                painterResource(if (playSate == AudioPlayerService.PlayState.PAUSED) Res.drawable.pause16 else Res.drawable.play16),
                 if (playSate == AudioPlayerService.PlayState.PAUSED) "Play" else "Pause",
                 modifier = Modifier.size(16.dp),
                 colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon)

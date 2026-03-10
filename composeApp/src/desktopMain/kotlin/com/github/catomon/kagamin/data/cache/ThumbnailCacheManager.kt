@@ -8,17 +8,14 @@ import com.github.catomon.kagamin.ui.util.removeBlackBars
 import com.github.catomon.kagamin.util.logErr
 import com.github.catomon.kagamin.util.logTrace
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.io.IOException
 import net.coobird.thumbnailator.Thumbnails
 import net.coobird.thumbnailator.resizers.configurations.Antialiasing
@@ -26,10 +23,10 @@ import net.coobird.thumbnailator.resizers.configurations.Rendering
 import java.awt.image.BufferedImage
 import java.io.File
 import java.nio.file.Files
+import kotlin.time.Duration.Companion.seconds
 
 object ThumbnailCacheManager {
-    private val ongoingCacheJobs = mutableMapOf<String, Deferred<File?>>()
-
+    private val ongoingCacheJobs = mutableMapOf<String, File?>()
     private val mutex = Mutex()
 
     object SIZE {
@@ -38,139 +35,121 @@ object ThumbnailCacheManager {
         const val H150 = 150
         const val H250 = 250
         const val H512 = 512
-
         const val DEFAULT_WIDTH = 1024
     }
 
     private val thumbnailCacheFolder = cacheFolder.resolve("thumbnails/")
 
-    private var timeoutJob: Job? = null
-
-    private val coroutineScope = CoroutineScope(Dispatchers.Default)
-
-    fun startTimeoutJob() {
-        timeoutJob?.cancel()
-        timeoutJob = coroutineScope.launch {
-            delay(3000)
-            try {
-                ongoingCacheJobs.forEach { it.value.cancel() }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-
-            coroutineScope2.cancel()
-
-            logErr { "ongoingCacheJobs wa canceled by timeoutJob after 3 sec." }
-        }
-    }
-
-    private val coroutineScope2 = CoroutineScope(Dispatchers.IO)
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     suspend fun cacheThumbnail(
         trackUri: String,
         size: Int = SIZE.ORIGINAL,
         retrieveImage: (() -> BufferedImage?)? = null,
     ): File? {
-        // I'd like it to work as intended - several coroutines waiting for the result
-        // But at some point everything breaks and no one retrieves thumbnails anymore
-        // Idk why so here is a little fix
-        while (mutex.isLocked || ongoingCacheJobs[trackUri] != null) {
-            delay(50)
+        // check if we already have the result cached
+        mutex.withLock {
+            ongoingCacheJobs[trackUri]?.let { cached ->
+                logTrace { "cache hit for $trackUri: ${cached?.path}" }
+                return getSizedFile(cached, size)
+            }
         }
 
+        // try to get from disk first
+        val diskFile = thumbnailCacheFolder.resolve("512/${trackUri.hashCode()}").takeIf { it.exists() }
+        if (diskFile != null) {
+            logTrace { "disk cache hit for $trackUri" }
+            mutex.withLock { ongoingCacheJobs[trackUri] = diskFile }
+            return getSizedFile(diskFile, size)
+        }
+
+        // meed to compute - coordinate with others
         return mutex.withLock {
-            ongoingCacheJobs[trackUri]?.let { existingJob ->
-                logTrace { "existing job retrieved for track uri: $trackUri" }
-                return@withLock existingJob
+            // double-check inside lock
+            ongoingCacheJobs[trackUri]?.let { cached ->
+                logTrace { "concurrent cache hit for $trackUri" }
+                return@withLock getSizedFile(cached, size)
             }
 
-            logTrace { "job created for track uri: $trackUri" }
-            val newJob = coroutineScope2.async(start = CoroutineStart.LAZY) {
+            // create computation job
+            val result = withTimeoutOrNull(10.seconds) {
+                scope.async {
+                    computeThumbnailFile(trackUri, retrieveImage)
+                }.await()
+            }
+
+            if (result != null) {
+                ongoingCacheJobs[trackUri] = result
+                logTrace { "computation completed for $trackUri: ${result.path}" }
+                return@withLock getSizedFile(result, size)
+            }
+
+            // start background computation for others
+            ongoingCacheJobs[trackUri] = null // mark as "in progress"
+
+            scope.launch {
                 try {
-                    thumbnailCacheFolder.resolve("512/${trackUri.hashCode()}").let {
-                        if (it.exists()) it else {
-                            if (retrieveImage != null)
-                                cacheThumbnail(trackUri, retrieveImage() ?: return@async null)
-                            else
-                                cacheThumbnail(
-                                    trackUri,
-                                    AudioTagsReader.read(File(trackUri))?.tag?.firstArtwork?.image as BufferedImage?
-                                        ?: return@async null
-                                )
-                        }
+                    val backgroundResult = computeThumbnailFile(trackUri, retrieveImage)
+                    mutex.withLock {
+                        ongoingCacheJobs[trackUri] = backgroundResult
                     }
+                    logTrace { "background computation done for $trackUri: ${backgroundResult?.path}" }
                 } catch (e: Exception) {
-                    e.printStackTrace()
-                    null
-                }
-            }
-
-            ongoingCacheJobs[trackUri] = newJob
-            newJob.invokeOnCompletion { error ->
-                logTrace { "job completed for track uri: $trackUri" }
-
-                error?.printStackTrace()
-
-                runBlocking {
+                    logErr { "background thumbnail failed for $trackUri: ${e.message}" }
                     mutex.withLock {
                         ongoingCacheJobs.remove(trackUri)
                     }
                 }
             }
 
-            startTimeoutJob()
-
-            newJob.start()
-
-            newJob
-        }.await().let { file ->
-            logTrace { "job result is ${file?.path} for size $size for track uri: $trackUri" }
-
-            try {
-                if (ongoingCacheJobs.isEmpty())
-                    timeoutJob?.cancel()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-
-            if (size > 0) {
-                file?.let {
-                    thumbnailCacheFolder.resolve("$size/${file.name}")
-                }
-            } else {
-                file
-            }
+            null
         }
     }
 
-    private suspend fun cacheThumbnail(
-        sourcePath: String, image: BufferedImage
+    private suspend fun computeThumbnailFile(
+        trackUri: String,
+        retrieveImage: (() -> BufferedImage?)?,
     ): File? {
-        try {
-            val uriHash = sourcePath.hashCode()
-            val extractedSrcTmpFile = cacheFolder.resolve("temp")
-            val h512 = cacheFolder.resolve("thumbnails/512/$uriHash")
-            if (!h512.exists()) {
-                extractedSrcTmpFile.parentFile?.mkdirs()
-                val srcImage = image.toComposeImageBitmap().removeBlackBars()
-                val srcHeight = srcImage.toAwtImage()
-                cacheScaledThumbnailFile(srcHeight, uriHash, SIZE.H64)
-                cacheScaledThumbnailFile(srcHeight, uriHash, SIZE.H150)
-//                cacheScaledThumbnailFile(srcHeight, uriHash, SIZE.H250)
-                return cacheScaledThumbnailFile(
-                    srcHeight,
-                    uriHash,
-                    SIZE.H512
-                ).also { extractedSrcTmpFile.delete() }
-            } else {
-                return h512
-            }
-        } catch (e: IOException) {
-            e.printStackTrace()
-            return null
+        val image = retrieveImage?.invoke()
+            ?: AudioTagsReader.read(File(trackUri))?.tag?.firstArtwork?.image
+
+        return image?.let { img ->
+            cacheThumbnailFromImage(trackUri, img as BufferedImage)
         }
     }
 
+    private suspend fun cacheThumbnailFromImage(sourcePath: String, image: BufferedImage): File? {
+        return try {
+            val uriHash = sourcePath.hashCode()
+            val h512 = thumbnailCacheFolder.resolve("512/$uriHash")
+
+            if (h512.exists()) {
+                h512
+            } else {
+                thumbnailCacheFolder.parentFile?.mkdirs()
+                h512.parentFile?.mkdirs()
+
+                val processedImage = image.toComposeImageBitmap().removeBlackBars().toAwtImage()
+
+                cacheScaledThumbnailFile(processedImage, uriHash, SIZE.H64)
+                cacheScaledThumbnailFile(processedImage, uriHash, SIZE.H150)
+                cacheScaledThumbnailFile(processedImage, uriHash, SIZE.H512)
+
+                h512
+            }
+        } catch (e: Exception) {
+            logErr { "failed to cache thumbnail: ${e.message}" }
+            null
+        }
+    }
+
+    private fun getSizedFile(baseFile: File?, size: Int): File? {
+        return if (size > 0 && baseFile != null) {
+            thumbnailCacheFolder.resolve("$size/${baseFile.name}")
+        } else {
+            baseFile
+        }
+    }
 
     private fun cacheScaledThumbnailFile(
         srcImage: BufferedImage,
@@ -178,25 +157,29 @@ object ThumbnailCacheManager {
         height: Int = SIZE.ORIGINAL,
         width: Int = SIZE.DEFAULT_WIDTH
     ): File {
-        val cachedScaledFile = cacheFolder.resolve("thumbnails/$height/$targetFileName")
-        if (cachedScaledFile.exists())
-            return cachedScaledFile
-        else
-            cachedScaledFile.parentFile?.mkdirs()
+        val cachedScaledFile = thumbnailCacheFolder.resolve("$height/$targetFileName")
+        if (cachedScaledFile.exists()) return cachedScaledFile
 
-        Thumbnails.of(srcImage).let {
-            if (height != SIZE.ORIGINAL && srcImage.height > height)
-                it.size(width, height)
-            else it.size(srcImage.width, srcImage.height)
+        cachedScaledFile.parentFile?.mkdirs()
+
+        Thumbnails.of(srcImage).let { creator ->
+            if (height != SIZE.ORIGINAL && srcImage.height > height) {
+                creator.size(width, height)
+            } else {
+                creator.size(srcImage.width, srcImage.height)
+            }
         }.outputFormat("JPEG")
-            .outputQuality(0.90f).antialiasing(Antialiasing.ON).rendering(Rendering.QUALITY)
-            .toFile(cachedScaledFile)
+            .outputQuality(0.90f)
+            .antialiasing(Antialiasing.ON)
+            .rendering(Rendering.QUALITY)
+            .toFile(cachedScaledFile.parentFile!!.resolve("$targetFileName.JPEG"))
 
-        return Files.move(
-            (cachedScaledFile.parentFile?.resolve("$targetFileName.JPEG")
-                ?: File("$targetFileName")).toPath(),
-            (cachedScaledFile.parentFile?.resolve("$targetFileName")
-                ?: File("$targetFileName")).toPath()
-        ).toFile()
+        // remove .JPEG from the name
+        Files.move(
+            cachedScaledFile.parentFile!!.resolve("$targetFileName.JPEG").toPath(),
+            cachedScaledFile.toPath()
+        )
+
+        return cachedScaledFile
     }
 }

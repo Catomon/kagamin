@@ -15,6 +15,9 @@ object WindowConfig {
     const val BOTTOM_CONTROLS_WIDTH = 505
     const val BOTTOM_CONTROLS_HEIGHT = 500
 
+    const val SCALED_UP_WIDTH = 600
+    const val SCALED_UP_HEIGHT = 600
+
     var isTransparent = false
 
     val isTraySupported = androidx.compose.ui.window.isTraySupported

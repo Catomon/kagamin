@@ -29,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,6 +45,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
+import com.github.catomon.kagamin.LocalLayoutManager
 import com.github.catomon.kagamin.LocalSnackbarHostState
 import com.github.catomon.kagamin.audio.AudioPlayerService
 import com.github.catomon.kagamin.data.AudioTrack
@@ -53,6 +55,7 @@ import com.github.catomon.kagamin.data.cache.ThumbnailCacheManager
 import com.github.catomon.kagamin.ui.components.LikeSongButton
 import com.github.catomon.kagamin.ui.components.TrackThumbnail
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
+import com.github.catomon.kagamin.ui.util.LayoutManager
 import com.github.catomon.kagamin.ui.util.formatMillisToMinutesSeconds
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.ui.windows.ConfirmWindowState
@@ -85,7 +88,14 @@ fun ThumbnailTrackItem(
     val snackbar = LocalSnackbarHostState.current
     val backgroundColor = KagaminTheme.colors.listItem
 
-    val height = 64.dp
+    val currentLayout by LocalLayoutManager.current.currentLayout
+
+    val height by derivedStateOf {
+        when (currentLayout) {
+            LayoutManager.Layout.ScaledUp -> 80.dp
+            else -> 64.dp
+        }
+    }
 
     ContextMenuArea(items = {
         ThumbnailTrackItemDefaults.contextMenuItems(
@@ -114,7 +124,7 @@ fun ThumbnailTrackItem(
                         track,
                         modifier = Modifier.width(height),
                         shape = RoundedCornerShape(8.dp),
-                        size = ThumbnailCacheManager.SIZE.H64
+                        size = ThumbnailCacheManager.SIZE.H150
                     )
 
                     TrackItemBody(
@@ -150,6 +160,14 @@ private fun TrackItemBody(
                 .firstOrNull { playlist -> playlist.id == "loved" }?.tracks?.any { it.id == track.id }
         } ?: false)
     }
+    val currentLayout by LocalLayoutManager.current.currentLayout
+
+    val fontScale by derivedStateOf {
+        when (currentLayout) {
+            LayoutManager.Layout.ScaledUp -> 1.25f
+            else -> 1f
+        }
+    }
 
     Box(
         modifier = modifier.fillMaxWidth().hoverable(interactionSource),
@@ -163,7 +181,7 @@ private fun TrackItemBody(
         ) {
             Text(
                 track.title,
-                fontSize = 10.sp,
+                fontSize = 10.sp * fontScale,
                 color = KagaminTheme.text,
                 maxLines = 1,
                 modifier = Modifier.let { if (isHovered) it.basicMarquee(iterations = Int.MAX_VALUE) else it }
@@ -174,7 +192,7 @@ private fun TrackItemBody(
                 if (track.artist.isNotBlank())
                     Text(
                         track.artist,
-                        fontSize = 8.sp,
+                        fontSize = 8.sp * fontScale,
                         color = KagaminTheme.textSecondary,
                         maxLines = 1,
                         modifier = Modifier.let { if (isHovered) it.basicMarquee(iterations = Int.MAX_VALUE) else it },
@@ -186,7 +204,7 @@ private fun TrackItemBody(
                 if (track.duration >= 0)
                     Text(
                         remember { formatMillisToMinutesSeconds(track.duration) },
-                        fontSize = 8.sp,
+                        fontSize = 8.sp * fontScale,
                         color = KagaminTheme.textSecondary,
                         maxLines = 1,
                         modifier = Modifier.let { if (isHovered) it.basicMarquee(iterations = Int.MAX_VALUE) else it },

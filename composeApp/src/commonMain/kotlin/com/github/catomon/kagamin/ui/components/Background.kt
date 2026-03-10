@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
@@ -48,7 +49,7 @@ fun Background(currentTrack: AudioTrack?, modifier: Modifier) {
         Image(
             painter = painterResource(backgroundRes),
             contentScale = ContentScale.Crop,
-            modifier = modifier.clip(RoundedCornerShape(14.dp)),
+            modifier = modifier.clip(RoundedCornerShape(14.dp)).blur(2.dp),
             contentDescription = null,
 //            colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon)
         )

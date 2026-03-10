@@ -36,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,6 +53,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
@@ -62,8 +64,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
+import com.github.catomon.kagamin.LocalLayoutManager
 import com.github.catomon.kagamin.data.Playlist
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
+import com.github.catomon.kagamin.ui.util.LayoutManager
 import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.ui.windows.LocalToolWindow
@@ -71,6 +75,7 @@ import com.github.catomon.kagamin.ui.windows.ToolScreenState
 import com.github.catomon.kagamin.ui.windows.ToolWindowState
 import com.github.catomon.kagamin.util.echoTrace
 import kagamin.composeapp.generated.resources.Res
+import kagamin.composeapp.generated.resources.add
 import kagamin.composeapp.generated.resources.search
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -122,6 +127,15 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
     val isHovered by interactionSource.collectIsHoveredAsState()
 
     var scrollBackTrigger by remember { mutableStateOf(0) }
+
+    val currentLayout by LocalLayoutManager.current.currentLayout
+
+    val fontScale by derivedStateOf {
+        when (currentLayout) {
+            LayoutManager.Layout.ScaledUp -> 1.25f
+            else -> 1f
+        }
+    }
 
     LaunchedEffect(scrollBackTrigger) {
         delay(3_000)
@@ -208,14 +222,14 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                                         end = Offset(size.width, size.height)
                                     )
                                 },
-                            textStyle = LocalTextStyle.current.copy(fontSize = 10.sp),
+                            textStyle = LocalTextStyle.current.copy(fontSize = 10.sp * fontScale),
                             cursorBrush = SolidColor(KagaminTheme.colors.buttonIcon),
                             maxLines = 1
                         )
                     } else {
                         Text(
                             currentPlaylist.name,
-                            fontSize = 10.sp,
+                            fontSize = 10.sp * fontScale,
                             color = KagaminTheme.colors.buttonIcon,
                             modifier = Modifier.weight(1f)
                         )
@@ -243,19 +257,28 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                     contentPadding = PaddingValues(2.dp)
                 ) {
                     item {
+                        val layout by LocalLayoutManager.current.currentLayout
+                        val height by derivedStateOf {
+                            when (layout) {
+                                LayoutManager.Layout.ScaledUp -> 40.dp
+                                else -> 64.dp
+                            }
+                        }
+
                         Box(
-                            Modifier.padding(2.dp).height(64.dp).fillMaxSize().clip(RoundedCornerShape(8.dp))
+                            Modifier.padding(2.dp).height(height).fillMaxSize().clip(RoundedCornerShape(8.dp))
                                 .background(KagaminTheme.colors.listItem)
                                 .clickable {
                                     viewModel.currentTab = Tabs.CREATE_PLAYLIST
                                     viewModel.createPlaylistWindow = !viewModel.createPlaylistWindow
                                 }, contentAlignment = Alignment.Center
                         ) {
-                            Text(
-                                "New playlist",
-                                textAlign = TextAlign.Center,
-                                color = KagaminTheme.textSecondary
-                            )
+                            Icon(painter = painterResource(Res.drawable.add), contentDescription =  null, tint = KagaminTheme.textSecondary)
+//                            Text(
+//                                "New playlist",
+//                                textAlign = TextAlign.Center,
+//                                color = KagaminTheme.textSecondary
+//                            )
                         }
                     }
 

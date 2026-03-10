@@ -65,11 +65,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
+import com.github.catomon.kagamin.LocalLayoutManager
 import com.github.catomon.kagamin.LocalWindow
 import com.github.catomon.kagamin.audio.PlaylistsManager
 import com.github.catomon.kagamin.data.AudioTrack
 import com.github.catomon.kagamin.ui.components.TrackProgressIndicator
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
+import com.github.catomon.kagamin.ui.util.LayoutManager
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.util.echoTrace
 import kagamin.composeapp.generated.resources.Res
@@ -89,7 +91,7 @@ fun Tracklist(
     val currentPlaylist by viewModel.currentPlaylist.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val tracklistManager = remember { TracklistManager(coroutineScope) }
-    var indexed = remember(currentPlaylist) {
+    val indexed = remember(currentPlaylist) {
         currentPlaylist.tracks.mapIndexed { i, track -> (track.uri to i) }.toMap()
     }
     val currentTrack by viewModel.currentTrack.collectAsState()
@@ -310,6 +312,15 @@ fun TracklistHeader(
 
     val progressAnimated by animateFloatAsState(if (isIndicatorHovered) progressOnHover else progress)
 
+    val currentLayout by LocalLayoutManager.current.currentLayout
+
+    val fontScale by derivedStateOf {
+        when (currentLayout) {
+            LayoutManager.Layout.ScaledUp -> 1.25f
+            else -> 1f
+        }
+    }
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.height(32.dp).fillMaxWidth().onPointerEvent(PointerEventType.Exit) {
@@ -411,7 +422,7 @@ fun TracklistHeader(
                                         )
                                     }//.focusRequester(focusRequester)
                                 ,
-                                textStyle = LocalTextStyle.current.copy(fontSize = 10.sp),
+                                textStyle = LocalTextStyle.current.copy(fontSize = 10.sp * fontScale),
                                 cursorBrush = SolidColor(KagaminTheme.colors.buttonIcon),
                                 maxLines = 1
                             )
@@ -459,13 +470,22 @@ fun TracklistHeader(
 private fun TrackName(currentTrack: AudioTrack?, modifier: Modifier = Modifier) {
     echoTrace { "Tracklist TrackName" }
 
+    val currentLayout by LocalLayoutManager.current.currentLayout
+
+    val fontScale by derivedStateOf {
+        when (currentLayout) {
+            LayoutManager.Layout.ScaledUp -> 1.25f
+            else -> 1f
+        }
+    }
+
     @Suppress("NAME_SHADOWING") val interactionSource =
         remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
 
     Text(
         currentTrack?.title ?: "",
-        fontSize = 10.sp,
+        fontSize = 10.sp * fontScale,
         color = KagaminTheme.colors.buttonIcon,
         maxLines = 1,
         modifier = modifier.hoverable(interactionSource)

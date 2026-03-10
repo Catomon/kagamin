@@ -275,7 +275,7 @@ fun SortingToggleButton(
 }
 
 @Composable
-private fun AnimatedPlayPauseButton(
+fun AnimatedPlayPauseButton(
     viewModel: KagaminViewModel,
     modifier: Modifier = Modifier
 ) {

@@ -11,6 +11,7 @@ class LayoutManager(
         Compact,
         Tiny,
         BottomControls,
+        ScaledUp,
     }
 
     constructor(layout: Layout): this(mutableStateOf(layout))

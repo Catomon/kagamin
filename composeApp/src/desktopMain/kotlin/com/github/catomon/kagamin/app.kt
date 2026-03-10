@@ -88,14 +88,16 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
 
     val layoutManager = remember {
         LayoutManager(
+
+
             try {
                 LayoutManager.Layout.valueOf(
                     kagaminViewModel.settings.extra["layout"]
-                        ?: LayoutManager.Layout.BottomControls.name
+                        ?: LayoutManager.Layout.ScaledUp.name
                 )
             } catch (e: Exception) {
                 e.printStackTrace()
-                LayoutManager.Layout.BottomControls
+                LayoutManager.Layout.ScaledUp
             }
         )
     }
@@ -123,6 +125,11 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
             LayoutManager.Layout.BottomControls -> DpSize(
                 width = WindowConfig.BOTTOM_CONTROLS_WIDTH.dp,
                 height = WindowConfig.BOTTOM_CONTROLS_HEIGHT.dp
+            )
+
+            LayoutManager.Layout.ScaledUp -> DpSize(
+                width = WindowConfig.SCALED_UP_WIDTH.dp,
+                height = WindowConfig.SCALED_UP_HEIGHT.dp
             )
         }
     }
@@ -269,10 +276,16 @@ private fun AppWindow(
                     }
 
                     LayoutManager.Layout.Tiny -> {
-                        layoutManager.currentLayout.value = LayoutManager.Layout.Default
+                        layoutManager.currentLayout.value = LayoutManager.Layout.BottomControls
                     }
 
-                    LayoutManager.Layout.BottomControls -> LayoutManager.Layout.Default
+                    LayoutManager.Layout.BottomControls -> {
+                        layoutManager.currentLayout.value = LayoutManager.Layout.ScaledUp
+                    }
+
+                    LayoutManager.Layout.ScaledUp -> {
+                        layoutManager.currentLayout.value = LayoutManager.Layout.Default
+                    }
                 }
                 false
             } else {
@@ -396,7 +409,7 @@ class AudioTagsReader private constructor(
                     null
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                //e.printStackTrace()
                 null
             }
     }

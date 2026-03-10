@@ -49,7 +49,7 @@ fun Background(currentTrack: AudioTrack?, modifier: Modifier) {
         Image(
             painter = painterResource(backgroundRes),
             contentScale = ContentScale.Crop,
-            modifier = modifier.clip(RoundedCornerShape(14.dp)).blur(2.dp),
+            modifier = modifier.clip(RoundedCornerShape(14.dp)),
             contentDescription = null,
 //            colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon)
         )

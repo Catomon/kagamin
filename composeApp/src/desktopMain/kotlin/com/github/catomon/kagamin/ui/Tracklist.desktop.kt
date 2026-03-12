@@ -316,7 +316,7 @@ fun TracklistHeader(
 
     val fontScale by derivedStateOf {
         when (currentLayout) {
-            LayoutManager.Layout.ScaledUp -> 1.25f
+            LayoutManager.Layout.Spacy -> 1.25f
             else -> 1f
         }
     }
@@ -474,7 +474,7 @@ private fun TrackName(currentTrack: AudioTrack?, modifier: Modifier = Modifier) 
 
     val fontScale by derivedStateOf {
         when (currentLayout) {
-            LayoutManager.Layout.ScaledUp -> 1.25f
+            LayoutManager.Layout.Spacy -> 1.25f
             else -> 1f
         }
     }

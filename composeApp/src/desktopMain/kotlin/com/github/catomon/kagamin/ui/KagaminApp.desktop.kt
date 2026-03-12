@@ -15,7 +15,7 @@ import com.github.catomon.kagamin.ui.screens.ControlsBottomPlayerScreen
 import com.github.catomon.kagamin.ui.screens.PlayerScreen
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.ui.screens.PlayerScreenDestination
-import com.github.catomon.kagamin.ui.screens.ScaledPlayerScreen
+import com.github.catomon.kagamin.ui.screens.SpacyPlayerScreen
 import com.github.catomon.kagamin.ui.screens.SettingsDestination
 import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.screens.TinyPlayerScreen
@@ -53,7 +53,7 @@ fun KagaminApp(
 
                     LayoutManager.Layout.BottomControls -> ControlsBottomPlayerScreen(kagaminViewModel, navController)
 
-                    LayoutManager.Layout.ScaledUp -> ScaledPlayerScreen(kagaminViewModel, navController)
+                    LayoutManager.Layout.Spacy -> SpacyPlayerScreen(kagaminViewModel, navController)
                 }
             }
 

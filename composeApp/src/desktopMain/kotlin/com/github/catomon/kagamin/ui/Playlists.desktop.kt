@@ -53,14 +53,12 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
@@ -132,7 +130,7 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
 
     val fontScale by derivedStateOf {
         when (currentLayout) {
-            LayoutManager.Layout.ScaledUp -> 1.25f
+            LayoutManager.Layout.Spacy -> 1.25f
             else -> 1f
         }
     }
@@ -260,7 +258,7 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                         val layout by LocalLayoutManager.current.currentLayout
                         val height by derivedStateOf {
                             when (layout) {
-                                LayoutManager.Layout.ScaledUp -> 40.dp
+                                LayoutManager.Layout.Spacy -> 40.dp
                                 else -> 64.dp
                             }
                         }

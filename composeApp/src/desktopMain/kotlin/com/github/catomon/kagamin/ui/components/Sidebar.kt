@@ -148,7 +148,7 @@ private fun SwapLayoutButton(layoutManager: LayoutManager) {
                     layoutManager.currentLayout.value = LayoutManager.Layout.Default
                 }
 
-                LayoutManager.Layout.ScaledUp -> {
+                LayoutManager.Layout.Spacy -> {
                     layoutManager.currentLayout.value = LayoutManager.Layout.Default
                 }
             }

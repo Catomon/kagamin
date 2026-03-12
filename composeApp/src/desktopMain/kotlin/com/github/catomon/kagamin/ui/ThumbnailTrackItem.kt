@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,7 +21,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -62,8 +60,6 @@ import com.github.catomon.kagamin.ui.windows.ConfirmWindowState
 import com.github.catomon.kagamin.ui.windows.LocalConfirmWindow
 import com.github.catomon.kagamin.util.echoTrace
 import kagamin.composeapp.generated.resources.Res
-import kagamin.composeapp.generated.resources.pause
-import kagamin.composeapp.generated.resources.play
 import kagamin.composeapp.generated.resources.selected
 import kagamin.composeapp.generated.resources.online
 import kagamin.composeapp.generated.resources.pause16
@@ -92,7 +88,7 @@ fun ThumbnailTrackItem(
 
     val height by derivedStateOf {
         when (currentLayout) {
-            LayoutManager.Layout.ScaledUp -> 80.dp
+            LayoutManager.Layout.Spacy -> 80.dp
             else -> 64.dp
         }
     }
@@ -164,7 +160,7 @@ private fun TrackItemBody(
 
     val fontScale by derivedStateOf {
         when (currentLayout) {
-            LayoutManager.Layout.ScaledUp -> 1.25f
+            LayoutManager.Layout.Spacy -> 1.25f
             else -> 1f
         }
     }

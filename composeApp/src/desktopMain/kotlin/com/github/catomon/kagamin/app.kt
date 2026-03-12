@@ -12,7 +12,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -93,11 +92,11 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
             try {
                 LayoutManager.Layout.valueOf(
                     kagaminViewModel.settings.extra["layout"]
-                        ?: LayoutManager.Layout.ScaledUp.name
+                        ?: LayoutManager.Layout.Spacy.name
                 )
             } catch (e: Exception) {
                 e.printStackTrace()
-                LayoutManager.Layout.ScaledUp
+                LayoutManager.Layout.Spacy
             }
         )
     }
@@ -127,7 +126,7 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
                 height = WindowConfig.BOTTOM_CONTROLS_HEIGHT.dp
             )
 
-            LayoutManager.Layout.ScaledUp -> DpSize(
+            LayoutManager.Layout.Spacy -> DpSize(
                 width = WindowConfig.SCALED_UP_WIDTH.dp,
                 height = WindowConfig.SCALED_UP_HEIGHT.dp
             )
@@ -280,10 +279,10 @@ private fun AppWindow(
                     }
 
                     LayoutManager.Layout.BottomControls -> {
-                        layoutManager.currentLayout.value = LayoutManager.Layout.ScaledUp
+                        layoutManager.currentLayout.value = LayoutManager.Layout.Spacy
                     }
 
-                    LayoutManager.Layout.ScaledUp -> {
+                    LayoutManager.Layout.Spacy -> {
                         layoutManager.currentLayout.value = LayoutManager.Layout.Default
                     }
                 }

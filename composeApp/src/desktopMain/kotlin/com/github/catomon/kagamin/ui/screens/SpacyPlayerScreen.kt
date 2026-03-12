@@ -1,6 +1,11 @@
 package com.github.catomon.kagamin.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
@@ -17,8 +22,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,6 +49,7 @@ import androidx.navigation.NavHostController
 import com.github.catomon.kagamin.LocalWindow
 import com.github.catomon.kagamin.data.AudioTrack
 import com.github.catomon.kagamin.data.cache.ThumbnailCacheManager
+import com.github.catomon.kagamin.ui.Menu
 import com.github.catomon.kagamin.ui.Playlists
 import com.github.catomon.kagamin.ui.Tracklist
 import com.github.catomon.kagamin.ui.TracksDropTarget
@@ -59,12 +67,12 @@ import com.github.catomon.kagamin.util.echoTrace
 import kotlinx.coroutines.launch
 
 @Composable
-fun ScaledPlayerScreen(
+fun SpacyPlayerScreen(
     viewModel: KagaminViewModel,
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    echoTrace { "ScaledPlayerScreen" }
+    echoTrace { "SpacyPlayerScreen" }
 
     val currentTrack by viewModel.currentTrack.collectAsState()
     val currentPlaylist by viewModel.currentPlaylist.collectAsState()
@@ -103,10 +111,12 @@ fun ScaledPlayerScreen(
                     Modifier
                         .padding(horizontal = 12.dp)
                         .height(40.dp)
+                        .width(175.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .clickable {
                             isMenuOpen = !isMenuOpen
                         }
+                        .graphicsLayer (scaleX = 1.20f, scaleY = 1.20f)
                 )
 
                 MinimizeButton()
@@ -225,6 +235,37 @@ fun ScaledPlayerScreen(
 //                    Modifier.padding(all = 18.dp)
 //                )
 //            }
+        }
+
+        AnimatedVisibility(
+            isMenuOpen,
+            enter = fadeIn() + slideInHorizontally(),
+            exit = fadeOut() + slideOutHorizontally()
+        ) {
+            Box(Modifier.fillMaxSize().clickable(null, null) {
+                isMenuOpen = false
+            }) {
+                Menu(
+                    currentTrack,
+                    viewModel, navigateToSettings = {
+                        if (navController.currentDestination?.route != SettingsDestination.toString())
+                            navController.navigate(SettingsDestination.toString())
+                    },
+                    onClose = {
+                        isMenuOpen = false
+                    },
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(top = 12.dp, start = 12.dp, end = 12.dp)
+                )
+            }
+        }
+
+        AnimatedVisibility(
+            viewModel.isLoading,
+            modifier = Modifier.align(Alignment.BottomCenter).padding(4.dp)
+        ) {
+            CircularProgressIndicator(Modifier.size(32.dp))
         }
     }
 }

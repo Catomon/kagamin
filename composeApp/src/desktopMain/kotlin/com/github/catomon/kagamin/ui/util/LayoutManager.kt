@@ -11,7 +11,7 @@ class LayoutManager(
         Compact,
         Tiny,
         BottomControls,
-        ScaledUp,
+        Spacy,
     }
 
     constructor(layout: Layout): this(mutableStateOf(layout))

@@ -36,7 +36,6 @@ import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.heart16
-import kagamin.composeapp.generated.resources.like_song
 import kagamin.composeapp.generated.resources.online
 import org.jetbrains.compose.resources.painterResource
 
@@ -58,7 +57,7 @@ fun PlaylistItem(
     val layout by LocalLayoutManager.current.currentLayout
     val height by derivedStateOf {
         when (layout) {
-            LayoutManager.Layout.ScaledUp -> 40.dp
+            LayoutManager.Layout.Spacy -> 40.dp
             else -> 64.dp
         }
     }
@@ -94,7 +93,7 @@ fun PlaylistItem(
                         viewModel.currentTab = Tabs.TRACKLIST
                     }) {
 
-                if (layout != LayoutManager.Layout.ScaledUp)
+                if (layout != LayoutManager.Layout.Spacy)
                     TrackThumbnail(
                         randomTrack,
                         modifier = Modifier.size(height),
@@ -102,7 +101,7 @@ fun PlaylistItem(
                         size = ThumbnailCacheManager.SIZE.H64
                     )
 
-                if (layout != LayoutManager.Layout.ScaledUp)
+                if (layout != LayoutManager.Layout.Spacy)
                     PlaylistItemContent(viewModel, playlist, Modifier.weight(1f))
                 else
                     CompactPlaylistItemContent(viewModel, playlist, Modifier.weight(1f))
@@ -119,7 +118,7 @@ private fun CompactPlaylistItemContent(
     val currentLayout by LocalLayoutManager.current.currentLayout
     val fontScale by derivedStateOf {
         when (currentLayout) {
-            LayoutManager.Layout.ScaledUp -> 1.25f
+            LayoutManager.Layout.Spacy -> 1.25f
             else -> 1f
         }
     }

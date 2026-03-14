@@ -87,7 +87,7 @@ fun TinyPlayerScreen(
                             .graphicsLayer(translationY = 2f)
                             .clip(RoundedCornerShape(8.dp))
                             .clickable {
-                                layoutManager.currentLayout.value = LayoutManager.Layout.Default
+                                layoutManager.currentLayout.value = LayoutManager.Layout.Old
 //                                if (navController.currentDestination?.route != SettingsDestination.toString())
 //                                    navController.navigate(SettingsDestination.toString())
                             })

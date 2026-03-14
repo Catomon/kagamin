@@ -85,7 +85,7 @@ fun CurrentTrackFrame(
             )
 
             PlaybackButtons(
-                viewModel, Modifier.width(133.dp)
+                viewModel, Modifier.width(125.dp)
             )
 
             PlaybackOptionsButtons(viewModel, Modifier.width(133.dp))
@@ -159,7 +159,7 @@ fun CompactCurrentTrackFrame(
                 PlaybackOptionsButtons(viewModel, Modifier.width(133.dp))
 
                 PlaybackButtons(
-                    viewModel, Modifier.width(133.dp)
+                    viewModel, Modifier.width(125.dp)
                 )
 
                 VolumeOptions(

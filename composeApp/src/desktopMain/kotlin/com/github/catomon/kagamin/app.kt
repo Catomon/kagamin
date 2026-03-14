@@ -87,16 +87,14 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
 
     val layoutManager = remember {
         LayoutManager(
-
-
             try {
                 LayoutManager.Layout.valueOf(
                     kagaminViewModel.settings.extra["layout"]
-                        ?: LayoutManager.Layout.Spacy.name
+                        ?: LayoutManager.Layout.Spacey.name
                 )
             } catch (e: Exception) {
                 e.printStackTrace()
-                LayoutManager.Layout.Spacy
+                LayoutManager.Layout.Spacey
             }
         )
     }
@@ -109,24 +107,24 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
 
     val windowSize = remember(currentLayout) {
         when (currentLayout) {
-            LayoutManager.Layout.Default -> DpSize(
+            LayoutManager.Layout.Old -> DpSize(
                 width = WindowConfig.WIDTH.dp, height = WindowConfig.HEIGHT.dp
             )
 
-            LayoutManager.Layout.Compact -> DpSize(
+            LayoutManager.Layout.OldCompact -> DpSize(
                 width = WindowConfig.COMPACT_WIDTH.dp, height = WindowConfig.COMPACT_HEIGHT.dp
             )
 
-            LayoutManager.Layout.Tiny -> DpSize(
+            LayoutManager.Layout.OldTiny -> DpSize(
                 width = WindowConfig.TINY_WIDTH.dp, height = WindowConfig.TINY_HEIGHT.dp
             )
 
-            LayoutManager.Layout.BottomControls -> DpSize(
+            LayoutManager.Layout.Compact -> DpSize(
                 width = WindowConfig.BOTTOM_CONTROLS_WIDTH.dp,
                 height = WindowConfig.BOTTOM_CONTROLS_HEIGHT.dp
             )
 
-            LayoutManager.Layout.Spacy -> DpSize(
+            LayoutManager.Layout.Spacey -> DpSize(
                 width = WindowConfig.SCALED_UP_WIDTH.dp,
                 height = WindowConfig.SCALED_UP_HEIGHT.dp
             )
@@ -233,15 +231,15 @@ private fun AppWindow(
 
     val resizable: Boolean
     when (layoutManager.currentLayout.value) {
-        LayoutManager.Layout.Default -> {
+        LayoutManager.Layout.Old -> {
             resizable = true
         }
 
-        LayoutManager.Layout.Compact -> {
+        LayoutManager.Layout.OldCompact -> {
             resizable = false
         }
 
-        LayoutManager.Layout.Tiny -> {
+        LayoutManager.Layout.OldTiny -> {
             resizable = false
         }
 
@@ -266,24 +264,24 @@ private fun AppWindow(
         onPreviewKeyEvent = {
             if (it.type == KeyEventType.KeyDown && it.key == Key.F2) {
                 when (layoutManager.currentLayout.value) {
-                    LayoutManager.Layout.Default -> {
+                    LayoutManager.Layout.Old -> {
+                        layoutManager.currentLayout.value = LayoutManager.Layout.OldCompact
+                    }
+
+                    LayoutManager.Layout.OldCompact -> {
+                        layoutManager.currentLayout.value = LayoutManager.Layout.OldTiny
+                    }
+
+                    LayoutManager.Layout.OldTiny -> {
                         layoutManager.currentLayout.value = LayoutManager.Layout.Compact
                     }
 
                     LayoutManager.Layout.Compact -> {
-                        layoutManager.currentLayout.value = LayoutManager.Layout.Tiny
+                        layoutManager.currentLayout.value = LayoutManager.Layout.Spacey
                     }
 
-                    LayoutManager.Layout.Tiny -> {
-                        layoutManager.currentLayout.value = LayoutManager.Layout.BottomControls
-                    }
-
-                    LayoutManager.Layout.BottomControls -> {
-                        layoutManager.currentLayout.value = LayoutManager.Layout.Spacy
-                    }
-
-                    LayoutManager.Layout.Spacy -> {
-                        layoutManager.currentLayout.value = LayoutManager.Layout.Default
+                    LayoutManager.Layout.Spacey -> {
+                        layoutManager.currentLayout.value = LayoutManager.Layout.Old
                     }
                 }
                 false

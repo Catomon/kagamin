@@ -10,43 +10,62 @@ import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.IRect
 
 fun ImageBitmap.removeBlackBars(): ImageBitmap {
-    val original = this
-    val width = original.width
-    val height = original.height
+    val w = width
+    val h = height
+    val pixels = IntArray(w * h)
+    readPixels(pixels)
 
-    var left = width
-    var right = 0
-    var top = height
-    var bottom = 0
-
-    val pixels = IntArray(width * height)
-    original.readPixels(pixels)
-
-//    val topColor = Color(pixels[width / 2 ])
-    val leftColor = Color(pixels[((height / 2) * width) + 25])
-
-    for (y in 0 until height) {
-        for (x in 0 until width) {
-            val pixel = pixels[y * width + x]
-            val color = Color(pixel)
-            val isHorizontalBarsColor = color.value == leftColor.value
-                //false //abs((color.red * 255 + color.green * 255 + color.blue * 255) - (leftColor.red * 255 + leftColor.green * 255 + leftColor.blue * 255)) < 25
-            val isVerticalBarsColor = color.red * 255 + color.green * 255 + color.blue * 255 > 120
-
-            if (isHorizontalBarsColor || isVerticalBarsColor) { //0.47f
-                if (x < left) left = x
-                if (x > right) right = x
-                if (y < top) top = y
-                if (y > bottom) bottom = y
-            }
+    fun averageColor(y: Int, xStart: Int, count: Int): Color {
+        var r = 0f; var g = 0f; var b = 0f
+        repeat(count.coerceAtMost(w)) { i ->
+            val px = Color(pixels[y * w + (xStart + i).coerceAtMost(w - 1)])
+            r += px.red; g += px.green; b += px.blue
         }
+        return Color(r / count, g / count, b / count, 1f)
     }
 
-    val offset = IntOffset(left, top)
-    val size = IntSize(right - left + 1, bottom - top + 1)
+    val sampleCount = 5
+    val topColor = averageColor(0, w / 2 - sampleCount / 2, sampleCount)
+    val bottomColor = averageColor(h - 1, w / 2 - sampleCount / 2, sampleCount)
+    val leftColor = averageColor(h / 2 - sampleCount / 2, 0, sampleCount)
+    val rightColor = averageColor(h / 2 - sampleCount / 2, w - sampleCount, sampleCount)
 
-    return original.cropped(offset, size)
+    fun isBarColor(c: Color, ref: Color): Boolean {
+        val dr = (c.red - ref.red) * 255f
+        val dg = (c.green - ref.green) * 255f
+        val db = (c.blue - ref.blue) * 255f
+        return dr * dr + dg * dg + db * db < 100f * 100f
+    }
+
+    var topCrop = 0
+    while (topCrop < h && (0 until w).all { x -> isBarColor(Color(pixels[topCrop * w + x]), topColor) }) {
+        topCrop++
+    }
+
+    var bottomCrop = h - 1
+    while (bottomCrop > topCrop && (0 until w).all { x -> isBarColor(Color(pixels[bottomCrop * w + x]), bottomColor) }) {
+        bottomCrop--
+    }
+
+    var leftCrop = 0
+    while (leftCrop < w && (topCrop..bottomCrop).all { y -> isBarColor(Color(pixels[y * w + leftCrop]), leftColor) }) {
+        leftCrop++
+    }
+
+    var rightCrop = w - 1
+    while (rightCrop > leftCrop && (topCrop..bottomCrop).all { y -> isBarColor(Color(pixels[y * w + rightCrop]), rightColor) }) {
+        rightCrop--
+    }
+
+    if (leftCrop >= w || topCrop >= h || rightCrop < 0 || bottomCrop < 0) {
+        return this
+    }
+
+    val offset = IntOffset(leftCrop, topCrop)
+    val size = IntSize(rightCrop - leftCrop + 1, bottomCrop - topCrop + 1)
+    return cropped(offset, size)
 }
+
 
 fun ImageBitmap.cropped(offset: IntOffset, size: IntSize): ImageBitmap {
     val srcBitmap = this.asSkiaBitmap()

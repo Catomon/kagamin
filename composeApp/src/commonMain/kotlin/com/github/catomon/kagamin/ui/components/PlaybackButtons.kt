@@ -32,7 +32,7 @@ import org.jetbrains.compose.resources.painterResource
 fun PlaybackButtons(
     viewModel: KagaminViewModel,
     modifier: Modifier = Modifier,
-    buttonsSize: Dp = 32.dp
+    buttonsSize: Dp = 24.dp
 ) {
     echoTrace { "PlaybackButtons" }
 
@@ -102,7 +102,7 @@ fun PlaybackButtons(
 fun PrevNextTrackButtons(
     viewModel: KagaminViewModel,
     modifier: Modifier = Modifier,
-    buttonsSize: Dp = 32.dp
+    buttonsSize: Dp = 24.dp
 ) {
     echoTrace { "PlaybackButtonsVariant" }
 

@@ -69,7 +69,7 @@ fun Sidebar(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly
         ) {
-            if (layoutManager.currentLayout.value != LayoutManager.Layout.Default) {
+            if (layoutManager.currentLayout.value != LayoutManager.Layout.Old) {
                 PlaybackTabButton(
                     {
                         if (viewModel.currentTab != Tabs.PLAYBACK) {
@@ -132,24 +132,24 @@ private fun SwapLayoutButton(layoutManager: LayoutManager) {
     IconButton(
         onClick = {
             when (layoutManager.currentLayout.value) {
-                LayoutManager.Layout.Default -> {
-                    layoutManager.currentLayout.value = LayoutManager.Layout.Compact
+                LayoutManager.Layout.Old -> {
+                    layoutManager.currentLayout.value = LayoutManager.Layout.OldCompact
+                }
+
+                LayoutManager.Layout.OldCompact -> {
+                    layoutManager.currentLayout.value = LayoutManager.Layout.OldTiny
+                }
+
+                LayoutManager.Layout.OldTiny -> {
+                    layoutManager.currentLayout.value = LayoutManager.Layout.Old
                 }
 
                 LayoutManager.Layout.Compact -> {
-                    layoutManager.currentLayout.value = LayoutManager.Layout.Tiny
+                    layoutManager.currentLayout.value = LayoutManager.Layout.Old
                 }
 
-                LayoutManager.Layout.Tiny -> {
-                    layoutManager.currentLayout.value = LayoutManager.Layout.Default
-                }
-
-                LayoutManager.Layout.BottomControls -> {
-                    layoutManager.currentLayout.value = LayoutManager.Layout.Default
-                }
-
-                LayoutManager.Layout.Spacy -> {
-                    layoutManager.currentLayout.value = LayoutManager.Layout.Default
+                LayoutManager.Layout.Spacey -> {
+                    layoutManager.currentLayout.value = LayoutManager.Layout.Old
                 }
             }
         }, modifier = Modifier.size(32.dp)

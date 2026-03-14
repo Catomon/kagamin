@@ -305,7 +305,7 @@ class KagaminViewModel(
         playlistsManager.setPlayMode(playMode)
     }
 
-    fun togglePlayMode() {
+    fun togglePlayMode(): PlaylistsManager.PlayMode {
         val playMode = when (playMode.value) {
             PlaylistsManager.PlayMode.PLAYLIST -> PlaylistsManager.PlayMode.REPEAT_PLAYLIST
             PlaylistsManager.PlayMode.REPEAT_PLAYLIST -> PlaylistsManager.PlayMode.RANDOM
@@ -314,6 +314,8 @@ class KagaminViewModel(
             PlaylistsManager.PlayMode.ONCE -> error("not planned")
         }
         playlistsManager.setPlayMode(playMode)
+
+        return playMode
     }
 
     var isSorting by mutableStateOf(false)

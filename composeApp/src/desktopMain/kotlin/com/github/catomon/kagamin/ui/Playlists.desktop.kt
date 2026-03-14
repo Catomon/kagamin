@@ -130,7 +130,7 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
 
     val fontScale by derivedStateOf {
         when (currentLayout) {
-            LayoutManager.Layout.Spacy -> 1.25f
+            LayoutManager.Layout.Spacey -> 1.25f
             else -> 1f
         }
     }
@@ -258,7 +258,7 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                         val layout by LocalLayoutManager.current.currentLayout
                         val height by derivedStateOf {
                             when (layout) {
-                                LayoutManager.Layout.Spacy -> 40.dp
+                                LayoutManager.Layout.Spacey -> 40.dp
                                 else -> 64.dp
                             }
                         }

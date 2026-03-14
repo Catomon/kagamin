@@ -4,14 +4,14 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 
 class LayoutManager(
-    val currentLayout: MutableState<Layout> = mutableStateOf(Layout.Default)
+    val currentLayout: MutableState<Layout> = mutableStateOf(Layout.Spacey)
 ) {
     enum class Layout {
-        Default,
+        Old,
+        OldCompact,
+        OldTiny,
         Compact,
-        Tiny,
-        BottomControls,
-        Spacy,
+        Spacey,
     }
 
     constructor(layout: Layout): this(mutableStateOf(layout))

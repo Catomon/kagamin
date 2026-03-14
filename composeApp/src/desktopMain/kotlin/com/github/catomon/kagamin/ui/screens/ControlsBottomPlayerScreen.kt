@@ -30,6 +30,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,6 +42,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toIntSize
@@ -49,6 +51,7 @@ import androidx.navigation.NavHostController
 import com.github.catomon.kagamin.LocalWindow
 import com.github.catomon.kagamin.audio.AudioPlayerManager
 import com.github.catomon.kagamin.audio.AudioPlayerService
+import com.github.catomon.kagamin.audio.PlaylistsManager
 import com.github.catomon.kagamin.data.SortType
 import com.github.catomon.kagamin.ui.MediaFolder
 import com.github.catomon.kagamin.ui.Menu
@@ -59,6 +62,8 @@ import com.github.catomon.kagamin.ui.components.AppLogo
 import com.github.catomon.kagamin.ui.components.Background
 import com.github.catomon.kagamin.ui.components.CurrentTrackFrameHorizontal
 import com.github.catomon.kagamin.ui.components.PlaybackModeToggleButton
+import com.github.catomon.kagamin.ui.components.PopupText
+import com.github.catomon.kagamin.ui.components.PopupTextHost
 import com.github.catomon.kagamin.ui.components.PrevNextTrackButtons
 import com.github.catomon.kagamin.ui.components.VolumeOptions
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
@@ -69,11 +74,6 @@ import com.github.catomon.kagamin.util.echoTraceFiltered
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.pause
 import kagamin.composeapp.generated.resources.play
-import kagamin.composeapp.generated.resources.sorting_artist
-import kagamin.composeapp.generated.resources.sorting_date_time
-import kagamin.composeapp.generated.resources.sorting_default
-import kagamin.composeapp.generated.resources.sorting_duration
-import kagamin.composeapp.generated.resources.sorting_title
 import kagamin.composeapp.generated.resources.star_angled
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -245,6 +245,8 @@ fun ControlsBottomPlayerScreen(
         ) {
             CircularProgressIndicator(Modifier.size(32.dp))
         }
+
+        PopupTextHost(Modifier.matchParentSize())
     }
 }
 
@@ -277,7 +279,8 @@ fun SortingToggleButton(
 @Composable
 fun AnimatedPlayPauseButton(
     viewModel: KagaminViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    buttonSize: Dp = 32.dp
 ) {
     echoTraceFiltered { "AnimatedPlayPauseButton" }
 
@@ -292,8 +295,6 @@ fun AnimatedPlayPauseButton(
     val playState by viewModel.playState.collectAsState()
 
     val starImage = imageResource(Res.drawable.star_angled)
-
-    val buttonsSize = 48.dp
 
     Box(
         modifier = modifier
@@ -318,7 +319,7 @@ fun AnimatedPlayPauseButton(
             }
     ) {
         IconButton(
-            modifier = Modifier.size(buttonsSize * 1.25f),
+            modifier = Modifier.size(buttonSize * 1.25f),
             onClick = viewModel::onPlayPause
         ) {
             AnimatedContent(playState, transitionSpec = { fadeIn() togetherWith fadeOut() }) { playState ->
@@ -326,14 +327,14 @@ fun AnimatedPlayPauseButton(
                     Icon(
                         painterResource(Res.drawable.play),
                         "Play",
-                        modifier = Modifier.size(buttonsSize * 1.25f),
+                        modifier = Modifier.size(buttonSize * 1.25f),
                         tint = KagaminTheme.colors.buttonIcon
                     )
                 } else {
                     Icon(
                         painterResource(Res.drawable.pause),
                         "Pause",
-                        modifier = Modifier.size(buttonsSize * 1.25f),
+                        modifier = Modifier.size(buttonSize * 1.25f),
                         tint = if (playState != AudioPlayerService.PlayState.PLAYING) KagaminTheme.colors.buttonIcon else Color.Transparent
                     )
                 }

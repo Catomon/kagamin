@@ -64,8 +64,8 @@ fun SettingsScreen(
     val scrollState = rememberScrollState()
 
     LaunchedEffect(Unit) {
-        if (currentLayout.value == LayoutManager.Layout.Tiny) currentLayout.value =
-            LayoutManager.Layout.Default
+        if (currentLayout.value == LayoutManager.Layout.OldTiny) currentLayout.value =
+            LayoutManager.Layout.Old
     }
 
     Box(
@@ -105,6 +105,10 @@ fun SettingsScreen(
 
                 CheckboxOption("Always on top", settings.alwaysOnTop) {
                     viewModel.settings = settings.copy(alwaysOnTop = it)
+                }
+
+                CheckboxOption("Character image background", settings.characterImageBackground) {
+                    viewModel.settings = settings.copy(characterImageBackground = it)
                 }
 
                 CheckboxOption("Track image as background", settings.useTrackImageAsBackground) {
@@ -203,19 +207,30 @@ private fun LayoutRadioButtons(
     ) {
         Text("Layout:", color = KagaminTheme.text, modifier = Modifier.align(Alignment.Start))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("Simple", color = KagaminTheme.textSecondary)
+            Text("Old", color = KagaminTheme.textSecondary)
             RadioButton(
-                selected = currentLayout != LayoutManager.Layout.BottomControls,
+                selected = when (currentLayout) {
+                    LayoutManager.Layout.OldCompact, LayoutManager.Layout.Old, LayoutManager.Layout.OldTiny -> true
+                    else -> false
+                },
                 onClick = {
-                    onLayoutSelected(LayoutManager.Layout.Default)
+                    onLayoutSelected(LayoutManager.Layout.Old)
                 },
             )
 
-            Text("Extended", color = KagaminTheme.textSecondary)
+            Text("Compact", color = KagaminTheme.textSecondary)
             RadioButton(
-                selected = currentLayout == LayoutManager.Layout.BottomControls,
+                selected = currentLayout == LayoutManager.Layout.Compact,
                 onClick = {
-                    onLayoutSelected(LayoutManager.Layout.BottomControls)
+                    onLayoutSelected(LayoutManager.Layout.Compact)
+                },
+            )
+
+            Text("Spacey", color = KagaminTheme.textSecondary)
+            RadioButton(
+                selected = currentLayout == LayoutManager.Layout.Spacey,
+                onClick = {
+                    onLayoutSelected(LayoutManager.Layout.Spacey)
                 },
             )
         }

@@ -18,6 +18,7 @@ data class AppSettings(
     val repeatPlaylist: Boolean = true,
     val lastPlaylistName: String = "default",
     val autoScrollNextTrack: Boolean = true,
+    val characterImageBackground: Boolean = true,
     val useTrackImageAsBackground: Boolean = true,
     val showMediaFolderPane: Boolean = false,
     val mediaFolderPath: String = "${System.getProperty("user.home")}\\Music",

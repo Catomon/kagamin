@@ -2,23 +2,30 @@ package com.github.catomon.kagamin.ui.components
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.TooltipArea
-import androidx.compose.foundation.TooltipPlacement
+import androidx.compose.foundation.background
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,9 +34,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.github.catomon.kagamin.audio.PlaylistsManager
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
@@ -41,6 +49,7 @@ import kagamin.composeapp.generated.resources.repeat_playlist
 import kagamin.composeapp.generated.resources.repeat_single
 import kagamin.composeapp.generated.resources.single
 import kagamin.composeapp.generated.resources.volume
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -68,7 +77,7 @@ fun PlaybackOptionsButtons(
 @Composable
 fun PlaybackModeToggleButton(
     playMode: PlaylistsManager.PlayMode,
-    togglePlayMode: () -> Unit,
+    togglePlayMode: () -> PlaylistsManager.PlayMode,
     modifier: Modifier = Modifier
 ) {
     echoTrace { "PlaybackModeToggleButton" }
@@ -82,20 +91,16 @@ fun PlaybackModeToggleButton(
             PlaylistsManager.PlayMode.ONCE -> Res.drawable.single
         }
 
-    TooltipArea(tooltip = {
-        Text(
-            when (playMode) {
+    Box(modifier = modifier.size(32.dp)) {
+        IconButton({
+            PopupText = when (togglePlayMode()) {
                 PlaylistsManager.PlayMode.PLAYLIST -> "Playlist"
                 PlaylistsManager.PlayMode.REPEAT_PLAYLIST -> "Repeat playlist"
                 PlaylistsManager.PlayMode.REPEAT_TRACK -> "Repeat track"
                 PlaylistsManager.PlayMode.RANDOM -> "Random"
                 PlaylistsManager.PlayMode.ONCE -> "Single"
             }
-        )
-    }, tooltipPlacement = TooltipPlacement.CursorPoint(DpOffset(0.dp, (-32).dp))) {
-        IconButton({
-            togglePlayMode()
-        }, modifier = modifier.size(32.dp)) {
+        }, modifier = Modifier.size(32.dp)) {
             AnimatedContent(imageRes) {
                 Icon(
                     painter = painterResource(imageRes),
@@ -104,6 +109,59 @@ fun PlaybackModeToggleButton(
                 )
             }
         }
+    }
+}
+
+var PopupText by mutableStateOf("")
+
+@Composable
+fun PopupTextHost(modifier: Modifier = Modifier) {
+    Box(modifier = modifier, contentAlignment = Alignment.Center) {
+        PopupText(PopupText)
+    }
+}
+
+@Composable
+fun PopupText(text: String) {
+    var offset by remember { mutableStateOf(0f) }
+    val animatedOffset by animateFloatAsState(offset)
+    var isVisible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(text) {
+        if (text.isEmpty()) {
+            isVisible = false
+            return@LaunchedEffect
+        }
+
+        if (isVisible) {
+            isVisible = false
+            delay(200)
+        }
+        offset = 1f
+        isVisible = true
+        delay(1500)
+        offset = 0f
+        isVisible = false
+
+        PopupText = ""
+    }
+
+    AnimatedVisibility(
+        isVisible,
+        enter = fadeIn(),
+        exit = fadeOut(),
+        modifier = Modifier.offset(y = -(16f * animatedOffset).dp)
+    ) {
+        Text(
+            text,
+            color = KagaminTheme.textSecondary,
+            modifier = Modifier.background(
+                color = KagaminTheme.colors.listItem,
+                shape = RoundedCornerShape(8.dp)
+            ).padding(10.dp),
+            fontSize = 18.sp,
+            softWrap = false, overflow = TextOverflow.Visible
+        )
     }
 }
 
@@ -198,7 +256,10 @@ fun VolumeOptions(
     val isHovered by interactionSource.collectIsHoveredAsState()
 
     var oldVolume by remember { mutableStateOf(volume) }
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier.hoverable(interactionSource).sizeIn(maxWidth = 133.dp).height(40.dp)) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.hoverable(interactionSource).sizeIn(maxWidth = 133.dp).height(40.dp)
+    ) {
         IconButton({
             onVolumeChange(if (volume > 0f) 0f else oldVolume)
         }, modifier = Modifier.size(buttonsSize)) {

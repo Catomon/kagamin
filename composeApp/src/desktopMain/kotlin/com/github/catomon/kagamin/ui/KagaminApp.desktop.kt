@@ -37,23 +37,23 @@ fun KagaminApp(
         ) {
             composable(PlayerScreenDestination.toString(),) {
                 when (layoutManager.value) {
-                    LayoutManager.Layout.Default -> {
+                    LayoutManager.Layout.Old -> {
                         PlayerScreen(kagaminViewModel.also {
                             it.currentTab = Tabs.TRACKLIST
                         }, navController)
                     }
 
-                    LayoutManager.Layout.Compact -> {
+                    LayoutManager.Layout.OldCompact -> {
                         CompactPlayerScreen(kagaminViewModel.also { it.currentTab = Tabs.PLAYBACK }, navController)
                     }
 
-                    LayoutManager.Layout.Tiny -> {
+                    LayoutManager.Layout.OldTiny -> {
                         TinyPlayerScreen(kagaminViewModel.also { it.currentTab = Tabs.PLAYBACK }, navController)
                     }
 
-                    LayoutManager.Layout.BottomControls -> ControlsBottomPlayerScreen(kagaminViewModel, navController)
+                    LayoutManager.Layout.Compact -> ControlsBottomPlayerScreen(kagaminViewModel, navController)
 
-                    LayoutManager.Layout.Spacy -> SpacyPlayerScreen(kagaminViewModel, navController)
+                    LayoutManager.Layout.Spacey -> SpacyPlayerScreen(kagaminViewModel, navController)
                 }
             }
 

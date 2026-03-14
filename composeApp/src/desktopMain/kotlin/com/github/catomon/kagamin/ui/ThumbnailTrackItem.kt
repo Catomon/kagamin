@@ -88,7 +88,7 @@ fun ThumbnailTrackItem(
 
     val height by derivedStateOf {
         when (currentLayout) {
-            LayoutManager.Layout.Spacy -> 80.dp
+            LayoutManager.Layout.Spacey -> 80.dp
             else -> 64.dp
         }
     }
@@ -160,7 +160,7 @@ private fun TrackItemBody(
 
     val fontScale by derivedStateOf {
         when (currentLayout) {
-            LayoutManager.Layout.Spacy -> 1.25f
+            LayoutManager.Layout.Spacey -> 1.25f
             else -> 1f
         }
     }

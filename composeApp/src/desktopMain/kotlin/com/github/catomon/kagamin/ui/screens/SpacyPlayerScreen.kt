@@ -17,9 +17,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -29,6 +31,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -39,14 +42,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.github.catomon.kagamin.LocalWindow
+import com.github.catomon.kagamin.audio.PlaylistsManager
 import com.github.catomon.kagamin.data.AudioTrack
 import com.github.catomon.kagamin.data.cache.ThumbnailCacheManager
 import com.github.catomon.kagamin.ui.Menu
@@ -55,8 +60,10 @@ import com.github.catomon.kagamin.ui.Tracklist
 import com.github.catomon.kagamin.ui.TracksDropTarget
 import com.github.catomon.kagamin.ui.components.AppLogo
 import com.github.catomon.kagamin.ui.components.Background
-import com.github.catomon.kagamin.ui.components.PlaybackButtons
+import com.github.catomon.kagamin.ui.components.ImageWithShadow
 import com.github.catomon.kagamin.ui.components.PlaybackModeToggleButton
+import com.github.catomon.kagamin.ui.components.PopupText
+import com.github.catomon.kagamin.ui.components.PopupTextHost
 import com.github.catomon.kagamin.ui.components.TrackThumbnailWithProgressOverlay
 import com.github.catomon.kagamin.ui.components.VolumeOptions
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
@@ -64,7 +71,11 @@ import com.github.catomon.kagamin.ui.trackDropTargetBorder
 import com.github.catomon.kagamin.ui.util.formatMillisToMinutesSeconds
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.util.echoTrace
+import kagamin.composeapp.generated.resources.Res
+import kagamin.composeapp.generated.resources.next
+import kagamin.composeapp.generated.resources.prev
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun SpacyPlayerScreen(
@@ -104,19 +115,19 @@ fun SpacyPlayerScreen(
             Row(
                 modifier = Modifier.height(height = 40.dp).fillMaxWidth()
                     .background(KagaminTheme.backgroundTransparent),
-                verticalAlignment = Alignment.CenterVertically,
+                verticalAlignment = Alignment.Top,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
+                Spacer(Modifier.size(24.dp))
                 AppLogo(
                     Modifier
-                        .padding(horizontal = 12.dp)
+                        .padding(horizontal = 10.dp)
                         .height(40.dp)
-                        .width(175.dp)
+                        .width(100.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .clickable {
                             isMenuOpen = !isMenuOpen
                         }
-                        .graphicsLayer (scaleX = 1.20f, scaleY = 1.20f)
                 )
 
                 MinimizeButton()
@@ -125,8 +136,14 @@ fun SpacyPlayerScreen(
             //main content in the center
             Row(Modifier.fillMaxWidth().weight(1f)) {
                 Column(Modifier.weight(0.34f)) {
-                    //playback buttons
-                    Box(contentAlignment = Alignment.Center, modifier = Modifier.height(36.dp).fillMaxWidth().background(color = KagaminTheme.backgroundTransparent)) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .height(36.dp)
+                            .fillMaxWidth()
+                            .background(color = KagaminTheme.backgroundTransparent)
+                            .offset(y = (-16).dp)
+                    ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             VolumeOptions(
                                 volume = volume,
@@ -135,7 +152,7 @@ fun SpacyPlayerScreen(
                                 }
                             )
 
-                            PlaybackButtons(viewModel)
+                            PlaybackButtons(viewModel, buttonsSize = 32.dp)
 
                             PlaybackModeToggleButton(playMode, {
                                 viewModel.togglePlayMode()
@@ -267,6 +284,8 @@ fun SpacyPlayerScreen(
         ) {
             CircularProgressIndicator(Modifier.size(32.dp))
         }
+
+        PopupTextHost(Modifier.matchParentSize())
     }
 }
 
@@ -383,5 +402,53 @@ fun CurrentTrackPaneSeekable(
                         )
                     }
             }
+    }
+}
+
+
+@Composable
+fun PlaybackButtons(
+    viewModel: KagaminViewModel,
+    modifier: Modifier = Modifier,
+    buttonsSize: Dp = 24.dp
+) {
+    echoTrace { "PlaybackButtons" }
+
+    val playState by viewModel.playState.collectAsState()
+
+    Row(
+        modifier = modifier.height(buttonsSize * 1.5f),//.background(Colors.noteBackground.copy(alpha = 0.75f)),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(
+            modifier = Modifier.size(buttonsSize),
+            onClick = {
+                viewModel.prevTrack()
+            }
+        ) {
+            ImageWithShadow(
+                painterResource(Res.drawable.prev),
+                "Previous",
+                modifier = Modifier.size(buttonsSize),
+                colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon)
+            )
+        }
+
+        AnimatedPlayPauseButton(viewModel, buttonSize = 32.dp)
+
+        IconButton(
+            modifier = Modifier.size(buttonsSize),
+            onClick = {
+                viewModel.nextTrack()
+            }
+        ) {
+            ImageWithShadow(
+                painterResource(Res.drawable.next),
+                "Next",
+                modifier = Modifier.size(buttonsSize),
+                colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon)
+            )
+        }
     }
 }

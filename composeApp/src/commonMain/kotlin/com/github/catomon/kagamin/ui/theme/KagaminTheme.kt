@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.sp
 import com.github.catomon.kagamin.LocalSnackbarHostState
 import com.github.catomon.kagamin.data.loadSettings
 import kagamin.composeapp.generated.resources.BadComic_Regular
+import kagamin.composeapp.generated.resources.Fluttershy_Regular
 import kagamin.composeapp.generated.resources.Res
 import org.jetbrains.compose.resources.Font
 
@@ -43,6 +44,8 @@ object KagaminTheme {
     val behindBackground get() = colors.behindBackground
     val background get() = colors.background
     val backgroundTransparent get() = colors.backgroundTransparent
+
+    val textScale = 1f
 
     init {
         colors =

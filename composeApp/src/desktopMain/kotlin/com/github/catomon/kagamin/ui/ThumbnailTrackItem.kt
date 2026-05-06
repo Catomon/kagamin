@@ -40,6 +40,7 @@ import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
@@ -60,10 +61,10 @@ import com.github.catomon.kagamin.ui.windows.ConfirmWindowState
 import com.github.catomon.kagamin.ui.windows.LocalConfirmWindow
 import com.github.catomon.kagamin.util.echoTrace
 import kagamin.composeapp.generated.resources.Res
-import kagamin.composeapp.generated.resources.selected
 import kagamin.composeapp.generated.resources.online
 import kagamin.composeapp.generated.resources.pause16
 import kagamin.composeapp.generated.resources.play16
+import kagamin.composeapp.generated.resources.selected
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 
@@ -88,8 +89,13 @@ fun ThumbnailTrackItem(
 
     val height by derivedStateOf {
         when (currentLayout) {
-            LayoutManager.Layout.Spacey -> 80.dp
-            else -> 64.dp
+            LayoutManager.Layout.Spacey -> {
+                if (viewModel.settings.showThumbnails) 80.dp else 53.dp
+            }
+
+            else -> {
+                if (viewModel.settings.showThumbnails) 64.dp else 45.dp
+            }
         }
     }
 
@@ -111,17 +117,24 @@ fun ThumbnailTrackItem(
             }
 
             Column(
-                Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)).background(backgroundColor)
+                Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp))
+                    .then(
+                        if (viewModel.settings.itemBackgroundColor)
+                            Modifier.background(backgroundColor)
+                        else
+                            Modifier
+                    )
                     .clickable {
                         onClick()
                     }) {
                 Row(Modifier.weight(1f)) {
-                    TrackThumbnail(
-                        track,
-                        modifier = Modifier.width(height),
-                        shape = RoundedCornerShape(8.dp),
-                        size = ThumbnailCacheManager.SIZE.H150
-                    )
+                    if (viewModel.settings.showThumbnails)
+                        TrackThumbnail(
+                            track,
+                            modifier = Modifier.width(height),
+                            shape = RoundedCornerShape(8.dp),
+                            size = ThumbnailCacheManager.SIZE.H150
+                        )
 
                     TrackItemBody(
                         viewModel = viewModel,
@@ -159,10 +172,15 @@ private fun TrackItemBody(
     val currentLayout by LocalLayoutManager.current.currentLayout
 
     val fontScale by derivedStateOf {
-        when (currentLayout) {
-            LayoutManager.Layout.Spacey -> 1.25f
-            else -> 1f
-        }
+        currentLayout.fontScale
+    }
+
+    val lineHeight by derivedStateOf {
+        if (currentLayout != LayoutManager.Layout.Spacey && viewModel.settings.showThumbnails) {
+            18.sp * (currentLayout.fontScale - 0.25f)
+        } else
+            if (!viewModel.settings.showThumbnails || currentLayout != LayoutManager.Layout.Spacey)
+                16.sp * (currentLayout.fontScale - 0.25f) else TextUnit.Unspecified
     }
 
     Box(
@@ -173,30 +191,37 @@ private fun TrackItemBody(
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier.clip(RoundedCornerShape(6.dp))
-                .align(Alignment.TopStart).padding(start = 4.dp)
+                .align(Alignment.CenterStart)
+                .padding(start = 4.dp)
         ) {
             Text(
                 track.title,
                 fontSize = 10.sp * fontScale,
                 color = KagaminTheme.text,
                 maxLines = 1,
+                lineHeight =
+                    if (currentLayout != LayoutManager.Layout.Spacey && viewModel.settings.showThumbnails)
+                        lineHeight
+                    else
+                        if (viewModel.settings.showThumbnails) TextUnit.Unspecified else lineHeight,
                 modifier = Modifier.let { if (isHovered) it.basicMarquee(iterations = Int.MAX_VALUE) else it }
             )
 
             //if (size < 64)
 //            Row(verticalAlignment = Alignment.CenterVertically) {
-                if (track.artist.isNotBlank())
-                    Text(
-                        track.artist,
-                        fontSize = 8.sp * fontScale,
-                        color = KagaminTheme.textSecondary,
-                        maxLines = 1,
-                        modifier = Modifier.let { if (isHovered) it.basicMarquee(iterations = Int.MAX_VALUE) else it },
-                        lineHeight = 16.sp
-                    )
+            if (track.artist.isNotBlank())
+                Text(
+                    track.artist,
+                    fontSize = 8.sp * fontScale,
+                    color = KagaminTheme.textSecondary,
+                    maxLines = 1,
+                    modifier = Modifier.let { if (isHovered) it.basicMarquee(iterations = Int.MAX_VALUE) else it },
+                    lineHeight = lineHeight
+                )
 
 //                Spacer(Modifier.width(4.dp))
 
+            if (viewModel.settings.showThumbnails)
                 if (track.duration >= 0)
                     Text(
                         remember { formatMillisToMinutesSeconds(track.duration) },
@@ -204,7 +229,7 @@ private fun TrackItemBody(
                         color = KagaminTheme.textSecondary,
                         maxLines = 1,
                         modifier = Modifier.let { if (isHovered) it.basicMarquee(iterations = Int.MAX_VALUE) else it },
-                        lineHeight = 16.sp
+                        lineHeight = lineHeight
                     )
 //            }
         }
@@ -261,7 +286,7 @@ private fun TrackItemBody(
                 )
             }
 
-            if (remember { track.uri.startsWith("https") }) {
+            if (!viewModel.currentPlaylist.value.isOnline && remember { track.uri.startsWith("https") }) {
                 Icon(
                     painterResource(Res.drawable.online),
                     null,

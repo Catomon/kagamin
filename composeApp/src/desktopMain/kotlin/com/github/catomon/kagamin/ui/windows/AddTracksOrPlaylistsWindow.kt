@@ -28,7 +28,7 @@ import com.github.catomon.kagamin.LocalSnackbarHostState
 import com.github.catomon.kagamin.WindowConfig
 import com.github.catomon.kagamin.WindowDraggableArea
 import com.github.catomon.kagamin.createTrackDragAndDropTarget
-import com.github.catomon.kagamin.kagaminWindowDecoration
+import com.github.catomon.kagamin.luckyWindowDecoration
 import com.github.catomon.kagamin.ui.AddTracksTab
 import com.github.catomon.kagamin.ui.CreatePlaylistTab
 import com.github.catomon.kagamin.ui.components.TrackThumbnail
@@ -36,7 +36,6 @@ import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import kagamin.composeapp.generated.resources.Res
-import kagamin.composeapp.generated.resources.arrow_left
 import kagamin.composeapp.generated.resources.close_white
 import kagamin.composeapp.generated.resources.kagamin_icon64
 import org.jetbrains.compose.resources.painterResource
@@ -73,7 +72,7 @@ fun ApplicationScope.AddTracksOrPlaylistsWindow(
             WindowDraggableArea {
                 Scaffold(
                     snackbarHost = { SnackbarHost(snackbar) },
-                    modifier = modifier.kagaminWindowDecoration().let { m ->
+                    modifier = modifier.luckyWindowDecoration().let { m ->
                         if (viewModel.currentTab == Tabs.ADD_TRACKS) m.dragAndDropTarget(
                             { true }, remember {
                                 createTrackDragAndDropTarget(

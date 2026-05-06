@@ -4,6 +4,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.draganddrop.dragAndDropTarget
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -22,12 +23,19 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ApplicationScope
@@ -73,6 +81,8 @@ import org.jaudiotagger.audio.AudioHeader
 import org.jaudiotagger.tag.FieldKey
 import org.jaudiotagger.tag.Tag
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.skia.FilterBlurMode
+import org.jetbrains.skia.MaskFilter
 import org.koin.java.KoinJavaComponent.get
 import java.awt.datatransfer.DataFlavor
 import java.awt.image.BufferedImage
@@ -319,7 +329,7 @@ private fun WindowScope.AppFrame(kagaminViewModel: KagaminViewModel = get(Kagami
         val snackbar = LocalSnackbarHostState.current
         KagaminApp(
             kagaminViewModel,
-            modifier = Modifier.kagaminWindowDecoration().dragAndDropTarget({ true }, remember {
+            modifier = Modifier.luckyWindowDecoration().dragAndDropTarget({ true }, remember {
                 createTrackDragAndDropTarget(kagaminViewModel, snackbar)
             }).onPreviewKeyEvent {
                 return@onPreviewKeyEvent when (it.key) {
@@ -334,7 +344,7 @@ private fun WindowScope.AppFrame(kagaminViewModel: KagaminViewModel = get(Kagami
     }
 }
 
-fun Modifier.kagaminWindowDecoration() =
+fun Modifier.luckyWindowDecoration3() =
     if (WindowConfig.isTransparent) this.padding(8.dp).customShadow().drawBehind {
         drawRoundRect(
             color = KagaminTheme.colors.thinBorder,
@@ -346,6 +356,104 @@ fun Modifier.kagaminWindowDecoration() =
     else this.customShadow(cornerRadius = 0.dp).border(
         2.dp, KagaminTheme.colors.thinBorder, RectangleShape
     )
+
+@Composable
+fun Modifier.luckyWindowDecoration(): Modifier {
+    val density = LocalDensity.current
+    val shadowColor = Color.White
+    val glowColor = MaterialTheme.colorScheme.surfaceContainerLow
+    val borderGradient = Brush.verticalGradient(
+        0.0f to KagaminTheme.colors.windowBorderGradientStart,
+        0.15f to KagaminTheme.colors.windowBorderGradientStart,
+        0.5f to KagaminTheme.colors.windowBorderGradientEnd,
+        1.0f to KagaminTheme.colors.windowBorderGradientEnd,
+    )
+
+    return if (WindowConfig.isTransparent)
+        this.padding(8.dp)
+            .border(
+                width = 2.dp,
+                brush = borderGradient,
+                shape = RoundedCornerShape(12.dp)
+            )
+            .customShadow(color = Color.White).clip(RoundedCornerShape(12.dp))
+            .padding(2.dp)
+    else
+        this.blurredShadow(cornerRadius = 0.dp, color = Color.White)
+            .border(
+                width = 2.dp,
+                color = shadowColor,
+                shape = RectangleShape
+            )
+}
+
+fun Modifier.customShadow(
+    color: Color = Color.Black,
+    alpha: Float = 0.75f,
+    cornerRadius: Dp = 12.dp,
+    shadowRadius: Dp = 4.dp,
+    offsetX: Dp = 0.dp,
+    offsetY: Dp = 0.dp
+) = drawBehind {
+    val shadowColor = color.copy(alpha = alpha).toArgb()
+
+    drawIntoCanvas { canvas ->
+        val paint = Paint().apply {
+            asFrameworkPaint().apply {
+                this.color = shadowColor
+                maskFilter = MaskFilter.makeBlur(
+                    FilterBlurMode.NORMAL,
+                    shadowRadius.toPx()
+                )
+            }
+        }
+
+        canvas.drawRoundRect(
+            left = offsetX.toPx(),
+            top = offsetY.toPx(),
+            right = size.width + offsetX.toPx(),
+            bottom = size.height + offsetY.toPx(),
+            cornerRadius.toPx(),
+            cornerRadius.toPx(),
+            paint
+        )
+    }
+}
+
+fun Modifier.blurredShadow(
+    color: Color = Color.Black,
+    alpha: Float = 0.75f,
+    cornerRadius: Dp = 12.dp,
+    shadowRadius: Dp = 4.dp,
+    offsetX: Dp = 0.dp,
+    offsetY: Dp = 0.dp,
+    addWidth: Dp = 0.dp,
+    addHeight: Dp = 0.dp
+) = drawBehind {
+    val shadowColor = color.copy(alpha = alpha).toArgb()
+
+    drawIntoCanvas { canvas ->
+        val paint = Paint().apply {
+            asFrameworkPaint().apply {
+                this.color = shadowColor
+                maskFilter = MaskFilter.makeBlur(
+                    FilterBlurMode.NORMAL,
+                    shadowRadius.toPx()
+                )
+            }
+        }
+
+        canvas.drawRoundRect(
+            left = offsetX.toPx(),
+            top = offsetY.toPx(),
+            right = size.width + offsetX.toPx() + addWidth.toPx(),
+            bottom = size.height + offsetY.toPx() + addHeight.toPx(),
+            cornerRadius.toPx(),
+            cornerRadius.toPx(),
+            paint
+        )
+    }
+}
 
 
 @OptIn(ExperimentalComposeUiApi::class)

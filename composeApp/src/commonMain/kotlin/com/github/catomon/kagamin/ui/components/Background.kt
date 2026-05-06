@@ -41,7 +41,7 @@ fun Background(currentTrack: AudioTrack?, modifier: Modifier) {
     if (settings.useTrackImageAsBackground && currentTrack != null) {
         TrackThumbnail(
             currentTrack,
-            modifier = modifier.clip(RoundedCornerShape(14.dp)),
+            modifier = modifier,
             contentScale = ContentScale.Crop,
             blur = true,
         )
@@ -50,7 +50,7 @@ fun Background(currentTrack: AudioTrack?, modifier: Modifier) {
             Image(
                 painter = painterResource(backgroundRes),
                 contentScale = ContentScale.Crop,
-                modifier = modifier.clip(RoundedCornerShape(14.dp)),
+                modifier = modifier,
                 contentDescription = null,
 //            colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon)
             )
@@ -58,7 +58,7 @@ fun Background(currentTrack: AudioTrack?, modifier: Modifier) {
             Image(
                 painter = painterResource(backgroundRes),
                 contentScale = ContentScale.Crop,
-                modifier = modifier.clip(RoundedCornerShape(14.dp)),
+                modifier = modifier,
                 contentDescription = null,
                 colorFilter = ColorFilter.tint(KagaminTheme.colors.buttonIcon)
             )

@@ -29,6 +29,7 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.catomon.kagamin.LocalLayoutManager
 import com.github.catomon.kagamin.data.AudioTrack
 import com.github.catomon.kagamin.data.cache.ThumbnailCacheManager
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
@@ -61,6 +62,11 @@ fun CurrentTrackFrameHorizontal(track: AudioTrack?, viewModel: KagaminViewModel,
     }
     val progressAnimated by animateFloatAsState(progressTargetValue)
 
+    val currentLayout by LocalLayoutManager.current.currentLayout
+    val fontScale by derivedStateOf {
+        currentLayout.fontScale
+    }
+
     Row(modifier.height(100.dp)) {
         TrackThumbnailWithProgressOverlay(
             track,
@@ -91,7 +97,7 @@ fun CurrentTrackFrameHorizontal(track: AudioTrack?, viewModel: KagaminViewModel,
             ) {
                 Text(
                     track.title,
-                    fontSize = 12.sp,
+                    fontSize = 12.sp * fontScale,
                     color = KagaminTheme.text,
                     maxLines = 1,
                     modifier = Modifier.let { if (isThumbnailHovered) it.basicMarquee(iterations = Int.MAX_VALUE) else it }
@@ -100,7 +106,7 @@ fun CurrentTrackFrameHorizontal(track: AudioTrack?, viewModel: KagaminViewModel,
                 if (track.artist.isNotBlank())
                     Text(
                         track.artist,
-                        fontSize = 10.sp,
+                        fontSize = 10.sp * fontScale,
                         color = KagaminTheme.textSecondary,
                         maxLines = 1,
                         modifier = Modifier.let { if (isThumbnailHovered) it.basicMarquee(iterations = Int.MAX_VALUE) else it },
@@ -127,7 +133,7 @@ fun CurrentTrackFrameHorizontal(track: AudioTrack?, viewModel: KagaminViewModel,
 
                         Text(
                             trackDurationText,
-                            fontSize = 10.sp,
+                            fontSize = 10.sp * fontScale,
                             color = KagaminTheme.colors.buttonIcon
                         )
                     }

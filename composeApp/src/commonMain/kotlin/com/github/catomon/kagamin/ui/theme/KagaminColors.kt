@@ -19,6 +19,9 @@ sealed class KagaminColors(
     open val thinBorder: Color = background,
     open val buttonIconSmallSelected: Color = Color.White,
     open val shadow: Color = thinBorder,
+
+    open  val windowBorderGradientStart: Color = buttonIcon,
+    open val windowBorderGradientEnd: Color=  buttonIcon
 ) {
 
     //    open val listItemA: Color = surface.copy(0.9f)
@@ -113,19 +116,38 @@ sealed class KagaminColors(
 
     object Violet : KagaminColors(
         name = "gami-kasa",
-        behindBackground = Color(0xffc09dff),
-        listItem = Color(0xcd9775d5), // Color(0xcb6c4141)
-        disabled = Color(0xff5825a4),
+        behindBackground = Color(0xFFBDA2F4),
+        listItem = Color(0xcda774ff), // Color(0xcb6c4141)
+        disabled = Color(0xFF5529A3),
         text = Color(0xFFFFFFFF),
         textSecondary = Color(0xFFDECCFF),
-        background = Color(0xff6232a9),
-        buttonIcon = Color(0xff9775d5),
+        background = Color(0xFF6C33C7),
+        buttonIcon = Color(0xffa473ff),
     ) {
-        override val buttonIconSmall: Color = Color(0xff916dd6)
-        override val thinBorder: Color = Color(0xff5515b4)
-        override val shadow: Color = Color(0xff5515b4)
+        override val buttonIconSmall: Color = Color(0xFF8B4FE0)
+        override val thinBorder: Color = Color(0xFF5529A3)
+        override val shadow: Color = Color(0xFF5529A3)
 //        override val buttonIconTransparent: Color = backgroundTransparent
     }
+
+//    // Primary
+//    val primary       = Color(0xFF6C33C7)
+//    val primaryDark   = Color(0xFF5529A3)
+//    val primaryLight  = Color(0xFFBDA2F4)
+//
+//    // Neutrals
+//    val textWhite     = Color(0xFFFFFFFF)
+//    val textOffWhite  = Color(0xFFF5F0FF)
+//    val deepNeutral   = Color(0xFF2D1A50)
+//
+//    // Accents
+//    val accentYellow  = Color(0xFFFFD93B)
+//    val accentPink    = Color(0xFFFF6BC6)
+//    val accentAqua    = Color(0xFF79E5F2)
+//
+//    // Optional UI-specific
+//    val cardBorder    = Color(0xFF8B4FE0)
+//    val hoverColor    = Color(0xFFA785ED)
 
     object VioletKasa : KagaminColors(
         name = "gami-kasa",
@@ -189,4 +211,14 @@ sealed class KagaminColors(
         override val thumbnailProgressIndicator: Color = background.copy(0.4f)
         override val buttonIconInactive: Color = disabled
     }
+}
+
+fun Color.darken(factor: Float): Color {
+    val color = this
+    return Color(
+        red = color.red * factor,
+        green = color.green * factor,
+        blue = color.blue * factor,
+        alpha = color.alpha
+    )
 }

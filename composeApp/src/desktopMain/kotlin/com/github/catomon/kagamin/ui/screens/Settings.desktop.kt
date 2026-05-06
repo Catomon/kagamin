@@ -115,6 +115,14 @@ fun SettingsScreen(
                     viewModel.settings = settings.copy(useTrackImageAsBackground = it)
                 }
 
+                CheckboxOption("Show thumbnails", settings.showThumbnails) {
+                    viewModel.settings = settings.copy(showThumbnails = it)
+                }
+
+                CheckboxOption("Item background color", settings.itemBackgroundColor) {
+                    viewModel.settings = settings.copy(itemBackgroundColor = it)
+                }
+
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("Crossfade")
 

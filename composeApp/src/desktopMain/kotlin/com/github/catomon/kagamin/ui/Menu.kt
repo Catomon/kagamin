@@ -16,7 +16,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.github.catomon.kagamin.LocalWindow
 import com.github.catomon.kagamin.data.AudioTrack
-import com.github.catomon.kagamin.kagaminWindowDecoration
+import com.github.catomon.kagamin.luckyWindowDecoration
 import com.github.catomon.kagamin.openInBrowser
 import com.github.catomon.kagamin.ui.components.Background
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
@@ -32,7 +32,7 @@ fun Menu(
     onClose: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(modifier = modifier.kagaminWindowDecoration().background(color = KagaminTheme.background)) {
+    Box(modifier = modifier.luckyWindowDecoration().background(color = KagaminTheme.background)) {
         Background(currentTrack, Modifier.matchParentSize())
 
         Column(

@@ -95,7 +95,8 @@ fun CurrentTrackFrame(
                 onVolumeChange = { newVolume ->
                     viewModel.setVolume(newVolume)
                 },
-                modifier = Modifier.width(133.dp)
+                modifier = Modifier.width(133.dp),
+                alwaysVisible = true,
             )
         }
     }
@@ -167,7 +168,8 @@ fun CompactCurrentTrackFrame(
                     onVolumeChange = { newVolume ->
                         viewModel.setVolume(newVolume)
                     },
-                    modifier = Modifier.width(133.dp)
+                    modifier = Modifier.width(133.dp),
+                    alwaysVisible = true,
                 )
 
 //                TrackProgressIndicator(

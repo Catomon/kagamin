@@ -128,12 +128,9 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
 
     val currentLayout by LocalLayoutManager.current.currentLayout
 
-    val fontScale by derivedStateOf {
-        when (currentLayout) {
-            LayoutManager.Layout.Spacey -> 1.25f
-            else -> 1f
-        }
-    }
+val fontScale by derivedStateOf {
+    currentLayout.fontScale
+}
 
     LaunchedEffect(scrollBackTrigger) {
         delay(3_000)
@@ -258,14 +255,18 @@ fun Playlists(viewModel: KagaminViewModel, modifier: Modifier = Modifier) {
                         val layout by LocalLayoutManager.current.currentLayout
                         val height by derivedStateOf {
                             when (layout) {
-                                LayoutManager.Layout.Spacey -> 40.dp
-                                else -> 64.dp
+                                LayoutManager.Layout.Spacey -> {
+                                    if (viewModel.settings.showThumbnails) 80.dp else 53.dp
+                                }
+
+                                else -> {
+                                    if (viewModel.settings.showThumbnails) 64.dp else 45.dp
+                                }
                             }
                         }
 
                         Box(
                             Modifier.padding(2.dp).height(height).fillMaxSize().clip(RoundedCornerShape(8.dp))
-                                .background(KagaminTheme.colors.listItem)
                                 .clickable {
                                     viewModel.currentTab = Tabs.CREATE_PLAYLIST
                                     viewModel.createPlaylistWindow = !viewModel.createPlaylistWindow

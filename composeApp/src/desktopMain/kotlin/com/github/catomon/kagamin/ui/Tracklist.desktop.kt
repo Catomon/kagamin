@@ -182,25 +182,42 @@ fun Tracklist(
             Column(Modifier.fillMaxSize()) {
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth()
-                        .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
-                        .drawWithContent {
-                            drawContent()
-                            drawRect(
-                                color = KagaminTheme.backgroundTransparent,
-                                size = size,
-                                blendMode = BlendMode.SrcOut
-                            )
-                            drawContent()
-                        }
-//                        .background(KagaminTheme.backgroundTransparent)
+                        .then(
+                            if (viewModel.settings.itemBackgroundColor) {
+                                Modifier
+                                    .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+                                    .drawWithContent {
+                                        drawContent()
+                                        drawRect(
+                                            color = KagaminTheme.backgroundTransparent,
+                                            size = size,
+                                            blendMode = BlendMode.SrcOut
+                                        )
+                                        drawContent()
+                                    }
+                            } else {
+                                Modifier.background(KagaminTheme.backgroundTransparent)
+                            })
                         .pointerInput(allowAutoScroll) {
                             allowAutoScroll = false
                         }, state = listState, contentPadding = PaddingValues(2.dp)
                 ) {
                     item {
+                        val layout by LocalLayoutManager.current.currentLayout
+                        val height by derivedStateOf {
+                            when (layout) {
+                                LayoutManager.Layout.Spacey -> {
+                                    if (viewModel.settings.showThumbnails) 80.dp else 53.dp
+                                }
+
+                                else -> {
+                                    if (viewModel.settings.showThumbnails) 64.dp else 45.dp
+                                }
+                            }
+                        }
+
                         Box(
-                            Modifier.padding(2.dp).height(64.dp).fillMaxSize().clip(RoundedCornerShape(8.dp))
-                                .background(KagaminTheme.colors.listItem)
+                            Modifier.padding(2.dp).height(height).fillMaxSize().clip(RoundedCornerShape(8.dp))
                                 .clickable {
 
                                 }, contentAlignment = Alignment.Center
@@ -235,9 +252,12 @@ fun Tracklist(
                                 }
                                 if (viewModel.isLoadingSong != null) return@onClick
 
-                                viewModel.viewModelScope.launch {
-                                    viewModel.play(track)
-                                }
+                                if (currentTrack != track)
+                                    viewModel.viewModelScope.launch {
+                                        viewModel.play(track)
+                                    }
+                                else
+                                    viewModel.onPlayPause()
                             },
                             modifier = Modifier.padding(2.dp)
                         )
@@ -315,10 +335,7 @@ fun TracklistHeader(
     val currentLayout by LocalLayoutManager.current.currentLayout
 
     val fontScale by derivedStateOf {
-        when (currentLayout) {
-            LayoutManager.Layout.Spacey -> 1.25f
-            else -> 1f
-        }
+        currentLayout.fontScale
     }
 
     Row(
@@ -473,10 +490,7 @@ private fun TrackName(currentTrack: AudioTrack?, modifier: Modifier = Modifier) 
     val currentLayout by LocalLayoutManager.current.currentLayout
 
     val fontScale by derivedStateOf {
-        when (currentLayout) {
-            LayoutManager.Layout.Spacey -> 1.25f
-            else -> 1f
-        }
+        currentLayout.fontScale
     }
 
     @Suppress("NAME_SHADOWING") val interactionSource =

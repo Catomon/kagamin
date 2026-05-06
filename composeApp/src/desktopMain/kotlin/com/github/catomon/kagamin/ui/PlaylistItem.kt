@@ -57,8 +57,13 @@ fun PlaylistItem(
     val layout by LocalLayoutManager.current.currentLayout
     val height by derivedStateOf {
         when (layout) {
-            LayoutManager.Layout.Spacey -> 40.dp
-            else -> 64.dp
+            LayoutManager.Layout.Spacey -> {
+               40.dp
+            }
+
+            else -> {
+                if (viewModel.settings.showThumbnails) 64.dp else 45.dp
+            }
         }
     }
 
@@ -87,13 +92,19 @@ fun PlaylistItem(
                 Modifier
                     .fillMaxSize()
                     .clip(RoundedCornerShape(8.dp))
-                    .background(color = backColor)
+                    .then(
+                        if (viewModel.settings.itemBackgroundColor)
+                            Modifier.background(color = backColor)
+                        else
+                            Modifier
+                    )
+
                     .clickable {
                         viewModel.changeCurrentPlaylist(playlist)
                         viewModel.currentTab = Tabs.TRACKLIST
                     }) {
 
-                if (layout != LayoutManager.Layout.Spacey)
+                if (layout != LayoutManager.Layout.Spacey && viewModel.settings.showThumbnails)
                     TrackThumbnail(
                         randomTrack,
                         modifier = Modifier.size(height),
@@ -117,10 +128,7 @@ private fun CompactPlaylistItemContent(
 ) {
     val currentLayout by LocalLayoutManager.current.currentLayout
     val fontScale by derivedStateOf {
-        when (currentLayout) {
-            LayoutManager.Layout.Spacey -> 1.25f
-            else -> 1f
-        }
+        currentLayout.fontScale
     }
 
     Row(
@@ -173,6 +181,11 @@ private fun PlaylistItemContent(
     viewModel: KagaminViewModel, playlist: Playlist,
     modifier: Modifier = Modifier
 ) {
+    val currentLayout by LocalLayoutManager.current.currentLayout
+    val fontScale by derivedStateOf {
+        currentLayout.fontScale
+    }
+
     Column(
         modifier.fillMaxHeight()
             .padding(4.dp)
@@ -199,7 +212,7 @@ private fun PlaylistItemContent(
             }
 
             Text(
-                playlist.name, fontSize = 10.sp, color = KagaminTheme.text, maxLines = 1,
+                playlist.name, fontSize = 10.sp * fontScale, color = KagaminTheme.text, maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
         }
@@ -207,7 +220,7 @@ private fun PlaylistItemContent(
 
         Text(
             "Tracks: ${playlist.tracks.size}",
-            fontSize = 8.sp,
+            fontSize = 8.sp * fontScale,
             color = KagaminTheme.textSecondary,
             maxLines = 1,
             lineHeight = 16.sp

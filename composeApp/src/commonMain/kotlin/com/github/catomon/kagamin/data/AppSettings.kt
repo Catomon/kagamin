@@ -20,6 +20,8 @@ data class AppSettings(
     val autoScrollNextTrack: Boolean = true,
     val characterImageBackground: Boolean = true,
     val useTrackImageAsBackground: Boolean = true,
+    val showThumbnails: Boolean = true,
+    val itemBackgroundColor: Boolean = false,
     val showMediaFolderPane: Boolean = false,
     val mediaFolderPath: String = "${System.getProperty("user.home")}\\Music",
     val extra: Map<String, String> = emptyMap()

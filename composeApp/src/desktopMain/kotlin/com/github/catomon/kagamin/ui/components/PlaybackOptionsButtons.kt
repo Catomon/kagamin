@@ -249,6 +249,7 @@ fun VolumeOptions(
     onVolumeChange: (Float) -> Unit,
     modifier: Modifier = Modifier,
     buttonsSize: Dp = 32.dp,
+    alwaysVisible: Boolean = false,
 ) {
     echoTrace { "VolumeOptions" }
 
@@ -271,7 +272,7 @@ fun VolumeOptions(
             )
         }
 
-        AnimatedVisibility(isHovered) {
+        AnimatedVisibility(isHovered || alwaysVisible) {
             VolumeSlider(
                 volume,
                 onVolumeChange = {

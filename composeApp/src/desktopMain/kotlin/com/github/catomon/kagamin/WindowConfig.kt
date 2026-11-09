@@ -18,10 +18,16 @@ object WindowConfig {
     const val SCALED_UP_WIDTH = 600
     const val SCALED_UP_HEIGHT = 600
 
+    const val TSUKAREMI_WIDTH = 700
+    const val TSUKAREMI_HEIGHT = 500
+
     var isTransparent = false
 
     val isTraySupported = androidx.compose.ui.window.isTraySupported
 
     val minSize = Dimension(TINY_WIDTH, TINY_HEIGHT)
     val maxSize = Dimension(770, 770)
+
+    val tsukaremiMinSize = Dimension(640, 420)
+    val tsukaremiMaxSize = Dimension(1200, 900)
 }

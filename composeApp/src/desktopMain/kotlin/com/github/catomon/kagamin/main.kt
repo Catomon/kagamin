@@ -20,6 +20,46 @@ import org.koin.core.context.GlobalContext.startKoin
 import java.util.logging.Level
 import javax.swing.JOptionPane
 
+fun mainOld(args: Array<String>) {
+    setDefaultExceptionHandler()
+
+    FileKit.init(appId = "Kagamin")
+    AbstractID3Tag.logger.level = Level.OFF
+
+    val logLevelArg =
+        args.find { it.startsWith("--logLevel") }?.substringAfter("=")?.uppercase() ?: System.getenv("logLevel")
+            ?.uppercase() ?: LogLevel.ERROR.name
+    Rogga.logLevel = LogLevel.entries.find { it.name == logLevelArg } ?: LogLevel.ERROR
+    echoMsg { "LogLevel: ${Rogga.logLevel.name}" }
+    Rogga.timestamp = true
+
+    application {
+        setComposeExceptionHandler()
+
+        startKoin {
+            modules(appModule, desktopModule)
+        }
+
+        setRenderApi()
+
+        setSingletonImageLoaderFactory { context ->
+            ImageLoader.Builder(context)
+                .crossfade(false)
+//                .memoryCachePolicy(policy = CachePolicy.DISABLED)
+//                .precision(Precision.INEXACT)
+                .diskCache {
+                    DiskCache.Builder()
+                        .directory(cacheFolder.toOkioPath().resolve("image_cache"))
+                        .maxSizePercent(0.02)
+                        .build()
+                }
+                .build()
+        }
+
+        AppContainer(::exitApplication)
+    }
+}
+
 fun main(args: Array<String>) {
     setDefaultExceptionHandler()
 

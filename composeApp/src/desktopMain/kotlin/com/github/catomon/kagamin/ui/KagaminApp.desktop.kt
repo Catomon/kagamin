@@ -20,17 +20,25 @@ import com.github.catomon.kagamin.ui.screens.SettingsDestination
 import com.github.catomon.kagamin.ui.util.Tabs
 import com.github.catomon.kagamin.ui.screens.TinyPlayerScreen
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
+import com.github.catomon.kagamin.ui.v3.TsukaremiPlayerScreen
+import com.github.catomon.kagamin.ui.v3.theme.V3Theme
 
 @Composable
 //Todo: not app, main window
 fun KagaminApp(
     kagaminViewModel: KagaminViewModel,
+    onOpenOptions: () -> Unit,
     modifier: Modifier
 ) {
     val navController = rememberNavController()
     val layoutManager = LocalLayoutManager.current.currentLayout
+    val isTsukaremi = layoutManager.value == LayoutManager.Layout.Tsukaremi
 
-    Scaffold(snackbarHost = { SnackbarHost(LocalSnackbarHostState.current) }, modifier = modifier, containerColor = KagaminTheme.colors.background) {
+    Scaffold(
+        snackbarHost = { SnackbarHost(LocalSnackbarHostState.current) },
+        modifier = modifier,
+        containerColor = if (isTsukaremi) V3Theme.colors.backgroundMid else KagaminTheme.colors.background,
+    ) {
         NavHost(
             navController,
             startDestination = PlayerScreenDestination.toString(),
@@ -54,6 +62,8 @@ fun KagaminApp(
                     LayoutManager.Layout.Compact -> ControlsBottomPlayerScreen(kagaminViewModel, navController)
 
                     LayoutManager.Layout.Spacey -> SpacyPlayerScreen(kagaminViewModel, navController)
+
+                    LayoutManager.Layout.Tsukaremi -> TsukaremiPlayerScreen(kagaminViewModel, navController, onOpenOptions)
                 }
             }
 

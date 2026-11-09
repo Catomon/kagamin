@@ -151,6 +151,10 @@ private fun SwapLayoutButton(layoutManager: LayoutManager) {
                 LayoutManager.Layout.Spacey -> {
                     layoutManager.currentLayout.value = LayoutManager.Layout.Old
                 }
+
+                LayoutManager.Layout.Tsukaremi -> {
+                    layoutManager.currentLayout.value = LayoutManager.Layout.Old
+                }
             }
         }, modifier = Modifier.size(32.dp)
     ) {

@@ -13,6 +13,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -56,9 +57,19 @@ import com.github.catomon.kagamin.data.loadSettings
 import com.github.catomon.kagamin.ui.KagaminApp
 import com.github.catomon.kagamin.ui.audioExtensions
 import com.github.catomon.kagamin.ui.compositionlocals.LocalAppSettings
+import com.github.catomon.kagamin.ui.components.LocalCustomThumbnail
+import com.github.catomon.kagamin.ui.components.LocalThumbnailSet
 import com.github.catomon.kagamin.ui.customShadow
 import com.github.catomon.kagamin.ui.theme.KagaminTheme
 import com.github.catomon.kagamin.ui.util.LayoutManager
+import com.github.catomon.kagamin.ui.v3.V3OptionsWindow
+import com.github.catomon.kagamin.ui.v3.components.v3WindowDecoration
+import com.github.catomon.kagamin.ui.v3.loadStoredBitmap
+import com.github.catomon.kagamin.ui.v3.theme.V3Theme
+import com.github.catomon.kagamin.ui.v3.theme.V3ThemeState
+import com.github.catomon.kagamin.ui.v3.theme.V3Themes
+import com.github.catomon.kagamin.ui.v3.v3ThumbnailSet
+import com.github.catomon.kagamin.ui.v3.theme.rememberV3ThemeState
 import com.github.catomon.kagamin.ui.viewmodel.KagaminViewModel
 import com.github.catomon.kagamin.ui.windows.AddTracksOrPlaylistsWindow
 import com.github.catomon.kagamin.ui.windows.ConfirmWindow
@@ -100,15 +111,20 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
             try {
                 LayoutManager.Layout.valueOf(
                     kagaminViewModel.settings.extra["layout"]
-                        ?: LayoutManager.Layout.Spacey.name
+                        ?: LayoutManager.Layout.Tsukaremi.name
                 )
             } catch (e: Exception) {
                 e.printStackTrace()
-                LayoutManager.Layout.Spacey
+                LayoutManager.Layout.Tsukaremi
             }
         )
     }
     val currentLayout by layoutManager.currentLayout
+
+    val v3ThemeState = rememberV3ThemeState(
+        V3Themes.byName(kagaminViewModel.settings.extra["v3theme"])
+    )
+    var showV3Options by remember { mutableStateOf(false) }
 
     val exitApp = {
         kagaminViewModel.saveSettings()
@@ -138,6 +154,11 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
                 width = WindowConfig.SCALED_UP_WIDTH.dp,
                 height = WindowConfig.SCALED_UP_HEIGHT.dp
             )
+
+            LayoutManager.Layout.Tsukaremi -> DpSize(
+                width = WindowConfig.TSUKAREMI_WIDTH.dp,
+                height = WindowConfig.TSUKAREMI_HEIGHT.dp
+            )
         }
     }
 
@@ -158,7 +179,30 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
             LocalLayoutManager provides layoutManager,
             LocalAppSettings provides kagaminViewModel.settings,
         ) {
-            AppWindow(windowState, kagaminViewModel, exitApp)
+            AppWindow(windowState, kagaminViewModel, exitApp, v3ThemeState, onOpenOptions = { showV3Options = true })
+        }
+    }
+
+    if (showV3Options) {
+        val optionsWindowState = rememberWindowState(
+            width = 460.dp,
+            height = 720.dp,
+            position = WindowPosition(Alignment.Center),
+        )
+        Window(
+            onCloseRequest = { showV3Options = false },
+            title = "Kagamin Options",
+            state = optionsWindowState,
+            icon = painterResource(Res.drawable.kagamin_icon64),
+        ) {
+            CompositionLocalProvider(LocalWindow provides window) {
+                V3Theme(v3ThemeState) {
+                    V3OptionsWindow(
+                        viewModel = kagaminViewModel,
+                        onClose = { showV3Options = false },
+                    )
+                }
+            }
         }
     }
 
@@ -235,7 +279,11 @@ fun ApplicationScope.AppContainer(onCloseRequest: () -> Unit) {
 
 @Composable
 private fun AppWindow(
-    windowState: WindowState, kagaminViewModel: KagaminViewModel, onCloseRequest: () -> Unit
+    windowState: WindowState,
+    kagaminViewModel: KagaminViewModel,
+    onCloseRequest: () -> Unit,
+    v3ThemeState: V3ThemeState,
+    onOpenOptions: () -> Unit,
 ) {
     val layoutManager = LocalLayoutManager.current
 
@@ -291,6 +339,10 @@ private fun AppWindow(
                     }
 
                     LayoutManager.Layout.Spacey -> {
+                        layoutManager.currentLayout.value = LayoutManager.Layout.Tsukaremi
+                    }
+
+                    LayoutManager.Layout.Tsukaremi -> {
                         layoutManager.currentLayout.value = LayoutManager.Layout.Old
                     }
                 }
@@ -299,16 +351,29 @@ private fun AppWindow(
                 false
             }
         }) {
-        window.minimumSize = WindowConfig.minSize
-        window.maximumSize = WindowConfig.maxSize
+        val isTsukaremi = layoutManager.currentLayout.value == LayoutManager.Layout.Tsukaremi
+        window.minimumSize =
+            if (isTsukaremi) WindowConfig.tsukaremiMinSize else WindowConfig.minSize
+        window.maximumSize =
+            if (isTsukaremi) WindowConfig.tsukaremiMaxSize else WindowConfig.maxSize
 
         CompositionLocalProvider(
             LocalWindow provides this.window,
             LocalConfirmWindow provides confirmWindowState,
-            LocalToolWindow provides toolWindowState
+            LocalToolWindow provides toolWindowState,
+            LocalThumbnailSet provides if (isTsukaremi) v3ThumbnailSet(v3ThemeState.colors.name) else null,
+            LocalCustomThumbnail provides if (isTsukaremi) remember(kagaminViewModel.settings.v3CustomThumbnail) {
+                loadStoredBitmap("thumbnails", kagaminViewModel.settings.v3CustomThumbnail)
+            } else null,
         ) {
             KagaminTheme {
-                AppFrame(kagaminViewModel)
+                if (isTsukaremi) {
+                    V3Theme(v3ThemeState) {
+                        AppFrame(kagaminViewModel, onOpenOptions)
+                    }
+                } else {
+                    AppFrame(kagaminViewModel, onOpenOptions)
+                }
             }
         }
 
@@ -323,23 +388,35 @@ private fun AppWindow(
 }
 
 @Composable
-private fun WindowScope.AppFrame(kagaminViewModel: KagaminViewModel = get(KagaminViewModel::class.java)) {
+private fun WindowScope.AppFrame(
+    kagaminViewModel: KagaminViewModel = get(KagaminViewModel::class.java),
+    onOpenOptions: () -> Unit = {},
+) {
     val settings = kagaminViewModel.settings //trigger recomposition
+    val isTsukaremi =
+        LocalLayoutManager.current.currentLayout.value == LayoutManager.Layout.Tsukaremi
     WindowDraggableArea {
         val snackbar = LocalSnackbarHostState.current
         KagaminApp(
             kagaminViewModel,
-            modifier = Modifier.luckyWindowDecoration().dragAndDropTarget({ true }, remember {
-                createTrackDragAndDropTarget(kagaminViewModel, snackbar)
-            }).onPreviewKeyEvent {
-                return@onPreviewKeyEvent when (it.key) {
-                    Key.MediaPlay -> {
-                        kagaminViewModel.onPlayPause(); true
-                    }
+            onOpenOptions = onOpenOptions,
+            modifier = Modifier
+                .then(
+                    if (isTsukaremi) Modifier.v3WindowDecoration()
+                    else Modifier.luckyWindowDecoration()
+                )
+                .dragAndDropTarget({ true }, remember {
+                    createTrackDragAndDropTarget(kagaminViewModel, snackbar)
+                })
+                .onPreviewKeyEvent {
+                    return@onPreviewKeyEvent when (it.key) {
+                        Key.MediaPlay -> {
+                            kagaminViewModel.onPlayPause(); true
+                        }
 
-                    else -> false
+                        else -> false
+                    }
                 }
-            }
         )
     }
 }

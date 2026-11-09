@@ -150,7 +150,8 @@ class KagaminViewModel(
 
     fun changeCurrentPlaylist(playlist: Playlist) {
         playlistsManager.changeCurrentPlaylist(playlist)
-        saveSettings(settings.copy(lastPlaylistName = playlist.name))
+        settings = settings.copy(lastPlaylistName = playlist.name)
+        saveSettings(settings)
     }
 
     fun reloadPlaylist(playlist: Playlist) {

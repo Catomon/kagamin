@@ -4,14 +4,15 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 
 class LayoutManager(
-    val currentLayout: MutableState<Layout> = mutableStateOf(Layout.Spacey)
+    val currentLayout: MutableState<Layout> = mutableStateOf(Layout.Tsukaremi)
 ) {
     enum class Layout {
         Old,
         OldCompact,
         OldTiny,
         Compact,
-        Spacey(pFontScale = 1.5f);
+        Spacey(pFontScale = 1.5f),
+        Tsukaremi(pFontScale = 1.2f);
 
         constructor(pFontScale: Float = 1.25f) {
             fontScale = pFontScale

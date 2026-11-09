@@ -241,6 +241,14 @@ private fun LayoutRadioButtons(
                     onLayoutSelected(LayoutManager.Layout.Spacey)
                 },
             )
+
+            Text("Tsukaremi", color = KagaminTheme.textSecondary)
+            RadioButton(
+                selected = currentLayout == LayoutManager.Layout.Tsukaremi,
+                onClick = {
+                    onLayoutSelected(LayoutManager.Layout.Tsukaremi)
+                },
+            )
         }
     }
 }

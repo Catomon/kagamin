@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -29,13 +30,23 @@ import com.github.catomon.kagamin.util.echoTrace
 import kagamin.composeapp.generated.resources.Res
 import kagamin.composeapp.generated.resources.def_thumb
 import kagamin.composeapp.generated.resources.def_thumb_150
-import kagamin.composeapp.generated.resources.def_thumb_512
 import kagamin.composeapp.generated.resources.def_thumb_64
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.imageResource
 
 object TrackThumbnailDefaults {
     val shape = RoundedCornerShape(12.dp)
 }
+
+/** Theme-provided fallback thumbnails, one per cached size. */
+class ThumbnailSet(
+    val thumb: DrawableResource,
+    val thumb64: DrawableResource,
+    val thumb150: DrawableResource,
+)
+
+val LocalThumbnailSet = staticCompositionLocalOf<ThumbnailSet?> { null }
+val LocalCustomThumbnail = staticCompositionLocalOf<ImageBitmap?> { null }
 
 @Composable
 internal expect fun rememberTrackThumbnail(track: AudioTrack?, size: Int) : ImageBitmap?
@@ -44,7 +55,6 @@ private val defaultThumbnail = mapOf(
     0 to Res.drawable.def_thumb,
     64 to Res.drawable.def_thumb_64,
     150 to Res.drawable.def_thumb_150,
-    512 to Res.drawable.def_thumb_512,
 )
 
 @Composable
@@ -59,6 +69,13 @@ fun TrackThumbnail(
     echoTrace { "TrackThumbnail" }
 
     val thumbnail = rememberTrackThumbnail(currentTrack, size)
+    val themeSet = LocalThumbnailSet.current
+    val customDefault = LocalCustomThumbnail.current
+    val fallback = when (size) {
+        64 -> themeSet?.thumb64
+        150 -> themeSet?.thumb150
+        else -> themeSet?.thumb
+    } ?: (defaultThumbnail[size] ?: Res.drawable.def_thumb)
 
     Box(
         contentAlignment = Alignment.Center,
@@ -69,7 +86,7 @@ fun TrackThumbnail(
             modifier = Modifier.fillMaxSize().clip(shape)
         ) { model ->
             Image(
-                bitmap = thumbnail ?: imageResource(defaultThumbnail[size] ?: Res.drawable.def_thumb),
+                bitmap = thumbnail ?: customDefault ?: imageResource(fallback),
                 contentDescription = null,
                 contentScale = contentScale,
                 modifier = Modifier.fillMaxSize().let { if (blur) it.blur(5.dp) else it }
